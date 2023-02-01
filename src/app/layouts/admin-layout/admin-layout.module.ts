@@ -7,7 +7,7 @@ import { AdminLayoutRoutes } from './admin-layout.routing';
 import { PrincipalComponent } from '../../pages/principal/principal.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BuscadorComponent } from 'src/app/pages/generico/buscador/buscador.component';
-import { NgxUiLoaderModule,  NgxUiLoaderConfig } from "ngx-ui-loader";
+import { NgxUiLoaderModule } from "ngx-ui-loader";
 import { PerfilComponent } from 'src/app/pages/generico/perfil/perfil.component';
 import { ConfigurarComponent } from 'src/app/pages/configurar/configurar.component';
 import { ReportesComponent } from 'src/app/pages/reportes/reportes.component';
@@ -27,7 +27,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatCommonModule } from '@angular/material/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSelectModule } from '@angular/material/select';
-import {MatStepperModule} from '@angular/material/stepper';
+import { MatStepperModule } from '@angular/material/stepper';
 
 
 
@@ -35,37 +35,13 @@ import { CambiarclaveComponent } from 'src/app/pages/generico/perfil/cambiarclav
 import { HechiceroComponent } from 'src/app/pages/generico/hechicero/hechicero.component';
 import { TablaComponent } from 'src/app/pages/generico/tabla/tabla.component';
 import { MatTableModule } from '@angular/material/table';
+import { AfiliadosComponent } from 'src/app/pages/principal/afiliados/afiliados.component';
+import { ContratosComponent } from 'src/app/pages/principal/contratos/contratos.component';
+import { AportesComponent } from 'src/app/pages/principal/aportes/aportes.component';
+import { ContabilidadComponent } from 'src/app/pages/principal/contabilidad/contabilidad.component';
+import { InversionesComponent } from 'src/app/pages/principal/inversiones/inversiones.component';
 
-const ngxUiLoaderConfig: NgxUiLoaderConfig = {
-  "bgsColor": "#79c680",
-  "bgsOpacity": 0.2,
-  "bgsPosition": "center-center",
-  "bgsSize": 60,
-  "bgsType": "ball-spin-clockwise",
-  "blur": 8,
-  "delay": 0,
-  "fastFadeOut": true,
-  "fgsColor": "#1ea24a",
-  "fgsPosition": "center-center",
-  "fgsSize": 50,
-  "fgsType": "ball-spin-clockwise",
-  "gap": 24,
-  "logoPosition": "center-center",
-  "logoSize": 120,
-  "logoUrl": "",
-  "masterLoaderId": "master",
-  "overlayBorderRadius": "0",
-  "overlayColor": "rgba(40, 40, 40, 0.63)",
-  "pbColor": "#79c680",
-  "pbDirection": "ltr",
-  "pbThickness": 3,
-  "hasProgressBar": true,
-  "text": "",
-  "textColor": "#FFFFFF",
-  "textPosition": "center-center",
-  "maxTime": -1,
-  "minTime": 300
-}
+
 
 @NgModule({
   imports: [
@@ -76,9 +52,7 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
     ReactiveFormsModule,
     NgbModule,
     ClipboardModule,
-    NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
-
-
+    NgxUiLoaderModule,
     MatCommonModule,
     MatFormFieldModule,
     MatTableModule,
@@ -110,6 +84,11 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
     CambiarclaveComponent,
     HechiceroComponent,
     TablaComponent,
+    AfiliadosComponent,
+    ContratosComponent,
+    AportesComponent,
+    ContabilidadComponent,
+    InversionesComponent
   ]
 })
 

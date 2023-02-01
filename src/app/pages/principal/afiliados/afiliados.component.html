@@ -1,0 +1,261 @@
+<div class="row">
+
+  <div class="col-md-12">
+
+      <div class="card card-profile shadow">
+          <div class="card-body">
+
+
+
+
+              <mat-tab-group>
+                  <mat-tab label="General">
+
+                      <div style="padding: 20px;">
+                          <br>
+                          <form>
+
+                              <div class="row">
+                                <div class="col-md-2">
+                                  <mat-form-field appearance="outline">
+                                    <mat-label>Nacionalidad</mat-label>
+                                    <mat-select placeholder="Estatus Afiliado">
+                                        <mat-option>Selección</mat-option>
+                                        <mat-option value="V-">VENEZOLANO</mat-option>
+                                        <mat-option value="E-">EXTRANJERO</mat-option>
+                                    </mat-select>
+                                    <mat-icon matSuffix>public</mat-icon>
+                                  </mat-form-field>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Cedula</mat-label>
+                                        <input matInput placeholder="Cedula" value="">
+
+                                    </mat-form-field>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                  <mat-form-field appearance="outline">
+                                    <mat-label>Estatus/Afiliado</mat-label>
+                                    <mat-select placeholder="Estatus Afiliado">
+                                        <mat-option>Selección</mat-option>
+                                        <mat-option>Activo</mat-option>
+                                        <mat-option>Inactivo</mat-option>
+                                    </mat-select>
+                                    <mat-icon matSuffix>home</mat-icon>
+
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-md-2">
+                                  <mat-form-field appearance="outline">
+                                    <mat-label>Estado Civil</mat-label>
+                                    <mat-select placeholder="Estado Civil">
+                                        <mat-option>Selección</mat-option>
+                                        <mat-option>Casado</mat-option>
+                                        <mat-option>Soltero</mat-option>
+                                    </mat-select>
+                                    <mat-icon matSuffix>face</mat-icon>
+                                  </mat-form-field>
+                                </div>
+
+                              </div>
+
+
+                              <div class="row">
+                                  <div class="col-md-5">
+                                      <mat-form-field appearance="outline">
+                                          <mat-label>Nombre Completo</mat-label>
+                                          <input matInput placeholder="Codigo de Banco" value="">
+
+
+                                      </mat-form-field>
+                                  </div>
+                                  <div class="col-md-5">
+                                      <mat-form-field appearance="outline">
+                                          <mat-label>Apellido Completo</mat-label>
+                                          <input matInput placeholder="Plan Anterior" value="">
+
+                                      </mat-form-field>
+                                  </div>
+                                  <div class="col-md-2">
+                                    <mat-form-field appearance="outline">
+                                      <mat-label>Sexo</mat-label>
+                                      <mat-select placeholder="Sexo">
+                                          <mat-option>Selección</mat-option>
+                                          <mat-option>Masculino</mat-option>
+                                          <mat-option>Femenino</mat-option>
+                                      </mat-select>
+                                      <mat-icon matSuffix>boy</mat-icon>
+                                    </mat-form-field>
+                                  </div>
+                                  
+                              </div>
+
+
+                              <div class="row">
+                                  <div class="col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Fecha Nacimiento</mat-label>
+                                        <input matInput placeholder="Fecha Nacimiento" value="">
+
+                                    </mat-form-field>
+                                  </div>
+                                  <div class="col-md-4">
+                                      <mat-form-field appearance="outline">
+                                          <mat-label>Fecha de Ingreso</mat-label>
+                                          <input matInput placeholder="Fecha de Ingreso" value="">
+                                      </mat-form-field>
+                                  </div>
+                                  
+                                  <div class="col-md-4">
+                                      <mat-form-field appearance="outline">
+                                          <mat-label>Actividad del Cliente</mat-label>
+                                          <input matInput placeholder="Actividad del Cliente" value="">
+
+
+                                      </mat-form-field>
+                                  </div>
+                              </div>
+
+
+                          </form>
+                      </div>
+
+
+                  </mat-tab>
+                  <mat-tab label="Dirección">
+                      <div style="padding: 20px;">
+                          <br>
+                          <hr class="my-4" />
+                          <h6 class="heading-small text-muted mb-4">Información de Contacto</h6>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <mat-form-field appearance="outline">
+                                <mat-label>Direccion</mat-label>
+                                <textarea matInput placeholder="Direccion completa" style="height: 70px;"></textarea>
+                              </mat-form-field>
+                            </div>
+
+                          </div>
+                          <div class="row">
+                            <div class="col-md-5">
+                              <mat-form-field appearance="outline">
+                                <mat-label>País</mat-label>
+                                <mat-select placeholder="País" >
+                                  <mat-option>Selección</mat-option>
+                                </mat-select>
+                                <mat-icon matSuffix>public</mat-icon>
+
+                              </mat-form-field>
+                            </div>
+                            <div class="col-md-4">
+                              <mat-form-field appearance="outline">
+                                <mat-label>Ciudad</mat-label>
+                                <mat-select placeholder="Ciudad">
+                                  <mat-option>Selección</mat-option>
+                                </mat-select>
+                                <mat-icon matSuffix>home</mat-icon>
+
+                              </mat-form-field>
+                            </div>
+                            <div class="col-md-3">
+                              <mat-form-field appearance="outline">
+                                <mat-label>Código Postal</mat-label>
+                                <input matInput placeholder="Código postal" >
+                                <mat-icon matSuffix>pin</mat-icon>
+
+                              </mat-form-field>
+                            </div>
+                          </div>
+
+                          <div class="row">
+                            <div class="col-md-4">
+                              <mat-form-field appearance="outline">
+                                  <mat-label>Urbanizacion</mat-label>
+                                  <input matInput placeholder="Urbanizacion" value="">
+
+                              </mat-form-field>
+                            </div>
+                            <div class="col-md-4">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Telefono de Habitacion</mat-label>
+                                    <input matInput placeholder="Telefono de Habitacion" value="">
+                                </mat-form-field>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Telefono de Oficina</mat-label>
+                                    <input matInput placeholder="Telefono de Oficina" value="">
+
+
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                      </div>
+
+                  </mat-tab>
+
+                  <mat-tab label="Contratos">
+                      <div style="padding: 20px;">
+                          <br>
+                          <table>
+                            <thead>
+                              <th>Contrato</th>
+                              <th>Nombre</th>
+                              <th>Pago</th>
+                              <th>Tipo Cuenta</th>
+                              <th>Numero Cuenta</th>
+                              <th>Fideicomitente</th>
+                              <th>Ubicacion</th>
+                              <th>Estatus</th>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                          </table>
+                      </div>
+                  </mat-tab>
+
+                  <mat-tab label="Empleadores">
+                    <div style="padding: 20px;">
+                        <br>
+                      <table>
+                            <thead>
+                              <th>Codigo Empresa</th>
+                              <th>Nombre Empresa</th>
+                              <th>Codigo Local</th>
+                              <th>Nombre Local</th>
+                            </thead>
+                            <tbody>
+                              
+                            </tbody>
+                          </table>
+                    </div>
+                </mat-tab>
+
+                <mat-tab label="Dependientes">
+                  <div style="padding: 20px;">
+                      <br>
+                      <table>
+                        <thead>
+                          <th>Cedula</th>
+                          <th>Nombre y Apellidos Completo</th>
+                          <th>Telefono</th>
+                        <tbody>
+                          
+                        </tbody>
+                      </table>
+                  </div>
+              </mat-tab>
+              
+              </mat-tab-group>
+
+
+          </div>
+      </div>
+  </div>
+  </div>

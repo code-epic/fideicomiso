@@ -90,6 +90,7 @@ export class LoginService {
   
   //ObenterAplicacion 
   protected obenterAplicacion(){
+    
     var Aplicacion = this.Token.Usuario.Aplicacion
     Aplicacion.forEach(e => {
       if(e.id == this.Id ){
@@ -100,6 +101,14 @@ export class LoginService {
   
   obtenerMenu() : any {
     return this.Aplicacion.Rol.Menu
+  }
+
+  obtenerPrivilegiosMenu(idUrl : string) : any {
+    var App = this.Aplicacion
+    var Menu: any
+    App.Rol.Menu.forEach(e => {if (e.url == idUrl) Menu = e});
+    return Menu
+    
   }
 
   obtenerSubMenu(idUrl : string) : any{   

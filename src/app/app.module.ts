@@ -38,38 +38,7 @@ import { MatInputModule } from '@angular/material/input';
 
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { MatTableModule } from '@angular/material/table';
-
-const ngxUiLoaderConfig: NgxUiLoaderConfig = {
-  "bgsColor": "#79c680",
-  "bgsOpacity": 0.2,
-  "bgsPosition": "center-center",
-  "bgsSize": 60,
-  "bgsType": "ball-spin-clockwise",
-  "blur": 8,
-  "delay": 0,
-  "fastFadeOut": true,
-  "fgsColor": "#1ea24a",
-  "fgsPosition": "center-center",
-  "fgsSize": 50,
-  "fgsType": "ball-spin-clockwise",
-  "gap": 24,
-  "logoPosition": "center-center",
-  "logoSize": 120,
-  "logoUrl": "",
-  "masterLoaderId": "master",
-  "overlayBorderRadius": "0",
-  "overlayColor": "rgba(40, 40, 40, 0.63)",
-  "pbColor": "#79c680",
-  "pbDirection": "ltr",
-  "pbThickness": 3,
-  "hasProgressBar": true,
-  "text": "",
-  "textColor": "#FFFFFF",
-  "textPosition": "center-center",
-  "maxTime": -1,
-  "minTime": 300
-}
-
+import { PortafolioComponent } from './pages/principal/portafolio/portafolio.component';
 
 
 @NgModule({
@@ -97,7 +66,7 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
     MatDialogModule,
     MatCommonModule,
     ToastContainerModule,
-    NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
+    NgxUiLoaderModule,
     MatToolbarModule,
     ToastrModule.forRoot({
       closeButton: false,
@@ -112,6 +81,7 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
     AppComponent,
     AdminLayoutComponent,
     AuthLayoutComponent,
+    PortafolioComponent,
   ],
   providers:  [
     {
