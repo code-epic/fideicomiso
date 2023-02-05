@@ -1,1 +1,291 @@
-<p>aportes works!</p>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body" style="padding:5px;height:100%">
+    
+  
+  
+                    <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" 
+                    (selectedTabChange)="tabActive($event)" [selectedIndex]="selectedIndex"
+                    style="padding:10px;">
+                        <mat-tab>
+  
+                            <ng-template mat-tab-label>
+                                &nbsp;CONSULTAR APORTES
+                            </ng-template>
+  
+                            <div class="container">
+                                <br>
+                                 <mat-selection-list>
+                                    <mat-list *ngFor="let e of lstAportes; let i=index "
+                                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                                        <div class="row">
+                                            <div class="col-md-1 texto-detalle" >
+                                                {{ e.numero }}
+                                            </div>
+                                            
+                                            <div class="col-md-4 texto-lista" >
+                                                {{ e.cedula }}  {{ e.nombre | uppercase}}  {{ e.apellido | uppercase}} 
+                                            </div>
+                                            <div class="col-md-3 texto-detalle">
+                                                {{ e.nombrecontrato | uppercase }} 
+                                            </div>
+                                            <div class="col-md-2 texto-detalle">
+                                                {{ e.portafolio | uppercase }}
+                                            </div>
+                                            <div class="col-md-1 texto-detalle">
+                                                {{ e.aprobado | uppercase }}
+                                            </div>
+                                          
+                                            <div class="col-md-1 text-right">
+    
+                                                <button mat-icon-button aria-label="Editar"
+                                                    (click)="editar(e)" >
+                                                    <mat-icon class="texto-gray">edit</mat-icon>
+                                                </button>
+    
+                                            </div>
+                                        </div>
+                                    </mat-list>
+                                </mat-selection-list> 
+                                <br><br>
+                            </div>
+  
+                        </mat-tab>
+                        <mat-tab style="width: 90%;padding: 20px;">
+                            <ng-template mat-tab-label>
+                                &nbsp;REGISTRAR APORTES
+                            </ng-template>
+                            <br>
+                                      
+                                <div class="card">
+                                    <div class="card-body" style="padding:20px;">
+                                      <div style="padding: 20px;">
+                                        <br>
+                                        <form>
+              
+                                            <div class="row">
+                                              
+              
+                                              <div class="col-md-4">
+                                                  <mat-form-field appearance="outline">
+                                                      <mat-label>Numero planilla</mat-label>
+                                                      <input matInput placeholder="Numero planilla" (blur)="Consultar()"
+                                                      [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.numero" value="{{Aporte.numero}}">
+              
+                                                  </mat-form-field>
+                                              </div>
+                                              
+                                              <div class="col-md-2">
+                                                <mat-form-field appearance="outline">
+                                                  <mat-label>Estatus</mat-label>
+                                                  <mat-select placeholder="Estatus" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.estatus" value="{{Aporte.estatus}}">
+                                                      <mat-option value=0>INACTIVO</mat-option>
+                                                      <mat-option value=1>ACTIVO</mat-option>
+                                                  </mat-select>
+                                                  <!-- <mat-icon matSuffix>home</mat-icon> -->
+              
+                                                </mat-form-field>
+                                              </div>
+                                              <div class="col-md-3">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Fecha Recepcion</mat-label>
+                                                    <input matInput placeholder="Fecha Recepcion" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.fecharecepcion" value="{{Aporte.fecharecepcion}}">
+            
+                                                </mat-form-field>
+                                              </div>
+                                              <div class="col-md-3">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Fecha Valor</mat-label>
+                                                    <input matInput placeholder="Fecha Valor" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.fechavalor" value="{{Aporte.fechavalor}}">
+            
+                                                </mat-form-field>
+                                              </div>
+                                            
+              
+                                            </div>
+              
+              
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Cedula</mat-label>
+                                                        <input matInput placeholder="Cedula" (blur)="ConsultarAfiliado()"
+                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.cedula" value="{{Aporte.cedula}}">
+                
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Nombre Completo</mat-label>
+                                                        <input matInput placeholder="Nombre Completo" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.nombre" value="{{Aporte.nombre}}">
+              
+              
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Apellido Completo</mat-label>
+                                                        <input matInput placeholder="Apellido Completo" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.apellido" value="{{Aporte.apellido}}">
+              
+                                                    </mat-form-field>
+                                                </div>
+                                                
+                                                
+                                            </div>
+              
+              
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Numero de Contrato</mat-label>
+                                                        <input matInput placeholder="Numero de Contrato" (blur)="ConsultarContrato()"
+                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.contrato" value="{{Aporte.contrato}}">
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Contrato</mat-label>
+                                                        <input matInput placeholder="Nombre de Contrato" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.nombrecontrato" value="{{Aporte.nombrecontrato}}">
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Portafolio</mat-label>
+                                                        <input matInput placeholder="Portafolio" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.portafolio" value="{{Aporte.portafolio}}">
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Nombre del Depositante</mat-label>
+                                                        <input matInput placeholder="Nombre del Depositante" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.nombredepositante" value="{{Aporte.nombredepositante}}">
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Apellido del Depositante</mat-label>
+                                                        <input matInput placeholder="Apellido del Depositante" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.apellidodepositante" value="{{Aporte.apellidodepositante}}">
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Agencia de Recepcion</mat-label>
+                                                        <input matInput placeholder="Agencia de Recepcion" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.agencia" value="{{Aporte.agencia}}">
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Numero de Cuenta</mat-label>
+                                                        <input matInput placeholder="Numero de Cuenta" maxlength="20"
+                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.numerocuenta" value="{{Aporte.numerocuenta}}">
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Movimiento Ejecutivo</mat-label>
+                                                        <input matInput placeholder="Movimiento Ejecutivo" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.movimiento" value="{{Aporte.movimiento}}">
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Numero de Documento</mat-label>
+                                                        <input matInput placeholder="Numero de Documento" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.numerodocumento" value="{{Aporte.numerodocumento}}">
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Numero de Cheque</mat-label>
+                                                        <input matInput placeholder="Numero de Cheque" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.numerocheque" value="{{Aporte.numerocheque}}">
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Banco</mat-label>
+                                                        <input matInput placeholder="Banco" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.banco" value="{{Aporte.banco}}">
+                                                    </mat-form-field>
+                                                </div>
+
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Aprobado Por</mat-label>
+                                                        <input matInput placeholder="Aprobado Por" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.aprobadopor" value="{{Aporte.aprobadopor}}">
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Total Efectivo</mat-label>
+                                                        <input type="number" matInput placeholder="Total Efectivo" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.totalefectivo" value="{{Aporte.totalefectivo}}">
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Total Cheque</mat-label>
+                                                        <input type="number" matInput placeholder="Total Cheque" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.totalcheque" value="{{Aporte.totalcheque}}">
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Total Planilla</mat-label>
+                                                        <input type="number" matInput placeholder="Total Planilla" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.totalplanilla" value="{{Aporte.totalplanilla}}">
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <mat-form-field appearance="outline">
+                                                        <mat-label>Aprobado</mat-label>
+                                                        <mat-select placeholder="Aprobado" [ngModelOptions]="{standalone: true}" [(ngModel)]="Aporte.aprobado" value="{{Aporte.aprobado}}">
+                                                            <mat-option value=0>NO</mat-option>
+                                                            <mat-option value=1>SI</mat-option>
+                                                        </mat-select>
+                                                        <!-- <mat-icon matSuffix>home</mat-icon> -->
+                                                  </mat-form-field>
+                                                </div>
+                                            </div>
+              
+              
+                                        </form>
+                                    </div>
+                                   
+                                       
+                                  </div>
+                                <div class="card-footer">
+                                    <div class="row">
+                            
+                                        <div class="col-md-12 text-right">
+                                            <button mat-flat-button color="primary" (click)="Guardar()">Registar aporte</button>
+                                        </div>
+                                    
+                                    </div>
+                                </div>
+  
+                                
+                            </div> 
+  
+  
+                            
+  
+  
+  
+                        </mat-tab>
+                    </mat-tab-group>
+  
+                
+            </div>
+        </div>
+    </div>
+  </div>
+  

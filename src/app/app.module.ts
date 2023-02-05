@@ -29,6 +29,7 @@ import { MatCommonModule } from '@angular/material/core';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { AuthGuardGuard } from './services/seguridad/auth-guard.guard';
 import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 import { AngularFileUploaderModule } from "angular-file-uploader";
 import { AuthInterceptorService } from './services/seguridad/auth-interceptor.service';
@@ -62,6 +63,7 @@ import { PortafolioComponent } from './pages/principal/portafolio/portafolio.com
     ReactiveFormsModule,
     MatInputModule,
     MatPaginatorModule,
+    MatDatepickerModule,
     MatTableModule,
     MatDialogModule,
     MatCommonModule,

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
 
@@ -16,17 +16,20 @@ export class AdminLayoutComponent implements OnInit {
   public clicked1: boolean = false;
   public pagina : string = '';
 
+
   constructor(private ruta : Router, private msj: MensajeService) { }
 
   ngOnInit() {
     const pagina = this.ruta.url.split("/")
+    
     this.pagina = pagina[1].toUpperCase()
     this.msj.contenido$.subscribe( e => {
-      console.log(e)
       this.pagina = e
     })
 
   }
+
+  
 
   IrA(url : string){
     

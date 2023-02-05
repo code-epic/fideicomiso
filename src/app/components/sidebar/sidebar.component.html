@@ -33,7 +33,7 @@
       <!-- Navigation -->
       <ul class="navbar-nav">
           <li *ngFor="let menuItem of menuItems" class=" nav-item">
-            <a routerLinkActive="active" [routerLink]="[menuItem.path]" class="nav-link">
+            <a routerLinkActive="active" [routerLink]="[menuItem.path]" class="nav-link" (click)="msj(menuItem.title)">
                 <i class="ni {{ menuItem.icon + ' ' +  menuItem.class}}"></i>
                 {{menuItem.title}}
             </a>

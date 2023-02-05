@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { MensajeService } from 'src/app/services/util/mensaje.service';
 
 declare interface RouteInfo {
     path: string;
@@ -20,7 +21,9 @@ export class SidebarComponent implements OnInit {
   public menuItems: any[];
   public isCollapsed = true;
 
-  constructor(private router: Router, private loginService: LoginService) { 
+  constructor(private router: Router, 
+    private mesageService : MensajeService,
+    private loginService: LoginService) { 
 
   }
 
@@ -45,5 +48,9 @@ export class SidebarComponent implements OnInit {
     this.router.events.subscribe((event) => {
       this.isCollapsed = true;
     });
+  }
+
+  msj(pagina : string){
+    this.mesageService.contenido$.emit(pagina.toUpperCase())
   }
 }

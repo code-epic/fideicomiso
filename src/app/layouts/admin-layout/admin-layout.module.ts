@@ -24,10 +24,11 @@ import { MatListModule } from '@angular/material/list';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatCommonModule } from '@angular/material/core';
+import { MatCommonModule, MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 
 
@@ -73,6 +74,8 @@ import { InversionesComponent } from 'src/app/pages/principal/inversiones/invers
     MatToolbarModule,
     MatSelectModule,
     MatStepperModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
 
   ],
   declarations: [
@@ -89,7 +92,10 @@ import { InversionesComponent } from 'src/app/pages/principal/inversiones/invers
     AportesComponent,
     ContabilidadComponent,
     InversionesComponent
-  ]
+  ],
+  providers: [
+    {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},
+  ],
 })
 
 export class AdminLayoutModule {}

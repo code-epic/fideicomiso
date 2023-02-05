@@ -14,6 +14,7 @@ export class PrincipalComponent implements OnInit {
   public salesChart;
   public clicked: boolean = true;
   public clicked1: boolean = false;
+  public pagina: string = "BUSCADOR"
 
   ngOnInit() {
 

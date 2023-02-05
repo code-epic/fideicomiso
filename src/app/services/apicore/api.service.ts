@@ -1,7 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 
 
@@ -68,7 +70,9 @@ export class ApiService {
     'Authorization': 'Bearer ' + sessionStorage.getItem('token') })
   };
 
-  constructor( private http : HttpClient) {
+  constructor( 
+    private http : HttpClient,
+    private ruta: Router) {
     
   }
 
@@ -79,6 +83,17 @@ export class ApiService {
     var url = this.URL + "crud" + this.hash
     //console.info( JSON.stringify(xAPI ))
     return this.http.post<any>(url, xAPI, this.httpOptions);
+  }
+
+  /**
+   * Ejecutar la coleccion
+   * @param xObjeto Objeto Coleccion
+   * @returns 
+   */
+  ExecColeccion(xObjeto): Observable<any> {
+    var url = this.URL + "ccoleccion";
+    console.log(url)
+    return this.http.post<any>(url, xObjeto, this.httpOptions);
   }
 
    //EnviarArchivos generales
@@ -95,5 +110,24 @@ export class ApiService {
     return this.URL + 'dw/' + peticion
   }
 
+
+  Mensaje(msj: string, txt: string, icono: SweetAlertIcon, destino: string) : boolean {
+    let respuesta = false
+    Swal.fire({
+      title: msj,
+      text: txt,
+      icon: icono,
+      showCancelButton: false,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'No',
+      allowEscapeKey: true,
+    }).then((result) => {
+      respuesta = result.isConfirmed
+    })
+
+    return respuesta
+  }
 
 }

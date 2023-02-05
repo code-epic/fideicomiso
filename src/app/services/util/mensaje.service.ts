@@ -5,6 +5,8 @@ import { EventEmitter, Injectable } from '@angular/core';
 })
 export class MensajeService {
 
+  pagina$ = new EventEmitter<any>();
+  pagina : string = 'Principal'
   contenido$ = new EventEmitter<any>();
   contenido : []
   estatusText$ = new EventEmitter<string>();

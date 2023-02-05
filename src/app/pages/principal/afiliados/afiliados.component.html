@@ -1,261 +1,367 @@
 <div class="row">
-
   <div class="col-md-12">
-
-      <div class="card card-profile shadow">
-          <div class="card-body">
-
-
+      <div class="card">
+          <div class="card-body" style="padding:5px;height:100%">
+  
 
 
-              <mat-tab-group>
-                  <mat-tab label="General">
+                  <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" 
+                  (selectedTabChange)="tabActive($event)" [selectedIndex]="selectedIndex"
+                  style="padding:10px;">
+                      <mat-tab>
 
-                      <div style="padding: 20px;">
+                          <ng-template mat-tab-label>
+                              &nbsp;CONSULTAR AFILIADOS
+                          </ng-template>
+
+                          <div class="container">
+                              <br>
+                               <mat-selection-list>
+                                  <mat-list *ngFor="let e of lstAfiliados; let i=index "
+                                      style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                                      <div class="row">
+  
+                                          
+                                          <div class="col-md-2 texto-detalle" >
+                                              {{ e.cedula }}
+                                          </div>
+                                          <div class="col-md-4 texto-lista">
+                                            {{ e.pnombre | uppercase}}  {{ e.papellido | uppercase}} 
+                                          </div>
+                                          <div class="col-md-2 texto-detalle">
+                                              {{ e.estadocivil | uppercase }}
+                                          </div>
+                                          <div class="col-md-3 texto-detalle">
+                                              {{ e.actividad | uppercase }}
+                                          </div>
+                                        
+                                          <div class="col-md-1 text-right">
+  
+                                              <button mat-icon-button aria-label="Editar"
+                                                  (click)="editar(e)" >
+                                                  <mat-icon class="texto-gray">edit</mat-icon>
+                                              </button>
+  
+                                          </div>
+                                      </div>
+                                  </mat-list>
+                              </mat-selection-list> 
+                              <br><br>
+                          </div>
+
+                      </mat-tab>
+                      <mat-tab style="width: 90%;padding: 20px;">
+                          <ng-template mat-tab-label>
+                              &nbsp;REGISTRAR AFILIADOS
+                          </ng-template>
                           <br>
-                          <form>
-
-                              <div class="row">
-                                <div class="col-md-2">
-                                  <mat-form-field appearance="outline">
-                                    <mat-label>Nacionalidad</mat-label>
-                                    <mat-select placeholder="Estatus Afiliado">
-                                        <mat-option>Selección</mat-option>
-                                        <mat-option value="V-">VENEZOLANO</mat-option>
-                                        <mat-option value="E-">EXTRANJERO</mat-option>
-                                    </mat-select>
-                                    <mat-icon matSuffix>public</mat-icon>
-                                  </mat-form-field>
+                                    
+                            <div class="card">
+                                <div class="card-body" style="padding:20px;">
+                                  <div style="padding: 20px;">
+                                    <br>
+                                    <form>
+          
+                                        <div class="row">
+                                          <div class="col-md-3">
+                                            <mat-form-field appearance="outline">
+                                              <mat-label>Nacionalidad</mat-label>
+                                              <mat-select placeholder="Estatus Afiliado" [ngModelOptions]="{standalone: true}" [(ngModel)]="Afiliado.nacionalidad" value="{{Afiliado.nacionalidad}}">
+                                                  <mat-option value="V-">VENEZOLANO</mat-option>
+                                                  <mat-option value="E-">EXTRANJERO</mat-option>
+                                              </mat-select>
+                                              <mat-icon matSuffix>public</mat-icon>
+                                            </mat-form-field>
+                                          </div>
+          
+                                          <div class="col-md-4">
+                                              <mat-form-field appearance="outline">
+                                                  <mat-label>Cedula</mat-label>
+                                                  <input matInput placeholder="Cedula" (blur)="Consultar()"
+                                                  [ngModelOptions]="{standalone: true}" [(ngModel)]="Afiliado.cedula" value="{{Afiliado.cedula}}">
+          
+                                              </mat-form-field>
+                                          </div>
+                                          
+                                          <div class="col-md-2">
+                                            <mat-form-field appearance="outline">
+                                              <mat-label>Estatus/Afiliado</mat-label>
+                                              <mat-select placeholder="Estatus Afiliado" [ngModelOptions]="{standalone: true}" [(ngModel)]="Afiliado.estatus" value="{{Afiliado.estatus}}">
+                                                <mat-option value=0>INACTIVO</mat-option>
+                                                <mat-option value=1>ACTIVO</mat-option>
+                                              </mat-select>
+                                              <mat-icon matSuffix>home</mat-icon>
+          
+                                            </mat-form-field>
+                                          </div>
+                                          <div class="col-md-3">
+                                            <mat-form-field appearance="outline">
+                                              <mat-label>Estado Civil</mat-label>
+                                              <mat-select placeholder="Estado Civil"  [ngModelOptions]="{standalone: true}" [(ngModel)]="Afiliado.estadocivil" value="{{Afiliado.estadocivil}}">
+                                                  <mat-option value="0">SELECCIONE</mat-option>
+                                                  <mat-option value="CASADO">CASADO (A)</mat-option>
+                                                  <mat-option value="SOLTERO">SOLTERO (A) </mat-option>
+                                              </mat-select>
+                                              <mat-icon matSuffix>face</mat-icon>
+                                            </mat-form-field>
+                                          </div>
+          
+                                        </div>
+          
+          
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Nombre Completo</mat-label>
+                                                    <input matInput placeholder="Nombre Completo" [ngModelOptions]="{standalone: true}" [(ngModel)]="Afiliado.pnombre" value="{{Afiliado.pnombre}}">
+          
+          
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Apellido Completo</mat-label>
+                                                    <input matInput placeholder="Apellido Completo" [ngModelOptions]="{standalone: true}" [(ngModel)]="Afiliado.papellido" value="{{Afiliado.papellido}}">
+          
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-md-2">
+                                              <mat-form-field appearance="outline">
+                                                <mat-label>Sexo</mat-label>
+                                                <mat-select placeholder="Sexo">
+                                                    <mat-option value="0">SELECCIONE</mat-option>
+                                                    <mat-option value="M">MASCULINO</mat-option>
+                                                    <mat-option value="F">FEMENINO</mat-option>
+                                                </mat-select>
+                                                <mat-icon matSuffix>boy</mat-icon>
+                                              </mat-form-field>
+                                            </div>
+                                            
+                                        </div>
+          
+          
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                              <mat-form-field appearance="outline">
+                                                  <mat-label>Fecha Nacimiento</mat-label>
+                                                  <input matInput [matDatepicker]="picker"  [(ngModel)]="Afiliado.nacimiento" 
+                                                  [formControl]="nacimiento"
+                                                  [value]="nacimiento.value">
+                                                  <mat-datepicker #picker></mat-datepicker>
+                                                  <mat-icon matSuffix (click)="picker.open()">event</mat-icon>
+                                              </mat-form-field>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Fecha de Ingreso</mat-label>
+                                                    <input matInput [matDatepicker]="picker1" [(ngModel)]="Afiliado.ingreso" 
+                                                    [formControl]="ingreso"
+                                                    [value]="ingreso.value">
+                                                    <mat-datepicker #picker1></mat-datepicker>
+                                                    <mat-icon matSuffix (click)="picker1.open()">event</mat-icon>
+                                                </mat-form-field>
+                                            </div>
+                                            
+                                            <div class="col-md-4">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Actividad del Cliente</mat-label>
+                                                    <input matInput placeholder="Actividad del Cliente" [ngModelOptions]="{standalone: true}" [(ngModel)]="Afiliado.actividad" value="{{Afiliado.actividad}}">
+          
+          
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+          
+          
+                                    </form>
                                 </div>
+                                  <mat-tab-group>
 
-                                <div class="col-md-4">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Cedula</mat-label>
-                                        <input matInput placeholder="Cedula" value="">
+                                    <mat-tab >
+                                      <ng-template mat-tab-label>
+                                        &nbsp;DIRECCION
+                                      </ng-template>
+                                        <div style="padding: 20px;">
+                                            <br>
+                                            <div class="row">
+                                              <div class="col-md-12">
+                                                <mat-form-field appearance="outline">
+                                                  <mat-label>Direccion</mat-label>
+                                                  <textarea matInput placeholder="Direccion completa" style="height: 70px;"
+                                                  [ngModelOptions]="{standalone: true}" [(ngModel)]="Afiliado.Direccion.direccion" value="{{Afiliado.Direccion.direccion}}">
+                                                </textarea>
+                                                </mat-form-field>
+                                              </div>
+                  
+                                            </div>
+                                            <div class="row">
+                                              <div class="col-md-5">
+                                                  <mat-form-field appearance="outline">
+                                                      <mat-label>País</mat-label>
+                                                      <mat-select placeholder="País" [ngModelOptions]="{standalone: true}"
+                                                          [(ngModel)]="Afiliado.Direccion.pais"
+                                                          value="{{Afiliado.Direccion.pais}}">
+                                                          <mat-option value="S">SELECCION</mat-option>
+                                                          <mat-option value="VENEZUELA">VENEZUELA</mat-option>
+                                                      </mat-select>
+                                                      <mat-icon matSuffix>public</mat-icon>
 
-                                    </mat-form-field>
-                                </div>
+                                                  </mat-form-field>
+                                              </div>
+                                              <div class="col-md-4">
+                                                  <mat-form-field appearance="outline">
+                                                      <mat-label>Ciudad</mat-label>
+                                                      <mat-select placeholder="Ciudad"
+                                                          [ngModelOptions]="{standalone: true}"
+                                                          [(ngModel)]="Afiliado.Direccion.ciudad"
+                                                          value="{{Afiliado.Direccion.ciudad}}">
+                                                          <mat-option value="S">SELECCION</mat-option>
+                                                          <mat-option value="MERIDA">MERIDA</mat-option>
+                                                      </mat-select>
+                                                      <mat-icon matSuffix>home</mat-icon>
+
+                                                  </mat-form-field>
+                                              </div>
+                                              <div class="col-md-3">
+                                                  <mat-form-field appearance="outline">
+                                                      <mat-label>Código Postal</mat-label>
+                                                      <input matInput placeholder="Código postal"
+                                                          [ngModelOptions]="{standalone: true}"
+                                                          [(ngModel)]="Afiliado.Direccion.codigopostal"
+                                                          value="{{Afiliado.Direccion.codigopostal}}">
+                                                      <mat-icon matSuffix>pin</mat-icon>
+
+                                                  </mat-form-field>
+                                              </div>
+                                          </div>
+
+                  
+                                            <div class="row">
+                                              <div class="col-md-4">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Urbanizacion</mat-label>
+                                                    <input matInput placeholder="Urbanizacion"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                          [(ngModel)]="Afiliado.Direccion.urbanizacion"
+                                                          value="{{Afiliado.Direccion.urbanizacion}}">
+                  
+                                                </mat-form-field>
+                                              </div>
+                                              <div class="col-md-4">
+                                                  <mat-form-field appearance="outline">
+                                                      <mat-label>Telefono de Habitacion</mat-label>
+                                                      <input matInput placeholder="Telefono de Habitacion"[ngModelOptions]="{standalone: true}"
+                                                      [(ngModel)]="Afiliado.Direccion.telefono"
+                                                      value="{{Afiliado.Direccion.telefono}}">
+                                                  </mat-form-field>
+                                              </div>
+                                              
+                                              <div class="col-md-4">
+                                                  <mat-form-field appearance="outline">
+                                                      <mat-label>Telefono Celular</mat-label>
+                                                      <input matInput placeholder="Telefono Celular" [ngModelOptions]="{standalone: true}"
+                                                      [(ngModel)]="Afiliado.Direccion.celular"
+                                                      value="{{Afiliado.Direccion.celular}}">
+                  
+                  
+                                                  </mat-form-field>
+                                              </div>
+                                          </div>
+                  
+                                        </div>
+                  
+                                    </mat-tab>
+                  
+                                    <mat-tab>
+                                      <ng-template mat-tab-label>
+                                        &nbsp;CONTRATOS
+                                      </ng-template>
+
+                                        <div style="padding: 20px;">
+                                            <br>
+                                            <table>
+                                              <thead>
+                                                <th>Contrato</th>
+                                                <th>Nombre</th>
+                                                <th>Pago</th>
+                                                <th>Tipo Cuenta</th>
+                                                <th>Numero Cuenta</th>
+                                                <th>Fideicomitente</th>
+                                                <th>Ubicacion</th>
+                                                <th>Estatus</th>
+                                              </thead>
+                                              <tbody>
+                  
+                                              </tbody>
+                                            </table>
+                                        </div>
+                                    </mat-tab>
+                  
+                                    <mat-tab >
+                                      <ng-template mat-tab-label>
+                                        &nbsp;EMPLEADORES
+                                      </ng-template>
+                                      <div style="padding: 20px;">
+                                          <br>
+                                        <table>
+                                              <thead>
+                                                <th>Codigo Empresa</th>
+                                                <th>Nombre Empresa</th>
+                                                <th>Codigo Local</th>
+                                                <th>Nombre Local</th>
+                                              </thead>
+                                              <tbody>
+                                                
+                                              </tbody>
+                                            </table>
+                                      </div>
+                                    </mat-tab>
+                    
+                                    <mat-tab>
+                                      <ng-template mat-tab-label>
+                                        &nbsp;DEPENDIENTES
+                                      </ng-template>
+                                      <div style="padding: 20px;">
+                                          <br>
+                                          <table>
+                                            <thead>
+                                              <th>Cedula</th>
+                                              <th>Nombre y Apellidos Completo</th>
+                                              <th>Telefono</th>
+                                            <tbody>
+                                              
+                                            </tbody>
+                                          </table>
+                                      </div>
+                                    </mat-tab>
                                 
-                                <div class="col-md-4">
-                                  <mat-form-field appearance="outline">
-                                    <mat-label>Estatus/Afiliado</mat-label>
-                                    <mat-select placeholder="Estatus Afiliado">
-                                        <mat-option>Selección</mat-option>
-                                        <mat-option>Activo</mat-option>
-                                        <mat-option>Inactivo</mat-option>
-                                    </mat-select>
-                                    <mat-icon matSuffix>home</mat-icon>
-
-                                  </mat-form-field>
+                                </mat-tab-group>
+                                
+                                    
+                              </div>
+                            <div class="card-footer">
+                                <div class="row">
+                        
+                                    <div class="col-md-12 text-right">
+                                        <button mat-flat-button color="primary" (click)="Guardar()">Registar contrato</button>
+                                    </div>
+                                
                                 </div>
-                                <div class="col-md-2">
-                                  <mat-form-field appearance="outline">
-                                    <mat-label>Estado Civil</mat-label>
-                                    <mat-select placeholder="Estado Civil">
-                                        <mat-option>Selección</mat-option>
-                                        <mat-option>Casado</mat-option>
-                                        <mat-option>Soltero</mat-option>
-                                    </mat-select>
-                                    <mat-icon matSuffix>face</mat-icon>
-                                  </mat-form-field>
-                                </div>
-
-                              </div>
-
-
-                              <div class="row">
-                                  <div class="col-md-5">
-                                      <mat-form-field appearance="outline">
-                                          <mat-label>Nombre Completo</mat-label>
-                                          <input matInput placeholder="Codigo de Banco" value="">
-
-
-                                      </mat-form-field>
-                                  </div>
-                                  <div class="col-md-5">
-                                      <mat-form-field appearance="outline">
-                                          <mat-label>Apellido Completo</mat-label>
-                                          <input matInput placeholder="Plan Anterior" value="">
-
-                                      </mat-form-field>
-                                  </div>
-                                  <div class="col-md-2">
-                                    <mat-form-field appearance="outline">
-                                      <mat-label>Sexo</mat-label>
-                                      <mat-select placeholder="Sexo">
-                                          <mat-option>Selección</mat-option>
-                                          <mat-option>Masculino</mat-option>
-                                          <mat-option>Femenino</mat-option>
-                                      </mat-select>
-                                      <mat-icon matSuffix>boy</mat-icon>
-                                    </mat-form-field>
-                                  </div>
-                                  
-                              </div>
-
-
-                              <div class="row">
-                                  <div class="col-md-4">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Fecha Nacimiento</mat-label>
-                                        <input matInput placeholder="Fecha Nacimiento" value="">
-
-                                    </mat-form-field>
-                                  </div>
-                                  <div class="col-md-4">
-                                      <mat-form-field appearance="outline">
-                                          <mat-label>Fecha de Ingreso</mat-label>
-                                          <input matInput placeholder="Fecha de Ingreso" value="">
-                                      </mat-form-field>
-                                  </div>
-                                  
-                                  <div class="col-md-4">
-                                      <mat-form-field appearance="outline">
-                                          <mat-label>Actividad del Cliente</mat-label>
-                                          <input matInput placeholder="Actividad del Cliente" value="">
-
-
-                                      </mat-form-field>
-                                  </div>
-                              </div>
-
-
-                          </form>
-                      </div>
-
-
-                  </mat-tab>
-                  <mat-tab label="Dirección">
-                      <div style="padding: 20px;">
-                          <br>
-                          <hr class="my-4" />
-                          <h6 class="heading-small text-muted mb-4">Información de Contacto</h6>
-                          <div class="row">
-                            <div class="col-md-12">
-                              <mat-form-field appearance="outline">
-                                <mat-label>Direccion</mat-label>
-                                <textarea matInput placeholder="Direccion completa" style="height: 70px;"></textarea>
-                              </mat-form-field>
                             </div>
 
-                          </div>
-                          <div class="row">
-                            <div class="col-md-5">
-                              <mat-form-field appearance="outline">
-                                <mat-label>País</mat-label>
-                                <mat-select placeholder="País" >
-                                  <mat-option>Selección</mat-option>
-                                </mat-select>
-                                <mat-icon matSuffix>public</mat-icon>
-
-                              </mat-form-field>
-                            </div>
-                            <div class="col-md-4">
-                              <mat-form-field appearance="outline">
-                                <mat-label>Ciudad</mat-label>
-                                <mat-select placeholder="Ciudad">
-                                  <mat-option>Selección</mat-option>
-                                </mat-select>
-                                <mat-icon matSuffix>home</mat-icon>
-
-                              </mat-form-field>
-                            </div>
-                            <div class="col-md-3">
-                              <mat-form-field appearance="outline">
-                                <mat-label>Código Postal</mat-label>
-                                <input matInput placeholder="Código postal" >
-                                <mat-icon matSuffix>pin</mat-icon>
-
-                              </mat-form-field>
-                            </div>
-                          </div>
-
-                          <div class="row">
-                            <div class="col-md-4">
-                              <mat-form-field appearance="outline">
-                                  <mat-label>Urbanizacion</mat-label>
-                                  <input matInput placeholder="Urbanizacion" value="">
-
-                              </mat-form-field>
-                            </div>
-                            <div class="col-md-4">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Telefono de Habitacion</mat-label>
-                                    <input matInput placeholder="Telefono de Habitacion" value="">
-                                </mat-form-field>
-                            </div>
                             
-                            <div class="col-md-4">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Telefono de Oficina</mat-label>
-                                    <input matInput placeholder="Telefono de Oficina" value="">
+                            </div> 
 
 
-                                </mat-form-field>
-                            </div>
-                        </div>
-
-                      </div>
-
-                  </mat-tab>
-
-                  <mat-tab label="Contratos">
-                      <div style="padding: 20px;">
-                          <br>
-                          <table>
-                            <thead>
-                              <th>Contrato</th>
-                              <th>Nombre</th>
-                              <th>Pago</th>
-                              <th>Tipo Cuenta</th>
-                              <th>Numero Cuenta</th>
-                              <th>Fideicomitente</th>
-                              <th>Ubicacion</th>
-                              <th>Estatus</th>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                          </table>
-                      </div>
-                  </mat-tab>
-
-                  <mat-tab label="Empleadores">
-                    <div style="padding: 20px;">
-                        <br>
-                      <table>
-                            <thead>
-                              <th>Codigo Empresa</th>
-                              <th>Nombre Empresa</th>
-                              <th>Codigo Local</th>
-                              <th>Nombre Local</th>
-                            </thead>
-                            <tbody>
-                              
-                            </tbody>
-                          </table>
-                    </div>
-                </mat-tab>
-
-                <mat-tab label="Dependientes">
-                  <div style="padding: 20px;">
-                      <br>
-                      <table>
-                        <thead>
-                          <th>Cedula</th>
-                          <th>Nombre y Apellidos Completo</th>
-                          <th>Telefono</th>
-                        <tbody>
                           
-                        </tbody>
-                      </table>
-                  </div>
-              </mat-tab>
+
+
+
+                      </mat-tab>
+                  </mat-tab-group>
+
               
-              </mat-tab-group>
-
-
           </div>
       </div>
   </div>
-  </div>
+</div>
