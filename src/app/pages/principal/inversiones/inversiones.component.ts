@@ -101,7 +101,7 @@ export class InversionesComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstPortafolio = data
+        if (data != null && data.msj == undefined) this.lstPortafolio = data
       },
       (error) => {
         console.log(error)
@@ -116,7 +116,7 @@ export class InversionesComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstInversiones = data
+        if (data != null && data.msj == undefined) this.lstInversiones = data
       },
       (error) => {
         console.log(error)
@@ -149,7 +149,7 @@ export class InversionesComponent implements OnInit {
       }
     )
   }
-  
+
   ConsultarInver() {
     this.xAPI.funcion = "FID_CInversion"
     this.xAPI.parametros = this.Inversiones.codigo
