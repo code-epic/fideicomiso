@@ -171,6 +171,7 @@ export class InversionesComponent implements OnInit {
   }
 
   Seleccionar(){
+    this.Listar()
     this.porta_insert = 'none'
     this.porta_search = ''
   }
