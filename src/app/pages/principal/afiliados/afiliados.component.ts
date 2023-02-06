@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Afiliado, Direccion } from 'src/app/services/banfanb/afiliado.service';
 
@@ -54,7 +55,8 @@ export class AfiliadosComponent implements OnInit {
   }
 
   constructor(
-    private apiService: ApiService
+    private apiService: ApiService,
+    private ngxService: NgxUiLoaderService
 
   ) { }
 
@@ -159,6 +161,9 @@ export class AfiliadosComponent implements OnInit {
     if (this.Afiliado.cedula == "") {
       return
     }
+
+    this.ngxService.startLoader('load-afi')
+
     let n = new Date(this.nacimiento.value).toISOString()
     let i = new Date(this.ingreso.value).toISOString()
     this.Afiliado.nacimiento = n
@@ -176,6 +181,7 @@ export class AfiliadosComponent implements OnInit {
       (data) => {
         console.log(data)
         this.Limpiar()
+        this.ngxService.stopLoader('load-afi')
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'afiliado')
 
 

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Aportes } from 'src/app/services/banfanb/aportes.service';
 
@@ -47,6 +48,7 @@ export class AportesComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private ngxService: NgxUiLoaderService
 
   ) { }
 
@@ -113,6 +115,8 @@ export class AportesComponent implements OnInit {
 
 
   Guardar() {
+
+    this.ngxService.startLoader('load-apor')
     var obj = {
       "coleccion": "aportes",
       "objeto": this.Aporte,
@@ -124,6 +128,8 @@ export class AportesComponent implements OnInit {
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
         console.log(data)
+        this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'aportes')
+        this.ngxService.stopLoader('load-apor')
       },
       (error) => {
         console.log(error)
@@ -160,6 +166,7 @@ export class AportesComponent implements OnInit {
       (data) => {
         if (data != null) {
           this.Aporte.nombrecontrato = data[0].razonsocial
+          this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'aportes')
         }
       },
       (error) => {

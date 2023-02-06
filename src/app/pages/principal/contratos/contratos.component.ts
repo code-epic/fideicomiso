@@ -1,5 +1,6 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Direccion } from 'src/app/services/banfanb/afiliado.service';
 import { Contrato, Ejecutivo, Politicas, Saldos } from 'src/app/services/banfanb/contrato.service';
@@ -93,7 +94,9 @@ export class ContratosComponent implements OnInit {
   public fechainicio = new FormControl(new Date());
 
   
-  constructor(private apiService: ApiService) { }
+  constructor(
+    private apiService: ApiService,
+    private ngxService: NgxUiLoaderService) { }
 
   ngOnInit(): void {
     this.Listar()
@@ -234,6 +237,7 @@ export class ContratosComponent implements OnInit {
 
   Guardar() {
 
+    this.ngxService.startLoader('load-cont')
     let f = new Date( this.fechainicio.value ).toISOString()
 
     this.Contrato.Saldos.fechainicio = f
@@ -248,6 +252,9 @@ export class ContratosComponent implements OnInit {
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
         console.log(data)
+        this.ngxService.stopLoader('load-cont')
+        this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'contratos')
+        
       },
       (error) => {
         console.log(error)
