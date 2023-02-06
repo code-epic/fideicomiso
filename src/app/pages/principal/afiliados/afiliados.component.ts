@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
-import { NgxUiLoaderService } from 'ngx-ui-loader'
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Afiliado, Direccion } from 'src/app/services/banfanb/afiliado.service';
 
@@ -56,9 +54,7 @@ export class AfiliadosComponent implements OnInit {
   }
 
   constructor(
-    private apiService: ApiService,
-    private ruta: Router,
-    private ngxService: NgxUiLoaderService,
+    private apiService: ApiService
 
   ) { }
 
@@ -103,7 +99,6 @@ export class AfiliadosComponent implements OnInit {
   Consultar() {
     this.xAPI.funcion = "FID_CAfiliado"
     this.xAPI.parametros = this.Afiliado.cedula
-
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {

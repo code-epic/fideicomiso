@@ -66,7 +66,6 @@ export class AportesComponent implements OnInit {
   }
 
   editar(e) {
-
     this.Aporte = e
     this.selectedIndex = 1
     this.active = true
@@ -76,11 +75,8 @@ export class AportesComponent implements OnInit {
   Listar() {
     this.xAPI.funcion = "FID_CAportes"
     this.xAPI.parametros = ''
-
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         this.lstAportes = data
       },
       (error) => {
