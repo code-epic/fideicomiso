@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Afiliado, Direccion } from 'src/app/services/banfanb/afiliado.service';
@@ -56,6 +57,7 @@ export class AfiliadosComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService
 
   ) { }
@@ -159,6 +161,7 @@ export class AfiliadosComponent implements OnInit {
   Guardar() {
 
     if (this.Afiliado.cedula == "") {
+      this._snackBar.open('Debe verificar todos los campos...', 'dance')
       return
     }
 

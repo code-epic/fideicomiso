@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Aportes } from 'src/app/services/banfanb/aportes.service';
@@ -48,6 +49,7 @@ export class AportesComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService
 
   ) { }
@@ -116,6 +118,10 @@ export class AportesComponent implements OnInit {
 
   Guardar() {
 
+    if(this.Aporte.numero == "") {
+      this._snackBar.open('Debe verificar todos los campos...', 'dance')
+      return
+    }
     this.ngxService.startLoader('load-apor')
     var obj = {
       "coleccion": "aportes",
@@ -175,4 +181,6 @@ export class AportesComponent implements OnInit {
       }
     )
   }
+
+  
 }

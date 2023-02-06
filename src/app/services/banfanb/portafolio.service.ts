@@ -10,7 +10,8 @@ export interface Portafolio {
   tipo : string
   numerocuenta : string
   valormercado : string
-
+  fecha : Date
+  autor : string
 }
 
 @Injectable({

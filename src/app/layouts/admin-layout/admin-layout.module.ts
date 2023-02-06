@@ -29,7 +29,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 import { CambiarclaveComponent } from 'src/app/pages/generico/perfil/cambiarclave/cambiarclave.component';
@@ -76,7 +76,7 @@ import { InversionesComponent } from 'src/app/pages/principal/inversiones/invers
     MatStepperModule,
     MatDatepickerModule,
     MatNativeDateModule,
-
+    MatSnackBarModule,
   ],
   declarations: [
     PrincipalComponent,

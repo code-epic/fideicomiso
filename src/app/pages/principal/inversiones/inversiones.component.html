@@ -2,24 +2,30 @@
     <div class="col-md-12">
         <div class="card card-profile shadow">
             <div class="card-body">
+                <ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
                 <mat-tab-group>
-                    <mat-tab label="Portafolio">
+                    <mat-tab label="PORTAFOLIO">
 
                         <div style="padding: 20px;">
                             <br>
                             <form>
 
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Codigo</mat-label>
-                                            <input matInput placeholder="Codigo" value="">
+                                            <input matInput placeholder="Codigo" 
+                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="Portafolio.codigo"
+                                            value="{{Portafolio.codigo}}" (blur)="Consultar()">
+                                            <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
+                                                    
                                         </mat-form-field>
                                     </div>
-                                    <div class="col-md-8">
+                                    <div class="col-md-9">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Descripcion General</mat-label>
-                                            <input matInput placeholder="Descripcion General" value="">
+                                            <input matInput placeholder="Descripcion General" [ngModelOptions]="{standalone: true}" [(ngModel)]="Portafolio.descripcion"
+                                            value="{{Portafolio.descripcion}}">
                                         </mat-form-field>
                                     </div>
                                 </div>
@@ -28,87 +34,79 @@
                                     <div class="col-md-4">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Moneda de Operaciones</mat-label>
-                                            <input matInput placeholder="Moneda de Operaciones" value="">
+                                            <mat-select placeholder="Moneda de Operaciones" [ngModelOptions]="{standalone: true}" [(ngModel)]="Portafolio.moneda"
+                                            value="{{Portafolio.moneda}}">
+                                                <mat-option value="BS">BOLIVARES</mat-option>
+                                                <mat-option value="DOLAR">DOLARES</mat-option>
+                                                <mat-option value="YUAN">YUANES</mat-option>
+                                            </mat-select>
+                                            <mat-icon matSuffix>currency_exchange</mat-icon>
+                                            
                                         </mat-form-field>
                                     </div>
-                                    <div class="col-md-8">
-                                        <mat-form-field appearance="outline">
-                                            <mat-label>Descripcion General</mat-label>
-                                            <input matInput placeholder="Descripcion General" value="">
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                                <div class="row">
+                                   
                                     <div class="col-md-4">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Frecuencia de Cierre</mat-label>
-                                            <input matInput placeholder="Frecuencia de Cierre" value="">
+                                            <input matInput placeholder="Frecuencia de Cierre" [ngModelOptions]="{standalone: true}" [(ngModel)]="Portafolio.frecuencia"
+                                            value="{{Portafolio.frecuencia}}">
                                         </mat-form-field>
                                     </div>
-                                    <div class="col-md-8">
-                                        <mat-form-field appearance="outline">
-                                            <mat-label>Descripcion General</mat-label>
-                                            <input matInput placeholder="Descripcion General" value="">
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                                <div class="row">
+                                   
                                     <div class="col-md-4">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Distribucion de Garantias</mat-label>
-                                            <input matInput placeholder="Distribucion de Garantias" value="">
+                                            <input matInput placeholder="Distribucion de Garantias" [ngModelOptions]="{standalone: true}" [(ngModel)]="Portafolio.distribucion"
+                                            value="{{Portafolio.distribucion}}">
                                         </mat-form-field>
                                     </div>
-                                    <div class="col-md-8">
-                                        <mat-form-field appearance="outline">
-                                            <mat-label>Descripcion General</mat-label>
-                                            <input matInput placeholder="Descripcion General" value="">
-                                        </mat-form-field>
-                                    </div>
+                                    
+                                  
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Tipo de Cuenta</mat-label>
-                                            <input matInput placeholder="Tipo de Cuenta" value="">
+                                            <input matInput placeholder="Tipo de Cuenta" [ngModelOptions]="{standalone: true}" [(ngModel)]="Portafolio.tipo"
+                                            value="{{Portafolio.tipo}}">
                                         </mat-form-field>
                                     </div>
-                                    <div class="col-md-8">
-                                        <mat-form-field appearance="outline">
-                                            <mat-label>Descripcion General</mat-label>
-                                            <input matInput placeholder="Descripcion General" value="">
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-9">
+                                    <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Numero de Cuenta Bancaria</mat-label>
-                                            <input matInput placeholder="Numero de Cuenta Bancaria" value="">
+                                            <input matInput placeholder="Numero de Cuenta Bancaria" [ngModelOptions]="{standalone: true}" [(ngModel)]="Portafolio.numerocuenta"
+                                            value="{{Portafolio.numerocuenta}}" maxlength="20">
                                         </mat-form-field>
                                     </div>
                                     <div class="col-md-3">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Valor de Mercado</mat-label>
-                                            <mat-select placeholder="Valor de Mercado">
-                                                <mat-option>Selección</mat-option>
-                                                <mat-option>Si</mat-option>
-                                                <mat-option>No</mat-option>
+                                            <mat-select placeholder="Valor de Mercado" [ngModelOptions]="{standalone: true}" [(ngModel)]="Portafolio.valormercado"
+                                            value="{{Portafolio.valormercado}}">
+                                                <mat-option value="NO">NO</mat-option>
+                                                <mat-option value="SI">SI</mat-option>
                                             </mat-select>
-                                            <mat-icon matSuffix>boy</mat-icon>
+                                            <mat-icon matSuffix>monetization_on</mat-icon>
                                         </mat-form-field>
                                     </div>
                                 </div>
 
                                 
-
+                                <div class="row">
+                            
+                                    <div class="col-md-12 text-right">
+                                        <hr>
+                                        <button mat-flat-button color="primary" (click)="Guardar()">Registar portafolio</button>
+                                    </div>
+                                
+                                </div>
 
                             </form>
                         </div>
                     </mat-tab>
 
-                    <mat-tab label="Inversiones">
+                    <mat-tab label="INVERSIONES">
                         <div style="padding: 20px;">
                             <br>
                             <div class="row">
@@ -134,72 +132,22 @@
                                         <input matInput placeholder="Grupo de Inversion" value="">
                                     </mat-form-field>
                                 </div>
-                                <div class="col-md-6">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Descripcion General</mat-label>
-                                        <input matInput placeholder="Descripcion General" value="">
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-md-3">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Codigo BCV</mat-label>
-                                        <mat-select placeholder="Codigo BCV">
-                                            <mat-option>Selección</mat-option>
-                                            <mat-option>Si</mat-option>
-                                            <mat-option>No</mat-option>
-                                        </mat-select>
-                                        <mat-icon matSuffix>boy</mat-icon>
-                                    </mat-form-field>
-                                </div>
-                            </div>
-
-                            <div class="row">
                                 <div class="col-md-3">
                                     <mat-form-field appearance="outline">
                                         <mat-label>Limite de Cartera</mat-label>
                                         <input matInput placeholder="Limite de Cartera" value="">
                                     </mat-form-field>
                                 </div>
-                                <div class="col-md-6">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Descripcion General</mat-label>
-                                        <input matInput placeholder="Descripcion General" value="">
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-md-3">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Codigo ISIN</mat-label>
-                                        <mat-select placeholder="Codigo ISIN">
-                                            <mat-option>Selección</mat-option>
-                                            <mat-option>Si</mat-option>
-                                            <mat-option>No</mat-option>
-                                        </mat-select>
-                                        <mat-icon matSuffix>boy</mat-icon>
-                                    </mat-form-field>
-                                </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-3">
                                     <mat-form-field appearance="outline">
                                         <mat-label>Moneda de Operaciones</mat-label>
                                         <input matInput placeholder="Moneda de Operaciones" value="">
                                     </mat-form-field>
                                 </div>
-                                <div class="col-md-6">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Descripcion General</mat-label>
-                                        <input matInput placeholder="Descripcion General" value="">
-                                    </mat-form-field>
-                                </div>
                                 <div class="col-md-3">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Decreto</mat-label>
-                                        <mat-select placeholder="Decreto">
-                                            <mat-option>Selección</mat-option>
-                                            <mat-option>Si</mat-option>
-                                            <mat-option>No</mat-option>
-                                        </mat-select>
-                                        <mat-icon matSuffix>boy</mat-icon>
+                                        <mat-label>Calculo de Costo</mat-label>
+                                        <input matInput placeholder="Calculo de Costo" value="">
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -207,28 +155,51 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Calculo de Costo</mat-label>
-                                        <input matInput placeholder="Calculo de Costo" value="">
+                                        <mat-label>Codigo BCV</mat-label>
+                                        <mat-select placeholder="Codigo BCV">
+                                            <mat-option value="NO">NO</mat-option>
+                                            <mat-option value="SI">SI</mat-option>
+                                        </mat-select>
+                                        <mat-icon matSuffix>article</mat-icon>
                                     </mat-form-field>
                                 </div>
-                                <div class="col-md-6">
+
+                                   
+                                <div class="col-md-3">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Descripcion General</mat-label>
-                                        <input matInput placeholder="Descripcion General" value="">
+                                        <mat-label>Codigo ISIN</mat-label>
+                                        <mat-select placeholder="Codigo ISIN">
+                                            <mat-option value="NO">NO</mat-option>
+                                            <mat-option value="SI">SI</mat-option>
+                                        </mat-select>
+                                        <mat-icon matSuffix>article</mat-icon>
                                     </mat-form-field>
                                 </div>
+
+
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Decreto</mat-label>
+                                        <mat-select placeholder="Decreto">
+                                            <mat-option value="NO">NO</mat-option>
+                                            <mat-option value="SI">SI</mat-option>
+                                        </mat-select>
+                                        <mat-icon matSuffix>article</mat-icon>
+                                    </mat-form-field>
+                                </div>
+
                                 <div class="col-md-3">
                                     <mat-form-field appearance="outline">
                                         <mat-label>Emision</mat-label>
                                         <mat-select placeholder="Emision">
-                                            <mat-option>Selección</mat-option>
-                                            <mat-option>Si</mat-option>
-                                            <mat-option>No</mat-option>
+                                            <mat-option value="NO">NO</mat-option>
+                                            <mat-option value="SI">SI</mat-option>
                                         </mat-select>
-                                        <mat-icon matSuffix>boy</mat-icon>
+                                        <mat-icon matSuffix>article</mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <mat-form-field appearance="outline">
@@ -250,9 +221,8 @@
                                     <mat-form-field appearance="outline">
                                         <mat-label>Valor Inicial</mat-label>
                                         <mat-select placeholder="Valor Inicial">
-                                            <mat-option>Selección</mat-option>
-                                            <mat-option>Si</mat-option>
-                                            <mat-option>No</mat-option>
+                                            <mat-option value="NO">NO</mat-option>
+                                            <mat-option value="SI">SI</mat-option>
                                         </mat-select>
                                         <mat-icon matSuffix>boy</mat-icon>
                                     </mat-form-field>
@@ -261,9 +231,8 @@
                                     <mat-form-field appearance="outline">
                                         <mat-label>Moneda Extranjera</mat-label>
                                         <mat-select placeholder="Moneda Extranjera">
-                                            <mat-option>Selección</mat-option>
-                                            <mat-option>Si</mat-option>
-                                            <mat-option>No</mat-option>
+                                            <mat-option value="NO">NO</mat-option>
+                                            <mat-option value="SI">SI</mat-option>
                                         </mat-select>
                                         <mat-icon matSuffix>boy</mat-icon>
                                     </mat-form-field>
@@ -272,15 +241,22 @@
                                     <mat-form-field appearance="outline">
                                         <mat-label>Estatus</mat-label>
                                         <mat-select placeholder="Estatus">
-                                            <mat-option>Selección</mat-option>
-                                            <mat-option>Si</mat-option>
-                                            <mat-option>No</mat-option>
+                                            <mat-option value="INACTIVO">INACTIVO</mat-option>
+                                            <mat-option value="ACTIVO">ACTIVO</mat-option>
                                         </mat-select>
                                         <mat-icon matSuffix>boy</mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
 
+                            <div class="row">
+                            
+                                <div class="col-md-12 text-right">
+                                    <hr>
+                                    <button mat-flat-button color="primary" (click)="GuardarInversiones()">Registar inversiones</button>
+                                </div>
+                            
+                            </div>
 
                         </div>
 

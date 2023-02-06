@@ -1,6 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
@@ -71,8 +70,7 @@ export class ApiService {
   };
 
   constructor( 
-    private http : HttpClient,
-    private ruta: Router) {
+    private http : HttpClient) {
     
   }
 
@@ -129,5 +127,7 @@ export class ApiService {
 
     return respuesta
   }
+
+ 
 
 }

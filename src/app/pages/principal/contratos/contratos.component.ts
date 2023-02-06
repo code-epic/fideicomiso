@@ -1,5 +1,6 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Direccion } from 'src/app/services/banfanb/afiliado.service';
@@ -96,6 +97,7 @@ export class ContratosComponent implements OnInit {
   
   constructor(
     private apiService: ApiService,
+    private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService) { }
 
   ngOnInit(): void {
@@ -237,6 +239,12 @@ export class ContratosComponent implements OnInit {
 
   Guardar() {
 
+    if (this.Contrato.numero == "") return
+    if(this.fechainicio.value == "") {
+      this._snackBar.open('Debe verificar todos los campos...', 'dance')
+      return
+    }
+    
     this.ngxService.startLoader('load-cont')
     let f = new Date( this.fechainicio.value ).toISOString()
 
@@ -262,5 +270,8 @@ export class ContratosComponent implements OnInit {
     )
 
   }
+
+  
+    
 
 }
