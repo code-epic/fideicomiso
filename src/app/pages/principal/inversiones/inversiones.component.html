@@ -6,7 +6,7 @@
                 <mat-tab-group>
                     <mat-tab label="PORTAFOLIO">
 
-                        <div style="padding: 20px;" class="animated fadeIn" [ngStyle]="{'display':porta_insert}">
+                        <div style="padding: 20px;" [ngStyle]="{'display':porta_insert}">
                             <br>
                             <form>
 
@@ -104,7 +104,7 @@
 
                             </form>
                         </div>
-                        <div style="padding: 20px;" class="animated fadeIn" [ngStyle]="{'display':porta_search}">
+                        <div style="padding: 20px;" [ngStyle]="{'display':porta_search}">
                             <br>
                                  <mat-selection-list>
                                     <mat-list *ngFor="let e of lstPortafolio; let i=index "
@@ -144,7 +144,7 @@
                     </mat-tab>
 
                     <mat-tab label="INVERSIONES">
-                        <div style="padding: 20px;" class="animated fadeIn" [ngStyle]="{'display':inver_insert}">
+                        <div style="padding: 20px;" [ngStyle]="{'display':inver_insert}">
                             <br>
                             <div class="row">
                                 <div class="col-md-4">
@@ -313,7 +313,7 @@
 
                         </div>
 
-                        <div style="padding: 20px;" class="animated fadeIn" [ngStyle]="{'display':inver_search}">
+                        <div style="padding: 20px;" [ngStyle]="{'display':inver_search}">
                             <br>
                                  <mat-selection-list>
                                     <mat-list *ngFor="let e of lstInversiones; let i=index "
@@ -330,10 +330,10 @@
                                                 {{ e.moneda | uppercase }}
                                             </div>
                                             <div class="col-md-2 texto-detalle">
-                                                {{ e.frecuencia | uppercase }}
+                                                {{ e.grupo | uppercase }}
                                             </div>
                                             <div class="col-md-2 texto-detalle">
-                                                {{ e.valormercado | uppercase }}
+                                                {{ e.estatus | uppercase }}
                                             </div>
                                           
                                             <div class="col-md-1 text-right">

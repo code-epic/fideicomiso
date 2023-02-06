@@ -90,6 +90,11 @@ export class InversionesComponent implements OnInit {
     this.porta_search = 'none'
   }
 
+  editarInver(e) {
+    this.Inversiones = e
+    this.inver_insert = ''
+    this.inver_search = 'none'
+  }
 
   Listar() {
     this.xAPI.funcion = "FID_CPortafolios"
@@ -104,13 +109,6 @@ export class InversionesComponent implements OnInit {
       }
     )
   }
-
-  editarInver(e) {
-    this.Inversiones = e
-    this.inver_insert = ''
-    this.inver_search = 'none'
-  }
-
 
   ListarInver() {
     this.lstInversiones = []
@@ -151,20 +149,7 @@ export class InversionesComponent implements OnInit {
       }
     )
   }
-
-  Seleccionar(){
-    this.porta_insert = 'none'
-    this.porta_search = ''
-  }
-
-  SeleccionarInversiones(){
-    this.ListarInver()
-    this.inver_insert = 'none'
-    this.inver_search = ''
-  }
-
-
-
+  
   ConsultarInver() {
     this.xAPI.funcion = "FID_CInversion"
     this.xAPI.parametros = this.Inversiones.codigo
@@ -184,6 +169,21 @@ export class InversionesComponent implements OnInit {
       }
     )
   }
+
+  Seleccionar(){
+    this.porta_insert = 'none'
+    this.porta_search = ''
+  }
+
+  SeleccionarInversiones(){
+    this.ListarInver()
+    this.inver_insert = 'none'
+    this.inver_search = ''
+  }
+
+
+
+
 
   Limpiar() {
     this.Portafolio = {
