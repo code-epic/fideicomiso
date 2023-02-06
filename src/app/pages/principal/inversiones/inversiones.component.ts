@@ -31,17 +31,17 @@ export class InversionesComponent implements OnInit {
     codigo: '',
     descripcion: '',
     grupo: '',
-    limitecartera: 0,
-    monedaoperaciones: '',
-    calculocosto: 0,
-    contabilidadcomo: '',
+    limite: '',
+    moneda: '',
+    calculo: '',
+    contabilidad: '',
     totalinvertido: 0,
     codigobcv: '',
     codigoisin: '',
     decreto: '',
     emision: '',
-    valorinicial: 0,
-    monedaextranjera: 0,
+    valorinicial: '',
+    monedaextranjera: '',
     estatus: 0,
     fecha: new Date(),
     autor: ''
@@ -56,6 +56,13 @@ export class InversionesComponent implements OnInit {
     parametros: ''
   }
 
+  public porta_insert : string = ''
+  public porta_search : string = 'none'
+
+  public inver_insert : string = ''
+  public inver_search : string = 'none'
+
+
   constructor(
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
@@ -63,6 +70,7 @@ export class InversionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.Listar()
+    this.ListarInver() 
   }
 
   tabActive(event) {
@@ -77,25 +85,49 @@ export class InversionesComponent implements OnInit {
   }
 
   editar(e) {
-    // this.Aporte = e
-    // this.selectedIndex = 1
-    // this.active = true
+    this.Portafolio = e
+    this.porta_insert = ''
+    this.porta_search = 'none'
   }
 
 
   Listar() {
-    // this.xAPI.funcion = "FID_CAportes"
-    // this.xAPI.parametros = ''
-    // this.apiService.Ejecutar(this.xAPI).subscribe(
-    //   (data) => {
-    //     this.lstAportes = data
-    //   },
-    //   (error) => {
-    //     console.log(error)
-    //     this.Limpiar()
-    //   }
-    // )
+    this.xAPI.funcion = "FID_CPortafolios"
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstPortafolio = data
+      },
+      (error) => {
+        console.log(error)
+        this.Limpiar()
+      }
+    )
   }
+
+  editarInver(e) {
+    this.Inversiones = e
+    this.inver_insert = ''
+    this.inver_search = 'none'
+  }
+
+
+  ListarInver() {
+    this.lstInversiones = []
+    this.xAPI.funcion = "FID_CInversiones"
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstInversiones = data
+      },
+      (error) => {
+        console.log(error)
+        this.Limpiar()
+      }
+    )
+  }
+
+
 
   Consultar() {
 
@@ -121,16 +153,24 @@ export class InversionesComponent implements OnInit {
   }
 
   Seleccionar(){
-    
+    this.porta_insert = 'none'
+    this.porta_search = ''
+  }
+
+  SeleccionarInversiones(){
+    this.ListarInver()
+    this.inver_insert = 'none'
+    this.inver_search = ''
   }
 
 
-  ConsultarInventario() {
-    this.xAPI.funcion = "FID_CInventario"
+
+  ConsultarInver() {
+    this.xAPI.funcion = "FID_CInversion"
     this.xAPI.parametros = this.Inversiones.codigo
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if (data != null) {
+        if (data != null && data.msj == undefined) {
           this.Inversiones = data[0]
         } else {
           let aux = this.Inversiones.codigo
@@ -199,7 +239,7 @@ export class InversionesComponent implements OnInit {
     this.ngxService.startLoader('load-inver')
     var obj = {
       "coleccion": "inversiones",
-      "objeto": this.Portafolio,
+      "objeto": this.Inversiones,
       "donde": `{\"codigo\":\"${this.Inversiones.codigo}\"}`,
       "driver": "MDBFIDE",
       "upsert": true

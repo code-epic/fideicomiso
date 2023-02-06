@@ -5,17 +5,17 @@ export interface Inversiones {
   codigo: string
   descripcion: string
   grupo: string
-  limitecartera: number
-  monedaoperaciones: string
-  calculocosto: number
-  contabilidadcomo: string
+  limite: string
+  moneda: string
+  calculo: string
+  contabilidad: string
   totalinvertido: number
   codigobcv: string
   codigoisin: string
   decreto: string
   emision: string
-  valorinicial: number
-  monedaextranjera: number
+  valorinicial: string
+  monedaextranjera: string
   estatus: number
   fecha: Date
   autor: string
