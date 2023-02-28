@@ -81,7 +81,7 @@
                                         </div>
                                         <div class="col-md-8">
                                             <mat-form-field appearance="outline">
-                                                <mat-label>Empresa / Afiliado</mat-label>
+                                                <mat-label>Empresa / Fideicomitente</mat-label>
                                                 <input matInput placeholder="Empresa / Afiliado" [(ngModel)]="Contrato.razonsocial"
                                                     value="{{Contrato.razonsocial}}">
 
@@ -580,7 +580,7 @@
                                                 </div>
                                             </mat-tab>
 
-                                            <mat-tab >
+                                            <mat-tab style="display:none">
                                                 <ng-template mat-tab-label>
                                                     &nbsp;SALDOS
                                                 </ng-template>
@@ -688,13 +688,7 @@
                                                 </div>
                                             </mat-tab>
 
-                                            <mat-tab > 
-                                                <ng-template mat-tab-label>
-                                                    &nbsp;OBRAS
-                                                </ng-template>
-                                                <br><br>
                                             
-                                            </mat-tab>
                                         
                                         </mat-tab-group>
                                     

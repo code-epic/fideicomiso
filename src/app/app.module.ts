@@ -39,7 +39,10 @@ import { MatInputModule } from '@angular/material/input';
 
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { MatTableModule } from '@angular/material/table';
-import { PortafolioComponent } from './pages/principal/portafolio/portafolio.component';
+import { PortafolioComponent } from './pages/principal/administracion/portafolio/portafolio.component';
+import { AdministracionComponent } from './pages/principal/administracion/administracion.component';
+import { EmpresaComponent } from './pages/principal/administracion/empresa/empresa.component';
+import { MatSelectModule } from '@angular/material/select';
 
 
 @NgModule({
@@ -63,9 +66,11 @@ import { PortafolioComponent } from './pages/principal/portafolio/portafolio.com
     ReactiveFormsModule,
     MatInputModule,
     MatPaginatorModule,
+    MatSelectModule,
     MatDatepickerModule,
     MatTableModule,
     MatDialogModule,
+    MatTabsModule,
     MatCommonModule,
     ToastContainerModule,
     NgxUiLoaderModule,
@@ -83,7 +88,6 @@ import { PortafolioComponent } from './pages/principal/portafolio/portafolio.com
     AppComponent,
     AdminLayoutComponent,
     AuthLayoutComponent,
-    PortafolioComponent,
   ],
   providers:  [
     {

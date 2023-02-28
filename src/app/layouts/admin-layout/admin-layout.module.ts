@@ -29,7 +29,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 
 
 import { CambiarclaveComponent } from 'src/app/pages/generico/perfil/cambiarclave/cambiarclave.component';
@@ -41,6 +41,9 @@ import { ContratosComponent } from 'src/app/pages/principal/contratos/contratos.
 import { AportesComponent } from 'src/app/pages/principal/aportes/aportes.component';
 import { ContabilidadComponent } from 'src/app/pages/principal/contabilidad/contabilidad.component';
 import { InversionesComponent } from 'src/app/pages/principal/inversiones/inversiones.component';
+import { PortafolioComponent } from 'src/app/pages/principal/administracion/portafolio/portafolio.component';
+import { AdministracionComponent } from 'src/app/pages/principal/administracion/administracion.component';
+import { EmpresaComponent } from 'src/app/pages/principal/administracion/empresa/empresa.component';
 
 
 
@@ -91,9 +94,13 @@ import { InversionesComponent } from 'src/app/pages/principal/inversiones/invers
     ContratosComponent,
     AportesComponent,
     ContabilidadComponent,
-    InversionesComponent
+    InversionesComponent,
+    PortafolioComponent,
+    AdministracionComponent,
+    EmpresaComponent,
   ],
   providers: [
+    {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},
   ],
 })

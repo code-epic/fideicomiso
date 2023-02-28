@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   ID : 'ID-003',
   Url: 'http://localhost',
-  API: '/devel/api/',
+  API: '/v1/api/',
   Hash: ':c521f27fb1b3311d686d511b668e5bd4'
 };
 

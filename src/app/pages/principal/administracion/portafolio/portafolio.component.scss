@@ -1,0 +1,100 @@
+.example-form {
+    min-width: 150px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.mat-form-field {
+    width: 100%;
+}
+
+.mat-tab {
+    margin-top: 48px;
+    padding: 50px;
+}
+
+table {
+    width: 100%;
+}
+
+.mat-mdc-form-field + .mat-mdc-form-field {
+    margin-left: 8px;
+  }
+
+
+
+.example-section {
+    margin: 12px 0;
+}
+  
+.example-margin {
+    margin: 0 12px;
+}
+
+ul {
+    list-style-type: none;
+    margin-top: 4px;
+}
+
+.texto-lista{
+    margin-top: 13px; 
+    font-weight: bold;
+}
+
+.texto-detalle{
+    margin-top: 13px; 
+    font-weight: none;
+}
+
+.texto-gray{
+    color: #969696;
+}
+
+
+.example-headers-align .mat-expansion-panel-header-title,
+.example-headers-align .mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.example-headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.example-headers-align .mat-form-field + .mat-form-field {
+  margin-left: 8px;
+}
+
+.calendario {
+    width: 2.75rem;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAcCAYAAAAEN20fAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEUSURBVEiJ7ZQxToVAEIY/YCHGxN6XGOIpnpaEsBSeQC9ArZbm9TZ6ADyBNzAhQGGl8Riv4BLAWAgmkpBYkH1b8FWT2WK/zJ8ZJ4qiI6XUI3ANnGKWBnht2/ZBDRK3hgVGNsCd7/ui+JkEIrKtqurLpEWaphd933+IyI3LEIdpCYCiKD6HcuOa/nwOa0ScJEnk0BJg0UTUWJRl6RxCYEzEmomsIlPU3IPW+grIAbquy+q6fluy/28RIBeRMwDXdXMgXLj/B2uimRXpui4D9sBeRLKl+1N+L+t6RwbWrZliTTTr1oxYtzVWiTQAcRxvTX+eJMnlUDaO1vpZRO5NS0x48sIwfPc87xg4B04MCzQi8hIEwe4bl1DnFMCN2zsAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat;
+    background-size: 23px;
+    background-position: center;
+    border-color: #bbbfc5 !important;
+}
+
+// mat-form-field {
+//     margin-right: 12px;
+//   }
+
+input{
+    text-transform: uppercase;
+}
+select{
+    text-transform: uppercase;
+}
+textarea {
+    text-transform: uppercase;
+}
+
+.example-form-field {
+    margin: 0 8px 16px 0;
+    width: 90%;
+}
+
+.asistente-button-container {
+    justify-content: center;
+    width: 30px;
+    padding-top: 13px;
+  }

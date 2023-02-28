@@ -88,6 +88,8 @@ export class ContratosComponent implements OnInit {
   public selectedIndex = 0;
   public active: boolean = false
 
+  public contrato_search: string = 'none'
+
   public xAPI: IAPICore = {
     funcion: '',
     parametros: ''
@@ -109,6 +111,7 @@ export class ContratosComponent implements OnInit {
     this.selectedIndex = event.index
     if (!this.active) {
       this.Limpiar()
+      //this.contrato_search = 'none'
       this.Listar()
     } else {
       this.active = !this.active
@@ -121,7 +124,7 @@ export class ContratosComponent implements OnInit {
     this.Contrato = e
     this.selectedIndex = 1
     this.active = true
-
+    //this.contrato_search = ''
     this.fechainicio.setValue(this.Contrato.Saldos.fechainicio)
   }
 

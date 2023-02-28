@@ -34,14 +34,26 @@ export class SidebarComponent implements OnInit {
     if (ROUTES.length == 0){
       await this.loginService.Iniciar()
       var App = this.loginService.Aplicacion
-      
+      let i = 0
       App.Rol.Menu.forEach(e => {
+        
+        if (i == 1){
+          ROUTES.push({
+            path : '/administracion',
+            title: 'Administracion',
+            icon : 'ni ni-circle-08',
+            class : 'text-pink'
+          })
+  
+        }
         ROUTES.push({
           path : e.url,
           title: e.nombre,
           icon : e.icono,
           class : e.clase
         })
+        i++
+
       });
     }
     this.menuItems = ROUTES.filter(menuItem => menuItem);    
