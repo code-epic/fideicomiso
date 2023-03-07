@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators} from '@angular/forms';
-import {FormsModule,ReactiveFormsModule} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 @Component({
@@ -16,15 +16,24 @@ export class HechiceroComponent implements OnInit {
   secondFormGroup = this._formBuilder.group({
     secondCtrl: ['', Validators.required],
   });
+
   isEditable = false;
 
   grupos : any
+
+  public tipo : any = {
+    nombre : 'MAESTRO',
+    delimitador : ';',
+    formato : 'csv'
+  }
 
   tipologias = new FormControl('');
 
   constructor(private _formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
+    
   }
+
 
 }

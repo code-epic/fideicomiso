@@ -85,7 +85,15 @@ export class ContratosComponent implements OnInit {
   }
 
   public lstContratos = []
+  
+  public lstPaises = []
+
+  public lstCiudades = []
+
+  public lstEstados = []
+
   public selectedIndex = 0;
+  
   public active: boolean = false
 
   public contrato_search: string = 'none'
@@ -96,7 +104,14 @@ export class ContratosComponent implements OnInit {
   }
   public fechainicio = new FormControl(new Date());
 
-  
+  public tabSaldos : boolean = false
+
+  public focus : boolean = false
+
+  public buscar = ''
+
+
+
   constructor(
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
@@ -104,6 +119,8 @@ export class ContratosComponent implements OnInit {
 
   ngOnInit(): void {
     this.Listar()
+    this.ListarPaises()
+    this.ListarEstados()
   }
 
   tabActive(event) {
@@ -113,6 +130,7 @@ export class ContratosComponent implements OnInit {
       this.Limpiar()
       //this.contrato_search = 'none'
       this.Listar()
+      this.tabSaldos = false
     } else {
       this.active = !this.active
     }
@@ -126,6 +144,7 @@ export class ContratosComponent implements OnInit {
     this.active = true
     //this.contrato_search = ''
     this.fechainicio.setValue(this.Contrato.Saldos.fechainicio)
+    this.tabSaldos = true
   }
 
 
@@ -144,6 +163,58 @@ export class ContratosComponent implements OnInit {
         this.Limpiar()
       }
     )
+  }
+
+  ListarPaises() {
+    this.xAPI.funcion = "ListarPaises"
+    this.xAPI.parametros = ''
+
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.lstPaises = data.Cuerpo
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+  }
+
+  ListarEstados() {
+    this.xAPI.funcion = "ListarEstados"
+    this.xAPI.parametros = ''
+
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.lstEstados = data.Cuerpo
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+  }
+
+  ListarCiudades() {
+    this.xAPI.funcion = "ListarCiudad"
+    this.xAPI.parametros = ''
+
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.lstCiudades = data
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+  }
+
+  Buscar(e){
+
   }
 
   Consultar() {

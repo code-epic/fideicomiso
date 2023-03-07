@@ -43,6 +43,8 @@ import { PortafolioComponent } from './pages/principal/administracion/portafolio
 import { AdministracionComponent } from './pages/principal/administracion/administracion.component';
 import { EmpresaComponent } from './pages/principal/administracion/empresa/empresa.component';
 import { MatSelectModule } from '@angular/material/select';
+import { FileUploadComponent } from './pages/generico/file/file-upload/file-upload.component';
+import { FileComponent } from './pages/generico/file/file/file.component';
 
 
 @NgModule({

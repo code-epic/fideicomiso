@@ -16,6 +16,35 @@
 
                             <div class="container">
                                 <br>
+                                <div class="row">
+                                  <div class="col-md-3 text-right">
+                              
+                                  </div>
+                                  <div class="col-md-6 text-center">
+                                    
+                                  
+                                    <br>
+                                    <form class="navbar-search">
+                                      <div class="form-group" [ngClass]="{ 'focused': focus === true }">
+                                        <div class="input-group input-group-alternative">
+                                          <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa fa-search "></i></span>
+                                          </div>
+                                          <input class="form-control" placeholder="Buscar" type="text" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="buscar" (focus)="focus = true" (blur)="focus = false" (keypress)="Buscar($event)">
+                                          <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa fa-sliders"></i></span>
+                                          </div>
+                              
+                                        </div>
+                                      </div>
+                                    </form>
+                              
+                                  </div>
+                                  <div class="col-md-3">
+                              
+                                  </div>
+                                </div>
                                  <mat-selection-list>
                                     <mat-list *ngFor="let e of lstContratos; let i=index "
                                         style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
@@ -67,8 +96,8 @@
                                     <div class="row">
                                         <div class="col-md-2">
                                             <mat-form-field appearance="outline">
-                                                <mat-label>Numero</mat-label>
-                                                <input matInput placeholder="Rif" [(ngModel)]="Contrato.numero"
+                                                <mat-label>Numero de control</mat-label>
+                                                <input matInput placeholder="Numero de control" [(ngModel)]="Contrato.numero"
                                                     value="{{Contrato.numero}}" (blur)="Consultar()">
                                             </mat-form-field>
                                         </div>
@@ -251,8 +280,8 @@
                                                                     <mat-select placeholder="País" [ngModelOptions]="{standalone: true}"
                                                                         [(ngModel)]="Contrato.Direccion.pais"
                                                                         value="{{Contrato.Direccion.pais}}">
-                                                                        <mat-option value="S">SELECCION</mat-option>
-                                                                        <mat-option value="VENEZUELA">VENEZUELA</mat-option>
+                                                                        <mat-option *ngFor="let e of lstPaises" value="{{e.code}}">{{e.nombre | uppercase }}</mat-option>
+                                                                       
                                                                     </mat-select>
                                                                     <mat-icon matSuffix>public</mat-icon>
 
@@ -265,8 +294,7 @@
                                                                         [ngModelOptions]="{standalone: true}"
                                                                         [(ngModel)]="Contrato.Direccion.ciudad"
                                                                         value="{{Contrato.Direccion.ciudad}}">
-                                                                        <mat-option value="S">SELECCION</mat-option>
-                                                                        <mat-option value="MERIDA">MERIDA</mat-option>
+                                                                        <mat-option *ngFor="let e of lstEstados" value="{{e.id_estado}}">{{e.estado | uppercase }}</mat-option>
                                                                     </mat-select>
                                                                     <mat-icon matSuffix>home</mat-icon>
 
@@ -580,7 +608,7 @@
                                                 </div>
                                             </mat-tab>
 
-                                            <mat-tab style="display:none">
+                                            <mat-tab *ngIf="tabSaldos">
                                                 <ng-template mat-tab-label>
                                                     &nbsp;SALDOS
                                                 </ng-template>

@@ -1,0 +1,128 @@
+<div class="container">
+
+    <form>
+
+        <div class="row">
+            <div class="col-md-12">
+                <p>Los productos definen el formato del contenido que forma la estructura de la carga digital</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <mat-form-field appearance="outline">
+                    <mat-label>Nombre producto</mat-label>
+                    <input matInput placeholder="Nombre producto" required value="{{tipo.nombre}}">
+                    <mat-icon matSuffix>tag</mat-icon>
+
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                    <mat-label>Formato</mat-label>
+                    <mat-select required value="{{tipo.formato}}">
+                        <mat-option value="csv">*.csv </mat-option>
+                        <mat-option value="txt">*.txt </mat-option>
+                        <mat-option value="-">*</mat-option>
+                    </mat-select>
+                    <!-- <mat-icon matSuffix>briefcase</mat-icon> -->
+
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field appearance="outline">
+                    <mat-label>Delimitador</mat-label>
+                    <mat-select required value="{{tipo.delimitador}}">
+                        <mat-option value=";"> PUNTO Y COMA ( ; )</mat-option>
+                        <mat-option value=",">COMA ( , )</mat-option>
+                        <mat-option value=".">PUNTO ( . )</mat-option>
+                        <mat-option value="tab">TABULADOR</mat-option>
+                        <mat-option value="-">-</mat-option>
+                    </mat-select>
+
+                </mat-form-field>
+            </div>
+            
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <mat-form-field appearance="outline">
+                    <mat-label>Nombre de las colmnas separadas por comas (,)</mat-label>
+                    <input matInput placeholder="codigo,nombre,descripcion" required value="{{tipo.columnas}}">
+                    <mat-icon matSuffix>web_stories</mat-icon>
+
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field appearance="outline">
+                    <mat-label>Delimitador</mat-label>
+                    <mat-select required value="{{tipo.accion}}">
+                        <mat-option value="api">API</mat-option>
+                        <mat-option value="db">BASE DE DATOS</mat-option>
+                        <mat-option value="service">SERVICIO</mat-option>
+                        <mat-option value="repo">REPOSITORIO</mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix>checklist</mat-icon>
+
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <mat-form-field appearance="outline">
+                    <mat-label>Con informacion</mat-label>
+                    <mat-select required value="{{tipo.datos}}">
+                        <mat-option value="0">NO INCLUYE DATOS</mat-option>
+                        <mat-option value="1">CON DATOS</mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix>checklist</mat-icon>
+
+                </mat-form-field>
+            </div>
+            <div class="col-md-7">
+                <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+
+                    <mat-form-field>
+                        <div>
+                            <input type="text" readonly name="accion" hidden="hidden" />
+                            <mat-toolbar style=" margin-left: -10px;">
+
+                                <!-- Display files names -->
+                                <input matInput [(ngModel)]="fileAttr" readonly name="name"
+                                    style="font-size: 14px; color: #999; " />
+                                <!-- Browse Button -->
+                                <button mat-mini-fab color="accent">
+                                    <mat-icon>attach_file</mat-icon>
+                                </button>
+                            </mat-toolbar>
+                            <!-- Fetch selected filed on change -->
+                            <input type="file" #fileInput id="uploadFile" (change)="uploadFileEvt($event)"
+                                name="uploadFile" multiple="multiple" accept="text/*" />
+
+                        </div>
+                    </mat-form-field>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <button mat-flat-button color="primary">
+                    <mat-icon matSuffix>psychology</mat-icon>
+                    Procesar
+                </button>
+            </div>
+            <div class="col-md-6" align="end">
+                <button mat-stroked-button >
+                    <mat-icon matSuffix>close</mat-icon>
+                    Cancelar
+                </button>
+            </div>
+           
+            
+          
+        </div>
+    </form>
+
+</div>

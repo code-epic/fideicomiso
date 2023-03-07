@@ -10,22 +10,35 @@
             <p>Los productos definen el formato del contenido que forma la estructura de la carga digital</p>
           </div>
         </div>
-        <div class="row">   
-          <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-5">
             <mat-form-field appearance="outline">
-              <mat-label>Producto</mat-label>
-              <mat-select formControlName="firstCtrl" required value="Crédito">
-                <mat-option value="Crédito">CREDITOS</mat-option>
-                <mat-option value="Otros">OTROS</mat-option>
+              <mat-label>Nombre producto</mat-label>
+              <input matInput placeholder="Nombre producto" required  value="{{tipo.nombre}}">
+              <mat-icon matSuffix>tag</mat-icon>
+
+            </mat-form-field>
+          </div>
+          <div class="col-md-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Formato</mat-label>
+              <mat-select formControlName="firstCtrl" required  value="{{tipo.formato}}">
+                <mat-option value="csv">Texto (*.Csv)</mat-option>
+                <mat-option value="txt">Texto (*.txt)</mat-option>
               </mat-select>
               <!-- <mat-icon matSuffix>briefcase</mat-icon> -->
 
             </mat-form-field>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-3">
             <mat-form-field appearance="outline">
-              <mat-label>Versión</mat-label>
-              <input matInput placeholder="Nueva clave" value="SOE-### (03-18)">
+              <mat-label>Delimitador</mat-label>
+              <mat-select formControlName="firstCtrl" required value="{{tipo.delimitador}}">
+                <mat-option value=";">;</mat-option>
+                <mat-option value=",">,</mat-option>
+                <mat-option value=".">.</mat-option>
+                <mat-option value="tab">TABULADOR</mat-option>
+              </mat-select>
               <mat-icon matSuffix>tag</mat-icon>
 
             </mat-form-field>
@@ -43,21 +56,24 @@
     </mat-step>
     <mat-step [stepControl]="secondFormGroup" >
       <form [formGroup]="secondFormGroup">
-        <ng-template matStepLabel>Subproductos</ng-template>
+        <ng-template matStepLabel>Archivos</ng-template>
         <div class="row">
           <div class="col-md-12">
             <p></p>
           </div>
         </div>
         <div class="row">   
-          <div class="col-md-4">
+          <div class="col-md-12">
+            <app-file ACCION="{{tipo}}"></app-file>
+          </div>
+          <!-- <div class="col-md-4">
             <mat-form-field appearance="outline">
               <mat-label>Sub Producto</mat-label>
               <mat-select formControlName="secondCtrl" required value="Crédito">
                 <mat-option value="Crédito">CREDITO CARTERIZADO</mat-option>
                 <mat-option value="Otros">OTROS</mat-option>
               </mat-select>
-              <!-- <mat-icon matSuffix>briefcase</mat-icon> -->
+              <mat-icon matSuffix>briefcase</mat-icon>
 
             </mat-form-field>
           </div>
@@ -72,7 +88,7 @@
               <mat-option value="INFORMACIÓN INTERNA">INFORMACIÓN INTERNA</mat-option>
             </mat-select>
           </mat-form-field>
-          </div>
+          </div> -->
           <!-- <mat-form-field appearance="outline"> DOCUMENTOS FINANCIEROS DEL DEUDOR, DOCUMENTOS  JURÍDICOS DEL DEUDOR
           <mat-label>Name</mat-label>
           <input matInput formControlName="firstCtrl" placeholder="Last name, First name" required>

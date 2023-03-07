@@ -1,0 +1,25 @@
+<form method="post" enctype="multipart/form-data" id="forma" name="forma">
+
+  <mat-form-field >
+    <div>
+      <input type="text" readonly name="accion" hidden="hidden"/>
+      <mat-toolbar style=" margin-left: -10px;">
+        
+        <!-- Display files names -->
+        <input matInput [(ngModel)]="fileAttr" readonly name="name" style="font-size: 14px; color: #999; " />
+        <!-- Browse Button -->
+        <button mat-mini-fab color="accent">
+          <mat-icon>attach_file</mat-icon>
+        </button>
+      </mat-toolbar>
+      <!-- Fetch selected filed on change -->
+      <input type="file" #fileInput id="uploadFile" 
+        (change)="uploadFileEvt($event)" 
+        name="uploadFile"
+        multiple="multiple" 
+        accept="text/*" />
+        
+    </div>
+  </mat-form-field>
+
+</form>

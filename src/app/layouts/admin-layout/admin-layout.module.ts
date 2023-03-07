@@ -44,6 +44,8 @@ import { InversionesComponent } from 'src/app/pages/principal/inversiones/invers
 import { PortafolioComponent } from 'src/app/pages/principal/administracion/portafolio/portafolio.component';
 import { AdministracionComponent } from 'src/app/pages/principal/administracion/administracion.component';
 import { EmpresaComponent } from 'src/app/pages/principal/administracion/empresa/empresa.component';
+import { FileUploadComponent } from 'src/app/pages/generico/file/file-upload/file-upload.component';
+import { FileComponent } from 'src/app/pages/generico/file/file/file.component';
 
 
 
@@ -98,6 +100,8 @@ import { EmpresaComponent } from 'src/app/pages/principal/administracion/empresa
     PortafolioComponent,
     AdministracionComponent,
     EmpresaComponent,
+    FileUploadComponent,
+    FileComponent,    
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},

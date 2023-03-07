@@ -4,12 +4,15 @@
   <div class="col-md-5">
     <mat-form-field appearance="outline">
       <mat-label>Seleccionar productos</mat-label>
-      <mat-select placeholder="Ciudad" [(ngModel)]="producto" VALUE="PRODUCTO">
-        <mat-option *ngFor="let e of lstMaestro" value="{{e.id}}">{{e.nombre}}</mat-option>
+      <mat-select placeholder="Seleccion de productos" [(ngModel)]="producto" 
+        (ngModelChange)="SeleccionarCambio($event)" >
+        <mat-option *ngFor="let e of lstMaestro" [value]="e.id">{{e.nombre}}</mat-option>
       </mat-select>
       <mat-icon matSuffix>business_center</mat-icon>
 
     </mat-form-field>
+
+   
   </div>
   <div class="col-md-2">
     <div class="asistente-button-container">
@@ -32,4 +35,8 @@
 
 <ng-template #hechicero let-modal>
   <app-hechicero></app-hechicero>
+</ng-template>
+
+<ng-template #filex let-modal>
+  <app-file></app-file>
 </ng-template>
