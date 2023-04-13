@@ -64,7 +64,7 @@ export class ContratosComponent implements OnInit {
     numero: '',
     rif: '',
     razonsocial: '',
-    plan: '',
+    plan: 'INVERSION',
     estatus: '1',
     tipo: '',
     empresa: '',
@@ -83,6 +83,21 @@ export class ContratosComponent implements OnInit {
     Saldos: this.Saldos,
 
   }
+
+  public lstTipoFideicomiso = [
+    { "key": "ADMINISTRACION", "val" : [
+      {"key": "0", "val":"OBRAS"}, 
+      {"key": "1", "val":"PRESTACIONES SOCIALES"}, 
+      {"key": "2", "val": "FONDO DE AHORRO"},
+      {"key": "3", "val": "OTROS"}
+    ] 
+    
+  },
+    { "key": "INVERSION", "val"  : [{"key": "0", "val":"PERSONAL"}, {"key": "1", "val":"JURIDICO"}] ,},
+    { "key": "MIXO" , "val" : [{"key": "0", "val":"JURIDICO"}] ,}
+  ]
+
+  public lstTipoFid = []
 
   public lstContratos = []
   
@@ -121,6 +136,7 @@ export class ContratosComponent implements OnInit {
     this.Listar()
     this.ListarPaises()
     this.ListarEstados()
+    
   }
 
   tabActive(event) {
@@ -147,6 +163,21 @@ export class ContratosComponent implements OnInit {
     this.tabSaldos = true
   }
 
+  getTipoFideicomiso() {
+    console.log("Seleccion");
+    let codigo = this.Contrato.plan
+    console.log(codigo)
+
+    this.lstTipoFid = []
+    this.lstTipoFideicomiso.forEach(e => {
+      
+      if (e.key == codigo){
+        this.lstTipoFid = e.val
+      }
+    });
+    
+    console.log(this.lstTipoFid)
+  }
 
   Listar() {
     this.xAPI.funcion = "FID_CContratos"
@@ -311,7 +342,7 @@ export class ContratosComponent implements OnInit {
       numero: '',
       rif: '',
       razonsocial: '',
-      plan: '',
+      plan: 'INVERSION',
       estatus: '1',
       tipo: '',
       empresa: '',
@@ -329,6 +360,8 @@ export class ContratosComponent implements OnInit {
       Politicas: this.Politicas,
       Saldos : this.Saldos
     }
+
+    this.getTipoFideicomiso()
 
   }
 

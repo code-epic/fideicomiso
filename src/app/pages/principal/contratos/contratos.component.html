@@ -121,8 +121,14 @@
                                         <div class="col-md-4">
                                             <mat-form-field appearance="outline">
                                                 <mat-label>Fideicomiso</mat-label>
-                                                <input matInput placeholder="Fideicomiso" [(ngModel)]="Contrato.plan"
-                                                    value="{{Contrato.plan}}">
+                                                <!-- <input matInput placeholder="Fideicomiso" [(ngModel)]="Contrato.plan"
+                                                    value="{{Contrato.plan}}"> -->
+                                                    <mat-select placeholder="Estatus del Plan" [ngModelOptions]="{standalone: true}"  (change)="getTipoFideicomiso()"
+                                                [(ngModel)]="Contrato.plan"  value="{{Contrato.plan}}">
+                                                    <mat-option value="ADMINISTRACION">ADMINISTRACION</mat-option>
+                                                    <mat-option value="INVERSION">INVERSION</mat-option>
+                                                    <mat-option value="MIXTO">MIXTO</mat-option>
+                                                </mat-select>
 
 
                                             </mat-form-field>
@@ -130,9 +136,13 @@
                                         <div class="col-md-4">
                                             <mat-form-field appearance="outline">
                                                 <mat-label>Tipo de Fideicomiso</mat-label>
-                                                <input matInput placeholder="Tipo de Fideicomiso" [(ngModel)]="Contrato.tipo"
-                                                    value="{{Contrato.tipo}}">
-
+                                               
+                                                    <mat-select placeholder="Tipo de Fideicomiso" [ngModelOptions]="{standalone: true}"
+                                                    [(ngModel)]="Contrato.tipo"  value="{{Contrato.tipo}}">
+                                                    <mat-option *ngFor="let e of lstTipoFid" [value]="e.key">
+                                                        {{e.val}}
+                                                      </mat-option>
+                                                    </mat-select>
 
                                             </mat-form-field>
                                         </div>
@@ -141,9 +151,9 @@
                                                 <mat-label>Estatus del Plan</mat-label>
                                                 <mat-select placeholder="Estatus del Plan" [ngModelOptions]="{standalone: true}"
                                                 [(ngModel)]="Contrato.estatus"  value="{{Contrato.estatus}}" desabled="true">
-                                                <mat-option value=1>ACTIVO</mat-option>
-                                                <mat-option value=0>INACTIVO</mat-option>
-                                              </mat-select>
+                                                    <mat-option value=1>ACTIVO</mat-option>
+                                                    <mat-option value=0>INACTIVO</mat-option>
+                                                </mat-select>
                                               <!-- <mat-icon matSuffix>home</mat-icon> -->
 
                                             </mat-form-field>
