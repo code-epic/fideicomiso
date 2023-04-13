@@ -17,7 +17,5 @@ export class PrincipalComponent implements OnInit {
   public pagina: string = "BUSCADOR"
 
   ngOnInit() {
-
   }
-
 }

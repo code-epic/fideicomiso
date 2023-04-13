@@ -18,7 +18,7 @@
       "id": "ID-003",
       "nombre": "Control de Fideicomiso",
       "url": "http://localhost/app/fideicomiso/index.html?tk=$0",
-      "comentario": "Usuario Fidepic",
+      "comentario": "Usuario Fideicomiso",
       "version": "V1.0.0.0",
       "autor": "Code-Epic Technologies",
       "Rol": {
@@ -33,54 +33,7 @@
             "accion": "Principal()",
             "clase": "text-primary",
             "color": "",
-            "SubMenu": [
-              {
-                "url": "",
-                "js": "",
-                "descripcion": "Documentos Registrados",
-                "icono": "fa fa-plus-circle",
-                "nombre": "Registrados",
-                "accion": "CargarUrl('control', 'registrar')",
-                "clase": "f-left",
-                "color": "bg-c-green",
-                "Privilegios": []
-              },
-              {
-                "url": "",
-                "js": "",
-                "descripcion": "Documentos Recibidos",
-                "icono": "fa fa-inbox",
-                "nombre": "Recibidos",
-                "accion": "CargarUrl('control', 'buzon')",
-                "clase": "f-left",
-                "color": "bg-c-blue",
-                "Privilegios": []
-              },
-              {
-                "url": "",
-                "js": "",
-                "descripcion": "Salidas Realizadas",
-                "icono": "fa fa-share",
-                "nombre": "Salidas",
-                "accion": "CargarUrl('control', 'salidas')",
-                "clase": "f-left",
-                "color": "bg-c-pink",
-                "Privilegios": [
-                  {
-                    "metodo": "registrados",
-                    "descripcion": "Registrados",
-                    "accion": "Registrados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "clasificacion",
-                    "descripcion": "Clasificacion",
-                    "accion": "Clasificacion()",
-                    "directivas": ""
-                  }
-                ]
-              }
-            ],
+            "SubMenu": [],
             "Privilegios": [
               {
                 "descripcion": "Configuracion",
@@ -100,116 +53,7 @@
             "accion": "",
             "clase": "text-green",
             "color": "",
-            "SubMenu": [
-              {
-                "url": "/registrar",
-                "js": "",
-                "descripcion": "Documentos Registrados",
-                "icono": "fa fa-plus-circle",
-                "nombre": "Registrados",
-                "accion": "CargarUrl('control', 'registrar')",
-                "clase": "f-left",
-                "color": "bg-c-green",
-                "Privilegios": [
-                  {
-                    "metodo": "registrados",
-                    "descripcion": "Registrados",
-                    "accion": "Registrados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "clasificacion",
-                    "descripcion": "Clasificacion",
-                    "accion": "Clasificacion()",
-                    "directivas": ""
-                  }
-                ]
-              },
-              {
-                "url": "/buzon",
-                "js": "",
-                "descripcion": "Documentos Recibidos",
-                "icono": "fa fa-inbox",
-                "nombre": "Recibidos",
-                "accion": "CargarUrl('control', 'buzon')",
-                "clase": "f-left",
-                "color": "bg-c-blue",
-                "Privilegios": [
-                  {
-                    "metodo": "recibidos",
-                    "descripcion": "Recibidos",
-                    "accion": "Recibidos()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "procesados",
-                    "descripcion": "Procesados",
-                    "accion": "Procesados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "pendientes",
-                    "descripcion": "Pendientes",
-                    "accion": "Pendientes()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "cerrados",
-                    "descripcion": "Cerrados",
-                    "accion": "Cerrados()",
-                    "directivas": ""
-                  }
-                ]
-              },
-              {
-                "url": "/salidas",
-                "js": "",
-                "descripcion": "Salidas Realizadas",
-                "icono": "fa fa-share",
-                "nombre": "Salidas",
-                "accion": "CargarUrl('control', 'salidas')",
-                "clase": "f-left",
-                "color": "bg-c-pink",
-                "Privilegios": [
-                  {
-                    "metodo": "registrados",
-                    "descripcion": "Registrados",
-                    "accion": "Registrados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "clasificacion",
-                    "descripcion": "Clasificacion",
-                    "accion": "Clasificacion()",
-                    "directivas": ""
-                  }
-                ]
-              },
-              {
-                "url": "/pendientes",
-                "js": "",
-                "descripcion": " Seguimiento",
-                "icono": "fa fa-envelope-open",
-                "nombre": "Seguimiento",
-                "accion": "CargarUrl('control', 'pendientes')",
-                "clase": "f-left",
-                "color": "bg-purple",
-                "Privilegios": [
-                  {
-                    "metodo": "alertas",
-                    "descripcion": "Alerta",
-                    "accion": "Alerta()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "pendientes",
-                    "descripcion": "Pendientes",
-                    "accion": "Pendientes()",
-                    "directivas": ""
-                  }
-                ]
-              }
-            ],
+            "SubMenu": [],
             "Privilegios": [
               {
                 "nombre": "configurar",
@@ -223,121 +67,12 @@
             "url": "/afiliado",
             "js": "",
             "icono": "ni-planet",
-            "descripcion": "Control de Afiliados",
-            "nombre": "Control de Afiliados",
+            "descripcion": "Afiliados",
+            "nombre": "Afiliados",
             "accion": "",
             "clase": "text-blue",
             "color": "",
-            "SubMenu": [
-              {
-                "url": "/registrar",
-                "js": "",
-                "descripcion": "Documentos Registrados",
-                "icono": "fa fa-plus-circle",
-                "nombre": "Registrados",
-                "accion": "CargarUrl('control', 'registrar')",
-                "clase": "f-left",
-                "color": "bg-c-green",
-                "Privilegios": [
-                  {
-                    "metodo": "registrados",
-                    "descripcion": "Registrados",
-                    "accion": "Registrados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "clasificacion",
-                    "descripcion": "Clasificacion",
-                    "accion": "Clasificacion()",
-                    "directivas": ""
-                  }
-                ]
-              },
-              {
-                "url": "/buzon",
-                "js": "",
-                "descripcion": "Documentos Recibidos",
-                "icono": "fa fa-inbox",
-                "nombre": "Recibidos",
-                "accion": "CargarUrl('control', 'buzon')",
-                "clase": "f-left",
-                "color": "bg-c-blue",
-                "Privilegios": [
-                  {
-                    "metodo": "recibidos",
-                    "descripcion": "Recibidos",
-                    "accion": "Recibidos()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "procesados",
-                    "descripcion": "Procesados",
-                    "accion": "Procesados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "pendientes",
-                    "descripcion": "Pendientes",
-                    "accion": "Pendientes()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "cerrados",
-                    "descripcion": "Cerrados",
-                    "accion": "Cerrados()",
-                    "directivas": ""
-                  }
-                ]
-              },
-              {
-                "url": "/salidas",
-                "js": "",
-                "descripcion": "Salidas Realizadas",
-                "icono": "fa fa-share",
-                "nombre": "Salidas",
-                "accion": "CargarUrl('control', 'salidas')",
-                "clase": "f-left",
-                "color": "bg-c-pink",
-                "Privilegios": [
-                  {
-                    "metodo": "registrados",
-                    "descripcion": "Registrados",
-                    "accion": "Registrados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "clasificacion",
-                    "descripcion": "Clasificacion",
-                    "accion": "Clasificacion()",
-                    "directivas": ""
-                  }
-                ]
-              },
-              {
-                "url": "/pendientes",
-                "js": "",
-                "descripcion": " Seguimiento",
-                "icono": "fa fa-envelope-open",
-                "nombre": "Seguimiento",
-                "accion": "CargarUrl('control', 'pendientes')",
-                "clase": "f-left",
-                "color": "bg-purple",
-                "Privilegios": [
-                  {
-                    "metodo": "alertas",
-                    "descripcion": "Alerta",
-                    "accion": "Alerta()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "pendientes",
-                    "descripcion": "Pendientes",
-                    "accion": "Pendientes()",
-                    "directivas": ""
-                  }
-                ]
-              }
-            ],
+            "SubMenu": [],
             "Privilegios": [
               {
                 "nombre": "configurar",
@@ -348,22 +83,22 @@
             ]
           },
           {
-            "url": "/aportes",
+            "url": "/transacciones",
             "js": "",
             "icono": "ni-pin-3",
             "descripcion": "Aportes",
-            "nombre": "Aportes",
+            "nombre": "Transacciones",
             "accion": "",
             "clase": "text-orange",
             "color": "",
             "Privilegio": [],
             "SubMenu": [
               {
-                "url": "",
+                "url": "/aporteinicial",
                 "js": "",
                 "icono": "fas fa-shipping-fast",
-                "nombre": "Oficina Postal",
-                "accion": "CargarUrl('cuerpo', 'inc/cnc/registro')",
+                "nombre": "Aporte Inicial",
+                "accion": "CargarUrl('aporteinicial', 'inc/cnc/registro')",
                 "clase": "opt",
                 "color": "bg-success",
                 "Privilegios": [
@@ -372,11 +107,56 @@
                     "descripcion": "Actualizar",
                     "accion": "ActualizarOPT()",
                     "directivas": ""
-                  },
+                  }
+                ]
+              },
+              {
+                "url": "/aportes",
+                "js": "",
+                "icono": "fas fa-shipping-fast",
+                "nombre": "Aportes",
+                "accion": "CargarUrl('aportes', 'inc/cnc/registro')",
+                "clase": "opt",
+                "color": "bg-success",
+                "Privilegios": [
                   {
-                    "metodo": "reporte",
-                    "descripcion": "Reportes",
-                    "accion": "Reportes()",
+                    "metodo": "actualizar",
+                    "descripcion": "Actualizar",
+                    "accion": "ActualizarOPT()",
+                    "directivas": ""
+                  }
+                ]
+              },
+              {
+                "url": "/retiros",
+                "js": "",
+                "icono": "fas fa-shipping-fast",
+                "nombre": "Retiros Parcial",
+                "accion": "CargarUrl('retiros', 'inc/cnc/registro')",
+                "clase": "opt",
+                "color": "bg-success",
+                "Privilegios": [
+                  {
+                    "metodo": "actualizar",
+                    "descripcion": "Actualizar",
+                    "accion": "ActualizarOPT()",
+                    "directivas": ""
+                  }
+                ]
+              },
+              {
+                "url": "/cancelacion",
+                "js": "",
+                "icono": "fas fa-shipping-fast",
+                "nombre": "Cancelacion",
+                "accion": "CargarUrl('cancelacion', 'inc/cnc/registro')",
+                "clase": "opt",
+                "color": "bg-success",
+                "Privilegios": [
+                  {
+                    "metodo": "actualizar",
+                    "descripcion": "Actualizar",
+                    "accion": "ActualizarOPT()",
                     "directivas": ""
                   }
                 ]
@@ -393,146 +173,7 @@
             "clase": "text-yellow",
             "color": "",
             "Privilegio": [],
-            "SubMenu": [
-              {
-                "url": "/rsbuzon",
-                "js": "",
-                "descripcion": "Buzon",
-                "icono": "fa fa-inbox",
-                "nombre": "Buzon",
-                "accion": "CargarUrl('resolucion', 'buzon')",
-                "clase": "f-left",
-                "color": "text-green",
-                "Privilegios": [
-                  {
-                    "metodo": "registrados",
-                    "descripcion": "Registrados",
-                    "accion": "Registrados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "enproceso",
-                    "descripcion": "En Proceso",
-                    "accion": "enProceso()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "pendientes",
-                    "descripcion": "Pendientes",
-                    "accion": "Pendientes()",
-                    "directivas": ""
-                  }
-                ]
-              },
-              {
-                "url": "/rstranscripcion",
-                "js": "",
-                "descripcion": "Analisis & Transcripcion",
-                "icono": "fa fa-keyboard",
-                "nombre": "Transcripcion",
-                "accion": "CargarUrl('resolucion', 'transcripcion')",
-                "clase": "f-left",
-                "color": "text-blue",
-                "Privilegios": [
-                  {
-                    "metodo": "recibidos",
-                    "descripcion": "Recibidos",
-                    "accion": "Recibidos()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "procesados",
-                    "descripcion": "Procesados",
-                    "accion": "Procesados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "pendientes",
-                    "descripcion": "Pendientes",
-                    "accion": "Pendientes()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "cerrados",
-                    "descripcion": "Cerrados",
-                    "accion": "Cerrados()",
-                    "directivas": ""
-                  }
-                ]
-              },
-              {
-                "url": "/rsrevision",
-                "js": "",
-                "descripcion": "Revision Documentos",
-                "icono": "fa fa-eye",
-                "nombre": "Revision",
-                "accion": "CargarUrl('resolucion', 'revision')",
-                "clase": "f-left",
-                "color": "text-yellow",
-                "Privilegios": [
-                  {
-                    "metodo": "registrados",
-                    "descripcion": "Registrados",
-                    "accion": "Registrados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "clasificacion",
-                    "descripcion": "Clasificacion",
-                    "accion": "Clasificacion()",
-                    "directivas": ""
-                  }
-                ]
-              },
-              {
-                "url": "/rsprocesos",
-                "js": "",
-                "descripcion": "Procesos",
-                "icono": "fa fa-folder-open",
-                "nombre": "Procesos",
-                "accion": "CargarUrl('resolucion', 'procesos')",
-                "clase": "f-left",
-                "color": "text-purple",
-                "Privilegios": [
-                  {
-                    "metodo": "alertas",
-                    "descripcion": "Alerta",
-                    "accion": "Alerta()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "pendientes",
-                    "descripcion": "Pendientes",
-                    "accion": "Pendientes()",
-                    "directivas": ""
-                  }
-                ]
-              },
-              {
-                "url": "/rsconfiguracion",
-                "js": "",
-                "descripcion": "Configuraciones",
-                "icono": "fa fa-cogs",
-                "nombre": "Configuracion",
-                "accion": "CargarUrl('resolucion', 'configuracion')",
-                "clase": "f-left",
-                "color": "text-pink",
-                "Privilegios": [
-                  {
-                    "metodo": "registrados",
-                    "descripcion": "Registrados",
-                    "accion": "Registrados()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "clasificacion",
-                    "descripcion": "Clasificacion",
-                    "accion": "Clasificacion()",
-                    "directivas": ""
-                  }
-                ]
-              }
-            ]
+            "SubMenu": []
           },
           {
             "url": "/contabilidad",
@@ -544,31 +185,7 @@
             "clase": "text-pink",
             "color": "",
             "Privilegio": [],
-            "SubMenu": [
-              {
-                "url": "",
-                "js": "",
-                "icono": "fas fa-shipping-fast",
-                "nombre": "Oficina Postal",
-                "accion": "CargarUrl('cuerpo', 'inc/cnc/registro')",
-                "clase": "opt",
-                "color": "bg-success",
-                "Privilegios": [
-                  {
-                    "metodo": "actualizar",
-                    "descripcion": "Actualizar",
-                    "accion": "ActualizarOPT()",
-                    "directivas": ""
-                  },
-                  {
-                    "metodo": "reporte",
-                    "descripcion": "Reportes",
-                    "accion": "Reportes()",
-                    "directivas": ""
-                  }
-                ]
-              }
-            ]
+            "SubMenu": []
           }
         ]
       }

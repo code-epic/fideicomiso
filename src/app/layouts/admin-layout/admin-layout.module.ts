@@ -46,6 +46,7 @@ import { AdministracionComponent } from 'src/app/pages/principal/administracion/
 import { EmpresaComponent } from 'src/app/pages/principal/administracion/empresa/empresa.component';
 import { FileUploadComponent } from 'src/app/pages/generico/file/file-upload/file-upload.component';
 import { FileComponent } from 'src/app/pages/generico/file/file/file.component';
+import { TransaccionesComponent } from 'src/app/pages/principal/transacciones/transacciones.component';
 
 
 
@@ -102,6 +103,7 @@ import { FileComponent } from 'src/app/pages/generico/file/file/file.component';
     EmpresaComponent,
     FileUploadComponent,
     FileComponent,    
+    TransaccionesComponent
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},

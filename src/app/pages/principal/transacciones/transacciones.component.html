@@ -1,0 +1,90 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-profile shadow">
+            <div class="card-body">
+                <ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
+                
+                <div class="row">
+
+                    <div class="col-xl-4 col-lg-4">
+                        <a routerLinkActive="active" [routerLink]="['/aporteinicial']">
+                            <div class="card card-stats mb-4 mb-xl-0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="card-title text-uppercase text-muted mb-0">Aporte Inicial</h5>
+                                            <span class="h2 font-weight-bold mb-0">Aporte Inicial</span>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
+                                            <i class="fas fa-warehouse"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="mt-3 mb-0 text-muted text-sm">
+                                        <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> Stock</span>
+                                        <span class="text-nowrap">en el sistema</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                        
+                    
+                    <div class="col-xl-4 col-lg-4">
+                        <a routerLinkActive="active" [routerLink]="['/aportes']">
+                            <div class="card card-stats mb-4 mb-xl-0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="card-title text-uppercase text-muted mb-0">Aportes</h5>
+                                            <span class="h2 font-weight-bold mb-0">Aportes Individual</span>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                                            <i class="fas fa-store"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="mt-3 mb-0 text-muted text-sm">
+                                        <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> Productos</span>
+                                        <span class="text-nowrap">en el sistema</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+
+                    <div class="col-xl-4 col-lg-4">
+                        <a routerLinkActive="active" [routerLink]="['/retiros']">
+                            <div class="card card-stats mb-4 mb-xl-0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="card-title text-uppercase text-muted mb-0">Retiros</h5>
+                                            <span class="h2 font-weight-bold mb-0">Retiros</span>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+                                            <i class="fas fa-truck"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="mt-3 mb-0 text-muted text-sm">
+                                        <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> Artículos</span>
+                                        <span class="text-nowrap">en el sistema</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -45,6 +45,8 @@ import { EmpresaComponent } from './pages/principal/administracion/empresa/empre
 import { MatSelectModule } from '@angular/material/select';
 import { FileUploadComponent } from './pages/generico/file/file-upload/file-upload.component';
 import { FileComponent } from './pages/generico/file/file/file.component';
+import { TramiteComponent } from './pages/tramite/tramite.component';
+import { ServiciosComponent } from './pages/servicios/servicios.component';
 
 
 @NgModule({
@@ -90,6 +92,8 @@ import { FileComponent } from './pages/generico/file/file/file.component';
     AppComponent,
     AdminLayoutComponent,
     AuthLayoutComponent,
+    TramiteComponent,
+    ServiciosComponent
   ],
   providers:  [
     {

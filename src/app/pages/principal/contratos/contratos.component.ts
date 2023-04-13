@@ -65,7 +65,7 @@ export class ContratosComponent implements OnInit {
     rif: '',
     razonsocial: '',
     plan: '',
-    estatus: '0',
+    estatus: '1',
     tipo: '',
     empresa: '',
     fideicomiso: '',
@@ -240,6 +240,27 @@ export class ContratosComponent implements OnInit {
     )
   }
 
+  ConsultarEmpresa(){
+    this.xAPI.funcion = "FID_CEmpresa"
+    this.xAPI.parametros = this.Contrato.rif
+
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        if (data != null) {
+          let Contrato = data[0]
+          this.Contrato.rif = Contrato.rif
+          this.Contrato.razonsocial = Contrato.razonsocial
+        } 
+      },
+      (error) => {
+        console.log(error)
+        this.Limpiar()
+      }
+    )
+  }
+
   Limpiar() {
     this.Direccion = {
       direccion: '',
@@ -291,7 +312,7 @@ export class ContratosComponent implements OnInit {
       rif: '',
       razonsocial: '',
       plan: '',
-      estatus: '',
+      estatus: '1',
       tipo: '',
       empresa: '',
       fideicomiso: '',

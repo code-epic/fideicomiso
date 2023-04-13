@@ -96,8 +96,8 @@
                                     <div class="row">
                                         <div class="col-md-2">
                                             <mat-form-field appearance="outline">
-                                                <mat-label>Numero de control</mat-label>
-                                                <input matInput placeholder="Numero de control" [(ngModel)]="Contrato.numero"
+                                                <mat-label>Plan</mat-label>
+                                                <input matInput placeholder="Plan" [(ngModel)]="Contrato.numero"
                                                     value="{{Contrato.numero}}" (blur)="Consultar()">
                                             </mat-form-field>
                                         </div>
@@ -105,6 +105,7 @@
                                             <mat-form-field appearance="outline">
                                                 <mat-label>Rif</mat-label>
                                                 <input matInput placeholder="Rif" [(ngModel)]="Contrato.rif"
+                                                (blur)="ConsultarEmpresa()"
                                                     value="{{Contrato.rif}}" >
                                             </mat-form-field>
                                         </div>
@@ -119,22 +120,10 @@
                                         </div>
                                         <div class="col-md-4">
                                             <mat-form-field appearance="outline">
-                                                <mat-label>Plan</mat-label>
-                                                <input matInput placeholder="Plan" [(ngModel)]="Contrato.plan"
+                                                <mat-label>Fideicomiso</mat-label>
+                                                <input matInput placeholder="Fideicomiso" [(ngModel)]="Contrato.plan"
                                                     value="{{Contrato.plan}}">
 
-
-                                            </mat-form-field>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <mat-form-field appearance="outline">
-                                                <mat-label>Estatus del Plan</mat-label>
-                                                <mat-select placeholder="Estatus del Plan" [ngModelOptions]="{standalone: true}"
-                                                [(ngModel)]="Contrato.estatus"  value="{{Contrato.estatus}}">
-                                                <mat-option value=0>INACTIVO</mat-option>
-                                                <mat-option value=1>ACTIVO</mat-option>
-                                              </mat-select>
-                                              <!-- <mat-icon matSuffix>home</mat-icon> -->
 
                                             </mat-form-field>
                                         </div>
@@ -147,6 +136,19 @@
 
                                             </mat-form-field>
                                         </div>
+                                        <div class="col-md-4">
+                                            <mat-form-field appearance="outline">
+                                                <mat-label>Estatus del Plan</mat-label>
+                                                <mat-select placeholder="Estatus del Plan" [ngModelOptions]="{standalone: true}"
+                                                [(ngModel)]="Contrato.estatus"  value="{{Contrato.estatus}}" desabled="true">
+                                                <mat-option value=1>ACTIVO</mat-option>
+                                                <mat-option value=0>INACTIVO</mat-option>
+                                              </mat-select>
+                                              <!-- <mat-icon matSuffix>home</mat-icon> -->
+
+                                            </mat-form-field>
+                                        </div>
+                                       
                                     </div>
 
                                     
@@ -163,7 +165,7 @@
                                                         <div class="row">
                                                             <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
-                                                                    <mat-label>Empresa</mat-label>
+                                                                    <mat-label>Empresa Sudeban</mat-label>
                                                                     <input matInput placeholder="Empresa Sudeban"
                                                                         [ngModelOptions]="{standalone: true}"
                                                                         [(ngModel)]="Contrato.empresa" value="{{Contrato.empresa}}">
@@ -172,8 +174,8 @@
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
-                                                                    <mat-label>Fideicomiso</mat-label>
-                                                                    <input matInput placeholder="Fedicomiso Sudeban"
+                                                                    <mat-label>Tipo Fideicomiso Sudeban</mat-label>
+                                                                    <input matInput placeholder="Tipo Fideicomiso Sudeban"
                                                                         [ngModelOptions]="{standalone: true}"
                                                                         [(ngModel)]="Contrato.fideicomiso"
                                                                         value="{{Contrato.fideicomiso}}">
@@ -216,6 +218,17 @@
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
+                                                                    <mat-label>Portafolio</mat-label>
+                                                                    <input matInput placeholder="Portafolio"
+                                                                        [ngModelOptions]="{standalone: true}"
+                                                                        [(ngModel)]="Contrato.Politicas.portafolio"
+                                                                        value="{{Contrato.Politicas.portafolio}}">
+                                                                    <mat-icon matSuffix>support_agent</mat-icon>
+
+                                                                </mat-form-field>
+                                                            </div>
+                                                            <!-- <div class="col-md-4">
+                                                                <mat-form-field appearance="outline">
                                                                     <mat-label>Grupo</mat-label>
                                                                     <input matInput placeholder="Grupo"
                                                                         [ngModelOptions]="{standalone: true}"
@@ -224,7 +237,7 @@
 
 
                                                                 </mat-form-field>
-                                                            </div>
+                                                            </div> -->
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-md-4">
@@ -460,7 +473,7 @@
 
                                                                 </mat-form-field>
                                                             </div>
-                                                            <div class="col-md-4">
+                                                            <!-- <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Portafolio</mat-label>
                                                                     <input matInput placeholder="Portafolio"
@@ -470,7 +483,7 @@
                                                                     <mat-icon matSuffix>support_agent</mat-icon>
 
                                                                 </mat-form-field>
-                                                            </div>
+                                                            </div> -->
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-md-6">
