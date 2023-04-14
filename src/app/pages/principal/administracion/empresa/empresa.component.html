@@ -35,8 +35,7 @@
                     <mat-label>País</mat-label>
                     <mat-select placeholder="País" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="Empresa.Direccion.pais" value="{{Empresa.Direccion.pais}}">
-                        <mat-option value="S">SELECCION</mat-option>
-                        <mat-option value="VENEZUELA">VENEZUELA</mat-option>
+                        <mat-option *ngFor="let e of lstPaises" value="{{e.code}}">{{e.nombre | uppercase }}</mat-option>
                     </mat-select>
                     <mat-icon matSuffix>public</mat-icon>
 
@@ -44,11 +43,11 @@
             </div>
             <div class="col-md-4">
                 <mat-form-field appearance="outline">
-                    <mat-label>Ciudad</mat-label>
-                    <mat-select placeholder="Ciudad" [ngModelOptions]="{standalone: true}"
+                    <mat-label>Estados</mat-label>
+                    <mat-select placeholder="Estados" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="Empresa.Direccion.ciudad" value="{{Empresa.Direccion.ciudad}}">
                         <mat-option value="S">SELECCION</mat-option>
-                        <mat-option value="MERIDA">MERIDA</mat-option>
+                        <mat-option *ngFor="let e of lstEstados" value="{{e.id_estado}}">{{e.estado | uppercase }}</mat-option>
                     </mat-select>
                     <mat-icon matSuffix>home</mat-icon>
 

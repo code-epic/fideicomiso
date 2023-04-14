@@ -38,6 +38,12 @@ export class EmpresaComponent implements OnInit {
   }
 
   public lstEmpresa: []
+    
+  public lstPaises = []
+
+  public lstCiudades = []
+
+  public lstEstados = []
 
   public empre_insert: string = ''
   public empre_search: string = 'none'
@@ -49,6 +55,8 @@ export class EmpresaComponent implements OnInit {
 
   ngOnInit(): void {
     this.Listar()
+    this.ListarPaises()
+    this.ListarEstados()
   }
 
   editar(e) {
@@ -70,7 +78,53 @@ export class EmpresaComponent implements OnInit {
       }
     )
   }
+  ListarPaises() {
+    this.xAPI.funcion = "ListarPaises"
+    this.xAPI.parametros = ''
 
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.lstPaises = data.Cuerpo
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+  }
+
+  ListarEstados() {
+    this.xAPI.funcion = "ListarEstados"
+    this.xAPI.parametros = ''
+
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.lstEstados = data.Cuerpo
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+  }
+
+  ListarCiudades() {
+    this.xAPI.funcion = "ListarCiudad"
+    this.xAPI.parametros = ''
+
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.lstCiudades = data
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+  }
   Consultar() {
 
     this.xAPI.funcion = "FID_CEmpresa"

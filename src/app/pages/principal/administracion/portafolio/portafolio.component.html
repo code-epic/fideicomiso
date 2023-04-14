@@ -42,9 +42,17 @@
             <div class="col-md-4">
                 <mat-form-field appearance="outline">
                     <mat-label>Frecuencia de Cierre</mat-label>
-                    <input matInput placeholder="Frecuencia de Cierre"
+                    <!-- <input matInput placeholder="Frecuencia de Cierre"
                         [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Portafolio.frecuencia" value="{{Portafolio.frecuencia}}">
+                        [(ngModel)]="Portafolio.frecuencia" value="{{Portafolio.frecuencia}}"> -->
+
+                    <mat-select placeholder="Frecuencia de Cierre"
+                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Portafolio.frecuencia"
+                        value="{{Portafolio.frecuencia}}">
+                        <mat-option value="MENSUAL">MENSUAL</mat-option>
+                        <mat-option value="TRIMESTRAL">TRIMESTRAL</mat-option>
+                    </mat-select>
+
                 </mat-form-field>
             </div>
 
@@ -65,9 +73,14 @@
             <div class="col-md-3">
                 <mat-form-field appearance="outline">
                     <mat-label>Tipo de Cuenta</mat-label>
-                    <input matInput placeholder="Tipo de Cuenta"
+                  
+                    <mat-select placeholder="Tipo de Cuenta"
                         [ngModelOptions]="{standalone: true}" [(ngModel)]="Portafolio.tipo"
                         value="{{Portafolio.tipo}}">
+                        <mat-option value="AHORRO">AHORRO</mat-option>
+                        <mat-option value="CORRIENTE">CORRIENTE</mat-option>
+                    </mat-select>
+
                 </mat-form-field>
             </div>
             <div class="col-md-6">
