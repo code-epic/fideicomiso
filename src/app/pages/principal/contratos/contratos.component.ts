@@ -366,8 +366,6 @@ export class ContratosComponent implements OnInit {
   }
 
   Guardar() {
-
-    if (this.Contrato.numero == "") return
     if(this.fechainicio.value == "") {
       this._snackBar.open('Debe verificar todos los campos...', 'dance')
       return
