@@ -14,6 +14,7 @@ import { AuthGuardGuard } from 'src/app/services/seguridad/auth-guard.guard'
 import { PrincipalComponent } from '../../pages/principal/principal.component'
 import { PortafolioComponent } from 'src/app/pages/principal/administracion/portafolio/portafolio.component'
 import { TransaccionesComponent } from 'src/app/pages/principal/transacciones/transacciones.component'
+import { PlancontableComponent } from 'src/app/pages/principal/contabilidad/plancontable/plancontable.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -75,6 +76,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'transacciones',
         component: TransaccionesComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'plancontable',
+        component: PlancontableComponent,
         canActivate: [AuthGuardGuard]
     },
 

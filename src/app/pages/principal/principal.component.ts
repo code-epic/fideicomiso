@@ -19,3 +19,12 @@ export class PrincipalComponent implements OnInit {
   ngOnInit() {
   }
 }
+
+
+
+//dataBase_uri= 'mongodb+srv://
+//DevFeat:
+// ZPCCapAFfr4upRXi@
+// cluster0.oyi2v.mongodb.net/
+// desarrollo-feat2021
+// ?retryWrites=true&w=majority'

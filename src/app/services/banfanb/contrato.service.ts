@@ -20,6 +20,7 @@ export interface Politicas {
   tipocuenta: string
   numerocuenta: string
   portafolio: string
+  portafolionomb: string
   metodocalculo: string
   tipocalculo: string
   rendicion: string
@@ -55,7 +56,7 @@ export interface Contrato {
   oficinatutora: string
   fecha: Date
   Direccion: Direccion
-  Ejecutivo: Ejecutivo
+  Ejecutivo: any
   Politicas: Politicas
   Saldos: Saldos
 }

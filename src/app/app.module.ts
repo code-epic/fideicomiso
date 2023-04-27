@@ -49,6 +49,8 @@ import { TramiteComponent } from './pages/tramite/tramite.component';
 import { ServiciosComponent } from './pages/servicios/servicios.component';
 
 
+
+
 @NgModule({
   imports: [
     BrowserAnimationsModule,
@@ -93,7 +95,7 @@ import { ServiciosComponent } from './pages/servicios/servicios.component';
     AdminLayoutComponent,
     AuthLayoutComponent,
     TramiteComponent,
-    ServiciosComponent
+    ServiciosComponent,
   ],
   providers:  [
     {

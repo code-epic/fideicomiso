@@ -1,0 +1,62 @@
+
+<form action="">
+  <div class="row">
+
+    <div class="col-md-4">
+      <mat-form-field appearance="outline">
+        <mat-label>Codigo Contable</mat-label>
+        <input matInput placeholder="Codigo Contable"  [(ngModel)]="nombre" value="">
+        <mat-icon matSuffix>toc</mat-icon>
+
+      </mat-form-field>
+    </div>
+    <div class="col-md-7">
+      <mat-form-field appearance="outline">
+        <mat-label>Descripción</mat-label>
+        <input matInput placeholder="Descripción" [(ngModel)]="observacion" value="">
+        <mat-icon matSuffix>content_paste</mat-icon>
+      </mat-form-field>
+
+    </div>
+    <div class="col-md-1">
+
+      <div class="example-button-container">
+        <button mat-mini-fab color="primary" aria-label="Guardar informacion" (click)="Guardar()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</form>
+
+
+<div class="mat-elevation-z8">
+  <table mat-table [dataSource]="dataSource">
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="codigo">
+      <th mat-header-cell *matHeaderCellDef> CODIGO </th>
+      <td mat-cell *matCellDef="let e"> {{e.codigo}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="descripcion">
+      <th mat-header-cell *matHeaderCellDef> DESCRIPCION </th>
+      <td mat-cell *matCellDef="let e"> {{e.descripcion | uppercase}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="tipo">
+      <th mat-header-cell *matHeaderCellDef> TIPO </th>
+      <td mat-cell *matCellDef="let e"> {{e.tipo}} </td>
+    </ng-container>
+
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Selecione la pagina">
+  </mat-paginator>
+</div>

@@ -123,7 +123,7 @@
                                                 <mat-label>Fideicomiso</mat-label>
                                                 <!-- <input matInput placeholder="Fideicomiso" [(ngModel)]="Contrato.plan"
                                                     value="{{Contrato.plan}}"> -->
-                                                    <mat-select placeholder="Estatus del Plan" [ngModelOptions]="{standalone: true}"  (change)="getTipoFideicomiso()"
+                                                    <mat-select placeholder="Estatus del Plan" [ngModelOptions]="{standalone: true}"  (selectionChange)="getTipoFideicomiso()"
                                                 [(ngModel)]="Contrato.plan"  value="{{Contrato.plan}}">
                                                     <mat-option value="ADMINISTRACION">ADMINISTRACION</mat-option>
                                                     <mat-option value="INVERSION">INVERSION</mat-option>
@@ -139,7 +139,7 @@
                                                
                                                     <mat-select placeholder="Tipo de Fideicomiso" [ngModelOptions]="{standalone: true}"
                                                     [(ngModel)]="Contrato.tipo"  value="{{Contrato.tipo}}">
-                                                    <mat-option *ngFor="let e of lstTipoFid" [value]="e.key">
+                                                    <mat-option *ngFor="let e of lstTipoFid" [value]="e.val">
                                                         {{e.val}}
                                                       </mat-option>
                                                     </mat-select>
@@ -206,7 +206,7 @@
 
 
                                                         <div class="row">
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-2">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Codigo de Banco</mat-label>
                                                                     <input matInput placeholder="Codigo de Banco"
@@ -216,7 +216,7 @@
 
                                                                 </mat-form-field>
                                                             </div>
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-2">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Plan Anterior</mat-label>
                                                                     <input matInput placeholder="Plan Anterior"
@@ -226,14 +226,23 @@
 
                                                                 </mat-form-field>
                                                             </div>
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-3">
                                                                 <mat-form-field appearance="outline">
-                                                                    <mat-label>Portafolio</mat-label>
-                                                                    <input matInput placeholder="Portafolio"
+                                                                    <mat-label>Portafolio #</mat-label>
+                                                                    <input matInput placeholder="Portafolio #"
                                                                         [ngModelOptions]="{standalone: true}"
                                                                         [(ngModel)]="Contrato.Politicas.portafolio"
-                                                                        value="{{Contrato.Politicas.portafolio}}">
-                                                                    <mat-icon matSuffix>support_agent</mat-icon>
+                                                                        value="{{Contrato.Politicas.portafolio}}" (blur)="ConsultarPortafolio()">
+
+                                                                </mat-form-field>
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                <mat-form-field appearance="outline">
+                                                                    <mat-label>Portafolio  Descripcion</mat-label>
+                                                                    <input matInput placeholder="Portafolio Descripcion"
+                                                                        [ngModelOptions]="{standalone: true}"
+                                                                        [(ngModel)]="Contrato.Politicas.portafolionomb"
+                                                                        value="{{Contrato.Politicas.portafolionomb}}" disabled="disabled">
 
                                                                 </mat-form-field>
                                                             </div>
@@ -250,7 +259,7 @@
                                                             </div> -->
                                                         </div>
                                                         <div class="row">
-                                                            <div class="col-md-4">
+                                                            <!-- <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Segmento</mat-label>
                                                                     <input matInput placeholder="Segmento"
@@ -269,14 +278,26 @@
                                                                         value="{{Contrato.subsegmento}}">
 
                                                                 </mat-form-field>
-                                                            </div>
-                                                            <div class="col-md-4">
+                                                            </div> -->
+                                                            <div class="col-md-12">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Oficina Tutora</mat-label>
-                                                                    <input matInput placeholder="Oficina Tutora"
+                                                                    <!-- <input matInput placeholder="Oficina Tutora"
                                                                         [ngModelOptions]="{standalone: true}"
                                                                         [(ngModel)]="Contrato.oficinatutora"
-                                                                        value="{{Contrato.oficinatutora}}">
+                                                                        value="{{Contrato.oficinatutora}}"> -->
+
+                                                                        <input type="text"
+                                                                            placeholder="{{oficinatutora}}"
+                                                                            aria-label="Oficinas"
+                                                                            matInput
+                                                                            [formControl]="myOficina"
+                                                                            [matAutocomplete]="autox">
+                                                                        <mat-autocomplete autoActiveFirstOption #autox="matAutocomplete">
+                                                                        <mat-option *ngFor="let option of filteredOficinas | async" [value]="option">
+                                                                            {{option | uppercase}}
+                                                                        </mat-option>
+                                                                        </mat-autocomplete>
 
 
                                                                 </mat-form-field>
@@ -284,7 +305,7 @@
                                                         </div>
 
 
-                                                        <div class="row">
+                                                        <div class="row" style="display: none;">
                                                             <div class="col-md-12">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Direccion</mat-label>
@@ -296,7 +317,7 @@
                                                             </div>
 
                                                         </div>
-                                                        <div class="row">
+                                                        <div class="row" style="display: none;">
                                                             <div class="col-md-5">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>País</mat-label>
@@ -336,7 +357,7 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="row">
+                                                        <div class="row" style="display: none;">
                                                             <div class="col-md-3">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Oficina nacional</mat-label>
@@ -348,7 +369,7 @@
 
                                                                 </mat-form-field>
                                                             </div>
-                                                            <div class="col-md-3">
+                                                            <div class="col-md-3" style="display: none;">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Teléfono</mat-label>
                                                                     <input matInput placeholder="Teléfono"
@@ -388,30 +409,52 @@
                                                 <div class="container">
                                                     <form>
                                                         <div class="row">
+                                                            <div class="col-md-11">
+                                                                <mat-form-field appearance="outline">
+                                                                    <mat-label>Ejecutivo de negocio</mat-label>
+                                                                   
+                                                                        <input type="text"
+                                                                            placeholder="Datos del Ejecutivos"
+                                                                            aria-label="Ejecutivos"
+                                                                            matInput
+                                                                            [formControl]="myControl"
+                                                                            [matAutocomplete]="auto">
+                                                                        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                                                                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                                                                            {{option | uppercase}}
+                                                                        </mat-option>
+                                                                        </mat-autocomplete>
+                                                                        
+
+                                                                </mat-form-field>
+                                                            </div>
+                                                            <div class="col-md-1 text-right">
+                                                                <div class="example-button-container">
+                                                                    <button mat-mini-fab color="primary" aria-label="Agregar" (click)="insertar()">
+                                                                      <mat-icon>add</mat-icon>
+                                                                    </button>
+                                                                  </div>
+                                                            </div>
+                                                            
+                                                        </div>
+
+                                                        <div class="row">
                                                             <div class="col-md-12">
                                                                 <table>
                                                                     <thead>
-                                                                        <th>NOMBRES Y APELLIDOS</th>
-                                                                        <th>CEDULA DE IDENTIDAD</th>
-                                                                        <th>TELEFONO</th>
-                                                                        <th>CELULAR</th>
-                                                                        <th>EMAIL</th>
+                                                                        <th>RESPONSABLES</th>
                                                                     </thead>
+                                                                    <tbody>
+                                                                        <tr *ngFor="let e of lstEjecutivos">
+                                                                            <td>{{e.nombre}}</td>
+                                                                        </tr>
+                                                                    </tbody>
                                                                 </table>
                                                             </div>
                                                         </div>
                                                         <br><br>
-                                                        <div class="row">
-                                                            <div class="col-md-4">
-                                                                <mat-form-field appearance="outline">
-                                                                    <mat-label>Ejecutivo de negocio</mat-label>
-                                                                    <input matInput placeholder="Ejecutivo de negocio"
-                                                                        [ngModelOptions]="{standalone: true}"
-                                                                        [(ngModel)]="Contrato.Ejecutivo.negocio"
-                                                                        value="{{Contrato.Ejecutivo.negocio}}">
-
-                                                                </mat-form-field>
-                                                            </div>
+                                                        <div class="row" style="display: none;">
+                                                            
                                                             <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Atencion al cliente</mat-label>
@@ -463,10 +506,17 @@
                                                             <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Tipo de Cuenta</mat-label>
-                                                                    <input matInput placeholder="Tipo de Cuenta"
+                                                                    <!-- <input matInput placeholder="Tipo de Cuenta"
                                                                         [ngModelOptions]="{standalone: true}"
                                                                         [(ngModel)]="Contrato.Politicas.tipocuenta"
+                                                                        value="{{Contrato.Politicas.tipocuenta}}"> -->
+
+                                                                        <mat-select placeholder="Tipo de Cuenta"
+                                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Contrato.Politicas.tipocuenta"
                                                                         value="{{Contrato.Politicas.tipocuenta}}">
+                                                                        <mat-option value="AHORRO">AHORRO</mat-option>
+                                                                        <mat-option value="CORRIENTE">CORRIENTE</mat-option>
+                                                                    </mat-select>
 
 
                                                                 </mat-form-field>
@@ -523,8 +573,8 @@
                                                         <div class="row">
                                                             <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
-                                                                    <mat-label>Redicion de cuenta</mat-label>
-                                                                    <input matInput placeholder="Redicion de cuenta"
+                                                                    <mat-label>Rendicion de cuenta</mat-label>
+                                                                    <input matInput placeholder="Rendicion de cuenta"
                                                                         [ngModelOptions]="{standalone: true}"
                                                                         [(ngModel)]="Contrato.Politicas.rendicion"
                                                                         value="{{Contrato.Politicas.rendicion}}">

@@ -29,6 +29,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 
 
@@ -47,6 +49,8 @@ import { EmpresaComponent } from 'src/app/pages/principal/administracion/empresa
 import { FileUploadComponent } from 'src/app/pages/generico/file/file-upload/file-upload.component';
 import { FileComponent } from 'src/app/pages/generico/file/file/file.component';
 import { TransaccionesComponent } from 'src/app/pages/principal/transacciones/transacciones.component';
+import { EjecutivosComponent } from 'src/app/pages/principal/administracion/ejecutivos/ejecutivos.component';
+import { PlancontableComponent } from 'src/app/pages/principal/contabilidad/plancontable/plancontable.component';
 
 
 
@@ -83,6 +87,7 @@ import { TransaccionesComponent } from 'src/app/pages/principal/transacciones/tr
     MatDatepickerModule,
     MatNativeDateModule,
     MatSnackBarModule,
+    MatAutocompleteModule
   ],
   declarations: [
     PrincipalComponent,
@@ -103,7 +108,9 @@ import { TransaccionesComponent } from 'src/app/pages/principal/transacciones/tr
     EmpresaComponent,
     FileUploadComponent,
     FileComponent,    
-    TransaccionesComponent
+    TransaccionesComponent,
+    EjecutivosComponent,
+    PlancontableComponent
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},

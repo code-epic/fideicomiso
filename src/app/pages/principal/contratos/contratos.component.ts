@@ -1,5 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import {FormControl} from '@angular/forms';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
@@ -32,6 +34,7 @@ export class ContratosComponent implements OnInit {
     tipocuenta: '',
     numerocuenta: '',
     portafolio: '',
+    portafolionomb: '',
     metodocalculo: '',
     tipocalculo: '',
     rendicion: '',
@@ -60,11 +63,13 @@ export class ContratosComponent implements OnInit {
     proceso: ''
   }
 
+  public lstEjecutivos = []
+  
   public Contrato: Contrato = {
     numero: '',
     rif: '',
     razonsocial: '',
-    plan: 'INVERSION',
+    plan: '',
     estatus: '1',
     tipo: '',
     empresa: '',
@@ -78,11 +83,14 @@ export class ContratosComponent implements OnInit {
     oficinatutora: '',
     fecha: new Date(),
     Direccion: this.Direccion,
-    Ejecutivo: this.Ejecutivo,
+    Ejecutivo: this.lstEjecutivos,
     Politicas: this.Politicas,
     Saldos: this.Saldos,
 
   }
+
+
+  public portafolio = ''
 
   public lstTipoFideicomiso = [
     { "key": "ADMINISTRACION", "val" : [
@@ -94,7 +102,7 @@ export class ContratosComponent implements OnInit {
     
   },
     { "key": "INVERSION", "val"  : [{"key": "0", "val":"PERSONAL"}, {"key": "1", "val":"JURIDICO"}] ,},
-    { "key": "MIXO" , "val" : [{"key": "0", "val":"JURIDICO"}] ,}
+    { "key": "MIXTO" , "val" : [{"key": "0", "val":"JURIDICO"}] ,}
   ]
 
   public lstTipoFid = []
@@ -106,6 +114,8 @@ export class ContratosComponent implements OnInit {
   public lstCiudades = []
 
   public lstEstados = []
+
+  
 
   public selectedIndex = 0;
   
@@ -125,7 +135,15 @@ export class ContratosComponent implements OnInit {
 
   public buscar = ''
 
+  myControl = new FormControl('');
+  options: string[] = [];
+  filteredOptions: Observable<string[]>;
 
+  myOficina = new FormControl('');
+  oficinas: string[] = [];
+  filteredOficinas: Observable<string[]>;
+
+  public oficinatutora = 'Oficina Tutora'
 
   constructor(
     private apiService: ApiService,
@@ -136,9 +154,80 @@ export class ContratosComponent implements OnInit {
     this.Listar()
     this.ListarPaises()
     this.ListarEstados()
+    this.ListarEjecutivos()
+    this.ListarOficinas()
+  }
+
+  ListarEjecutivos(){
+    this.xAPI.funcion = "FID_CEjecutivos"
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        
+        if (data != null && data.msj == undefined) {
+          data.forEach(e => {
+            let valor = e.nacionalidad + e.cedula + ' ' + e.papellido + ' ' + e.pnombre + ' | ' + e.actividad 
+            this.options.push(valor)
+          });
+
+        }
+
+        this.filteredOptions = this.myControl.valueChanges.pipe(
+          startWith(''),
+          map(value => this._filter(value || '')),
+        );
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
     
   }
 
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+    return this.options.filter(option => option.toLowerCase().includes(filterValue));
+  }
+
+  ListarOficinas(){
+    this.xAPI.funcion = "FID_COficinas"
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        // console.log(data)
+        if (data != null && data.msj == undefined) {
+          data.forEach(e => {
+            let valor = e.direccion + ' | ' + e.telefonos 
+            this.oficinas.push(valor)
+          });
+
+        }
+
+        this.filteredOficinas = this.myOficina.valueChanges.pipe(
+          startWith(''),
+          map(value => this._filteroficinas(value || '')),
+        );
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+  }
+
+  private _filteroficinas(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.oficinas.filter(option => option.toLowerCase().includes(filterValue));
+  }
+
+
+
+  insertar(){
+    let value = this.myControl.value + ''
+    this.lstEjecutivos.push({ "nombre": value.toUpperCase() })
+    this.myControl.setValue('')
+
+  }
   tabActive(event) {
    
     this.selectedIndex = event.index
@@ -154,36 +243,37 @@ export class ContratosComponent implements OnInit {
   }
 
   editar(e) {
-
     this.Contrato = e
     this.selectedIndex = 1
     this.active = true
     //this.contrato_search = ''
     this.fechainicio.setValue(this.Contrato.Saldos.fechainicio)
+    this.myOficina.setValue(this.Contrato.oficinatutora.toUpperCase())
+    this.lstEjecutivos = this.Contrato.Ejecutivo
+    this.getTipoFideicomiso()
     this.tabSaldos = true
   }
 
   getTipoFideicomiso() {
-    console.log("Seleccion");
+    
     let codigo = this.Contrato.plan
-    console.log(codigo)
+    // console.log(codigo)
 
     this.lstTipoFid = []
     this.lstTipoFideicomiso.forEach(e => {
       
       if (e.key == codigo){
         this.lstTipoFid = e.val
+        
       }
     });
     
-    console.log(this.lstTipoFid)
+    // console.log(this.lstTipoFid)
   }
 
   Listar() {
     this.xAPI.funcion = "FID_CContratos"
     this.xAPI.parametros = ''
-
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data)
@@ -199,11 +289,9 @@ export class ContratosComponent implements OnInit {
   ListarPaises() {
     this.xAPI.funcion = "ListarPaises"
     this.xAPI.parametros = ''
-
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
+        // console.log(data)
         this.lstPaises = data.Cuerpo
       },
       (error) => {
@@ -215,11 +303,9 @@ export class ContratosComponent implements OnInit {
   ListarEstados() {
     this.xAPI.funcion = "ListarEstados"
     this.xAPI.parametros = ''
-
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
+        //console.log(data)
         this.lstEstados = data.Cuerpo
       },
       (error) => {
@@ -231,8 +317,6 @@ export class ContratosComponent implements OnInit {
   ListarCiudades() {
     this.xAPI.funcion = "ListarCiudad"
     this.xAPI.parametros = ''
-
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data)
@@ -251,13 +335,14 @@ export class ContratosComponent implements OnInit {
   Consultar() {
     this.xAPI.funcion = "FID_CContrato"
     this.xAPI.parametros = this.Contrato.numero
-
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data != null) {
           this.Contrato = data[0]
           this.fechainicio.setValue(this.Contrato.Saldos.fechainicio)
+          this.myOficina.setValue(this.Contrato.oficinatutora.toUpperCase())
+          this.lstEjecutivos = this.Contrato.Ejecutivo
+          this.getTipoFideicomiso()
         } else {
           let aux = this.Contrato.numero
           this.Limpiar()
@@ -273,7 +358,7 @@ export class ContratosComponent implements OnInit {
 
   ConsultarEmpresa(){
     this.xAPI.funcion = "FID_CEmpresa"
-    this.xAPI.parametros = this.Contrato.rif
+    this.xAPI.parametros = this.Contrato.rif.toUpperCase()
 
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -291,6 +376,30 @@ export class ContratosComponent implements OnInit {
       }
     )
   }
+
+
+  // ConsultarEjecutivo() {
+
+  //   this.xAPI.funcion = "FID_CEjecutivo"
+  //   this.xAPI.parametros = this.Ejecutivo.cedula
+
+  //   this.apiService.Ejecutar(this.xAPI).subscribe(
+  //     (data) => {
+  //       console.log(data)
+  //       if (data != null && data.msj == undefined) {
+  //         this.Ejecutivo = data[0]
+  //       } else {
+  //         let aux = this.Ejecutivo.cedula
+  //         this.Limpiar()
+  //         this.Ejecutivo.cedula = aux
+  //       }
+  //     },
+  //     (error) => {
+  //       console.log(error)
+  //       this.Limpiar()
+  //     }
+  //   )
+  // }
 
   Limpiar() {
     this.Direccion = {
@@ -328,6 +437,7 @@ export class ContratosComponent implements OnInit {
       tipocuenta: '',
       numerocuenta: '',
       portafolio: '',
+      portafolionomb : '',
       metodocalculo: '',
       tipocalculo: '',
       rendicion: '',
@@ -342,7 +452,7 @@ export class ContratosComponent implements OnInit {
       numero: '',
       rif: '',
       razonsocial: '',
-      plan: 'INVERSION',
+      plan: '',
       estatus: '1',
       tipo: '',
       empresa: '',
@@ -356,13 +466,13 @@ export class ContratosComponent implements OnInit {
       oficinatutora: '',
       fecha: new Date(),
       Direccion: this.Direccion,
-      Ejecutivo: this.Ejecutivo,
+      Ejecutivo: this.lstEjecutivos,
       Politicas: this.Politicas,
       Saldos : this.Saldos
     }
 
     this.getTipoFideicomiso()
-
+    this.lstEjecutivos = []
   }
 
   Guardar() {
@@ -370,10 +480,13 @@ export class ContratosComponent implements OnInit {
       this._snackBar.open('Debe verificar todos los campos...', 'dance')
       return
     }
-    
+    this.Contrato.Ejecutivo = this.lstEjecutivos
+
     this.ngxService.startLoader('load-cont')
     let f = new Date( this.fechainicio.value ).toISOString()
 
+    let ofc = this.myOficina.value + ''
+    this.Contrato.oficinatutora = ofc.toUpperCase()
     this.Contrato.Saldos.fechainicio = f
     var obj = {
       "coleccion": "contratos",
@@ -383,9 +496,10 @@ export class ContratosComponent implements OnInit {
       "upsert": true
     }
 
+    // console.log(obj)
+
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
-        console.log(data)
         this.ngxService.stopLoader('load-cont')
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'contratos')
         
@@ -395,6 +509,28 @@ export class ContratosComponent implements OnInit {
       }
     )
 
+  }
+
+  ConsultarPortafolio() {
+
+    this.xAPI.funcion = "FID_CPortafolio"
+    this.xAPI.parametros = this.Contrato.Politicas.portafolio
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+       
+        if (data != null && data.msj == undefined) {
+          this.Contrato.Politicas.portafolionomb = data[0].descripcion
+        } else {
+          let aux = this.Contrato.Politicas.portafolio
+          this.Contrato.Politicas.portafolio = aux
+        }
+      },
+      (error) => {
+        console.log(error)
+        
+      }
+    )
   }
 
   

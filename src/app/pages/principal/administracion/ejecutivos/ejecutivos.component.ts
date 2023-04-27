@@ -3,16 +3,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { Empresa } from 'src/app/services/banfanb/administracion';
-import { Direccion } from 'src/app/services/banfanb/afiliado.service';
+import { Afiliado, Direccion } from 'src/app/services/banfanb/afiliado.service';
+import { FormControl } from '@angular/forms';
 
 @Component({
-  selector: 'app-empresa',
-  templateUrl: './empresa.component.html',
-  styleUrls: ['./empresa.component.scss']
+  selector: 'app-ejecutivos',
+  templateUrl: './ejecutivos.component.html',
+  styleUrls: ['./ejecutivos.component.css']
 })
-export class EmpresaComponent implements OnInit {
-
+export class EjecutivosComponent implements OnInit {
   public xAPI: IAPICore = {
     funcion: '',
     parametros: ''
@@ -31,13 +30,26 @@ export class EmpresaComponent implements OnInit {
     oficinanacional: ''
   }
 
-  public Empresa: Empresa = {
-    rif: '',
-    razonsocial: '',
+  public Ejecutivo: Afiliado = {
+    nacionalidad: '',
+    cedula: '',
+    estatus: 0,
+    estadocivil: '',
+    pnombre: '',
+    smombre: '',
+    papellido: '',
+    sapellido: '',
+    sexo: '',
+    nacimiento: '',
+    ingreso: '',
+    actividad: '',
     Direccion: this.Direccion
   }
 
-  public lstEmpresa: []
+  public nacimiento = new FormControl(new Date());
+  public ingreso = new FormControl(new Date());
+
+  public lstEjecutivos: []
     
   public lstPaises = []
 
@@ -60,17 +72,17 @@ export class EmpresaComponent implements OnInit {
   }
 
   editar(e) {
-    this.Empresa = e
+    this.Ejecutivo = e
     this.empre_insert = ''
     this.empre_search = 'none'
   }
 
   Listar() {
-    this.xAPI.funcion = "FID_CEmpresas"
+    this.xAPI.funcion = "FID_CEjecutivos"
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if (data != null && data.msj == undefined) this.lstEmpresa = data
+        if (data != null && data.msj == undefined) this.lstEjecutivos = data
       },
       (error) => {
         console.log(error)
@@ -81,11 +93,9 @@ export class EmpresaComponent implements OnInit {
   ListarPaises() {
     this.xAPI.funcion = "ListarPaises"
     this.xAPI.parametros = ''
-
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        //console.log(data)
+        console.log(data)
         this.lstPaises = data.Cuerpo
       },
       (error) => {
@@ -97,11 +107,9 @@ export class EmpresaComponent implements OnInit {
   ListarEstados() {
     this.xAPI.funcion = "ListarEstados"
     this.xAPI.parametros = ''
-
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        //console.log(data)
+        console.log(data)
         this.lstEstados = data.Cuerpo
       },
       (error) => {
@@ -117,7 +125,7 @@ export class EmpresaComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        //console.log(data)
+        console.log(data)
         this.lstCiudades = data
       },
       (error) => {
@@ -127,18 +135,18 @@ export class EmpresaComponent implements OnInit {
   }
   Consultar() {
 
-    this.xAPI.funcion = "FID_CEmpresa"
-    this.xAPI.parametros = this.Empresa.rif
+    this.xAPI.funcion = "FID_CEjecutivo"
+    this.xAPI.parametros = this.Ejecutivo.cedula
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data)
         if (data != null && data.msj == undefined) {
-          this.Empresa = data[0]
+          this.Ejecutivo = data[0]
         } else {
-          let aux = this.Empresa.rif
+          let aux = this.Ejecutivo.cedula
           this.Limpiar()
-          this.Empresa.rif = aux
+          this.Ejecutivo.cedula = aux
         }
       },
       (error) => {
@@ -169,9 +177,19 @@ export class EmpresaComponent implements OnInit {
       oficinanacional: ''
     }
 
-    this.Empresa = {
-      rif: '',
-      razonsocial: '',
+    this.Ejecutivo = {
+      nacionalidad: '',
+      cedula: '',
+      estatus: 0,
+      estadocivil: '',
+      pnombre: '',
+      smombre: '',
+      papellido: '',
+      sapellido: '',
+      sexo: '',
+      nacimiento: '',
+      ingreso: '',
+      actividad: '',
       Direccion: this.Direccion
     }
   }
@@ -179,15 +197,22 @@ export class EmpresaComponent implements OnInit {
 
   Guardar() {
 
-    if (this.Empresa.rif == "") {
+    if (this.Ejecutivo.cedula == "") {
       this._snackBar.open('Debe verificar todos los campos...', 'dance')
       return
     }
-    this.ngxService.startLoader('load-inver')
+    this.ngxService.startLoader('load-ejecutivo')
+
+    let n = new Date(this.nacimiento.value).toISOString()
+    let i = new Date(this.ingreso.value).toISOString()
+    this.Ejecutivo.nacimiento = n
+    this.Ejecutivo.ingreso = i
+
+
     var obj = {
-      "coleccion": "empresa",
-      "objeto": this.Empresa,
-      "donde": `{\"rif\":\"${this.Empresa.rif}\"}`,
+      "coleccion": "ejecutivo",
+      "objeto": this.Ejecutivo,
+      "donde": `{\"cedula\":\"${this.Ejecutivo.cedula}\"}`,
       "driver": "MDBFIDE",
       "upsert": true
     }
@@ -196,7 +221,7 @@ export class EmpresaComponent implements OnInit {
       (data) => {
         console.log(data)
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
-        this.ngxService.stopLoader('load-inver')
+        this.ngxService.stopLoader('load-ejecutivo')
         this.Limpiar()
       },
       (error) => {
@@ -206,6 +231,6 @@ export class EmpresaComponent implements OnInit {
   }
 
 
-
-
 }
+
+
