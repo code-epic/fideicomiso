@@ -7,6 +7,9 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Direccion } from 'src/app/services/banfanb/afiliado.service';
 import { Contrato, Ejecutivo, Politicas, Saldos } from 'src/app/services/banfanb/contrato.service';
+import { SemilleroService } from 'src/app/services/banfanb/semillero';
+import { Semillero } from 'src/app/services/banfanb/semillero';
+import { UtilService } from 'src/app/services/util/util.service';
 
 @Component({
   selector: 'app-contratos',
@@ -89,6 +92,16 @@ export class ContratosComponent implements OnInit {
 
   }
 
+  public semillero : Semillero = {
+    codigo: 0,
+    plan: '',
+    descripcion: '',
+    fecha: new Date(),
+    autor: ''
+  }
+
+
+
 
   public portafolio = ''
 
@@ -148,7 +161,9 @@ export class ContratosComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
-    private ngxService: NgxUiLoaderService) { }
+    private ngxService: NgxUiLoaderService,
+    private util: UtilService
+    ) { }
 
   ngOnInit(): void {
     this.Listar()
@@ -156,6 +171,29 @@ export class ContratosComponent implements OnInit {
     this.ListarEstados()
     this.ListarEjecutivos()
     this.ListarOficinas()
+  }
+
+
+
+  GenerarSemillero(){
+    this.xAPI.funcion = "FID_CSemillero"
+    this.xAPI.parametros = ""
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        if (data != null) {
+          let codigo = parseInt(data[0].codigo) + 1
+          this.Contrato.numero = this.util.zfill(codigo, 4)
+        
+        } else {
+          this.Contrato.numero = "0001"
+        }
+
+      },
+      (error) => {
+        console.log(error)
+        this.Limpiar()
+      }
+    )
   }
 
   ListarEjecutivos(){
@@ -234,6 +272,7 @@ export class ContratosComponent implements OnInit {
     if (!this.active) {
       this.Limpiar()
       //this.contrato_search = 'none'
+      this.GenerarSemillero()
       this.Listar()
       this.tabSaldos = false
     } else {
@@ -276,7 +315,6 @@ export class ContratosComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         this.lstContratos = data
       },
       (error) => {
@@ -475,14 +513,48 @@ export class ContratosComponent implements OnInit {
     this.lstEjecutivos = []
   }
 
+
   Guardar() {
     if(this.fechainicio.value == "") {
       this._snackBar.open('Debe verificar todos los campos...', 'dance')
       return
     }
-    this.Contrato.Ejecutivo = this.lstEjecutivos
 
     this.ngxService.startLoader('load-cont')
+    this.semillero.codigo = parseInt(this.Contrato.numero)
+    this.semillero.plan = this.Contrato.numero
+    this.semillero.descripcion = "Contratos"
+    let f = new Date()
+    this.semillero.fecha = f
+
+    var obj = {
+      "coleccion": "semillero",
+      "objeto": this.semillero,
+      "donde": `{\"codigo\":\"${this.semillero.codigo }\"}`,
+      "driver": "MDBFIDE",
+      "upsert": true
+    }
+
+    // console.log(obj)
+
+    this.apiService.ExecColeccion(obj).subscribe(
+      (data) => {
+        this.GuardarContrato() 
+        
+      },
+      (error) => {
+        console.log(error)
+        this.ngxService.stopLoader('load-cont')
+      }
+    )
+
+  }
+
+  GuardarContrato() {
+   
+    this.Contrato.Ejecutivo = this.lstEjecutivos
+
+    
     let f = new Date( this.fechainicio.value ).toISOString()
 
     let ofc = this.myOficina.value + ''
@@ -506,6 +578,7 @@ export class ContratosComponent implements OnInit {
       },
       (error) => {
         console.log(error)
+        this.ngxService.stopLoader('load-cont')
       }
     )
 

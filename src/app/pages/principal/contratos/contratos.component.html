@@ -98,7 +98,7 @@
                                             <mat-form-field appearance="outline">
                                                 <mat-label>Plan</mat-label>
                                                 <input matInput placeholder="Plan" [(ngModel)]="Contrato.numero"
-                                                    value="{{Contrato.numero}}" (blur)="Consultar()">
+                                                    value="{{Contrato.numero}}" (blur)="Consultar()" readonly>
                                             </mat-form-field>
                                         </div>
                                         <div class="col-md-2">
@@ -172,7 +172,7 @@
                                                 <div class="container">
                                                     <form>
 
-                                                        <div class="row">
+                                                        <div class="row" style="display: none;">
                                                             <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Empresa Sudeban</mat-label>
@@ -204,9 +204,31 @@
 
                                                         </div>
 
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <mat-form-field appearance="outline">
+                                                                    <mat-label>Codigo Cartera #</mat-label>
+                                                                    <input matInput placeholder="Codigo Cartera #"
+                                                                        [ngModelOptions]="{standalone: true}"
+                                                                        [(ngModel)]="Contrato.Politicas.portafolio"
+                                                                        value="{{Contrato.Politicas.portafolio}}" (blur)="ConsultarPortafolio()">
+
+                                                                </mat-form-field>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <mat-form-field appearance="outline">
+                                                                    <mat-label>Cartera  Descripcion</mat-label>
+                                                                    <input matInput placeholder="Cartera Descripcion"
+                                                                        [ngModelOptions]="{standalone: true}"
+                                                                        [(ngModel)]="Contrato.Politicas.portafolionomb"
+                                                                        value="{{Contrato.Politicas.portafolionomb}}" disabled="disabled">
+
+                                                                </mat-form-field>
+                                                            </div>
+                                                        </div>
 
                                                         <div class="row">
-                                                            <div class="col-md-2">
+                                                            <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Codigo de Banco</mat-label>
                                                                     <input matInput placeholder="Codigo de Banco"
@@ -216,7 +238,7 @@
 
                                                                 </mat-form-field>
                                                             </div>
-                                                            <div class="col-md-2">
+                                                            <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Plan Anterior</mat-label>
                                                                     <input matInput placeholder="Plan Anterior"
@@ -226,26 +248,7 @@
 
                                                                 </mat-form-field>
                                                             </div>
-                                                            <div class="col-md-3">
-                                                                <mat-form-field appearance="outline">
-                                                                    <mat-label>Portafolio #</mat-label>
-                                                                    <input matInput placeholder="Portafolio #"
-                                                                        [ngModelOptions]="{standalone: true}"
-                                                                        [(ngModel)]="Contrato.Politicas.portafolio"
-                                                                        value="{{Contrato.Politicas.portafolio}}" (blur)="ConsultarPortafolio()">
-
-                                                                </mat-form-field>
-                                                            </div>
-                                                            <div class="col-md-5">
-                                                                <mat-form-field appearance="outline">
-                                                                    <mat-label>Portafolio  Descripcion</mat-label>
-                                                                    <input matInput placeholder="Portafolio Descripcion"
-                                                                        [ngModelOptions]="{standalone: true}"
-                                                                        [(ngModel)]="Contrato.Politicas.portafolionomb"
-                                                                        value="{{Contrato.Politicas.portafolionomb}}" disabled="disabled">
-
-                                                                </mat-form-field>
-                                                            </div>
+                                                          
                                                             <!-- <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Grupo</mat-label>
@@ -680,8 +683,8 @@
                                                     </form>
                                                 </div>
                                             </mat-tab>
-
-                                            <mat-tab *ngIf="tabSaldos">
+                                            <!-- *ngIf="tabSaldos" -->
+                                            <mat-tab >
                                                 <ng-template mat-tab-label>
                                                     &nbsp;SALDOS
                                                 </ng-template>
@@ -690,18 +693,7 @@
                                                     <div class="row">
                                                         <div class="col-md-4">
                                                             <mat-form-field appearance="outline">
-                                                                <mat-label>Saldo inicio del ejercicio</mat-label>
-                                                                <input type="number" matInput placeholder="Saldo inicio del ejercicio" 
-                                                                    [ngModelOptions]="{standalone: true}"
-                                                                    [(ngModel)]="Contrato.Saldos.saldoinicio"
-                                                                    value="{{Contrato.Saldos.saldoinicio}}">
-
-
-                                                            </mat-form-field>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <mat-form-field appearance="outline">
-                                                                <mat-label>Inicio del ejercicio</mat-label>
+                                                                <mat-label>Fecha de inicio</mat-label>
                                                                 <input matInput [matDatepicker]="picker" 
                                                                 [(ngModel)]="Contrato.Saldos.fechainicio"
                                                                 [formControl]="fechainicio"
@@ -714,8 +706,20 @@
                                                         </div>
                                                         <div class="col-md-4">
                                                             <mat-form-field appearance="outline">
-                                                                <mat-label>Fondo por aplicar</mat-label>
-                                                                <input type="number" matInput placeholder="Fondo por aplicar" 
+                                                                <mat-label>Monto de Apertura</mat-label>
+                                                                <input type="number" matInput placeholder="Monto de Apertura" 
+                                                                    [ngModelOptions]="{standalone: true}"
+                                                                    [(ngModel)]="Contrato.Saldos.saldoinicio"
+                                                                    value="{{Contrato.Saldos.saldoinicio}}">
+
+
+                                                            </mat-form-field>
+                                                        </div>
+                                                        
+                                                        <div class="col-md-4">
+                                                            <mat-form-field appearance="outline">
+                                                                <mat-label>Saldo Disponible</mat-label>
+                                                                <input type="number" matInput placeholder="Saldo Disponible" 
                                                                 [ngModelOptions]="{standalone: true}"
                                                                 [(ngModel)]="Contrato.Saldos.fondo"
                                                                 value="{{Contrato.Saldos.fondo}}">
@@ -724,7 +728,7 @@
                                                             </mat-form-field>
                                                         </div>
                                                     </div>
-                                                    <div class="row">
+                                                    <div class="row" style="display: none;">
                                                         <div class="col-md-6">
                                                             <mat-form-field appearance="outline">
                                                                 <mat-label>Total de capital</mat-label>
@@ -749,7 +753,7 @@
                                                         </div>
 
                                                     </div>
-                                                    <div class="row">
+                                                    <div class="row" style="display: none;">
                                                         <div class="col-md-4">
                                                             <mat-form-field appearance="outline">
                                                                 <mat-label>Capital neto</mat-label>

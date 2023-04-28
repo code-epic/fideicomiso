@@ -183,6 +183,7 @@ export class EmpresaComponent implements OnInit {
       this._snackBar.open('Debe verificar todos los campos...', 'dance')
       return
     }
+    this.Empresa.rif = this.Empresa.rif.toUpperCase()
     this.ngxService.startLoader('load-inver')
     var obj = {
       "coleccion": "empresa",
@@ -191,7 +192,7 @@ export class EmpresaComponent implements OnInit {
       "driver": "MDBFIDE",
       "upsert": true
     }
-
+    console.log(obj)
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
         console.log(data)
