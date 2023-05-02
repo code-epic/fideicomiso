@@ -15,6 +15,7 @@ import { PrincipalComponent } from '../../pages/principal/principal.component'
 import { PortafolioComponent } from 'src/app/pages/principal/administracion/portafolio/portafolio.component'
 import { TransaccionesComponent } from 'src/app/pages/principal/transacciones/transacciones.component'
 import { PlancontableComponent } from 'src/app/pages/principal/contabilidad/plancontable/plancontable.component'
+import { ComprobanteComponent } from 'src/app/pages/principal/contabilidad/comprobante/comprobante.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -80,6 +81,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'plancontable',
         component: PlancontableComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'comprobante',
+        component: ComprobanteComponent,
         canActivate: [AuthGuardGuard]
     },
 

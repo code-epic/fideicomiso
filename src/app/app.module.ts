@@ -39,9 +39,6 @@ import { MatInputModule } from '@angular/material/input';
 
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { MatTableModule } from '@angular/material/table';
-import { PortafolioComponent } from './pages/principal/administracion/portafolio/portafolio.component';
-import { AdministracionComponent } from './pages/principal/administracion/administracion.component';
-import { EmpresaComponent } from './pages/principal/administracion/empresa/empresa.component';
 import { MatSelectModule } from '@angular/material/select';
 import { FileUploadComponent } from './pages/generico/file/file-upload/file-upload.component';
 import { FileComponent } from './pages/generico/file/file/file.component';

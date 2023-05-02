@@ -26,6 +26,8 @@ export interface Politicas {
   rendicion: string
   condicionganancia: string
   metodoganancia: string
+  comision: string
+  tasa : number
   enviar: string
   numeromaximo: number
   intervalominimo: number

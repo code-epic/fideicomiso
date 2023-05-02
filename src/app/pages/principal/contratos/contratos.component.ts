@@ -43,6 +43,8 @@ export class ContratosComponent implements OnInit {
     rendicion: '',
     condicionganancia: '',
     metodoganancia: '',
+    comision: '',
+    tasa : 0,
     enviar: '',
     numeromaximo: 0,
     intervalominimo: 0
@@ -481,6 +483,8 @@ export class ContratosComponent implements OnInit {
       rendicion: '',
       condicionganancia: '',
       metodoganancia: '',
+      comision: '',
+      tasa : 0,
       enviar: '',
       numeromaximo: 0,
       intervalominimo: 0

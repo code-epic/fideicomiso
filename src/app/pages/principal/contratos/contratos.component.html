@@ -3,8 +3,6 @@
         <div class="card">
             <div class="card-body" style="padding:5px;height:100%">
                 <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
-
-
                     <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" 
                     (selectedTabChange)="tabActive($event)" [selectedIndex]="selectedIndex"
                     style="padding:10px;">
@@ -549,7 +547,32 @@
                                                             </div> -->
                                                         </div>
                                                         <div class="row">
-                                                            <div class="col-md-6">
+
+                                                            <div class="col-md-4">
+                                                                <mat-form-field appearance="outline">
+                                                                    <mat-label>Tipo de Comision</mat-label>
+                                                                    <!-- <input matInput placeholder="Fideicomiso" [(ngModel)]="Contrato.plan"
+                                                                        value="{{Contrato.plan}}"> -->
+                                                                        <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}" 
+                                                                    [(ngModel)]="Contrato.Politicas.comision"  value="{{Contrato.Politicas.comision}}">
+                                                                        <mat-option value="ADMINISTRATIVA">ADMINISTRACION</mat-option>
+                                                                        <mat-option value="FLAT">FLAT</mat-option>
+                                                                    </mat-select>
+                    
+                    
+                                                                </mat-form-field>
+                                                            </div>
+                                                            <div class="col-md-3" >
+                                                                <mat-form-field appearance="outline">
+                                                                    <mat-label>Tasa de la comision</mat-label>
+                                                                    <input matInput placeholder="Tasa de la comision"
+                                                                        [ngModelOptions]="{standalone: true}"
+                                                                        [(ngModel)]="Contrato.Politicas.tasa"
+                                                                        value="{{Contrato.Politicas.tasa}}">
+                                                                </mat-form-field>
+                                                            </div>
+
+                                                            <div class="col-md-5" style="display: none;">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Metodo de Calculo de ganancia</mat-label>
                                                                     <input matInput placeholder="Metodo de Calculo de ganancia"
@@ -560,7 +583,7 @@
 
                                                                 </mat-form-field>
                                                             </div>
-                                                            <div class="col-md-6">
+                                                            <div class="col-md-5">
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Tipo de Calculo Disponible</mat-label>
                                                                     <input matInput placeholder="Tipo de Calculo Disponible"
@@ -693,7 +716,7 @@
                                                     <div class="row">
                                                         <div class="col-md-4">
                                                             <mat-form-field appearance="outline">
-                                                                <mat-label>Fecha de inicio</mat-label>
+                                                                <mat-label>Fecha de Apertura</mat-label>
                                                                 <input matInput [matDatepicker]="picker" 
                                                                 [(ngModel)]="Contrato.Saldos.fechainicio"
                                                                 [formControl]="fechainicio"
@@ -716,7 +739,7 @@
                                                             </mat-form-field>
                                                         </div>
                                                         
-                                                        <div class="col-md-4">
+                                                        <div class="col-md-4" style="display:none">
                                                             <mat-form-field appearance="outline">
                                                                 <mat-label>Saldo Disponible</mat-label>
                                                                 <input type="number" matInput placeholder="Saldo Disponible" 

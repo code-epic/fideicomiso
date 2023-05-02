@@ -30,9 +30,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
-
 
 import { CambiarclaveComponent } from 'src/app/pages/generico/perfil/cambiarclave/cambiarclave.component';
 import { HechiceroComponent } from 'src/app/pages/generico/hechicero/hechicero.component';
@@ -51,7 +49,7 @@ import { FileComponent } from 'src/app/pages/generico/file/file/file.component';
 import { TransaccionesComponent } from 'src/app/pages/principal/transacciones/transacciones.component';
 import { EjecutivosComponent } from 'src/app/pages/principal/administracion/ejecutivos/ejecutivos.component';
 import { PlancontableComponent } from 'src/app/pages/principal/contabilidad/plancontable/plancontable.component';
-
+import { ComprobanteComponent } from 'src/app/pages/principal/contabilidad/comprobante/comprobante.component';
 
 
 @NgModule({
@@ -110,7 +108,8 @@ import { PlancontableComponent } from 'src/app/pages/principal/contabilidad/plan
     FileComponent,    
     TransaccionesComponent,
     EjecutivosComponent,
-    PlancontableComponent
+    PlancontableComponent,
+    ComprobanteComponent,
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},
