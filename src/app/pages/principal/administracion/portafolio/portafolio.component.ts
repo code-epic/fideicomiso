@@ -41,6 +41,11 @@ export class PortafolioComponent implements OnInit {
     this.Listar()
   }
 
+  atras(){
+    this.porta_insert = ''
+    this.porta_search = 'none'
+  }
+
   editar(e) {
     this.Portafolio = e
     this.porta_insert = ''

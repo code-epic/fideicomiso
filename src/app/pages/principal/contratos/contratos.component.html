@@ -238,6 +238,30 @@
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">
+                                                                    <mat-label>Fecha de Apertura</mat-label>
+                                                                    <input matInput [matDatepicker]="picker" 
+                                                                    [(ngModel)]="Contrato.Saldos.fechainicio"
+                                                                    [formControl]="fechainicio"
+                                                                    [value]="fechainicio.value">
+                                                                    <mat-datepicker #picker></mat-datepicker>
+                                                                    <mat-icon matSuffix (click)="picker.open()">event</mat-icon>
+                                                                </mat-form-field>
+                                                                <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+    
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <mat-form-field appearance="outline">
+                                                                    <mat-label>Monto de Apertura</mat-label>
+                                                                    <input type="number" matInput placeholder="Monto de Apertura" 
+                                                                        [ngModelOptions]="{standalone: true}"
+                                                                        [(ngModel)]="Contrato.Saldos.saldoinicio"
+                                                                        value="{{Contrato.Saldos.saldoinicio}}">
+    
+    
+                                                                </mat-form-field>
+                                                            </div>
+                                                            <div class="col-md-4" style="display: none;">
+                                                                <mat-form-field appearance="outline" >
                                                                     <mat-label>Plan Anterior</mat-label>
                                                                     <input matInput placeholder="Plan Anterior"
                                                                         [(ngModel)]="Contrato.plananterior"
@@ -714,32 +738,9 @@
                                                 <br><br>
                                                 <div class="container">
                                                     <div class="row">
-                                                        <div class="col-md-4">
-                                                            <mat-form-field appearance="outline">
-                                                                <mat-label>Fecha de Apertura</mat-label>
-                                                                <input matInput [matDatepicker]="picker" 
-                                                                [(ngModel)]="Contrato.Saldos.fechainicio"
-                                                                [formControl]="fechainicio"
-                                                                [value]="fechainicio.value">
-                                                                <mat-datepicker #picker></mat-datepicker>
-                                                                <mat-icon matSuffix (click)="picker.open()">event</mat-icon>
-                                                            </mat-form-field>
-                                                            <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
-
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <mat-form-field appearance="outline">
-                                                                <mat-label>Monto de Apertura</mat-label>
-                                                                <input type="number" matInput placeholder="Monto de Apertura" 
-                                                                    [ngModelOptions]="{standalone: true}"
-                                                                    [(ngModel)]="Contrato.Saldos.saldoinicio"
-                                                                    value="{{Contrato.Saldos.saldoinicio}}">
-
-
-                                                            </mat-form-field>
-                                                        </div>
                                                         
-                                                        <div class="col-md-4" style="display:none">
+                                                        
+                                                        <div class="col-md-4">
                                                             <mat-form-field appearance="outline">
                                                                 <mat-label>Saldo Disponible</mat-label>
                                                                 <input type="number" matInput placeholder="Saldo Disponible" 
@@ -826,7 +827,7 @@
                                     <div class="row">
                             
                                         <div class="col-md-12 text-right">
-                                            <button mat-flat-button color="primary" (click)="Guardar()">Registar contrato</button>
+                                            <button mat-flat-button color="primary" (click)="Guardar()">Aceptar</button>
                                         </div>
                                     
                                     </div>

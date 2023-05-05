@@ -98,8 +98,7 @@
         <div class="row">
             <div class="col-md-12 text-right">
                 <hr>
-                <button mat-flat-button color="primary" (click)="Guardar()">Registar
-                    empresa</button>
+                <button mat-flat-button color="primary" (click)="Guardar()">Aceptar</button>
             </div>
 
         </div>
@@ -110,6 +109,13 @@
 
 <div style="padding: 20px;" [ngStyle]="{'display':empre_search}">
     <br>
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <button mat-icon-button aria-label="volver" (click)="atras()" >
+                <mat-icon class="texto-gray">arrow_back</mat-icon>
+            </button>
+        </div>
+    </div>
     <mat-selection-list>
         <mat-list *ngFor="let e of lstEmpresa; let i=index "
             style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">

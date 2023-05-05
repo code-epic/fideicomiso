@@ -59,6 +59,12 @@ export class EmpresaComponent implements OnInit {
     this.ListarEstados()
   }
 
+
+  atras(){
+    this.empre_insert = ''
+    this.empre_search = 'none'
+  }
+
   editar(e) {
     this.Empresa = e
     this.empre_insert = ''
