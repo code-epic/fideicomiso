@@ -44,6 +44,7 @@ import { FileUploadComponent } from './pages/generico/file/file-upload/file-uplo
 import { FileComponent } from './pages/generico/file/file/file.component';
 import { TramiteComponent } from './pages/tramite/tramite.component';
 import { ServiciosComponent } from './pages/servicios/servicios.component';
+import { CurrencyMaskModule } from 'ng2-currency-mask';
 
 
 
@@ -84,7 +85,8 @@ import { ServiciosComponent } from './pages/servicios/servicios.component';
       progressBar: true,
       positionClass: "toast-top-right",
       preventDuplicates: false    }),
-    AngularFileUploaderModule
+    AngularFileUploaderModule,
+    CurrencyMaskModule
 
   ],
   declarations: [

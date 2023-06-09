@@ -50,6 +50,7 @@ import { TransaccionesComponent } from 'src/app/pages/principal/transacciones/tr
 import { EjecutivosComponent } from 'src/app/pages/principal/administracion/ejecutivos/ejecutivos.component';
 import { PlancontableComponent } from 'src/app/pages/principal/contabilidad/plancontable/plancontable.component';
 import { ComprobanteComponent } from 'src/app/pages/principal/contabilidad/comprobante/comprobante.component';
+import { CurrencyMaskModule } from "ng2-currency-mask";
 
 
 @NgModule({
@@ -85,7 +86,8 @@ import { ComprobanteComponent } from 'src/app/pages/principal/contabilidad/compr
     MatDatepickerModule,
     MatNativeDateModule,
     MatSnackBarModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    CurrencyMaskModule,
   ],
   declarations: [
     PrincipalComponent,

@@ -73,7 +73,6 @@ export class PortafolioComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         if (data != null && data.msj == undefined) {
           this.Portafolio = data[0]
         } else {

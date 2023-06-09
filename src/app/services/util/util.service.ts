@@ -68,6 +68,15 @@ export class UtilService {
   ConvertirCadena(cadena: string): string {
     return cadena.toLowerCase().replace(/á/g, "a").replace(/ê/g, "i").replace(/í/g, "i").replace(/ó/g, "o").replace(/ú/g, "u")
   }
+  /**
+   * Generar Unico ID
+   * @returns string
+   */
+  GenerarUnicId () : string {
+    return Math.random().toString(36).substr(2, 18);
+  }
+  
+
 
 
 }

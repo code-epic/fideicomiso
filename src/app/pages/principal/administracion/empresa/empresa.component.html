@@ -65,6 +65,41 @@
         </div>
 
         <div class="row">
+                <div class="col-md-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Tipo de Cuenta</mat-label>
+                      
+                        <mat-select placeholder="Tipo de Cuenta" [ngModelOptions]="{standalone: true}" [(ngModel)]="Empresa.tipo" value="{{Empresa.tipo}}">
+                            <mat-option value="AHORRO">AHORRO</mat-option>
+                            <mat-option value="CORRIENTE">CORRIENTE</mat-option>
+                        </mat-select>
+    
+                    </mat-form-field>
+                </div>
+                <div class="col-md-8">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Numero de Cuenta Bancaria</mat-label>
+                        <input matInput placeholder="Numero de Cuenta Bancaria" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="Empresa.numerocuenta" value="{{Empresa.numerocuenta}}"  maxlength="20">
+                    </mat-form-field>
+                </div>
+                <!-- <div class="col-md-3" style="display: none;">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Valor de Mercado</mat-label>
+                        <mat-select placeholder="Valor de Mercado"
+                            [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Empresa.valormercado"
+                            value="{{Empresa.valormercado}}">
+                            <mat-option value="NO">NO</mat-option>
+                            <mat-option value="SI">SI</mat-option>
+                        </mat-select>
+                        <mat-icon matSuffix>monetization_on</mat-icon>
+                    </mat-form-field>
+                </div> -->
+    
+        </div>
+
+        <div class="row">
             <div class="col-md-3">
                 <mat-form-field appearance="outline">
                     <mat-label>Celular</mat-label>

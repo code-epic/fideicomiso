@@ -42,7 +42,7 @@ export class EjecutivosComponent implements OnInit {
     sexo: '',
     nacimiento: '',
     ingreso: '',
-    actividad: '',
+    actividad: 'NEGOCIO',
     Direccion: this.Direccion
   }
 
@@ -194,7 +194,7 @@ export class EjecutivosComponent implements OnInit {
       sexo: '',
       nacimiento: '',
       ingreso: '',
-      actividad: '',
+      actividad: 'NEGOCIO',
       Direccion: this.Direccion
     }
   }

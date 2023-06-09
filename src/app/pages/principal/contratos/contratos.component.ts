@@ -44,10 +44,12 @@ export class ContratosComponent implements OnInit {
     condicionganancia: '',
     metodoganancia: '',
     comision: '',
-    tasa : 0,
+    tasa: 0,
     enviar: '',
     numeromaximo: 0,
-    intervalominimo: 0
+    intervalominimo: 0,
+    flat: 'NO',
+    tasaflat: 0
   }
 
   public Saldos : Saldos = {
@@ -75,7 +77,7 @@ export class ContratosComponent implements OnInit {
     rif: '',
     razonsocial: '',
     plan: '',
-    estatus: '1',
+    estatus: '2',
     tipo: '',
     empresa: '',
     fideicomiso: '',
@@ -91,7 +93,7 @@ export class ContratosComponent implements OnInit {
     Ejecutivo: this.lstEjecutivos,
     Politicas: this.Politicas,
     Saldos: this.Saldos,
-
+    clasificacion: '1'
   }
 
   public semillero : Semillero = {
@@ -116,7 +118,7 @@ export class ContratosComponent implements OnInit {
     ] 
     
   },
-    { "key": "INVERSION", "val"  : [{"key": "0", "val":"PERSONAL"}, {"key": "1", "val":"JURIDICO"}] ,},
+    { "key": "INVERSION", "val"  : [{"key": "0", "val":"PERSONAL"}, {"key": "1", "val":"JURIDICO"}, {"key": "2", "val":"GUBERNAMENTAL"}] ,},
     { "key": "MIXTO" , "val" : [{"key": "0", "val":"JURIDICO"}] ,}
   ]
 
@@ -145,6 +147,8 @@ export class ContratosComponent implements OnInit {
   public fechainicio = new FormControl(new Date());
 
   public tabSaldos : boolean = false
+
+  public tabEjecutivo : boolean = false
 
   public focus : boolean = false
 
@@ -178,6 +182,8 @@ export class ContratosComponent implements OnInit {
 
 
   GenerarSemillero(){
+
+    
     this.xAPI.funcion = "FID_CSemillero"
     this.xAPI.parametros = ""
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -274,7 +280,9 @@ export class ContratosComponent implements OnInit {
     if (!this.active) {
       this.Limpiar()
       //this.contrato_search = 'none'
-      this.GenerarSemillero()
+      //this.GenerarSemillero()
+      this.Contrato.numero = this.util.GenerarUnicId()
+      this.Contrato.estatus = "2"
       this.Listar()
       this.tabSaldos = false
     } else {
@@ -405,9 +413,12 @@ export class ContratosComponent implements OnInit {
       (data) => {
         console.log(data)
         if (data != null) {
-          let Contrato = data[0]
-          this.Contrato.rif = Contrato.rif
-          this.Contrato.razonsocial = Contrato.razonsocial
+          let Empresa = data[0]
+          this.Contrato.rif = Empresa.rif
+          this.Contrato.razonsocial = Empresa.razonsocial
+          this.Contrato.Politicas.tipocuenta = Empresa.tipo
+          this.Contrato.Politicas.numerocuenta = Empresa.numerocuenta
+          this.Contrato.Politicas.enviar = Empresa.Direccion.correo
         } 
       },
       (error) => {
@@ -487,7 +498,9 @@ export class ContratosComponent implements OnInit {
       tasa : 0,
       enviar: '',
       numeromaximo: 0,
-      intervalominimo: 0
+      intervalominimo: 0,
+      tasaflat: 0,
+      flat: 'NO'
     }
 
     this.Contrato = {
@@ -506,6 +519,7 @@ export class ContratosComponent implements OnInit {
       segmento: '',
       subsegmento: '',
       oficinatutora: '',
+      clasificacion: '1',
       fecha: new Date(),
       Direccion: this.Direccion,
       Ejecutivo: this.lstEjecutivos,

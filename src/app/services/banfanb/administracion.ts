@@ -6,6 +6,8 @@ import { Direccion } from './afiliado.service';
 export interface Empresa {
     rif: string,
     razonsocial: string,
+    tipo : string
+    numerocuenta: string
     Direccion : Direccion
 }
 

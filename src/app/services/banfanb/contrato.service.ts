@@ -28,6 +28,8 @@ export interface Politicas {
   metodoganancia: string
   comision: string
   tasa : number
+  flat: string
+  tasaflat : number
   enviar: string
   numeromaximo: number
   intervalominimo: number
@@ -42,6 +44,7 @@ export interface Ejecutivo {
 
 export interface Contrato {
   numero: string
+  clasificacion: string
   rif: string
   razonsocial: string
   plan: string

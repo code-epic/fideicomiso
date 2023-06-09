@@ -34,7 +34,9 @@ export class EmpresaComponent implements OnInit {
   public Empresa: Empresa = {
     rif: '',
     razonsocial: '',
-    Direccion: this.Direccion
+    Direccion: this.Direccion,
+    tipo: 'AHORRO',
+    numerocuenta: ''
   }
 
   public lstEmpresa: []
@@ -87,11 +89,8 @@ export class EmpresaComponent implements OnInit {
   ListarPaises() {
     this.xAPI.funcion = "ListarPaises"
     this.xAPI.parametros = ''
-
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        //console.log(data)
         this.lstPaises = data.Cuerpo
       },
       (error) => {
@@ -138,7 +137,6 @@ export class EmpresaComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         if (data != null && data.msj == undefined) {
           this.Empresa = data[0]
         } else {
@@ -178,7 +176,9 @@ export class EmpresaComponent implements OnInit {
     this.Empresa = {
       rif: '',
       razonsocial: '',
-      Direccion: this.Direccion
+      Direccion: this.Direccion,
+      numerocuenta: '',
+      tipo: ''
     }
   }
 
@@ -201,7 +201,7 @@ export class EmpresaComponent implements OnInit {
     console.log(obj)
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
-        console.log(data)
+       
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
         this.ngxService.stopLoader('load-inver')
         this.Limpiar()
