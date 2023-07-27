@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import {FormControl} from '@angular/forms';
-import {Observable} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
+import { FormControl} from '@angular/forms';
+import { Observable} from 'rxjs';
+import { map, startWith} from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
@@ -10,6 +10,7 @@ import { Contrato, Ejecutivo, Politicas, Saldos } from 'src/app/services/banfanb
 import { SemilleroService } from 'src/app/services/banfanb/semillero';
 import { Semillero } from 'src/app/services/banfanb/semillero';
 import { UtilService } from 'src/app/services/util/util.service';
+import { PlanFideicomiso } from 'src/app/services/banfanb/contabilidad.service';
 
 @Component({
   selector: 'app-contratos',
@@ -104,6 +105,25 @@ export class ContratosComponent implements OnInit {
     autor: ''
   }
 
+  public planFideicomiso : PlanFideicomiso ={
+    fecha_apertura: '',
+    observacion: '',
+    monto_apertura: 0,
+    usuario: '',
+    estatus: 0,
+    metodo_ganancia: 0,
+    frecuencia: 0,
+    tasa_flat: 0,
+    comision_flat: 0,
+    tipo_calculo: 0,
+    tasa_comision: 0,
+    tipo_comision: 0,
+    clasificacion: '',
+    tipo_fideicomiso: '',
+    fideicomiso: '',
+    identificador: 0
+  }
+
 
 
 
@@ -163,6 +183,8 @@ export class ContratosComponent implements OnInit {
   filteredOficinas: Observable<string[]>;
 
   public oficinatutora = 'Oficina Tutora'
+
+  public saldo_inicio = ''
 
   constructor(
     private apiService: ApiService,
@@ -283,10 +305,14 @@ export class ContratosComponent implements OnInit {
       //this.GenerarSemillero()
       this.Contrato.numero = this.util.GenerarUnicId()
       this.Contrato.estatus = "2"
+      
       this.Listar()
       this.tabSaldos = false
+      this.planFideicomiso.identificador = 0
+      console.log(this.planFideicomiso)
     } else {
       this.active = !this.active
+      
     }
 
   }
@@ -300,7 +326,13 @@ export class ContratosComponent implements OnInit {
     this.myOficina.setValue(this.Contrato.oficinatutora.toUpperCase())
     this.lstEjecutivos = this.Contrato.Ejecutivo
     this.getTipoFideicomiso()
+    this.saldo_inicio = this.Contrato.Saldos.saldoinicio.toString()
+    this.planFideicomiso.identificador = parseInt(this.Contrato.numero)
     this.tabSaldos = true
+
+
+    console.log(this.planFideicomiso)
+
   }
 
   getTipoFideicomiso() {
@@ -532,52 +564,77 @@ export class ContratosComponent implements OnInit {
   }
 
 
+  getPlanFideicomisoDB(){
+    let f = new Date().toISOString()
+    if(this.fechainicio.value != "") {
+      f = new Date( this.fechainicio.value ).toISOString()
+    }
+
+    this.planFideicomiso.fecha_apertura = f.substring(0,10)
+
+
+    this.planFideicomiso.observacion = this.Contrato.rif + '|' + this.Contrato.razonsocial 
+    this.planFideicomiso.monto_apertura = parseFloat(this.saldo_inicio)
+    this.planFideicomiso.usuario = ''
+    this.planFideicomiso.estatus = parseInt(this.Contrato.estatus)
+    this.planFideicomiso.metodo_ganancia = parseInt(this.Contrato.Politicas.metodoganancia)
+    this.planFideicomiso.frecuencia = parseInt(this.Contrato.Politicas.condicionganancia)
+    this.planFideicomiso.tasa_flat =  parseFloat(this.Contrato.Politicas.tasaflat.toString())
+    this.planFideicomiso.comision_flat = parseInt(this.Contrato.Politicas.flat)
+    this.planFideicomiso.tipo_calculo = parseInt(this.Contrato.Politicas.tipocalculo.toString())
+    this.planFideicomiso.tasa_comision = parseFloat(this.Contrato.Politicas.tasa.toString())
+    this.planFideicomiso.tipo_comision = parseInt(this.Contrato.Politicas.comision)
+    this.planFideicomiso.clasificacion = this.Contrato.clasificacion
+    this.planFideicomiso.tipo_fideicomiso =  this.Contrato.tipo
+    this.planFideicomiso.fideicomiso = this.Contrato.plan
+  }
+
   Guardar() {
-    if(this.fechainicio.value == "") {
-      this._snackBar.open('Debe verificar todos los campos...', 'dance')
+
+    if(this.fechainicio.value == "" && this.saldo_inicio == '') {
+      this._snackBar.open("Debe verificar todos los campos de fecha...", "Ok");
       return
     }
 
     this.ngxService.startLoader('load-cont')
-    this.semillero.codigo = parseInt(this.Contrato.numero)
-    this.semillero.plan = this.Contrato.numero
-    this.semillero.descripcion = "Contratos"
-    let f = new Date()
-    this.semillero.fecha = f
 
-    var obj = {
-      "coleccion": "semillero",
-      "objeto": this.semillero,
-      "donde": `{\"codigo\":\"${this.semillero.codigo }\"}`,
-      "driver": "MDBFIDE",
-      "upsert": true
-    }
+    this.getPlanFideicomisoDB()
+    console.log(this.planFideicomiso)
 
-    // console.log(obj)
 
-    this.apiService.ExecColeccion(obj).subscribe(
+    this.xAPI.funcion = this.planFideicomiso.identificador>0?'FID_UPlanFideicomiso': 'FID_IPlanFideicomiso'
+    this.xAPI.parametros = ''
+    this.xAPI.valores = JSON.stringify(this.planFideicomiso)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.GuardarContrato() 
-        
+        console.log(data)
+        if (data != null && data.msj != undefined) {
+          let numero = this.planFideicomiso.identificador>0?this.planFideicomiso.identificador:data.msj
+
+          this.Contrato.numero = this.util.zfill(numero, 4)
+          this.Contrato.Saldos.fechainicio = this.planFideicomiso.fecha_apertura 
+          this.Contrato.Saldos.saldoinicio = this.planFideicomiso.monto_apertura 
+      
+          this.GuardarContrato() 
+      
+        }
       },
       (error) => {
         console.log(error)
         this.ngxService.stopLoader('load-cont')
+        
       }
     )
+
 
   }
 
   GuardarContrato() {
-   
+  
     this.Contrato.Ejecutivo = this.lstEjecutivos
-
-    
-    let f = new Date( this.fechainicio.value ).toISOString()
-
     let ofc = this.myOficina.value + ''
     this.Contrato.oficinatutora = ofc.toUpperCase()
-    this.Contrato.Saldos.fechainicio = f
+
     var obj = {
       "coleccion": "contratos",
       "objeto": this.Contrato,
@@ -586,13 +643,17 @@ export class ContratosComponent implements OnInit {
       "upsert": true
     }
 
-    // console.log(obj)
+    console.log(obj)
 
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
         this.ngxService.stopLoader('load-cont')
-        this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'contratos')
-        
+        this.apiService.Mensaje(
+          "Felicitaciones, Proceso exitoso",
+          "Codigo de plan #" + this.Contrato.numero,
+          "success",
+          "contratos"
+        );
       },
       (error) => {
         console.log(error)

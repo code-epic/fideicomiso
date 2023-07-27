@@ -1,24 +1,24 @@
 {
   "cedula": "10117372",
-  "nombre": "Gonzalez Adela",
-  "login": "adelag",
+  "nombre": "Direccion General",
+  "login": "dgeneral",
   "correo": "",
-  "clave": "8d6a893b0a331d6fd52830e20d6ad0af3012f2b269e5c76fb7ad5c7e671fd513",
+  "clave": "393a9f8b0b9d1b751bffbe860fe18d19f0639cbae7bc42123f187cf7f5187322",
   "sucursal": "Todas",
   "direccion": "Principal",
   "cargo": "Analista",
   "telefono": "",
-  "sistema": "Fideicomiso",
+  "sistema": "Gestion de docuemtnos",
   "token": "Autorizado",
   "Perfil": {
-    "descripcion": "Control de Fideicomiso"
+    "descripcion": "Gestion de docuemtnos"
   },
   "Aplicacion": [
     {
-      "id": "ID-003",
-      "nombre": "Control de Fideicomiso",
-      "url": "http://localhost/app/fideicomiso/index.html?tk=$0",
-      "comentario": "Usuario Fideicomiso",
+      "id": "ID-006",
+      "nombre": "Gestion de docuemtnos",
+      "url": "http://localhost/app/gdoc/index.html?tk=$0",
+      "comentario": "Usuario Gestion de docuemtnos",
       "version": "V1.0.0.0",
       "autor": "Code-Epic Technologies",
       "Rol": {
@@ -45,49 +45,37 @@
             ]
           },
           {
-            "url": "/contratos",
+            "url": "/ghumana",
             "js": "",
             "icono": "ni-badge",
-            "descripcion": "Contratos",
-            "nombre": "Contratos",
+            "descripcion": "G. Humana",
+            "nombre": "G. Humana",
             "accion": "",
             "clase": "text-green",
             "color": "",
             "SubMenu": [],
             "Privilegios": [
-              {
-                "nombre": "configurar",
-                "descripcion": "Configurar",
-                "accion": "Configurar()",
-                "directiva": "validar usuario;"
-              }
             ]
           },
           {
-            "url": "/afiliado",
+            "url": "/gadministrativa",
             "js": "",
             "icono": "ni-planet",
-            "descripcion": "Afiliados",
-            "nombre": "Afiliados",
+            "descripcion": "G. Administrativa",
+            "nombre": "G. Administrativa",
             "accion": "",
             "clase": "text-blue",
             "color": "",
             "SubMenu": [],
             "Privilegios": [
-              {
-                "nombre": "configurar",
-                "descripcion": "Configurar",
-                "accion": "Configurar()",
-                "directiva": "validar usuario;"
-              }
             ]
           },
           {
-            "url": "/transacciones",
+            "url": "/gcomonicacional",
             "js": "",
             "icono": "ni-pin-3",
-            "descripcion": "Aportes",
-            "nombre": "Transacciones",
+            "descripcion": "G. Comunicacional",
+            "nombre": "G. Comunicacional",
             "accion": "",
             "clase": "text-orange",
             "color": "",
@@ -164,11 +152,11 @@
             ]
           },
           {
-            "url": "/inversion",
+            "url": "/asesorialegal",
             "js": "",
             "icono": "ni-single-02 ",
-            "descripcion": "Inversiones",
-            "nombre": "Inversiones",
+            "descripcion": "Asesoria Legal",
+            "nombre": "Asesoria Legal",
             "accion": "",
             "clase": "text-yellow",
             "color": "",
@@ -176,11 +164,71 @@
             "SubMenu": []
           },
           {
-            "url": "/contabilidad",
+            "url": "/tecnologia",
             "js": "",
             "icono": "ni-circle-08 ",
-            "descripcion": "Contabilidad",
-            "nombre": "Contabilidad",
+            "descripcion": "Tecnologia",
+            "nombre": "Tecnologia",
+            "accion": "",
+            "clase": "text-blue",
+            "color": "",
+            "Privilegio": [],
+            "SubMenu": []
+          },
+          {
+            "url": "/seguridadintegral",
+            "js": "",
+            "icono": "ni-circle-08 ",
+            "descripcion": "Seguridad Integral",
+            "nombre": "Seguridad Integral",
+            "accion": "",
+            "clase": "text-pink",
+            "color": "",
+            "Privilegio": [],
+            "SubMenu": []
+          },
+          {
+            "url": "/comercializacion",
+            "js": "",
+            "icono": "ni-circle-08 ",
+            "descripcion": "D. Comercializacion",
+            "nombre": "D. Comercializacion",
+            "accion": "",
+            "clase": "text-pink",
+            "color": "",
+            "Privilegio": [],
+            "SubMenu": []
+          },
+          {
+            "url": "/produccion",
+            "js": "",
+            "icono": "ni-circle-08 ",
+            "descripcion": "D. Produccion",
+            "nombre": "D. Produccion",
+            "accion": "",
+            "clase": "text-orange",
+            "color": "",
+            "Privilegio": [],
+            "SubMenu": []
+          },
+          {
+            "url": "/arrendamiento",
+            "js": "",
+            "icono": "ni-circle-08 ",
+            "descripcion": "D. Arrendamiento",
+            "nombre": "D. Arrendamiento",
+            "accion": "",
+            "clase": "text-pink",
+            "color": "",
+            "Privilegio": [],
+            "SubMenu": []
+          },
+          {
+            "url": "/proyectos",
+            "js": "",
+            "icono": "ni-circle-08 ",
+            "descripcion": "D. Proyectos",
+            "nombre": "D. Proyectos",
             "accion": "",
             "clase": "text-pink",
             "color": "",

@@ -161,9 +161,9 @@
                                             <mat-form-field appearance="outline">
                                                 <mat-label>Clasificacion</mat-label>
                                                 <mat-select placeholder="Clasificacion" [ngModelOptions]="{standalone: true}"
-                                                [(ngModel)]="Contrato.estatus"  value="{{Contrato.estatus}}" readonly >
-                                                    <mat-option value=1>CENTRALIZADO</mat-option>
-                                                    <mat-option value=2>DESCENTRALIZADO</mat-option>
+                                                [(ngModel)]="Contrato.clasificacion"  value="{{Contrato.clasificacion}}" readonly >
+                                                    <mat-option value='1'>CENTRALIZADO</mat-option>
+                                                    <mat-option value='2'>DESCENTRALIZADO</mat-option>
                                                 </mat-select>
                                               <!-- <mat-icon matSuffix>home</mat-icon> -->
 
@@ -257,7 +257,7 @@
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Monto de Apertura</mat-label>
                                                                     <input matInput placeholder="Monto de Apertura" 
-                                                                        [(ngModel)]="Contrato.Saldos.saldoinicio"
+                                                                        [(ngModel)]="saldo_inicio"
                                                                         currencyMask [options]="{ prefix: 'Bs. ', thousands: '.', decimal: ',' }"
                                                                         value=""
                                                                         >
@@ -555,7 +555,7 @@
                                                                     <mat-label>Tipo de Comision</mat-label>
                                                                         <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}" 
                                                                     [(ngModel)]="Contrato.Politicas.comision"  value="{{Contrato.Politicas.comision}}">
-                                                                        <mat-option value="ADMINISTRATIVA">ADMINISTRATIVA</mat-option>
+                                                                        <mat-option value="1">ADMINISTRATIVA</mat-option>
                                                                     </mat-select>
                     
                                                                 </mat-form-field>
@@ -573,12 +573,14 @@
                                                             <div class="col-md-5" style="display: none;">
                                                             </div>
                                                             <div class="col-md-5">
-                                                                <mat-label>Tipo de Calculo</mat-label>
+                                                                <mat-form-field appearance="outline">
+                                                                    <mat-label>Tipo de Calculo</mat-label>
                                                                     <mat-select  [ngModelOptions]="{standalone: true}" 
-                                                                [(ngModel)]="Contrato.Politicas.tipocalculo"  value="{{Contrato.Politicas.tipocalculo}}">
-                                                                    <mat-option value="SSPF">SALDO PROMEDIO FONDO FIDUCIARIO</mat-option>
-                                                                    <mat-option value="SSPF">SALDO PROMEDIO SOBRE INTERESES</mat-option>
-                                                                </mat-select>
+                                                                    [(ngModel)]="Contrato.Politicas.tipocalculo"  value="{{Contrato.Politicas.tipocalculo}}">
+                                                                        <mat-option value="1">SALDO PROMEDIO FONDO FIDUCIARIO</mat-option>
+                                                                        <mat-option value="2">SALDO PROMEDIO SOBRE INTERESES</mat-option>
+                                                                    </mat-select>
+                                                                </mat-form-field>
                                                             </div>
 
                                                         </div>
@@ -591,8 +593,8 @@
                                                                     <mat-label>Comisi&oacute;n Flat</mat-label>
                                                                         <mat-select placeholder="Comision Flat" [ngModelOptions]="{standalone: true}" 
                                                                     [(ngModel)]="Contrato.Politicas.flat"  value="{{Contrato.Politicas.flat}}">
-                                                                        <mat-option value="SI">SI</mat-option>
-                                                                        <mat-option value="NO">NO APLICA</mat-option>
+                                                                        <mat-option value="1">SI</mat-option>
+                                                                        <mat-option value="0">NO APLICA</mat-option>
                                                                     </mat-select>
                     
                     
@@ -635,11 +637,11 @@
                                                                     <mat-select placeholder="Frecuencia de Cierre"
                                                                         [ngModelOptions]="{standalone: true}" [(ngModel)]="Contrato.Politicas.condicionganancia"
                                                                         value="{{Contrato.Politicas.condicionganancia}}">
-                                                                        <mat-option value="MENSUAL">MENSUAL</mat-option>
-                                                                        <mat-option value="TRIMESTRAL">TRIMESTRAL</mat-option>
-                                                                        <mat-option value="SEMESTRAL">SEMESTRAL</mat-option>
-                                                                        <mat-option value="ANUAL">ANUAL</mat-option>
-                                                                        <mat-option value="NO APLICA">NO APLICA</mat-option>
+                                                                        <mat-option value="1">MENSUAL</mat-option>
+                                                                        <mat-option value="2">TRIMESTRAL</mat-option>
+                                                                        <mat-option value="3">SEMESTRAL</mat-option>
+                                                                        <mat-option value="4">ANUAL</mat-option>
+                                                                        <mat-option value="5">NO APLICA</mat-option>
                                                                     </mat-select>
 
                                                                 </mat-form-field>
@@ -648,12 +650,12 @@
                                                                 <mat-form-field appearance="outline">
                                                                     <mat-label>Metodo de pago de ganancia</mat-label>
 
-                                                                    <mat-select placeholder="Frecuencia de Cierre"
+                                                                    <mat-select placeholder="Metodo de pago de ganancia"
                                                                         [ngModelOptions]="{standalone: true}" [(ngModel)]="Contrato.Politicas.metodoganancia"
                                                                         value="{{Contrato.Politicas.metodoganancia}}">
-                                                                        <mat-option value="CAPITALIZAR">CAPITALIZAR</mat-option>
-                                                                        <mat-option value="REINVENTIR">REINVENTIR</mat-option>
-                                                                        <mat-option value="PAGAR">PAGAR</mat-option>
+                                                                        <mat-option value="1">CAPITALIZAR</mat-option>
+                                                                        <mat-option value="2">REINVENTIR</mat-option>
+                                                                        <mat-option value="3">PAGAR</mat-option>
                                                                     </mat-select>
                                                                 </mat-form-field>
                                                             </div>

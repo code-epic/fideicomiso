@@ -1,0 +1,112 @@
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+.mat-tab {
+  margin-top: 48px;
+  padding: 50px;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-mdc-form-field + .mat-mdc-form-field {
+  margin-left: 8px;
+}
+
+
+
+.example-section {
+  margin: 12px 0;
+}
+
+.example-margin {
+  margin: 0 12px;
+}
+
+ul {
+  list-style-type: none;
+  margin-top: 4px;
+}
+
+.texto-lista{
+  margin-top: 13px; 
+  font-weight: bold;
+}
+
+.texto-detalle{
+  margin-top: 13px; 
+  font-weight: none;
+}
+
+.texto-gray{
+  color: #969696;
+}
+
+
+.example-headers-align .mat-expansion-panel-header-title,
+.example-headers-align .mat-expansion-panel-header-description {
+flex-basis: 0;
+}
+
+.example-headers-align .mat-expansion-panel-header-description {
+justify-content: space-between;
+align-items: center;
+}
+
+.example-headers-align .mat-form-field + .mat-form-field {
+margin-left: 8px;
+}
+
+
+
+input{
+  text-transform: uppercase;
+  color: #444242;
+  font-weight: bold;
+}
+
+select{
+  text-transform: uppercase;
+  color: #444242;
+  font-weight: bold;
+}
+textarea {
+  text-transform: uppercase;
+  color: #444242;
+  font-weight: bold;
+}
+
+.example-form-field {
+  margin: 0 8px 16px 0;
+  width: 90%;
+}
+
+.asistente-button-container {
+  justify-content: center;
+  width: 30px;
+  padding-top: 13px;
+}
+
+
+.example-small-box, .example-large-box {
+  margin: 0px;
+  padding: 0px;
+}
+
+.example-small-box {
+  height: 100px;
+  width: 100px;
+}
+
+.example-large-box {
+  height: 100%;
+  width: 100%;
+}

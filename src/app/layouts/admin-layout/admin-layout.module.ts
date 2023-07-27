@@ -46,12 +46,20 @@ import { AdministracionComponent } from 'src/app/pages/principal/administracion/
 import { EmpresaComponent } from 'src/app/pages/principal/administracion/empresa/empresa.component';
 import { FileUploadComponent } from 'src/app/pages/generico/file/file-upload/file-upload.component';
 import { FileComponent } from 'src/app/pages/generico/file/file/file.component';
-import { TransaccionesComponent } from 'src/app/pages/principal/transacciones/transacciones.component';
+import { TransaccionesComponent } from 'src/app/pages/principal/operaciones/transacciones/transacciones.component';
 import { EjecutivosComponent } from 'src/app/pages/principal/administracion/ejecutivos/ejecutivos.component';
 import { PlancontableComponent } from 'src/app/pages/principal/contabilidad/plancontable/plancontable.component';
 import { ComprobanteComponent } from 'src/app/pages/principal/contabilidad/comprobante/comprobante.component';
 import { CurrencyMaskModule } from "ng2-currency-mask";
-
+import { CuentaComponent } from 'src/app/pages/principal/contabilidad/cuenta/cuenta.component';
+  
+import { NgxMaskModule, IConfig } from 'ngx-mask'
+import { OperacionesComponent } from 'src/app/pages/principal/operaciones/operaciones.component';
+import { ProcesosComponent } from 'src/app/pages/principal/operaciones/procesos/procesos.component';
+import { ListadosComponent } from 'src/app/pages/principal/operaciones/listados/listados.component';
+import { PrecierreComponent } from 'src/app/pages/principal/operaciones/procesos/precierre/precierre.component';
+import { CierreComponent } from 'src/app/pages/principal/operaciones/procesos/cierre/cierre.component';
+export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 
 @NgModule({
   imports: [
@@ -76,6 +84,7 @@ import { CurrencyMaskModule } from "ng2-currency-mask";
     MatExpansionModule,
     MatButtonToggleModule,
     AutocompleteLibModule,
+    NgxMaskModule.forRoot(),
     MatListModule,
     MatInputModule,
     MatPaginatorModule,
@@ -108,10 +117,16 @@ import { CurrencyMaskModule } from "ng2-currency-mask";
     EmpresaComponent,
     FileUploadComponent,
     FileComponent,    
+    OperacionesComponent,
+    ProcesosComponent,
+    ListadosComponent,
+    PrecierreComponent,
+    CierreComponent,
     TransaccionesComponent,
     EjecutivosComponent,
     PlancontableComponent,
     ComprobanteComponent,
+    CuentaComponent
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},

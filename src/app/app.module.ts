@@ -40,12 +40,9 @@ import { MatInputModule } from '@angular/material/input';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
-import { FileUploadComponent } from './pages/generico/file/file-upload/file-upload.component';
-import { FileComponent } from './pages/generico/file/file/file.component';
 import { TramiteComponent } from './pages/tramite/tramite.component';
 import { ServiciosComponent } from './pages/servicios/servicios.component';
 import { CurrencyMaskModule } from 'ng2-currency-mask';
-
 
 
 
@@ -86,7 +83,7 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
       positionClass: "toast-top-right",
       preventDuplicates: false    }),
     AngularFileUploaderModule,
-    CurrencyMaskModule
+    CurrencyMaskModule,
 
   ],
   declarations: [

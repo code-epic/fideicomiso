@@ -4,17 +4,30 @@ import { Injectable } from '@angular/core';
 
 //no posee una sola transaccion
 export interface Comprobante {
-  numero: string //numero de comprobante
+  codigo : string
+  numero : string
+  plan: string //numero de comprobante
   fecha : string //fecha de la operacion
-  monto_global : number // Producto de las transaciones
-  instrumento : string //deuda publica o colocacion a plazo, operaciones, retiros
+  saldo_debe : number // Producto de las transaciones
+  saldo_haber: number
+  monto_total : number // Producto de las transaciones
   detalle : string
-  debito: number
-  credito: number
-  monto: number
-  idtra : string //transaccion ID
-  cuenta : string
-  tipo_movimiento: string // debe o haber
+  tipo: string // debe o haber
+  estatus : boolean 
+  items : []
+}
+
+//no posee una sola transaccion
+export interface IComprobante {
+  cuenta: string //Cuenta de comprobante
+  fecha : string //fecha de la operacion
+  debe : number // Producto de las transaciones
+  haber: number
+  referencia : string //deuda publica o colocacion a plazo, operaciones, retiros
+  descripcion : string
+  auxiliar : string //transaccion ID
+  cc : string //comprobante contable
+  tipo: string // debe o haber
   estatus : boolean 
 }
 

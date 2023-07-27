@@ -1,0 +1,95 @@
+<div class="row">
+  <div class="col-md-12">
+    <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
+    <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" style="padding:10px;">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
+          &nbsp;PRECIERRE
+        </ng-template>
+
+        <div class="example-large-box mat-elevation-z4">
+          <div style="padding: 20px; width: 100%; margin-bottom: 0px;">
+            <div class="row">
+              <div class="col-md-8"></div>
+              <div class="col-md-4">
+                <mat-form-field appearance="outline">
+                  <mat-label>Fecha de Cierre Al</mat-label>
+                  <input matInput [matDatepicker]="xpicker">
+                  <mat-datepicker #xpicker></mat-datepicker>
+                  <mat-icon matSuffix (click)="xpicker.open()">event</mat-icon>
+                </mat-form-field>
+                <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                  <mat-label>Fecha de Contable</mat-label>
+                  <input matInput [matDatepicker]="xpicker">
+                  <mat-datepicker #xpicker></mat-datepicker>
+                  <mat-icon matSuffix (click)="xpicker.open()">event</mat-icon>
+                </mat-form-field>
+                <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+              </div>
+
+              <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                  <mat-label>Fecha de Inicio</mat-label>
+                  <input matInput [matDatepicker]="ypicker">
+                  <mat-datepicker #ypicker></mat-datepicker>
+                  <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
+                </mat-form-field>
+                <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+              </div>
+
+              <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                  <mat-label>Fecha Fin</mat-label>
+                  <input matInput [matDatepicker]="zpicker">
+                  <mat-datepicker #zpicker></mat-datepicker>
+                  <mat-icon matSuffix (click)="zpicker.open()">event</mat-icon>
+                </mat-form-field>
+                <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+              </div>
+
+              <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                  <mat-label>N&uacute;mero de dias </mat-label>
+                  <input matInput placeholder="N&uacute;mero de dias">
+                  <mat-icon matSuffix>folder</mat-icon>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
+          &nbsp;CIERRE
+        </ng-template>
+        <br>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
+          &nbsp;CIERRE MENSUAL
+        </ng-template>
+        <br>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
+          &nbsp;CIERRE SEMESTRAL
+        </ng-template>
+        <br>
+      </mat-tab>
+
+    </mat-tab-group>
+  </div>
+</div>

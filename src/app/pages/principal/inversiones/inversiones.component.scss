@@ -80,15 +80,41 @@ ul {
 
 input{
     text-transform: uppercase;
+    color: #505050;
 }
 select{
     text-transform: uppercase;
+    color: #505050;
 }
 textarea {
     text-transform: uppercase;
+    color: #505050;
 }
+
 
 .example-form-field {
     margin: 0 8px 16px 0;
     width: 90%;
-}
+  }
+  
+  .asistente-button-container {
+    justify-content: center;
+    width: 30px;
+    padding-top: 13px;
+  }
+  
+  
+  .example-small-box, .example-large-box {
+    margin: 0px;
+    padding: 0px;
+  }
+  
+  .example-small-box {
+    height: 100px;
+    width: 100px;
+  }
+  
+  .example-large-box {
+    height: 100%;
+    width: 100%;
+  }

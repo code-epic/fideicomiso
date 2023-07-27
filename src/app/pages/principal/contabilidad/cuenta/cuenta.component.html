@@ -1,0 +1,193 @@
+<ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
+<mat-tab-group mat-stretch-tabs class="example-stretched-tabs" (selectedTabChange)="tabActive($event)"
+  [selectedIndex]="selectedIndex" style="padding:10px;">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      &nbsp;CONSULTA CUENTA
+    </ng-template>
+    <div class="example-large-box mat-elevation-z4">
+      <br><br>
+
+  
+          <br>
+          <table mat-table [dataSource]="dataSource">
+
+            <!-- <ng-container matColumnDef="codigo">
+              <th mat-header-cell *matHeaderCellDef> CODIGO </th>
+              <td mat-cell *matCellDef="let e"> {{e.codigo | uppercase}} </td>
+            </ng-container> -->
+
+             <!-- Weight Column -->
+             <ng-container matColumnDef="cuenta">
+              <th mat-header-cell *matHeaderCellDef> CUENTA </th>
+              <td mat-cell *matCellDef="let e"> {{e.cuenta}} </td>
+            </ng-container>
+
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="descripcion">
+              <th mat-header-cell *matHeaderCellDef> DESCRIPCION </th>
+              <td mat-cell *matCellDef="let e"> {{e.descripcion | uppercase}} </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="accion">
+              <th mat-header-cell *matHeaderCellDef> NATURALEZA </th>
+              <td mat-cell *matCellDef="let e"> {{ e.accion }} </td>
+            </ng-container>
+
+             <!-- Weight Column -->
+             <ng-container matColumnDef="codigo_asignacion">
+              <th mat-header-cell *matHeaderCellDef> TOTALIZADORA </th>
+              <td mat-cell *matCellDef="let e"> {{ getTotalizadora( e.codigo_asignacion ) }} </td>
+            </ng-container>
+
+
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <mat-paginator [pageSizeOptions]="[10, 20, 30]" showFirstLastButtons aria-label="Selecione la pagina">
+          </mat-paginator>
+       
+      <!-- <mat-selection-list>
+        <mat-list *ngFor="let e of lstCuenta; let i=index "
+          style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+          <div class="row">
+
+            <div class="col-md-3 texto-detalle">
+              {{ e.codigo | uppercase }}
+            </div>
+            <div class="col-md-5 texto-lista">
+              {{ e.descripcion | uppercase}}
+            </div>
+
+            <div class="col-md-2 texto-detalle">
+              {{ getDebe(e.disminuye_por) | uppercase }}
+            </div>
+            <div class="col-md-1 texto-detalle">
+              {{ e.cuenta | uppercase }}
+            </div>
+            <div class="col-md-1 text-right">
+
+              <button mat-icon-button aria-label="Editar" (click)="editar(e)">
+                <mat-icon class="texto-gray">edit</mat-icon>
+              </button>
+
+            </div>
+          </div>
+        </mat-list>
+      </mat-selection-list> -->
+      <br><br>
+    </div>
+  </mat-tab>
+  <mat-tab style="width: 90%;padding: 20px;">
+    <ng-template mat-tab-label>
+      <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
+      &nbsp;REGISTRO DE CUENTA
+    </ng-template>
+    <br>
+
+    <div class="card">
+      <div class="card-body" style="padding:20px;">
+        <div style="padding: 20px;">
+          <br>
+          <form>
+
+            <div class="row">
+              <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                  <mat-label>Codigo</mat-label>
+                  <input matInput placeholder="Codigo" [ngModelOptions]="{standalone: true}" [(ngModel)]="txtCuenta"
+                    value="{{txtCuenta}}" (blur)="setSegmento();Consultar()" maxlength="23" >
+                  <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
+
+                </mat-form-field>
+              </div>
+
+
+              <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                  <mat-label>Aumenta por </mat-label>
+                  <mat-select placeholder="Aumenta por " [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="Cuenta.aumenta" value="{{Cuenta.aumenta}}">
+                    <mat-option value="DEBE">DEBE</mat-option>
+                    <mat-option value="HABER">HABER</mat-option>
+                  </mat-select>
+
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                  <mat-label>Disminuye por </mat-label>
+                  <mat-select placeholder="Disminuye por " [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="Cuenta.disminuye" value="{{Cuenta.disminuye}}">
+                    <mat-option value="DEBE">DEBE</mat-option>
+                    <mat-option value="HABER">HABER</mat-option>
+                  </mat-select>
+
+                </mat-form-field>
+              </div>
+              <div class="col-md-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Descripcion</mat-label>
+                  <input matInput placeholder="Descripcion" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="Cuenta.descripcion" value="{{Cuenta.descripcion}}">
+                </mat-form-field>
+              </div>
+              <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                  <mat-label>Cuenta Totalizadora</mat-label>
+                  <mat-select placeholder="Cuenta Totalizadora" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="cmbTotalizadora" value="{{cmbTotalizadora}}">
+                    <mat-option value="1">SI</mat-option>
+                    <mat-option value="0">NO</mat-option>
+                  </mat-select>
+
+                </mat-form-field>
+              </div>
+              <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                  <mat-label>Tipo de moneda</mat-label>
+                  <mat-select placeholder="Tipo de moneda" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="Cuenta.moneda" value="{{Cuenta.moneda}}">
+                    <mat-option value="1">BOLIVARES</mat-option>
+                    <mat-option value="2">DOLARES</mat-option>
+                    <mat-option value="3">EUROS</mat-option>
+                    <mat-option value="4">YUANES</mat-option>
+                  </mat-select>
+
+                </mat-form-field>
+              </div>
+
+
+            </div>
+
+
+
+
+
+          </form>
+        </div>
+
+      </div>
+      <div class="card-footer">
+        <div class="row">
+
+          <div class="col-md-12 text-right">
+            <button mat-flat-button color="primary" (click)="Guardar()">Registar</button>
+          </div>
+
+        </div>
+      </div>
+
+
+    </div>
+
+
+
+  </mat-tab>
+</mat-tab-group>
+

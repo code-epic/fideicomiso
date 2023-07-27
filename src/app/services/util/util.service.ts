@@ -75,7 +75,45 @@ export class UtilService {
   GenerarUnicId () : string {
     return Math.random().toString(36).substr(2, 18);
   }
-  
+
+
+
+  //Recibe  Fecha Formato: AAAA-MM-DD 00:00:00
+  //Retorna Fecha Formato: DD/MM/AAAA
+  ConvertirFechaHumana(f) {
+    var ISODate = new Date(f).toISOString();
+    var fe = ISODate.substr(0, 10);
+    var fa = fe.split("-");
+    if (fa[0] != "0001") {
+      return fa[2] + "/" + fa[1] + "/" + fa[0];
+    } else {
+      return "1900-01-01";
+    }
+    //return fa[2] + "/" + fa[1] + "/" + fa[0];
+  }
+
+  //Recibe  Fecha Formato: DD/MM/AAAA
+  //Retorna Fecha Formato: AAAA-MM-DD
+  ConvertirFechaDB(f: any) : string {
+    var faux = ''
+    if (typeof f != "object") {
+      faux = "1900-01-01"
+      if (f != undefined && f != "") {
+        var fx = f.split("-");
+        faux = fx[2] + "-" + fx[1] + "-" + fx[0];
+      }
+      return faux;
+    }else{
+      var ISODate = new Date(f).toISOString();
+      var fe = ISODate.substr(0, 10);
+      var fa = fe.split("-");
+      if (fa[0] != "0001") {
+        return fa[0] + "-" + fa[1] + "-" + fa[2];
+      } else {
+        return "1900-01-01";
+      }
+    }
+  }
 
 
 

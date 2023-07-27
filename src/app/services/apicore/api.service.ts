@@ -90,7 +90,6 @@ export class ApiService {
    */
   ExecColeccion(xObjeto): Observable<any> {
     var url = this.URL + "ccoleccion";
-    console.log(url)
     return this.http.post<any>(url, xObjeto, this.httpOptions);
   }
 

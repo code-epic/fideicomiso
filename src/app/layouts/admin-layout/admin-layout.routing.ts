@@ -13,9 +13,15 @@ import { AuthGuardGuard } from 'src/app/services/seguridad/auth-guard.guard'
 
 import { PrincipalComponent } from '../../pages/principal/principal.component'
 import { PortafolioComponent } from 'src/app/pages/principal/administracion/portafolio/portafolio.component'
-import { TransaccionesComponent } from 'src/app/pages/principal/transacciones/transacciones.component'
+import { TransaccionesComponent } from 'src/app/pages/principal/operaciones/transacciones/transacciones.component'
 import { PlancontableComponent } from 'src/app/pages/principal/contabilidad/plancontable/plancontable.component'
 import { ComprobanteComponent } from 'src/app/pages/principal/contabilidad/comprobante/comprobante.component'
+import { CuentaComponent } from 'src/app/pages/principal/contabilidad/cuenta/cuenta.component'
+import { OperacionesComponent } from 'src/app/pages/principal/operaciones/operaciones.component'
+import { ProcesosComponent } from 'src/app/pages/principal/operaciones/procesos/procesos.component'
+import { ListadosComponent } from 'src/app/pages/principal/operaciones/listados/listados.component'
+import { PrecierreComponent } from 'src/app/pages/principal/operaciones/procesos/precierre/precierre.component'
+import { CierreComponent } from 'src/app/pages/principal/operaciones/procesos/cierre/cierre.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -75,8 +81,28 @@ export const AdminLayoutRoutes: Routes = [
         component: AdministracionComponent,
         canActivate: [AuthGuardGuard]
     },{
+        path: 'operaciones',
+        component: OperacionesComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'procesos',
+        component: ProcesosComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'precierre',
+        component: PrecierreComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'cierre',
+        component: CierreComponent,
+        canActivate: [AuthGuardGuard]
+    },{
         path: 'transacciones',
         component: TransaccionesComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'listados',
+        component: ListadosComponent,
         canActivate: [AuthGuardGuard]
     },{
         path: 'plancontable',
@@ -85,6 +111,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'comprobante',
         component: ComprobanteComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'cuenta',
+        component: CuentaComponent,
         canActivate: [AuthGuardGuard]
     },
 

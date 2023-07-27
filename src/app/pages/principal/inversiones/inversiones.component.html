@@ -3,217 +3,510 @@
         <div class="card card-profile shadow">
             <div class="card-body">
                 <ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
-                <mat-tab-group>
+                <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" (selectedTabChange)="tabActive($event)"
+                [selectedIndex]="selectedIndex" style="padding:10px;">
+
+
+
+                    <mat-tab label="CONSULTA">
+                        
+                        <div class="example-large-box mat-elevation-z4">
+                            <br><br>
+                            <div class="row" style="margin:0px; padding: 0px;">
+                                
+                                <div class="col-md-12">
+                                    <mat-selection-list>
+
+
+                                        <div class="row">
+                                            <div class="col-md-2 texto-lista">
+                                                NUMERO
+                                            </div>
+                                            <div class="col-md-2 texto-lista" >
+                                                    COD. INST. 
+                                            </div>
+                                            <div class="col-md-4 texto-lista">
+                                                INSTRUMENTO
+                                            </div>
+                                            <div class="col-md-2 texto-lista">
+                                                VALOR NOMINAL
+                                            </div>
+                                            <div class="col-md-2 text-right texto-lista">
+                                                # ACCION
+                                                
+                                            </div>
+                                        </div>
+                                        <mat-divider></mat-divider>
+                                        <mat-list *ngFor="let e of lstInversiones; let i=index" 
+                                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+
+                                            
+                                            
+                                            <div class="row">
+
+                                                <div class="col-md-2 texto-detalle">
+                                                    {{ getZFill(e.identificador) }}
+                                                </div>
+                                                <div class="col-md-2 texto-detalle" >
+                                                    {{ e.codigo_isin | uppercase}}
+                                                </div>
+                                                <div class="col-md-4 texto-detalle">
+                                                    {{ e.instrumento | uppercase }}
+                                                </div>
+                                                <div class="col-md-2 texto-detalle">
+                                                    {{ e.valor_nominal | uppercase }}
+                                                </div>
+                                            
+                                                <div class="col-md-2 text-right">
+
+                                                    <button mat-icon-button aria-label="Editar"
+                                                        (click)="editar(e)" >
+                                                        <mat-icon class="texto-gray">edit</mat-icon>
+                                                    </button>
+
+                                                </div>
+                                            </div>
+                                        </mat-list>
+                                    </mat-selection-list> 
+                                </div>
+                            </div>
+                        </div>
+                      </mat-tab>
                     
                     <mat-tab label="INVERSIONES">
-                        <div style="padding: 20px;" [ngStyle]="{'display':inver_insert}">
+                        <div style="padding: 20px;" >
                             <br>
                             <div class="row">
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Numero</mat-label>
+                                        <input matInput placeholder="Numero" disabled="disabled"
+                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Inversiones.numero"
+                                        >
+                                        <mat-icon matSuffix >folder</mat-icon>
+                                    </mat-form-field>
+                                </div>
                                 <div class="col-md-4">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Codigo</mat-label>
-                                        <input matInput placeholder="Codigo" [ngModelOptions]="{standalone: true}" [(ngModel)]="Inversiones.codigo"
-                                        value="{{Inversiones.codigo}}" (blur)="ConsultarInver()">
-                                        <mat-icon matSuffix (click)="SeleccionarInversiones()">search</mat-icon>
+                                        <mat-label>Codigo del Instrumento</mat-label>
+                                        <input matInput placeholder="Codigo del Instrumento" 
+                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Inversiones.codigo_isin" 
+                                        >
+                                        
                                     </mat-form-field>
                                 </div>
-                                <div class="col-md-8">
+                             
+                                <div class="col-md-5">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Descripcion General</mat-label>
-                                        <input matInput placeholder="Descripcion General" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.descripcion"
-                                        value="{{Inversiones.descripcion}}">
+                                        <mat-label>Instrumento</mat-label>
+
+                                            <input type="text"
+                                                placeholder="{{instrumento}}"
+                                                aria-label="Instrumento"
+                                                matInput
+                                                [(ngModel)]="Inversiones.instrumento"
+                                                [formControl]="myInstrumento"
+                                                [matAutocomplete]="ainstrumento">
+                                            <mat-autocomplete autoActiveFirstOption #ainstrumento="matAutocomplete">
+                                            <mat-option *ngFor="let option of filInstrumento | async" [value]="option">
+                                                {{option | uppercase}}
+                                            </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon matSuffix (click)="SeleccionarInversiones()">search</mat-icon>
+
                                     </mat-form-field>
+                                </div>
+
+                                <!-- <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Tipo de Sistema de  Codificación</mat-label>
+                                        <input matInput placeholder="Codigo del Instrumento" disabled="disabled">
+                                    </mat-form-field>
+                                </div> -->
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Custodia</mat-label>
+
+                                            <input type="text"
+                                                placeholder="{{custodia}}"
+                                                aria-label="Custodia"
+                                                matInput
+                                                [(ngModel)]="Inversiones.custodio"
+                                                [formControl]="myCustodia"
+                                                [matAutocomplete]="acustodia">
+                                            <mat-autocomplete autoActiveFirstOption #acustodia="matAutocomplete">
+                                            <mat-option *ngFor="let option of filCustodia | async" [value]="option">
+                                                {{option | uppercase}}
+                                            </mat-option>
+                                            </mat-autocomplete>
+
+
+                                    </mat-form-field>
+                                </div>
+                             
+                                <div class="col-md-6">
+
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Emisor</mat-label>
+
+                                            <input type="text"
+                                                placeholder="{{emisor}}"
+                                                aria-label="Emisor"
+                                                matInput
+                                                [(ngModel)]="Inversiones.emisor"
+                                                [formControl]="myEmisor"
+                                                [matAutocomplete]="autox">
+                                            <mat-autocomplete autoActiveFirstOption #autox="matAutocomplete">
+                                            <mat-option *ngFor="let option of filEmisor | async" [value]="option">
+                                                {{option | uppercase}}
+                                            </mat-option>
+                                            </mat-autocomplete>
+
+
+                                    </mat-form-field>
+
+                                    
                                 </div>
                             </div>
 
 
                             <div class="row">
-                                <div class="col-md-3">
+                                <!-- <div class="col-md-3">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Grupo de Inversion</mat-label>
-                                        <input matInput placeholder="Grupo de Inversion" [ngModelOptions]="{standalone: true}" [(ngModel)]="Inversiones.grupo"
+                                        <mat-label>Valor</mat-label>
+                                        <input matInput placeholder="Valor" [ngModelOptions]="{standalone: true}" [(ngModel)]="Inversiones.grupo"
                                         value="{{Inversiones.grupo}}">
                                     </mat-form-field>
-                                </div>
+                                </div> -->
                                 <div class="col-md-3">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Limite de Cartera</mat-label>
-                                        <input matInput placeholder="Limite de Cartera" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.limite"
-                                        value="{{Inversiones.limite}}">
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-md-3">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Moneda de Operaciones</mat-label>
-                                        <input matInput placeholder="Moneda de Operaciones" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.moneda"
-                                        value="{{Inversiones.moneda}}">
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-md-3">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Calculo de Costo</mat-label>
-                                        <input matInput placeholder="Calculo de Costo" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.calculo"
-                                        value="{{Inversiones.calculo}}">
-                                    </mat-form-field>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Codigo BCV</mat-label>
-                                        <mat-select placeholder="Codigo BCV" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.codigobcv"
-                                        value="{{Inversiones.codigobcv}}">
-                                            <mat-option value="NO">NO</mat-option>
-                                            <mat-option value="SI">SI</mat-option>
+                                        <mat-label>Tipo de moneda</mat-label>
+                                        <mat-select placeholder="Tipo de moneda"  [(value)]="tipo_moneda" >
+                                            <mat-option value=0>------</mat-option>
+                                            <mat-option value=1>BOLIVARES</mat-option>
+                                            <mat-option value=2>DOLARES</mat-option>
+                                            <mat-option value=3>YUANES</mat-option>
                                         </mat-select>
-                                        <mat-icon matSuffix>article</mat-icon>
-                                    </mat-form-field>
-                                </div>
-
-                                   
-                                <div class="col-md-3">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Codigo ISIN</mat-label>
-                                        <mat-select placeholder="Codigo ISIN" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.codigoisin"
-                                        value="{{Inversiones.codigoisin}}">
-                                            <mat-option value="NO">NO</mat-option>
-                                            <mat-option value="SI">SI</mat-option>
-                                        </mat-select>
-                                        <mat-icon matSuffix>article</mat-icon>
-                                    </mat-form-field>
-                                </div>
-
-
-                                <div class="col-md-3">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Decreto</mat-label>
-                                        <mat-select placeholder="Decreto" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.decreto"
-                                        value="{{Inversiones.decreto}}">
-                                            <mat-option value="NO">NO</mat-option>
-                                            <mat-option value="SI">SI</mat-option>
-                                        </mat-select>
-                                        <mat-icon matSuffix>article</mat-icon>
-                                    </mat-form-field>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Emision</mat-label>
-                                        <mat-select placeholder="Emision" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.emision"
-                                        value="{{Inversiones.emision}}">
-                                            <mat-option value="NO">NO</mat-option>
-                                            <mat-option value="SI">SI</mat-option>
-                                        </mat-select>
-                                        <mat-icon matSuffix>article</mat-icon>
-                                    </mat-form-field>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Crear contabilidad como</mat-label>
-                                        <input matInput placeholder="Crear contabilidad como" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.contabilidad"
-                                        value="{{Inversiones.contabilidad}}">
+                                        <mat-icon matSuffix>currency_exchange</mat-icon>
+                    
                                     </mat-form-field>
                                 </div>
                                 <div class="col-md-6">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Total Invertido</mat-label>
-                                        <input matInput placeholder="Total Invertido" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.totalinvertido"
-                                        value="{{Inversiones.totalinvertido}}">
+                                        <mat-label>Pais</mat-label>
+                                        <input matInput placeholder="Pais" 
+                                            [ngModelOptions]="{standalone: true}" 
+                                         [(ngModel)]="Inversiones.pais" >
                                     </mat-form-field>
                                 </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Estatus de la Inversion</mat-label>
+                                        <mat-select placeholder="Estatus de la Inversion"
+                                         [(value)]="estatus" >
+                                            <mat-option value=0>------</mat-option>
+                                            <mat-option value=1>ACTIVA</mat-option>
+                                            <mat-option value=2>VENCIDA</mat-option>
+                                        </mat-select>
+
+                                    </mat-form-field>
+                                </div>
+                                
+                              
                                 
                             </div>
 
                             <div class="row">
-                                <div class="col-md-4">
+                                <!-- <div class="col-md-3">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Valor Inicial</mat-label>
-                                        <mat-select placeholder="Valor Inicial" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.valorinicial"
-                                        value="{{Inversiones.valorinicial}}">
-                                            <mat-option value="NO">NO</mat-option>
-                                            <mat-option value="SI">SI</mat-option>
+                                        <mat-label>Nombre Titulo</mat-label>
+                                        <input matInput placeholder="Nombre Titulo" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.calculo"
+                                        value="{{Inversiones.calculo}}">
+                                    </mat-form-field>
+                                </div> -->
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Tipo de Inversion</mat-label>
+                                        <mat-select placeholder="Tipo de Inversion" 
+                                         [(value)]="tipo_inversion">
+                                            <mat-option value=0>------</mat-option>
+                                            <mat-option value=1>RENTA FIJA</mat-option>
+                                            <mat-option value=2>RENTA VARIABLE</mat-option>
                                         </mat-select>
-                                        <mat-icon matSuffix>boy</mat-icon>
+
                                     </mat-form-field>
                                 </div>
-                                <div class="col-md-4">
+                                
+                                <div class="col-md-3">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Moneda Extranjera</mat-label>
-                                        <mat-select placeholder="Moneda Extranjera" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.monedaextranjera"
-                                        value="{{Inversiones.monedaextranjera}}">
-                                            <mat-option value="NO">NO</mat-option>
-                                            <mat-option value="SI">SI</mat-option>
-                                        </mat-select>
-                                        <mat-icon matSuffix>boy</mat-icon>
+                                        <mat-label>Valor Nominal</mat-label>
+                                        <input matInput type="number" placeholder="Nombre Titulo" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.valor_nominal"
+                                        value="{{Inversiones.valor_nominal}}">
                                     </mat-form-field>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <mat-form-field appearance="outline">
-                                        <mat-label>Estatus</mat-label>
-                                        <mat-select placeholder="Estatus" [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.estatus"
-                                        value="{{Inversiones.estatus}}">
-                                            <mat-option value="INACTIVO">INACTIVO</mat-option>
-                                            <mat-option value="ACTIVO">ACTIVO</mat-option>
-                                        </mat-select>
-                                        <mat-icon matSuffix>boy</mat-icon>
+                                        <mat-label>Precio de Compra</mat-label>
+                                        <input matInput placeholder="Nombre Titulo" [ngModelOptions]="{standalone: true}"  
+                                        [(ngModel)]="Inversiones.precio_compra" type="number"
+                                        value="{{Inversiones.precio_compra}}" (blur)="CalcularCostosAdquisicion()">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Costo Adquision</mat-label>
+                                        <input matInput placeholder="Nombre Titulo" type="number"
+                                        [ngModelOptions]="{standalone: true}"  [(ngModel)]="Inversiones.costo_adquisicion"
+                                        value="{{Inversiones.costo_adquisicion}}" readonly>
                                     </mat-form-field>
                                 </div>
                             </div>
 
                             <div class="row">
+                                <div class="col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Fecha de Emision</mat-label>
+                                        <input matInput [matDatepicker]="xpicker"  [ngModelOptions]="{standalone: true}"  
+                                        [(ngModel)]="fecha_emision">
+                                        <mat-datepicker #xpicker></mat-datepicker>
+                                        <mat-icon matSuffix (click)="xpicker.open()">event</mat-icon>
+                                    </mat-form-field>
+                                    <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+                                </div>
+
+                                   
+                                <div class="col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Fecha de Compra</mat-label>
+                                        <input matInput [matDatepicker]="ypicker" [ngModelOptions]="{standalone: true}"  
+                                        [(ngModel)]="fecha_compra">
+                                        <mat-datepicker #ypicker></mat-datepicker>
+                                        <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
+                                    </mat-form-field>
+                                    <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Fecha Vencimiento</mat-label>
+                                        <input matInput [matDatepicker]="zpicker" [ngModelOptions]="{standalone: true}"  
+                                        [(ngModel)]="fecha_vencimiento" >
+                                        <mat-datepicker #zpicker></mat-datepicker>
+                                        <mat-icon matSuffix (click)="zpicker.open()">event</mat-icon>
+                                    </mat-form-field>
+                                    <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <!-- Informativo.- Calculos del rendimiento el cupon es el interes -->
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Base de calculo</mat-label>
+                                        <input matInput placeholder="Base de calculo" [ngModelOptions]="{standalone: true}"  
+                                        type="number"
+                                        [(ngModel)]="Inversiones.base_calculo">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <!-- Informativo.- Calculos del rendimiento el cupon es el interes -->
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Tasa de cupon actual</mat-label>
+                                        <input matInput placeholder="Tasa de cupon actual"  [ngModelOptions]="{standalone: true}"  
+                                        type="number"
+                                        [(ngModel)]="Inversiones.tasa_cupon" (blur)="InteresesCaidos()">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Plazo Cupon</mat-label>
+                                        <input matInput placeholder="Plazo Cupon"  [ngModelOptions]="{standalone: true}"  
+                                        type="number"
+                                        [(ngModel)]="Inversiones.plazo_cupon" (blur)="RendicionCupon()">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Rendimiento Cupon</mat-label>
+                                        <input matInput placeholder="Plazo Cupon"  [ngModelOptions]="{standalone: true}"  
+                                        type="number"
+                                        [(ngModel)]="Inversiones.rendimiento_cupon">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Interes Diario</mat-label>
+                                        <input matInput placeholder="Interes Diario" 
+                                        [ngModelOptions]="{standalone: true}"  readonly
+                                        type="number"
+                                        [(ngModel)]="Inversiones.interes_diario">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Plazo Vencimiento</mat-label>
+                                        <input matInput placeholder="Plazo Vencimiento" [ngModelOptions]="{standalone: true}"  
+                                        type="number"
+                                        [(ngModel)]="Inversiones.plazo_vencimiento" (blur)="RendimientoAlVencimiento()">
+                                    </mat-form-field>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Rendimiento al vencimiento</mat-label>
+                                        <input matInput placeholder="Rendimiento al vencimiento" 
+                                        [ngModelOptions]="{standalone: true}"  
+                                        type="number"
+                                        [(ngModel)]="Inversiones.rendimiento_vencimiento" >
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Dias Caidos</mat-label>
+                                        <input matInput placeholder="Dias Caidos"
+                                        type="number"
+                                        [(ngModel)]="Inversiones.dias_caidos"
+                                        >
+                                    </mat-form-field>
+                                </div>
+                                
+                               
+                            </div>
+                            <div class="row">
+                                
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Interes Caido</mat-label>
+                                        <input matInput placeholder="Interes Caido" 
+                                        [ngModelOptions]="{standalone: true}"  
+                                        type="number"
+                                        [(ngModel)]="Inversiones.intereses_caidos">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Amortizacion Diaria</mat-label>
+                                        <input matInput placeholder="Amortizacion Diaria"  [ngModelOptions]="{standalone: true}"  
+                                        type="number"
+                                        [(ngModel)]="Inversiones.amortizacion_diaria" readonly>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Primas</mat-label>
+                                        <input matInput type="number" placeholder="Primas">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Descuentos</mat-label>
+                                        <input matInput placeholder="Descuentos" type="number" [ngModelOptions]="{standalone: true}"  
+                                        [(ngModel)]="Inversiones.descuento" readonly>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                       
+                          
+                            <div class="row">
                             
                                 <div class="col-md-12 text-right">
                                     <hr>
-                                    <button mat-flat-button color="primary" (click)="GuardarInversiones()">Registar inversiones</button>
+                                    <button mat-flat-button color="primary" (click)="GuardarInversiones()">Aceptar</button>
                                 </div>
                             
                             </div>
 
                         </div>
 
-                        <div style="padding: 20px;" [ngStyle]="{'display':inver_search}">
-                            <br>
-                                 <mat-selection-list>
-                                    <mat-list *ngFor="let e of lstInversiones; let i=index "
-                                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                                        <div class="row">
-    
-                                            <div class="col-md-1 texto-detalle">
-                                                {{ e.codigo | uppercase }}
-                                            </div>
-                                            <div class="col-md-4 texto-lista" >
-                                                {{ e.descripcion | uppercase}}
-                                            </div>
-                                            <div class="col-md-2 texto-detalle">
-                                                {{ e.moneda | uppercase }}
-                                            </div>
-                                            <div class="col-md-2 texto-detalle">
-                                                {{ e.grupo | uppercase }}
-                                            </div>
-                                            <div class="col-md-2 texto-detalle">
-                                                {{ e.estatus | uppercase }}
-                                            </div>
-                                          
-                                            <div class="col-md-1 text-right">
-    
-                                                <button mat-icon-button aria-label="Editar"
-                                                    (click)="editarInver(e)" >
-                                                    <mat-icon class="texto-gray">edit</mat-icon>
-                                                </button>
-    
-                                            </div>
-                                        </div>
-                                    </mat-list>
-                                </mat-selection-list> 
-                                <br><br>
-                        </div>
+                     
                     </mat-tab>
 
+                    <mat-tab label="SALDOS">
+                        <div style="padding: 20px;">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Saldo Libro</mat-label>
+                                        <input matInput placeholder="Saldo Libro">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Dias Devengados</mat-label>
+                                        <input matInput placeholder="Dias Devengados">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Dias Transcurridos</mat-label>
+                                        <input matInput placeholder="Interes Caido">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Interes Diario</mat-label>
+                                        <input matInput placeholder="Interes Diario">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Interes acumulado</mat-label>
+                                        <input matInput placeholder="Interes acumulado">
+                                    </mat-form-field>
+                                </div>
+                              
+                                <div class="col-md-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Saldo Amortizado</mat-label>
+                                        <input matInput placeholder="Saldo Amortizado">
+                                    </mat-form-field>
+                                </div>
+                            </div>
 
+                        </div>
+
+                    </mat-tab>
+                    <mat-tab label="PROCESOS">
+                        <div style="padding: 20px;">
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Fecha de Inicio Cupon</mat-label>
+                                        <input matInput [matDatepicker]="xpickera">
+                                        <mat-datepicker #xpickera></mat-datepicker>
+                                        <mat-icon matSuffix (click)="xpickera.open()">event</mat-icon>
+                                    </mat-form-field>
+                                    <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+                                </div>
+
+                                
+                                <div class="col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Fecha de Finalizacion de Cupon</mat-label>
+                                        <input matInput [matDatepicker]="ypickerc">
+                                        <mat-datepicker #ypickerc></mat-datepicker>
+                                        <mat-icon matSuffix (click)="ypickerc.open()">event</mat-icon>
+                                    </mat-form-field>
+                                    <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="PORTAFOLIO">
+
+                    </mat-tab>
 
                 </mat-tab-group>
 

@@ -1,263 +1,308 @@
 <div class="row">
   <div class="col-md-12">
-      <div class="card">
-          <div class="card-body" style="padding:5px;height:100%">
-              <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
-                  <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" 
-                  (selectedTabChange)="tabActive($event)" [selectedIndex]="selectedIndex"
-                  style="padding:10px;">
-                      <mat-tab>
+    <div class="card">
+      <div class="card-body" style="padding:5px;height:100%">
+        <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" (selectedTabChange)="tabActive($event)"
+          [selectedIndex]="selectedIndex" style="padding:10px;">
+          <mat-tab>
 
-                          <ng-template mat-tab-label>
-                              &nbsp;CONSULTAR COMPROBANTE
-                          </ng-template>
+            <ng-template mat-tab-label>
+              &nbsp;CONSULTA COMPROBANTE
+            </ng-template>
 
-                          <div class="container">
-                              <br>
-                              <div class="row">
-                                <div class="col-md-3 text-right">
-                            
-                                </div>
-                                <div class="col-md-6 text-center">
-                                  
-                                
-                                  <br>
-                                  <form class="navbar-search">
-                                    <div class="form-group" [ngClass]="{ 'focused': focus === true }">
-                                      <div class="input-group input-group-alternative">
-                                        <div class="input-group-prepend">
-                                          <span class="input-group-text"><i class="fa fa-search "></i></span>
-                                        </div>
-                                        <input class="form-control" placeholder="Buscar" type="text" [ngModelOptions]="{standalone: true}"
-                                          [(ngModel)]="buscar" (focus)="focus = true" (blur)="focus = false" (keypress)="Buscar($event)">
-                                        <div class="input-group-prepend">
-                                          <span class="input-group-text"><i class="fa fa-sliders"></i></span>
-                                        </div>
-                            
-                                      </div>
-                                    </div>
-                                  </form>
-                            
-                                </div>
-                                <div class="col-md-3">
-                            
-                                </div>
-                              </div>
-                               <mat-selection-list>
-                                  <mat-list *ngFor="let e of lst; let i=index "
-                                      style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                                      <div class="row">
-  
-                                          <div class="col-md-1 texto-detalle">
-                                              {{ e.numero | uppercase }}
-                                          </div>
-                                          <div class="col-md-4 texto-lista" >
-                                              {{ e.rif }} {{ e.razonsocial | uppercase}}
-                                          </div>
-                                          <div class="col-md-2 texto-detalle">
-                                              {{ e.codigo | uppercase }}
-                                          </div>
-                                          <div class="col-md-2 texto-detalle">
-                                              {{ e.plan | uppercase }}
-                                          </div>
-                                          <div class="col-md-2 texto-detalle">
-                                              {{ e.tipo | uppercase }}
-                                          </div>
-                                        
-                                          <div class="col-md-1 text-right">
-  
-                                              <button mat-icon-button aria-label="Editar"
-                                                  (click)="editar(e)" >
-                                                  <mat-icon class="texto-gray">edit</mat-icon>
-                                              </button>
-  
-                                          </div>
-                                      </div>
-                                  </mat-list>
-                              </mat-selection-list> 
-                              <br><br>
-                          </div>
+            <div class="container">
+              <br>
+              <div class="row">
+                <div class="col-md-3 text-right">
 
-                      </mat-tab>
-                      <mat-tab style="width: 90%;padding: 20px;">
-                          <ng-template mat-tab-label>
-                              <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
-                              &nbsp;REGISTRAR COMPROBANTE
-                          </ng-template>
-                          <br>
-                                    
-                              <div class="card">
-                                  <div class="card-body" style="padding:20px;">
-                          
-                                    <form>
-
-                                      <div class="row">
-                                        <div class="col-md-3">
-                                          <mat-form-field appearance="outline">
-                                            <mat-label>Codigo</mat-label>
-                                            <input matInput placeholder="Codigo" [ngModelOptions]="{standalone: true}" [(ngModel)]="Comprobante.numero"
-                                              value="{{Comprobante.numero}}" (blur)="Consultar()">
-                                            <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
-                                  
-                                          </mat-form-field>
-                                        </div>
-                                        <div class="col-md-9">
-                                          <mat-form-field appearance="outline">
-                                            <mat-label>Descripcion General</mat-label>
-                                            <input matInput placeholder="Descripcion General" [ngModelOptions]="{standalone: true}"
-                                              [(ngModel)]="Comprobante.detalle" value="{{Comprobante.detalle}}">
-                                          </mat-form-field>
-                                        </div>
-                                      </div>
-                                  
-                                      <div class="row">
-                                        <div class="col-md-4">
-                                          <mat-form-field appearance="outline">
-                                            <mat-label>Tipo Comprobante</mat-label>
-                                            <mat-select placeholder="Tipo Comprobante" [ngModelOptions]="{standalone: true}"
-                                              [(ngModel)]="Comprobante.instrumento" value="{{Comprobante.instrumento}}">
-                                              <mat-option value="OPERACIONES">OPERACIONES</mat-option>
-                                              <mat-option value="RETIROS">RETIROS</mat-option>
-                                            </mat-select>
-                                            <mat-icon matSuffix>currency_exchange</mat-icon>
-                                  
-                                          </mat-form-field>
-                                        </div>
-                                  
-                                        <div class="col-md-4">
-                                          <mat-form-field appearance="outline">
-                                            <mat-label>Fecha del ejercicio</mat-label>
-                                            <input matInput [matDatepicker]="picker" [(ngModel)]="Comprobante.fecha" [formControl]="fechainicio"
-                                              [value]="fechainicio.value">
-                                            <mat-datepicker #picker></mat-datepicker>
-                                            <mat-icon matSuffix (click)="picker.open()">event</mat-icon>
-                                          </mat-form-field>
-                                          <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
-                                  
-                                        </div>
-                                  
-                                        
-                                        <!-- <div class="col-md-4">
-                                          <mat-form-field appearance="outline">
-                                            <mat-label>Frecuencia de Cierre</mat-label>
-                                            <mat-select placeholder="Frecuencia de Cierre" [ngModelOptions]="{standalone: true}"
-                                              [(ngModel)]="Portafolio.frecuencia" value="{{Portafolio.frecuencia}}">
-                                              <mat-option value="MENSUAL">MENSUAL</mat-option>
-                                              <mat-option value="TRIMESTRAL">TRIMESTRAL</mat-option>
-                                            </mat-select>
-                                  
-                                          </mat-form-field>
-                                        </div> -->
-                                  
-                                        <div class="col-md-4">
-                                          <mat-form-field appearance="outline">
-                                            <mat-label>Monto global</mat-label>
-                                            <input matInput placeholder="Monto global" [ngModelOptions]="{standalone: true}"
-                                              [(ngModel)]="Comprobante.monto_global" value="{{Comprobante.monto_global}}">
-                                          </mat-form-field>
-                                        </div>
-                                      </div>
-                                  
-                                  
-                                      <div class="row">
-                                        <div class="col-md-12 text-center">
-                                          <hr>
-                                          <p align="center"><b>DETALLE</b></p>
-                                         
-                                        </div>
-                                      </div>
-                                  
-                                      <div class="row">
-                                  
-                                  
-                                  
-                                        <div class="col-md-2">
-                                          <mat-form-field appearance="outline">
-                                            <mat-label>Cod. Trans</mat-label>
-                                            <input matInput placeholder="Cod. Trans" [ngModelOptions]="{standalone: true}"
-                                              [(ngModel)]="Comprobante.idtra" value="{{Comprobante.idtra}}">
-                                          </mat-form-field>
-                                        </div>
-                                  
-                                        <div class="col-md-2">
-                                          <mat-form-field appearance="outline">
-                                            <mat-label>Tipo Movimiento</mat-label>
-                                  
-                                            <mat-select placeholder="Cuenta Debe" [ngModelOptions]="{standalone: true}" [(ngModel)]="Comprobante.tipo_movimiento"
-                                              value="{{Comprobante.tipo_movimiento}}">
-                                              <mat-option value="00000000-">DEBE</mat-option>
-                                              <mat-option value="00000000-">HABER</mat-option>
-                                            </mat-select>
-                                  
-                                          </mat-form-field>
-                                        </div>
-                                        <div class="col-md-5">
-                                          <mat-form-field appearance="outline">
-                                            <mat-label>Cuenta Contable</mat-label>
-                                            <mat-select placeholder="Cuenta Contable" [ngModelOptions]="{standalone: true}" [(ngModel)]="Comprobante.cuenta"
-                                              value="{{Comprobante.cuenta}}">
-                                              <mat-option *ngFor="let e of lstComprobante; let i=index " value="{{ e.codigo}}">{{ e.codigo + ' | ' + e.descripcion | uppercase }}</mat-option>
-                                            </mat-select>
-                                  
-                                          </mat-form-field>
-                                        </div>
-                                  
-                                  
-                                        <div class="col-md-3">
-                                          <mat-form-field appearance="outline">
-                                            <mat-label>Monto</mat-label>
-                                            <input matInput placeholder="Monto" [ngModelOptions]="{standalone: true}"
-                                              [(ngModel)]="Comprobante.monto" value="{{Comprobante.monto}}">
-                                          
-                                  
-                                          </mat-form-field>
-                                        </div>
-                                      </div>
-                                      
-                                  
-                                     
-                                  
-                                  
-                                    </form>
-                                  
-                                     
-                                </div>  
-                              <div class="card-footer">
-                                  <div class="row">
-                          
-                                      <div class="col-md-12 text-right">
-                                          <button mat-flat-button color="primary" (click)="Guardar()">Registar</button>
-                                      </div>
-                                  
-                                  </div>
-                              </div>
-
-                              
-                          </div> 
+                </div>
+                <div class="col-md-6 text-center">
 
 
-                          
+                  <br>
+                  <form class="navbar-search">
+                    <div class="form-group" [ngClass]="{ 'focused': focus === true }">
+                      <div class="input-group input-group-alternative">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-search "></i></span>
+                        </div>
+                        <input class="form-control" placeholder="Buscar" type="text"
+                          [ngModelOptions]="{standalone: true}" [(ngModel)]="buscar" (focus)="focus = true"
+                          (blur)="focus = false" (keypress)="Buscar($event)">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-sliders"></i></span>
+                        </div>
+
+                      </div>
+                    </div>
+                  </form>
+
+                </div>
+                <div class="col-md-3">
+
+                </div>
+              </div>
+              <mat-selection-list>
+                <mat-list *ngFor="let e of lst; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+
+                    <div class="col-md-1 texto-detalle">
+                      {{ e.numero | uppercase }}
+                    </div>
+                    <div class="col-md-4 texto-lista">
+                      {{ e.rif }} {{ e.razonsocial | uppercase}}
+                    </div>
+                    <div class="col-md-2 texto-detalle">
+                      {{ e.codigo | uppercase }}
+                    </div>
+                    <div class="col-md-2 texto-detalle">
+                      {{ e.plan | uppercase }}
+                    </div>
+                    <div class="col-md-2 texto-detalle">
+                      {{ e.tipo | uppercase }}
+                    </div>
+
+                    <div class="col-md-1 text-right">
+
+                      <button mat-icon-button aria-label="Editar" (click)="editar(e)">
+                        <mat-icon class="texto-gray">edit</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+              <br><br>
+            </div>
+
+          </mat-tab>
+          <mat-tab style="width: 90%;padding: 20px;">
+            <ng-template mat-tab-label>
+              <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
+              &nbsp;REGISTRO DE COMPROBANTE
+            </ng-template>
+            <br>
+
+            <div class="card">
+              <div class="card-body" style="padding:20px;">
+
+                <form>
+
+                  <div class="row">
+                    <div class="col-md-3">
+                      <input type="hidden" matInput [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="Comprobante.codigo" value="{{Comprobante.codigo}}" (blur)="ConsultarComprobante()">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Plan</mat-label>
+
+                        <input matInput placeholder="Plan" [ngModelOptions]="{standalone: true}"
+                          [(ngModel)]="Comprobante.plan" value="{{Comprobante.plan}}" (blur)="ConsultarContrato()">
+                        <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
+
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-9">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Nombre del Fideicomiso</mat-label>
+                        <input matInput placeholder="Nombre General" [ngModelOptions]="{standalone: true}"
+                          [(ngModel)]="Contrato.razonsocial" value="{{Contrato.razonsocial}}" readonly="readonly">
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div class="row">
+
+
+                    <div class="col-md-3">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Fecha Ejercicio</mat-label>
+                        <input matInput [matDatepicker]="picker" [formControl]="fechaejercicio"
+                          [value]="fechaejercicio.value">
+                        <mat-datepicker #picker></mat-datepicker>
+                        <mat-icon matSuffix  (click)="picker.open()">event</mat-icon>
+                      </mat-form-field>
+                      <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+                    </div>
+
+                    <div class="col-md-2">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Numero</mat-label>
+                        <input matInput placeholder="Numero" [ngModelOptions]="{standalone: true}"
+                          [(ngModel)]="Comprobante.numero" value="{{Comprobante.numero}}">
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-md-7">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Descripcion </mat-label>
+                        <input matInput placeholder="Descripcion" [ngModelOptions]="{standalone: true}"
+                          [(ngModel)]="Comprobante.detalle" value="{{Comprobante.detalle}}">
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <hr>
+                  <div class="row">
+                    <div class="col-md-12 text-center">
+                      <p align="center"><b>ASIENTOS CONTABLES</b></p>
+
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-7">
+                      <mat-form-field appearance="outline">
+                        <mat-label></mat-label>
+                        <input type="text" placeholder="Cuenta" aria-label="Cuentas" matInput
+                          [formControl]="myCuentas" [matAutocomplete]="autox" [(ngModel)]="cuenta">
+                        <mat-autocomplete autoActiveFirstOption #autox="matAutocomplete">
+                          <mat-option *ngFor="let option of filteredCuentas | async" [value]="option">
+                            {{option | uppercase}}
+                          </mat-option>
+                        </mat-autocomplete>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-md-2">
+                      <mat-form-field appearance="outline">
+                        <mat-label>DEBE</mat-label>
+                        <input tyle="text-align:right;" matInput placeholder="DEBE"
+                          [ngModelOptions]="{standalone: true}" [(ngModel)]="debe">
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-md-2">
+                      <mat-form-field appearance="outline">
+                        <mat-label>HABER</mat-label>
+                        <input style="text-align:right;" matInput placeholder="HABER"
+                          [ngModelOptions]="{standalone: true}" [(ngModel)]="haber">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-1 asistente-button-container">
+                      <button mat-mini-fab color="primary" title="Registrar" (click)="addElement()">
+                        <mat-icon>add</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="mat-elevation-z8">
+                        <table mat-table [dataSource]="dataSource">
+
+                          <!-- Position Column -->
+                          <ng-container matColumnDef="cuenta">
+                            <th mat-header-cell *matHeaderCellDef> CUENTA </th>
+                            <td mat-cell *matCellDef="let e"> {{e.cuenta}} </td>
+                          </ng-container>
+
+                          <!-- Name Column -->
+                          <ng-container matColumnDef="fecha">
+                            <th mat-header-cell *matHeaderCellDef> FECHA </th>
+                            <td mat-cell *matCellDef="let e"> {{ e.fecha }} </td>
+                          </ng-container>
+
+                          <!-- Weight Column -->
+                          <ng-container matColumnDef="descripcion">
+                            <th mat-header-cell *matHeaderCellDef> DESCRIPCION </th>
+                            <td mat-cell *matCellDef="let e"> {{e.descripcion}} </td>
+                          </ng-container>
+
+                          <!-- Weight Column -->
+                          <ng-container matColumnDef="debe">
+                            <th mat-header-cell *matHeaderCellDef> DEBE </th>
+                            <td mat-cell *matCellDef="let e"> {{e.debe}} </td>
+                          </ng-container>
+
+                          <!-- Weight Column -->
+                          <ng-container matColumnDef="haber">
+                            <th mat-header-cell *matHeaderCellDef> HABER </th>
+                            <td mat-cell *matCellDef="let e"> {{e.haber}} </td>
+                          </ng-container>
+
+
+                          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+
+                        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
+                          aria-label="Selecione la pagina">
+                        </mat-paginator>
+                      </div>
+                      <br>
+
+                    </div>
+
+                  </div>
+
+
+                  <div class="row">
+                    <div class="col-md-3">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Fecha Creacion</mat-label>
+                        <input matInput [matDatepicker]="picker" [formControl]="fechacreacion"  readonly="readonly" 
+                          [value]="fechacreacion.value">
+                        <mat-datepicker #picker></mat-datepicker>
+                        <mat-icon matSuffix>event</mat-icon>
+                      </mat-form-field>
+                      <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+                    </div>
+                    <div class="col-md-4">
+
+                    </div>
+
+                    <div class="col-md-2">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Saldo Debe</mat-label>
+                        <input style="text-align:right;" readonly="readonly" matInput placeholder="Saldo Debe"
+                          [ngModelOptions]="{standalone: true}" [(ngModel)]="saldo_debe" [value]="saldo_debe">
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-md-2">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Saldo Haber</mat-label>
+                        <input style="text-align:right;" readonly="readonly" matInput placeholder="Saldo Haber"
+                          [ngModelOptions]="{standalone: true}" [(ngModel)]="saldo_haber" [value]="saldo_haber">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-1 asistente-button-container">
+
+                    </div>
+                  </div>
+
+
+                </form>
+
+
+              </div>
+              <div class="card-footer">
+                <div class="row">
+
+                  <div class="col-md-12 text-right">
+                    <button mat-flat-button color="warn" (click)="Guardar()">Registar Comprobante</button>
+                  </div>
+
+                </div>
+              </div>
+
+
+            </div>
 
 
 
-                      </mat-tab>
-                  </mat-tab-group>
 
-              
-          </div>
+
+
+          </mat-tab>
+        </mat-tab-group>
+
+
       </div>
+    </div>
   </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-

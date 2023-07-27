@@ -14,6 +14,18 @@ export interface Portafolio {
   autor : string
 }
 
+// export interface Cuenta {
+//   codigo : string
+//   descripcion: string
+//   aumenta_por : string
+//   disminuye_por : string
+//   codigo_asignacion : string
+//   cuenta: string
+// }
+
+
+
+
 @Injectable({
   providedIn: 'root'
 })
