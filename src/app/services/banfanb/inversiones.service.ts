@@ -1,4 +1,6 @@
 import { Injectable } from "@angular/core";
+import { ApiService, IAPICore } from "../apicore/api.service";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 export interface Inversion {
   identificador: number;
@@ -13,9 +15,9 @@ export interface Inversion {
   codigo_isin: string;
   emisor: string;
   custodio: string;
-  fecha_emision: string; // fecha
-  fecha_compra: string; // fecha
-  fecha_vencimiento: string; // fecha
+  fecha_emision: any; // fecha
+  fecha_compra: any; // fecha
+  fecha_vencimiento: any; // fecha
   id_cartera: number;
   id_portafolio: number;
   valor_nominal: number; //doble
@@ -31,55 +33,36 @@ export interface Inversion {
   amortizacion_diaria: number; //doble
   primas: number; //doble
   descuento: number; //doble
-}
+};
 
-
-
-// export interface Inversiones {
-//   codigo: string
-//   descripcion: string
-//   grupo: string
-//   limite: string
-//   moneda: string
-//   calculo: string
-//   contabilidad: string
-//   totalinvertido: number
-//   codigobcv: string
-//   codigoisin: string
-//   decreto: string
-//   emision: string
-//   tipo: string
-//   valor_nominal: number
-//   costo_adquisicion: number
-//   precio_compra: number
-//   base_calculo: number
-//   tasa_cupon: number
-//   plazo_cupon: number
-//   intereses_caidos: number
-//   dias_caidos: number
-//   intereses_diario_caidos:  number
-//   descuento: number
-//   rendimiento_vencimiento: number
-//   plazo_vencimiento: number
-//   prima: number
-//   rendimiento_cupon: number
-//   amortizacion_diaria: number
-//   valorinicial: string
-//   monedaextranjera: string
-//   estatus: string
-//   fecha: Date
-//   autor: string
-//   pais: string
-//   fecha_emision: string
-//   fecha_compra: string
-//   fecha_vencimiento : string
-//   fecha_inicio_cupon: string
-//   fecha_fin_cupon: string
-// }
+export interface MovInversion {
+  estatus: number;
+  llave: string;
+  debe: number; //Doble
+  haber: number; //Doble
+  usuario: string;
+  cuenta: number;
+  inversion: number;
+  fecha_cierre?: string;
+  fecha_precierre?: string;
+};
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root'
 })
 export class InversionesService {
+
+  public xAPI: IAPICore = {
+    funcion: "",
+    parametros: "",
+    valores: "",
+  };
+
+
+
   constructor() {}
+
+
+
+  
 }

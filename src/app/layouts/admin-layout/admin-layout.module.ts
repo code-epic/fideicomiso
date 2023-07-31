@@ -131,6 +131,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},
+    
   ],
 })
 

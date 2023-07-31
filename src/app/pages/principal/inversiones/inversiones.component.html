@@ -19,17 +19,20 @@
 
 
                                         <div class="row">
-                                            <div class="col-md-2 texto-lista">
+                                            <div class="col-md-1 texto-lista">
                                                 NUMERO
                                             </div>
                                             <div class="col-md-2 texto-lista" >
                                                     COD. INST. 
                                             </div>
-                                            <div class="col-md-4 texto-lista">
+                                            <div class="col-md-3 texto-lista">
                                                 INSTRUMENTO
                                             </div>
                                             <div class="col-md-2 texto-lista">
                                                 VALOR NOMINAL
+                                            </div>
+                                            <div class="col-md-2 texto-lista">
+                                                INTERES DIARIO
                                             </div>
                                             <div class="col-md-2 text-right texto-lista">
                                                 # ACCION
@@ -44,19 +47,21 @@
                                             
                                             <div class="row">
 
-                                                <div class="col-md-2 texto-detalle">
+                                                <div class="col-md-1 texto-detalle">
                                                     {{ getZFill(e.identificador) }}
                                                 </div>
                                                 <div class="col-md-2 texto-detalle" >
                                                     {{ e.codigo_isin | uppercase}}
                                                 </div>
-                                                <div class="col-md-4 texto-detalle">
+                                                <div class="col-md-3 texto-detalle">
                                                     {{ e.instrumento | uppercase }}
                                                 </div>
                                                 <div class="col-md-2 texto-detalle">
-                                                    {{ e.valor_nominal | uppercase }}
+                                                    {{ e.valor_nominal }}
                                                 </div>
-                                            
+                                                <div class="col-md-2 texto-detalle">
+                                                    {{ e.interes_diario }}
+                                                </div>
                                                 <div class="col-md-2 text-right">
 
                                                     <button mat-icon-button aria-label="Editar"
@@ -68,6 +73,7 @@
                                             </div>
                                         </mat-list>
                                     </mat-selection-list> 
+                                    <br><br>
                                 </div>
                             </div>
                         </div>
@@ -268,41 +274,90 @@
 
                             <div class="row">
                                 <div class="col-md-4">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Fecha de Emision</mat-label>
-                                        <input matInput [matDatepicker]="xpicker"  [ngModelOptions]="{standalone: true}"  
-                                        [(ngModel)]="fecha_emision">
-                                        <mat-datepicker #xpicker></mat-datepicker>
-                                        <mat-icon matSuffix (click)="xpicker.open()">event</mat-icon>
-                                    </mat-form-field>
-                                    <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+                                    <label for="tmsOrigen">Fecha Emision (*) </label>
+                                    <form class="form-inline">
+                                        <div class="form-group" style="width:100%">
+                                            <div class="input-group" style="width:100%">
+                                                <input class="form-control" placeholder="AAAA-MM-DD"
+                                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha_emi" ngbDatepicker
+                                                    #fo="ngbDatepicker" [value]="formatter.format(fecha_emision)"
+                                                    placement="bottom" [positionTarget]="buttonEl" readonly>
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button"
+                                                        id="fori">
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <!-- <mat-form-field appearance="outline">
+                                        <mat-label>Fecha de Compra</mat-label>
+                                        <input matInput [matDatepicker]="ypicker" [ngModelOptions]="{standalone: true}"  
+                                        [(ngModel)]="fecha_emi"  [value]="formatter.format(fecha_emision)">
+                                        <mat-datepicker #ypicker></mat-datepicker>
+                                        <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
+                                    </mat-form-field> -->
 
                                 </div>
 
                                    
                                 <div class="col-md-4">
-                                    <mat-form-field appearance="outline">
+
+                                    <label for="tmsOrigen">Fecha Compra (*) </label>
+                                    <form class="form-inline">
+                                        <div class="form-group" style="width:100%">
+                                            <div class="input-group" style="width:100%">
+                                                <input class="form-control" placeholder="AAAA-MM-DD"
+                                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha_com" ngbDatepicker
+                                                    #fox="ngbDatepicker" [value]="formatter.format(fecha_compra)"
+                                                    placement="bottom" [positionTarget]="buttonEl" readonly>
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="fox.toggle()" type="button"
+                                                        id="fori">
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <!-- <mat-form-field appearance="outline">
                                         <mat-label>Fecha de Compra</mat-label>
                                         <input matInput [matDatepicker]="ypicker" [ngModelOptions]="{standalone: true}"  
-                                        [(ngModel)]="fecha_compra">
+                                        [(ngModel)]="fecha_com"  [value]="formatter.format(fecha_compra)">
                                         <mat-datepicker #ypicker></mat-datepicker>
                                         <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
-                                    </mat-form-field>
+                                    </mat-form-field> -->
                                     <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
 
                                 </div>
                                 <div class="col-md-4">
-                                    <mat-form-field appearance="outline">
+                                    <label for="tmsOrigen">Fecha Vencimiento (*) </label>
+                                    <form class="form-inline">
+                                        <div class="form-group" style="width:100%">
+                                            <div class="input-group" style="width:100%">
+                                                <input class="form-control" placeholder="AAAA-MM-DD"
+                                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha_ven" ngbDatepicker
+                                                    #foy="ngbDatepicker" [value]="formatter.format(fecha_vencimiento)"
+                                                    placement="bottom" [positionTarget]="buttonEl" readonly>
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="foy.toggle()" type="button"
+                                                        id="fori">
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <!-- <mat-form-field appearance="outline">
                                         <mat-label>Fecha Vencimiento</mat-label>
-                                        <input matInput [matDatepicker]="zpicker" [ngModelOptions]="{standalone: true}"  
-                                        [(ngModel)]="fecha_vencimiento" >
+                                        <input matInput [matDatepicker]="zpicker" [ngModelOptions]="{standalone: true}" 
+                                        [(ngModel)]="fecha_ven"  [value]="formatter.format(fecha_vencimiento)"  >
                                         <mat-datepicker #zpicker></mat-datepicker>
                                         <mat-icon matSuffix (click)="zpicker.open()">event</mat-icon>
-                                    </mat-form-field>
+                                    </mat-form-field> -->
                                     <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
 
                                 </div>
                             </div>
+                            <hr>
 
                             <div class="row">
                                 <div class="col-md-3">
@@ -400,7 +455,8 @@
                                 <div class="col-md-3">
                                     <mat-form-field appearance="outline">
                                         <mat-label>Primas</mat-label>
-                                        <input matInput type="number" placeholder="Primas">
+                                        <input matInput type="number" placeholder="Primas" [ngModelOptions]="{standalone: true}"  
+                                        [(ngModel)]="Inversiones.primas" >
                                     </mat-form-field>
                                 </div>
                                 <div class="col-md-3">
@@ -515,3 +571,5 @@
         </div>
     </div>
 </div>
+
+<br><br><br>

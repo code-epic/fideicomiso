@@ -5,8 +5,10 @@ import { map, startWith } from "rxjs/operators";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
-import { Inversion } from "src/app/services/banfanb/inversiones.service";
+import { Inversion, InversionesService, MovInversion } from "src/app/services/banfanb/inversiones.service";
 import { UtilService } from "src/app/services/util/util.service";
+import { NgbModal, NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
+import { Location } from '@angular/common';
 
 @Component({
   selector: "app-inversiones",
@@ -55,13 +57,25 @@ export class InversionesComponent implements OnInit {
   public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
-  };
+  }
 
+  public movimiento: MovInversion = {
+    estatus: 0,
+    llave: "",
+    debe: 0,
+    haber: 0,
+    usuario: "",
+    cuenta: 0,
+    inversion: 0
+  }
   public inver_insert: string = '';
   public inver_search: string = "none";
   public emisor: string = '';
   public custodia: string = '';
   public instrumento: string = '';
+  public fecha_emi: any
+  public fecha_com: any
+  public fecha_ven: any
 
   myEmisor = new FormControl('');
   filEmisor: Observable<string[]>;
@@ -78,28 +92,30 @@ export class InversionesComponent implements OnInit {
   public tipo_inversion = '1'
   public active: boolean = false
 
-  public fecha_emision : any
-  public fecha_compra : any
-  public fecha_vencimiento : any
+  public fecha_emision : NgbDate | null
+  public fecha_compra : NgbDate | null
+  public fecha_vencimiento : NgbDate | null
 
   constructor(
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
-    private util: UtilService
+    private util: UtilService,
+    public formatter: NgbDateParserFormatter,
   ) {}
 
   ngOnInit(): void {
-    this.ListarInver();
     this.ListarCustodia();
     this.ListarEmisor();
     this.ListarInstrumento();
+    this.ListarInver();
   }
 
   tabActive(event) {
     this.selectedIndex = event.index;
+    if (this.selectedIndex == 0)this.LimpiarInver()
     if (!this.active) {
-      // this.Limpiar();
+      
       //this.contrato_search = 'none'
       //this.GenerarSemillero()
       // this.Listar()
@@ -144,14 +160,10 @@ export class InversionesComponent implements OnInit {
     this.estatus = this.Inversiones.estatus.toString()
     this.tipo_inversion = this.Inversiones.tipo_inversion.toString()
     this.Inversiones.numero =  this.getZFill( this.Inversiones.identificador )
-    //this.contrato_search = ''
-    // this.fechainicio.setValue(this.Contrato.Saldos.fechainicio)
-    // this.myOficina.setValue(this.Contrato.oficinatutora.toUpperCase())
-    // this.lstEjecutivos = this.Contrato.Ejecutivo
-    // this.getTipoFideicomiso()
-    // this.saldo_inicio = this.Contrato.Saldos.saldoinicio.toString()
-    // this.planFideicomiso.identificador = parseInt(this.Contrato.numero)
-    // this.tabSaldos = true
+
+    this.fecha_emision = NgbDate.from(this.formatter.parse(e.fecha_emision))
+    this.fecha_compra = NgbDate.from(this.formatter.parse(e.fecha_compra))
+    this.fecha_vencimiento = NgbDate.from(this.formatter.parse(e.fecha_vencimiento))
 
 
     // console.log(this.planFideicomiso)
@@ -268,6 +280,7 @@ export class InversionesComponent implements OnInit {
   }
 
   ListarInver() {
+    this.ngxService.startLoader("load-inver");
     this.lstInversiones = [];
     this.xAPI.funcion = "FID_CInversiones";
     this.xAPI.parametros = '';
@@ -275,10 +288,12 @@ export class InversionesComponent implements OnInit {
       (data) => {
         if (data != null && data.msj == undefined)
           this.lstInversiones = data.Cuerpo;
+          this.ngxService.stopLoader("load-inver");
       },
       (error) => {
         console.log(error);
         this.LimpiarInver();
+        this.ngxService.stopLoader("load-inver");
       }
     );
   }
@@ -319,18 +334,20 @@ export class InversionesComponent implements OnInit {
     this.Inversiones.tipo_moneda = parseInt(this.tipo_moneda)
     this.Inversiones.estatus = parseInt(this.estatus)
     this.Inversiones.tipo_inversion = parseInt(this.tipo_inversion)
-    this.Inversiones.fecha_emision = this.util.ConvertirFechaDB(this.fecha_emision)
-    this.Inversiones.fecha_compra = this.util.ConvertirFechaDB(this.fecha_compra)
-    this.Inversiones.fecha_vencimiento = this.util.ConvertirFechaDB(this.fecha_vencimiento)
+    this.Inversiones.fecha_emision = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_emi) : this.Inversiones.fecha_emision.substring(0, 10)
+    this.Inversiones.fecha_compra = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_com) : this.Inversiones.fecha_compra.substring(0, 10)
+    this.Inversiones.fecha_vencimiento = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_ven) : this.Inversiones.fecha_vencimiento.substring(0, 10)
 
     this.xAPI.funcion =
-      this.Inversiones.identificador == 0 ? "FID_IInversion" : "FID_UInversion";
-    this.xAPI.parametros = "";
-    this.xAPI.valores = JSON.stringify(this.Inversiones);
-    console.log(this.Inversiones);
+      this.Inversiones.identificador == 0 ? "FID_IInversion" : "FID_UInversion"
+    this.xAPI.parametros = ''
+    this.xAPI.valores = JSON.stringify(this.Inversiones)
+    console.log(this.Inversiones)
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        console.log(data)
+      async data => {
+        
+        if (this.Inversiones.identificador == 0 ) await this.AsientoInversion(this.Inversiones)
+        
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
         this.ngxService.stopLoader('load-inver')
         this.LimpiarInver()
@@ -341,20 +358,38 @@ export class InversionesComponent implements OnInit {
     )
   }
 
+
   CalcularCostosAdquisicion() {
-    this.Inversiones.costo_adquisicion =
-      this.Inversiones.valor_nominal * (this.Inversiones.precio_compra / 100);
-    this.Descuento();
+    let mt = this.Inversiones.valor_nominal * (this.Inversiones.precio_compra / 100)
+    this.Inversiones.costo_adquisicion = parseFloat(mt.toFixed(2));
+
+    if ( this.Inversiones.precio_compra > 100) {
+      this.Inversiones.descuento = 0
+      this.Prima()
+    }else{
+      this.Inversiones.primas = 0
+      this.Descuento()
+    }
   }
 
   Descuento() {
-    this.Inversiones.descuento =
-      this.Inversiones.valor_nominal - this.Inversiones.costo_adquisicion;
+    let mt = this.Inversiones.valor_nominal - this.Inversiones.costo_adquisicion
+    this.Inversiones.descuento = parseFloat(mt.toFixed(2))
+  }
+
+  Prima() {
+    let mt = ( this.Inversiones.valor_nominal - this.Inversiones.costo_adquisicion ) * - 1
+    this.Inversiones.primas = parseFloat(mt.toFixed(2))
   }
 
   AmortizacionDiaria() {
-    this.Inversiones.amortizacion_diaria =
-      this.Inversiones.descuento / this.Inversiones.plazo_vencimiento;
+    let mt = this.Inversiones.descuento / this.Inversiones.plazo_vencimiento
+    if (this.Inversiones.primas  > 0 ) {
+      mt = this.Inversiones.primas / this.Inversiones.plazo_vencimiento
+    }
+    
+    this.Inversiones.amortizacion_diaria = parseFloat(mt.toFixed(2))
+      
   }
 
   InteresesCaidos() {
@@ -374,7 +409,7 @@ export class InversionesComponent implements OnInit {
     let rendicion =
       (inv.valor_nominal * inv.tasa_cupon * (inv.plazo_cupon / 100)) /
       inv.base_calculo;
-    this.Inversiones.rendimiento_cupon = rendicion;
+    this.Inversiones.rendimiento_cupon = parseFloat(rendicion.toFixed(2));
     this.InteresDiarioCupon();
   }
 
@@ -382,7 +417,7 @@ export class InversionesComponent implements OnInit {
     let inv = this.Inversiones;
     let rendicion =
       (inv.valor_nominal * inv.tasa_cupon * (1 / 100)) / inv.base_calculo;
-    this.Inversiones.interes_diario = rendicion;
+    this.Inversiones.interes_diario = parseFloat(rendicion.toFixed(2));
   }
 
   RendimientoAlVencimiento() {
@@ -390,7 +425,49 @@ export class InversionesComponent implements OnInit {
     let rendicion =
       (inv.valor_nominal * (inv.tasa_cupon / 100) * inv.plazo_vencimiento) /
       inv.base_calculo;
-    this.Inversiones.rendimiento_vencimiento = rendicion;
+    this.Inversiones.rendimiento_vencimiento = parseFloat(rendicion.toFixed(2));
     this.AmortizacionDiaria();
+  }
+
+
+  //5 inversiones en papeles comerciales
+  //6 deposito para microcredito
+  //3 disponibilidad en cuenta operativa
+  AsientoInversion(Inv: Inversion) {
+    // let cuenta = Inv.instrumento == "57"
+    this.movimiento.inversion = Inv.identificador
+    this.movimiento.cuenta = 3
+    this.movimiento.debe = 0
+    this.movimiento.haber = Inv.costo_adquisicion
+    this.movimiento.fecha_precierre = "1900-01-01"
+    this.movimiento.fecha_cierre = "1900-01-01"
+
+    this.xAPI.funcion = "FID_IMovInversion";
+    this.xAPI.parametros = "";
+    this.xAPI.valores = JSON.stringify(this.movimiento);
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.movimiento.cuenta = 5,
+        this.movimiento.debe = Inv.costo_adquisicion,
+        this.movimiento.haber = 0
+
+        this.xAPI.valores = JSON.stringify(this.movimiento);
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          (data) => {
+            this._snackBar.open("Movimientos de Inversion Generado...", "Ok");
+          },
+          (error) => {
+            this._snackBar.open(
+              "No se ha generado el movimiento.. 712.",
+              "Error"
+            );
+          }
+        )
+      },
+      (error) => {
+        this._snackBar.open("No se ha generado el movimiento 711...", "Error");
+      }
+    );
   }
 }

@@ -96,10 +96,11 @@ export class UtilService {
   //Retorna Fecha Formato: AAAA-MM-DD
   ConvertirFechaDB(f: any) : string {
     var faux = ''
+    console.log(typeof f, f)
     if (typeof f != "object") {
       faux = "1900-01-01"
       if (f != undefined && f != "") {
-        var fx = f.split("-");
+        var fx = f.split("/");
         faux = fx[2] + "-" + fx[1] + "-" + fx[0];
       }
       return faux;

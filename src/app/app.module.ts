@@ -25,7 +25,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { NgxUiLoaderModule,  NgxUiLoaderConfig } from "ngx-ui-loader";
 
-import { MatCommonModule } from '@angular/material/core';
+import { MAT_DATE_LOCALE, MatCommonModule, MatNativeDateModule } from '@angular/material/core';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { AuthGuardGuard } from './services/seguridad/auth-guard.guard';
 import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
@@ -69,6 +69,7 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
     MatPaginatorModule,
     MatSelectModule,
     MatDatepickerModule,
+    MatNativeDateModule,
     MatTableModule,
     MatDialogModule,
     MatTabsModule,
@@ -106,6 +107,9 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
     { 
       provide: MatPaginatorIntl, 
       useValue: CustomPaginator() 
+    },
+    {
+      provide: MAT_DATE_LOCALE, useValue: 'en-GB'
     }
   ],
   bootstrap: [AppComponent]

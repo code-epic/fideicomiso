@@ -6,7 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Direccion } from 'src/app/services/banfanb/afiliado.service';
-import { Contrato, Ejecutivo, Politicas, Saldos } from 'src/app/services/banfanb/contrato.service';
+import { Contrato, Ejecutivo, MovComision, Politicas, Saldos } from 'src/app/services/banfanb/contrato.service';
 import { SemilleroService } from 'src/app/services/banfanb/semillero';
 import { Semillero } from 'src/app/services/banfanb/semillero';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -124,6 +124,17 @@ export class ContratosComponent implements OnInit {
     identificador: 0
   }
 
+  public movimiento : MovComision = {
+    debe: 0,
+    estatus: 0,
+    fecha_cierre: '',
+    fecha_precierre: '',
+    haber: 0,
+    cuenta: 0,
+    plan: 0,
+    llave: '',
+    usuario: ''
+  }
 
 
 
@@ -610,19 +621,20 @@ export class ContratosComponent implements OnInit {
         console.log(data)
         if (data != null && data.msj != undefined) {
           let numero = this.planFideicomiso.identificador>0?this.planFideicomiso.identificador:data.msj
+          let monto = this.planFideicomiso.monto_apertura
 
           this.Contrato.numero = this.util.zfill(numero, 4)
           this.Contrato.Saldos.fechainicio = this.planFideicomiso.fecha_apertura 
           this.Contrato.Saldos.saldoinicio = this.planFideicomiso.monto_apertura 
       
           this.GuardarContrato() 
+          this.AsientoContrato(numero, monto)
       
         }
       },
       (error) => {
         console.log(error)
         this.ngxService.stopLoader('load-cont')
-        
       }
     )
 
@@ -686,6 +698,43 @@ export class ContratosComponent implements OnInit {
   }
 
   
-    
+  //18 fideicomiso de inversion
+  //3 disponibilidad en cuenta operativa
+  AsientoContrato(plan: number, monto: number) {
+    this.movimiento.plan = plan
+    this.movimiento.cuenta = 3
+    this.movimiento.debe = monto
+    this.movimiento.haber = 0
+    this.movimiento.fecha_precierre = "1900-01-01"
+    this.movimiento.fecha_cierre = "1900-01-01"
+
+    this.xAPI.funcion = "FID_IMovComision";
+    this.xAPI.parametros = "";
+    this.xAPI.valores = JSON.stringify(this.movimiento);
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.movimiento.cuenta = 18,
+        this.movimiento.debe = 0,
+        this.movimiento.haber = monto
+
+        this.xAPI.valores = JSON.stringify(this.movimiento);
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          (data) => {
+            this._snackBar.open("Movimientos de Comisiones Generado...", "Ok");
+          },
+          (error) => {
+            this._snackBar.open(
+              "No se ha generado el movimiento.. 712.",
+              "Error"
+            );
+          }
+        )
+      },
+      (error) => {
+        this._snackBar.open("No se ha generado el movimiento 711...", "Error");
+      }
+    );
+  }
 
 }
