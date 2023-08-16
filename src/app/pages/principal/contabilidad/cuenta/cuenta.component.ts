@@ -22,6 +22,7 @@ export class CuentaComponent implements OnInit {
     "descripcion",
     "codigo_asignacion",
     "accion",
+    "disparador"
   ];
   dataSource: any;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -80,6 +81,7 @@ export class CuentaComponent implements OnInit {
     this.Cuenta = e;
     this.porta_insert = "";
     this.porta_search = "none";
+    console.log(e)
   }
 
   // Listar() {
@@ -97,19 +99,47 @@ export class CuentaComponent implements OnInit {
   // }
 
   Consultar() {
+    this.getSegmento();
     this.xAPI.funcion = "FID_CCuenta";
-    this.xAPI.parametros = this.Cuenta.codigo;
+    this.xAPI.parametros =
+      this.Cuenta.codigo +
+      "," +
+      this.Cuenta.parte +
+      "," +
+      this.Cuenta.moneda +
+      "," +
+      this.Cuenta.nivel_1 +
+      "," +
+      this.Cuenta.nivel_2 +
+      "," +
+      this.Cuenta.nivel_3 +
+      "," +
+      this.Cuenta.nivel_4 +
+      "," +
+      this.Cuenta.nivel_5;
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
+        console.log(data);
         if (data.Cuerpo != undefined) {
-          this.Cuenta = data.Cuerpo.length > 0? data.Cuerpo[0]: {};
+          if ( data.Cuerpo.length > 0) {
+            this.Cuenta =  data.Cuerpo[0] ;
+            this.Cuenta.moneda = this.Cuenta.moneda=='0'?'1':this.Cuenta.moneda
+          }else{
+            let aux = this.Cuenta.codigo;
+            this.Limpiar();
+            this.Cuenta.codigo = aux
+            this.Cuenta.aumenta = this.naturaleza(this.Cuenta.codigo)
+            this.Cuenta.disminuye = this.Cuenta.aumenta=='DEBE'?'HABER':'DEBE'
+            this.getSegmento();
+            
+          }
         } else {
           let aux = this.Cuenta.codigo;
           this.Limpiar();
           this.Cuenta.codigo = aux;
         }
+
       },
       (error) => {
         console.log(error);
@@ -125,12 +155,14 @@ export class CuentaComponent implements OnInit {
   }
 
   Limpiar() {
+
+
     this.Cuenta = {
       moneda: "",
       totalizadora: 0,
       parte: "",
-      disminuye: "",
-      aumenta: "",
+      disminuye: '',
+      aumenta: '',
       descripcion: "",
       codigo: "",
       nivel_1: "",
@@ -184,20 +216,19 @@ export class CuentaComponent implements OnInit {
       this.Cuenta.nivel_4 = cta[6];
       this.Cuenta.nivel_5 = cta[7];
     }
-
   }
 
   Guardar() {
     this.txtCuenta.length;
 
-    this.getSegmento();
+    
     this.Cuenta.totalizadora = parseInt(this.cmbTotalizadora);
 
     if (this.Cuenta.codigo == "") {
       this._snackBar.open("Debe verificar todos los campos...", "Ok");
       return;
     }
-    this.ngxService.startLoader('load-inver')
+    this.ngxService.startLoader("load-inver");
     this.xAPI.funcion = "FID_ICuenta";
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.Cuenta);
@@ -213,8 +244,7 @@ export class CuentaComponent implements OnInit {
         );
         this.ngxService.stopLoader("load-inver");
         this.Limpiar();
-        this.txtCuenta = ''
-
+        this.txtCuenta = "";
       },
       (error) => {
         console.log(error);
@@ -222,8 +252,8 @@ export class CuentaComponent implements OnInit {
     );
   }
 
-  getTotalizadora(codigo : number) : string {
-    return codigo==1?'SI':'NO'
+  getTotalizadora(codigo: number): string {
+    return codigo == 1 ? "SI" : "NO";
   }
 
   getDebe(tipo: string): string {
@@ -239,6 +269,7 @@ export class CuentaComponent implements OnInit {
     this.selectedIndex = event.index;
     if (!this.active) {
       this.Limpiar();
+      this.txtCuenta = ''
       //this.contrato_search = 'none'
       //this.GenerarSemillero()
       // this.Listar()
@@ -280,6 +311,7 @@ export class CuentaComponent implements OnInit {
               codigo_asignacion: e.totalizadora,
               cuenta: cta,
               accion: e.aumenta == "DEBE" ? "D/H" : "H/D",
+              disparador: ''
             });
           });
           this.dataSource = new MatTableDataSource<LCuenta>(this.ELEMENT_DATA);
@@ -290,5 +322,33 @@ export class CuentaComponent implements OnInit {
         console.error(err);
       }
     );
+  }
+
+  naturaleza(cuenta: string): string {
+    let nat = "DEBE";
+
+    switch (cuenta.substring(0, 2)) {
+      case "71":
+        //ACTIVOS
+        nat = "DEBE";
+        break;
+      case "72":
+        //ACTIVOS
+        nat = "HABER";
+        break;
+      case "73":
+        //ACTIVOS
+        nat = "HABER";
+        break;
+      case "74":
+        //ACTIVOS
+        nat = "DEBE";
+        break;
+      case "75":
+        //ACTIVOS
+        nat = "HABER";
+        break;
+    }
+    return nat;
   }
 }

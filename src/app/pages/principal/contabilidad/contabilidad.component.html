@@ -1,93 +1,95 @@
 <div class="row">
-  <div class="col-md-12">
-      <div class="card card-profile shadow">
-          <div class="card-body">
-              <ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
-              
-              <div class="row">
+    <div class="col-md-12">
+        <div class="card card-profile shadow">
+            <div class="card-body">
+                <ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
 
-                  <div class="col-xl-4 col-lg-4">
-                      <a routerLinkActive="active" [routerLink]="['/cuenta']">
-                          <div class="card card-stats mb-4 mb-xl-0">
-                              <div class="card-body">
-                                  <div class="row">
-                                      <div class="col">
-                                          <h5 class="card-title text-uppercase text-muted mb-0">Cuenta Contable</h5>
-                                          <span class="h2 font-weight-bold mb-0">Cuenta Contable</span>
-                                      </div>
-                                      <div class="col-auto">
-                                          <div class="icon icon-shape bg-purple text-white rounded-circle shadow">
-                                          <i class="fas fa-warehouse"></i>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <p class="mt-3 mb-0 text-muted text-sm">
-                                      <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> Stock</span>
-                                      <span class="text-nowrap">en el sistema</span>
-                                  </p>
-                              </div>
-                          </div>
-                      </a>
-                  </div>
+                <div class="row">
 
-                  <!-- <div class="col-xl-4 col-lg-4">
-                    <a routerLinkActive="active" [routerLink]="['/plancontable']">
-                        <div class="card card-stats mb-4 mb-xl-0">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <h5 class="card-title text-uppercase text-muted mb-0">Plan contable</h5>
-                                        <span class="h2 font-weight-bold mb-0">Plan contable Bolivares</span>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
-                                        <i class="fas fa-warehouse"></i>
+                    <div class="col-xl-4 col-lg-4">
+                        <a routerLinkActive="active" [routerLink]="['/cuenta']">
+                            <div class="card card-stats mb-4 mb-xl-0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="card-title text-uppercase text-muted mb-0">Cuenta Contable</h5>
+                                            <span class="h2 font-weight-bold mb-0">Cuenta Contable</span>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="icon icon-shape bg-purple text-white rounded-circle shadow">
+                                                <!-- <i class="fas fa-warehouse"></i> -->
+                                                <i class="fas fa-window-restore"></i>
+                                            </div>
                                         </div>
                                     </div>
+                                    <p class="mt-3 mb-0 text-muted text-sm">
+                                        <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> Stock</span>
+                                        <span class="text-nowrap">en el sistema</span>
+                                    </p>
                                 </div>
-                                <p class="mt-3 mb-0 text-muted text-sm">
-                                    <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> Stock</span>
-                                    <span class="text-nowrap">en el sistema</span>
-                                </p>
                             </div>
-                        </div>
-                    </a>
-                </div> -->
+                        </a>
+                    </div>
 
 
-                  <div class="col-xl-4 col-lg-4">
-                    <a routerLinkActive="active" [routerLink]="['/comprobante']">
-                        <div class="card card-stats mb-4 mb-xl-0">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <h5 class="card-title text-uppercase text-muted mb-0">Comprobante Contable</h5>
-                                        <span class="h2 font-weight-bold mb-0">Comprobante Contable </span>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="icon icon-shape bg-red text-white rounded-circle shadow">
-                                        <i class="fas fa-calculator"></i>
+
+
+                    <div class="col-xl-4 col-lg-4">
+                        <a routerLinkActive="active" [routerLink]="['/comprobante']">
+                            <div class="card card-stats mb-4 mb-xl-0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="card-title text-uppercase text-muted mb-0">Comprobante Contable
+                                            </h5>
+                                            <span class="h2 font-weight-bold mb-0">Comprobante Contable </span>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="icon icon-shape bg-red text-white rounded-circle shadow">
+                                                <!-- <i class="fas fa-calculator"></i> -->
+                                                <i class="fas fa-tasks"></i>
+                                            </div>
                                         </div>
                                     </div>
+                                    <p class="mt-3 mb-0 text-muted text-sm">
+                                        <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> Stock</span>
+                                        <span class="text-nowrap">en el sistema</span>
+                                    </p>
                                 </div>
-                                <p class="mt-3 mb-0 text-muted text-sm">
-                                    <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> Stock</span>
-                                    <span class="text-nowrap">en el sistema</span>
-                                </p>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
+
+
+                    <div class="col-xl-4 col-lg-4">
+                        <a routerLinkActive="active" [routerLink]="['/tabla']">
+                            <div class="card card-stats mb-4 mb-xl-0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="card-title text-uppercase text-muted mb-0">Tablas</h5>
+                                            <span class="h2 font-weight-bold mb-0">Configurador de tablas</span>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="icon icon-shape bg-blue text-white rounded-circle shadow">
+                                                <!-- <i class="fas fa-warehouse"></i> -->
+                                                <i class="fas fa-wrench"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="mt-3 mb-0 text-muted text-sm">
+                                        <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> Amarres</span>
+                                        <span class="text-nowrap">contables</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+
                 </div>
-                      
 
-
-
-               
-              </div>
-
-          </div>
-      </div>
-  </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-

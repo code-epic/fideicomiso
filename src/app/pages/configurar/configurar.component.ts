@@ -22,9 +22,6 @@ export class ConfigurarComponent implements OnInit {
   @ViewChild('filex', { static: true }) filex: TemplateRef<any>;
 
   public lstMaestro : any
-
-
-
   constructor(
     public dialog: MatDialog, 
     private apiService : ApiService,

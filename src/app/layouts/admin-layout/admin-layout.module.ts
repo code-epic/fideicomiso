@@ -59,6 +59,7 @@ import { ProcesosComponent } from 'src/app/pages/principal/operaciones/procesos/
 import { ListadosComponent } from 'src/app/pages/principal/operaciones/listados/listados.component';
 import { PrecierreComponent } from 'src/app/pages/principal/operaciones/procesos/precierre/precierre.component';
 import { CierreComponent } from 'src/app/pages/principal/operaciones/procesos/cierre/cierre.component';
+import { TablasComponent } from 'src/app/pages/principal/contabilidad/tablas/tablas.component';
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 
 @NgModule({
@@ -126,7 +127,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     EjecutivosComponent,
     PlancontableComponent,
     ComprobanteComponent,
-    CuentaComponent
+    CuentaComponent,
+    TablasComponent,
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},

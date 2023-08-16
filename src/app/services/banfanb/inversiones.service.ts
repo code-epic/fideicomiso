@@ -45,6 +45,7 @@ export interface MovInversion {
   inversion: number;
   fecha_cierre?: string;
   fecha_precierre?: string;
+  fecha_operacion: string;
 };
 
 @Injectable({

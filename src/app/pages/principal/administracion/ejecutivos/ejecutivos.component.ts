@@ -9,7 +9,7 @@ import { FormControl } from '@angular/forms';
 @Component({
   selector: 'app-ejecutivos',
   templateUrl: './ejecutivos.component.html',
-  styleUrls: ['./ejecutivos.component.css']
+  styleUrls: ['./ejecutivos.component.scss']
 })
 export class EjecutivosComponent implements OnInit {
   public xAPI: IAPICore = {

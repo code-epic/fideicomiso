@@ -215,6 +215,76 @@
 
                                                         </div>
 
+                                                      
+
+                                                        <div class="row">
+                                                          
+                                                            <div class="col-md-4">
+                                                                <label >Fecha de Registro (*) </label>
+                                                                <form class="form-inline">
+                                                                    <div class="form-group" style="width:100%">
+                                                                        <div class="input-group" style="width:100%">
+                                                                            <input class="form-control" placeholder="AAAA-MM-DD"
+                                                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="fechar" ngbDatepicker
+                                                                                #foc="ngbDatepicker" [value]="formatter.format(fecharegistro)"
+                                                                                placement="bottom" [positionTarget]="buttonElec" readonly>
+                                                                            <div class="input-group-append">
+                                                                                <button #buttonElec class="btn calendario" (click)="foc.toggle()" type="button"
+                                                                                    id="fori">
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </form>
+
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label >Fecha de Apertura (*) </label>
+                                                                <form class="form-inline">
+                                                                    <div class="form-group" style="width:100%">
+                                                                        <div class="input-group" style="width:100%">
+                                                                            <input class="form-control" placeholder="AAAA-MM-DD"
+                                                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="fechai" ngbDatepicker
+                                                                                #fo="ngbDatepicker" [value]="formatter.format(fechainicio)"
+                                                                                placement="bottom" [positionTarget]="buttonEle" readonly>
+                                                                            <div class="input-group-append">
+                                                                                <button #buttonEle class="btn calendario" (click)="fo.toggle()" type="button"
+                                                                                    id="fori">
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </form>
+
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label>Monto de Apertura (*) </label>
+                                                                <input class="form-control" placeholder="Monto de Apertura" 
+                                                                    [(ngModel)]="saldo_inicio"
+                                                                    currencyMask [options]="{ prefix: 'Bs. ', thousands: '.', decimal: ',' }"
+                                                                value="">
+                                                                <!-- <mat-form-field appearance="outline">
+                                                                    <mat-label>Monto de Apertura</mat-label>
+                                                                    <input matInput placeholder="Monto de Apertura" 
+                                                                        [(ngModel)]="saldo_inicio"
+                                                                        currencyMask [options]="{ prefix: 'Bs. ', thousands: '.', decimal: ',' }"
+                                                                        value=""
+                                                                        >
+                                                                </mat-form-field> -->
+                                                            </div>
+                                                            <div class="col-md-4" style="display: none;">
+                                                                <mat-form-field appearance="outline" >
+                                                                    <mat-label>Plan Anterior</mat-label>
+                                                                    <input matInput placeholder="Plan Anterior"
+                                                                        [(ngModel)]="Contrato.plananterior"
+                                                                        [ngModelOptions]="{standalone: true}"
+                                                                        value="{{Contrato.plananterior}}">
+
+                                                                </mat-form-field>
+                                                            </div>
+                                                          
+                                                        </div>
+                                                        <hr>
                                                         <div class="row">
                                                             <div class="col-md-5">
                                                                 <mat-form-field appearance="outline">
@@ -237,44 +307,7 @@
                                                                 </mat-form-field>
                                                             </div>
                                                         </div>
-
-                                                        <div class="row">
-                                                          
-                                                            <div class="col-md-4">
-                                                                <mat-form-field appearance="outline">
-                                                                    <mat-label>Fecha de Apertura</mat-label>
-                                                                    <input matInput [matDatepicker]="picker" 
-                                                                    [(ngModel)]="Contrato.Saldos.fechainicio"
-                                                                    [formControl]="fechainicio"
-                                                                    [value]="fechainicio.value">
-                                                                    <mat-datepicker #picker></mat-datepicker>
-                                                                    <mat-icon matSuffix (click)="picker.open()">event</mat-icon>
-                                                                </mat-form-field>
-                                                                <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
-    
-                                                            </div>
-                                                            <div class="col-md-4">
-                                                                <mat-form-field appearance="outline">
-                                                                    <mat-label>Monto de Apertura</mat-label>
-                                                                    <input matInput placeholder="Monto de Apertura" 
-                                                                        [(ngModel)]="saldo_inicio"
-                                                                        currencyMask [options]="{ prefix: 'Bs. ', thousands: '.', decimal: ',' }"
-                                                                        value=""
-                                                                        >
-                                                                </mat-form-field>
-                                                            </div>
-                                                            <div class="col-md-4" style="display: none;">
-                                                                <mat-form-field appearance="outline" >
-                                                                    <mat-label>Plan Anterior</mat-label>
-                                                                    <input matInput placeholder="Plan Anterior"
-                                                                        [(ngModel)]="Contrato.plananterior"
-                                                                        [ngModelOptions]="{standalone: true}"
-                                                                        value="{{Contrato.plananterior}}">
-
-                                                                </mat-form-field>
-                                                            </div>
-                                                          
-                                                        </div>
+                                                        <hr>
                                                         <div class="row">
                                                             <!-- <div class="col-md-4">
                                                                 <mat-form-field appearance="outline">

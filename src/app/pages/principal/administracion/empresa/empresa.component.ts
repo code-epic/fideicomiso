@@ -78,6 +78,7 @@ export class EmpresaComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data)
         if (data != null && data.msj == undefined) this.lstEmpresa = data
       },
       (error) => {

@@ -42,6 +42,18 @@
               <td mat-cell *matCellDef="let e"> {{ getTotalizadora( e.codigo_asignacion ) }} </td>
             </ng-container>
 
+              <!-- Weight Column -->
+              <ng-container matColumnDef="disparador">
+                <th mat-header-cell *matHeaderCellDef> ACCION </th>
+                <td mat-cell *matCellDef="let e">
+                  <button mat-icon-button aria-label="Editar"
+                    (click)="editar(e)" >
+                    <mat-icon class="texto-gray">edit</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+  
+
 
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

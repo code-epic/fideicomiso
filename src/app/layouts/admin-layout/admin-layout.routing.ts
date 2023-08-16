@@ -22,6 +22,7 @@ import { ProcesosComponent } from 'src/app/pages/principal/operaciones/procesos/
 import { ListadosComponent } from 'src/app/pages/principal/operaciones/listados/listados.component'
 import { PrecierreComponent } from 'src/app/pages/principal/operaciones/procesos/precierre/precierre.component'
 import { CierreComponent } from 'src/app/pages/principal/operaciones/procesos/cierre/cierre.component'
+import { TablasComponent } from 'src/app/pages/principal/contabilidad/tablas/tablas.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -115,6 +116,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'cuenta',
         component: CuentaComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'tabla',
+        component: TablasComponent,
         canActivate: [AuthGuardGuard]
     },
 

@@ -5,9 +5,6 @@ import { Maestro } from 'src/app/services/util/tabla.service';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
 
-
-
-
 @Component({
   selector: 'app-tabla',
   templateUrl: './tabla.component.html',
@@ -24,13 +21,9 @@ export class TablaComponent implements OnInit {
 
   public ELEMENT_DATA: Maestro[] = [];
 
-
   displayedColumns: string[] = ['codigo', 'nombre', 'observacion', 'fecha'];
-
   dataSource: any
-
   public nombre: string = ""
-
   public observacion: string = ""
 
   @ViewChild(MatPaginator) paginator: MatPaginator;

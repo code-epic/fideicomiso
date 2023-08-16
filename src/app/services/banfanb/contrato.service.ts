@@ -66,6 +66,7 @@ export interface Contrato {
 export interface MovComision {
   debe: number;
   estatus: number;
+  fecha_operacion: string;
   fecha_cierre: string;
   fecha_precierre: string;
   haber: number;

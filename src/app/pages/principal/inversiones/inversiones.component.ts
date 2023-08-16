@@ -66,16 +66,14 @@ export class InversionesComponent implements OnInit {
     haber: 0,
     usuario: "",
     cuenta: 0,
-    inversion: 0
+    inversion: 0,
+    fecha_operacion: ""
   }
   public inver_insert: string = '';
   public inver_search: string = "none";
   public emisor: string = '';
   public custodia: string = '';
   public instrumento: string = '';
-  public fecha_emi: any
-  public fecha_com: any
-  public fecha_ven: any
 
   myEmisor = new FormControl('');
   filEmisor: Observable<string[]>;
@@ -91,6 +89,10 @@ export class InversionesComponent implements OnInit {
   public estatus = '1'
   public tipo_inversion = '1'
   public active: boolean = false
+
+  public fecha_emi: any
+  public fecha_com: any
+  public fecha_ven: any
 
   public fecha_emision : NgbDate | null
   public fecha_compra : NgbDate | null
@@ -342,15 +344,17 @@ export class InversionesComponent implements OnInit {
       this.Inversiones.identificador == 0 ? "FID_IInversion" : "FID_UInversion"
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Inversiones)
-    console.log(this.Inversiones)
+
+    // console.log(this.Inversiones)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        
-        if (this.Inversiones.identificador == 0 ) await this.AsientoInversion(this.Inversiones)
-        
-        this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
-        this.ngxService.stopLoader('load-inver')
-        this.LimpiarInver()
+        if (this.Inversiones.identificador > 0 ) {
+          await this.AsientoInversion(this.Inversiones)
+        }else {
+          this.LimpiarInver()
+          this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
+          this.ngxService.stopLoader('load-inver')
+        }
       },
       (error) => {
         console.log(error)
@@ -436,6 +440,7 @@ export class InversionesComponent implements OnInit {
   AsientoInversion(Inv: Inversion) {
     // let cuenta = Inv.instrumento == "57"
     this.movimiento.inversion = Inv.identificador
+    this.movimiento.fecha_operacion = this.Inversiones.fecha_emision
     this.movimiento.cuenta = 3
     this.movimiento.debe = 0
     this.movimiento.haber = Inv.costo_adquisicion
@@ -455,7 +460,11 @@ export class InversionesComponent implements OnInit {
         this.xAPI.valores = JSON.stringify(this.movimiento);
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
-            this._snackBar.open("Movimientos de Inversion Generado...", "Ok");
+
+            this._snackBar.open("Movimientos de Inversion Generado...", "Ok")
+            this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
+            this.ngxService.stopLoader('load-inver')
+            this.LimpiarInver()
           },
           (error) => {
             this._snackBar.open(

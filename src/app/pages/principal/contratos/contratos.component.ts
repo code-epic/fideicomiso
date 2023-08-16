@@ -11,6 +11,7 @@ import { SemilleroService } from 'src/app/services/banfanb/semillero';
 import { Semillero } from 'src/app/services/banfanb/semillero';
 import { UtilService } from 'src/app/services/util/util.service';
 import { PlanFideicomiso } from 'src/app/services/banfanb/contabilidad.service';
+import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-contratos',
@@ -133,7 +134,8 @@ export class ContratosComponent implements OnInit {
     cuenta: 0,
     plan: 0,
     llave: '',
-    usuario: ''
+    usuario: '',
+    fecha_operacion: ''
   }
 
 
@@ -175,7 +177,12 @@ export class ContratosComponent implements OnInit {
     funcion: '',
     parametros: ''
   }
-  public fechainicio = new FormControl(new Date());
+
+  public fechai: any
+  public fechainicio  : any
+
+  public fechar: any
+  public fecharegistro  : any
 
   public tabSaldos : boolean = false
 
@@ -201,7 +208,8 @@ export class ContratosComponent implements OnInit {
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
-    private util: UtilService
+    private util: UtilService,
+    public formatter: NgbDateParserFormatter,
     ) { }
 
   ngOnInit(): void {
@@ -333,7 +341,9 @@ export class ContratosComponent implements OnInit {
     this.selectedIndex = 1
     this.active = true
     //this.contrato_search = ''
-    this.fechainicio.setValue(this.Contrato.Saldos.fechainicio)
+    this.fechainicio = NgbDate.from(this.formatter.parse(this.Contrato.Saldos.fechainicio))
+    
+    
     this.myOficina.setValue(this.Contrato.oficinatutora.toUpperCase())
     this.lstEjecutivos = this.Contrato.Ejecutivo
     this.getTipoFideicomiso()
@@ -430,7 +440,8 @@ export class ContratosComponent implements OnInit {
       (data) => {
         if (data != null) {
           this.Contrato = data[0]
-          this.fechainicio.setValue(this.Contrato.Saldos.fechainicio)
+        
+          this.fechainicio = NgbDate.from(this.formatter.parse(this.Contrato.Saldos.fechainicio))
           this.myOficina.setValue(this.Contrato.oficinatutora.toUpperCase())
           this.lstEjecutivos = this.Contrato.Ejecutivo
           this.getTipoFideicomiso()
@@ -509,6 +520,7 @@ export class ContratosComponent implements OnInit {
       correo: '',
       oficinanacional: ''
     }
+
     this.Saldos  = {
       saldoinicio: 0,
       sse_fechainicio: '',
@@ -526,6 +538,7 @@ export class ContratosComponent implements OnInit {
       cliente: '',
       proceso: ''
     }
+
     this.Politicas = {
       observaciones: '',
       tipocuenta: '',
@@ -576,13 +589,9 @@ export class ContratosComponent implements OnInit {
 
 
   getPlanFideicomisoDB(){
-    let f = new Date().toISOString()
-    if(this.fechainicio.value != "") {
-      f = new Date( this.fechainicio.value ).toISOString()
-    }
+    
 
-    this.planFideicomiso.fecha_apertura = f.substring(0,10)
-
+    this.planFideicomiso.fecha_apertura = typeof this.fechai == 'object' ? this.util.ConvertirFecha(this.fechai) : this.Contrato.Saldos.fechainicio.substring(0, 10)
 
     this.planFideicomiso.observacion = this.Contrato.rif + '|' + this.Contrato.razonsocial 
     this.planFideicomiso.monto_apertura = parseFloat(this.saldo_inicio)
@@ -602,7 +611,7 @@ export class ContratosComponent implements OnInit {
 
   Guardar() {
 
-    if(this.fechainicio.value == "" && this.saldo_inicio == '') {
+    if(this.Contrato.Saldos.fechainicio == "" && this.saldo_inicio == '') {
       this._snackBar.open("Debe verificar todos los campos de fecha...", "Ok");
       return
     }
@@ -626,9 +635,10 @@ export class ContratosComponent implements OnInit {
           this.Contrato.numero = this.util.zfill(numero, 4)
           this.Contrato.Saldos.fechainicio = this.planFideicomiso.fecha_apertura 
           this.Contrato.Saldos.saldoinicio = this.planFideicomiso.monto_apertura 
-      
+          
+          this.AsientoContrato(numero, monto, this.planFideicomiso.fecha_apertura )
+
           this.GuardarContrato() 
-          this.AsientoContrato(numero, monto)
       
         }
       },
@@ -700,11 +710,12 @@ export class ContratosComponent implements OnInit {
   
   //18 fideicomiso de inversion
   //3 disponibilidad en cuenta operativa
-  AsientoContrato(plan: number, monto: number) {
+  AsientoContrato(plan: number, monto: number, fecha_operacion : string) {
     this.movimiento.plan = plan
     this.movimiento.cuenta = 3
     this.movimiento.debe = monto
     this.movimiento.haber = 0
+    this.movimiento.fecha_operacion = fecha_operacion
     this.movimiento.fecha_precierre = "1900-01-01"
     this.movimiento.fecha_cierre = "1900-01-01"
 
