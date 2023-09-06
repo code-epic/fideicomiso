@@ -17,6 +17,27 @@ export interface Comprobante {
   items : []
 }
 
+
+export interface FID_IComprobante {
+	plan	:	string
+	codigo	:	string
+	descripcion	:	string
+  detalle	:	string
+	fecha_operacion	:	string
+  fecha_ejercicio	:	string
+	debe	:	number,
+	haber	:	number,
+}
+
+export interface FID_IDetalleComprobante {
+	comprobante	 :	number
+	cuenta	 :	number
+	debe	 :	number
+	haber	 :	number
+	fecha_operacion	 :	string
+	fecha_ejercicio	 :	string
+}
+
 //no posee una sola transaccion
 export interface IComprobante {
   cuenta: string //Cuenta de comprobante

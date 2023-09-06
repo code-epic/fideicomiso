@@ -250,7 +250,6 @@ export class ProcesosComponent implements OnInit {
   }
 
   getCuenta(e){
-   
     return e.codigo_padre + '.' + e.parte + '.' + e.moneda + '.' + e.nivel_1 + '.' + e.nivel_2 + '.' + e.nivel_3 + '.' + e.nivel_4 + '.' + e.nivel_5
   }
 

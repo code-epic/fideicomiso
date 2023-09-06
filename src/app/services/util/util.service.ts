@@ -120,4 +120,9 @@ export class UtilService {
     var diff = fechaFin - fechaInicio;
     return diff / (1000 * 60 * 60 * 24);
   }
+
+  ConvertirMoneda(numero : number) : any {
+    return  new Intl.NumberFormat("es-VE").format(numero)
+  }
+  
 }

@@ -2,13 +2,143 @@
     <div class="col-md-12">
         <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
         <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" style="padding:10px;">
+
+          <mat-tab>
+            <ng-template mat-tab-label>
+                <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
+                &nbsp;BALANCE DE COMPROBACION
+            </ng-template>
+            <br>
+            <div class="example-large-box mat-elevation-z4">
+              <div style="padding: 20px; width: 100%; margin-bottom: 0px;">
+    
+                <div class="row" >
+                  <div class="col-md-12">
+                    <br>
+                    
+                    <!-- <table style="font-size: 15px;" padding="5" class="asientos" style="width: 100%;">
+                      
+                      <thead>
+                        <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">
+                          <th style="text-align: left; " >DESCRIPCION DE LA CUENTA</th>
+                          <th style="text-align: center;">SALDO INICIAL</th>
+                          <th style="text-align: center;">MONTO DEBE</th>
+                          <th style="text-align: center;">MONTO HABER</th>
+                          <th style="text-align: center;">SALDO ACTUAL</th>
+                        </tr>
+                      </thead>
+                      <tbody> -->
+                        <div [innerHtml]="HTMLComprobacion"></div>
+                        <!-- <ng-container *ngFor="let e of lstComprobacion;"> 
+                          
+                          <tr  >
+                            <td style="display: none;">{{ getPaso(e) }}</td>
+                            <td *ngIf="e.totalizadora=='1'" colspan="5"  style="background-color: #eeeee4;">{{ getTitulosACuentas(e) }}</td>
+                            <td *ngIf="e.totalizadora=='2'" colspan="5"  style="background-color: #f1f1ee;">&nbsp;&nbsp;&nbsp;{{ getTitulosACuentas(e) }}</td>
+                            <td *ngIf="e.totalizadora=='0'">
+                              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                              {{ getTitulosACuentas(e) }}</td>
+                            <td *ngIf="e.totalizadora=='0'" style="border: 0px;border-right:  1px solid  #ccc; text-align: right;">
+                              
+                            </td>
+                            <td *ngIf="e.totalizadora=='0'" style="border: 0px;border-right:  1px solid  #ccc; text-align: right;">
+                              {{ getMoneda(e.debe) }}&nbsp;&nbsp;
+                            </td>
+                            <td *ngIf="e.totalizadora=='0'" style="border: 0px;border-right:  1px solid  #ccc; text-align: right;">
+                              {{ getMoneda(e.haber) }}&nbsp;&nbsp;
+                            </td>
+                            <td *ngIf="e.totalizadora=='0'" style="border: 0px;border-right:  1px solid  #ccc; text-align: right;">
+                              
+                            </td> 
+                          </tr>
+                          <tr *ngIf="cambio">
+                            <th  colspan="5"  style="border: 0px; border-bottom: 1px solid #ccc; background-color: #fffff054; height: 30px;">TOTALES CUENTA </th>
+                          </tr>
+                          
+                        </ng-container> -->
+                        
+                      <!-- </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="2"></td>
+                           </tr>
+                      </tfoot>
+                    </table> -->
+    
+                    <br>
+                    <br>
+                  </div>
+                </div>
+    
+              </div>
+          </div>
+
+        </mat-tab>
+
+
             <mat-tab>
                 <ng-template mat-tab-label>
                     <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
                     &nbsp;BALANCE AL CIERRE
                 </ng-template>
                 <br>
+
+
+                <div class="example-large-box mat-elevation-z4">
+                    <div style="padding: 20px; width: 100%; margin-bottom: 0px;">
+          
+                      <div class="row" >
+                        <div class="col-md-12">
+                          <br>
+                          
+                          <table style="font-size: 15px;" padding="5" class="asientos" style="width: 100%;">
+                            
+                            <thead>
+                              <tr style="border: 0px; border-bottom: 1px solid #c6c5c5; background-color: #e1e1d154; height: 35px;">
+                                <th>CUENTA</th>
+                                <th style="text-align: left;" >DESCRIPCION DE LA CUENTA</th>
+                                <th style="text-align: center;">TOTAL</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let e of lstTotales;" >
+                                <td *ngIf="e.totalizadora=='1'" style="background-color: #e1e1d9;">{{ e.codigo }}</td>
+                                <td *ngIf="e.totalizadora!='1'">{{ e.codigo }}</td>
+                                <td *ngIf="e.totalizadora=='1'"  style="background-color: #e1e1d9;">{{ e.descripcion | uppercase }}</td>
+                                <td *ngIf="e.totalizadora!='1'">{{ e.descripcion | uppercase }}</td>
+
+                                <td *ngIf="e.totalizadora=='1'" 
+                                  style="border: 0px;border-right:  
+                                        1px solid  #ccc; text-align: right;
+                                        background-color: #e1e1d9;
+                                        font-weight: bold; color: #717b22;">
+                                  {{ getMoneda(e.total) }}&nbsp;&nbsp;
+                                </td>
+                                <td *ngIf="e.totalizadora!='1'" style="border: 0px;border-right:  1px solid  #ccc; text-align: right;">
+                                  {{ getMoneda(e.total) }}&nbsp;&nbsp;
+                                </td>
+                              </tr>
+                            </tbody>
+                            <tfoot>
+                              <tr>
+                                <td colspan="2"></td>
+                                <!-- <td style="border: 0px;border-top:  1px solid  #ccc; text-align: right; font-weight: bold; font-size: 15px;"> {{ acum_debe }}&nbsp;&nbsp;</td>
+                                <td style="border: 0px;border-top:  1px solid  #ccc;text-align: right; font-weight: bold; font-size: 15px;"> {{ acum_haber }}&nbsp;&nbsp;</td> -->
+                              </tr>
+                            </tfoot>
+                          </table>
+          
+                          <br>
+                          <br>
+                        </div>
+                      </div>
+          
+                    </div>
+                </div>
+          
+
             </mat-tab>
+        
             <mat-tab>
                 <ng-template mat-tab-label>
                     <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
@@ -30,13 +160,7 @@
                 </ng-template>
                 <br>
             </mat-tab>
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
-                    &nbsp;BALANCE DE COMPROBACION
-                </ng-template>
-                <br>
-            </mat-tab>
+          
         </mat-tab-group>
     </div>
 </div>

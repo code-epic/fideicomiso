@@ -190,7 +190,7 @@
                   <tbody>
                     <tr *ngFor="let e of lstAsientos;" >
                       <td>{{ getCuenta(e) }}</td>
-                      <td>{{ e.descripcion || uppercase }}</td>
+                      <td>{{ e.descripcion | uppercase }}</td>
                       <td style="border: 0px;border-right:  1px solid  #ccc; text-align: right;">{{ e.debe }}&nbsp;&nbsp;</td>
                       <td style="border: 0px; text-align: right;">{{ e.haber }}&nbsp;&nbsp;</td>
                     </tr>

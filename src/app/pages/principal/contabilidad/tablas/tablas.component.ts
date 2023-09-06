@@ -334,13 +334,16 @@ export class TablasComponent implements OnInit {
         str = "COMPRA";
         break;
       case "V":
-        str = "VENTA";
+        str = "VENCIMIENTO";
         break;
       case "A":
         str = "APERTURA";
         break;
       case "G":
-        str = "GASTO / COMISION";
+        str = "COBRO DE CUPON";
+        break;
+      case "X":
+        str = "COMPRA / VENTA";
         break;
       default:
         break;
