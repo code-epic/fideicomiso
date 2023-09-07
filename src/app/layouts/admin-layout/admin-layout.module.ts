@@ -60,6 +60,11 @@ import { ListadosComponent } from 'src/app/pages/principal/operaciones/listados/
 import { PrecierreComponent } from 'src/app/pages/principal/operaciones/procesos/precierre/precierre.component';
 import { CierreComponent } from 'src/app/pages/principal/operaciones/procesos/cierre/cierre.component';
 import { TablasComponent } from 'src/app/pages/principal/contabilidad/tablas/tablas.component';
+import { ConfiguracionesComponent } from 'src/app/pages/principal/administracion/configuraciones/configuraciones.component';
+import { ConsultainversionesComponent } from 'src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component';
+import { SaldosinversionesComponent } from 'src/app/pages/principal/inversiones/saldosinversiones/saldosinversiones.component';
+import { ProcesosinversionesComponent } from 'src/app/pages/principal/inversiones/procesosinversiones/procesosinversiones.component';
+import { ConciliacionesinversionesComponent } from 'src/app/pages/principal/inversiones/conciliacionesinversiones/conciliacionesinversiones.component';
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 
 @NgModule({
@@ -129,6 +134,11 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     ComprobanteComponent,
     CuentaComponent,
     TablasComponent,
+    ConfiguracionesComponent,
+    ConsultainversionesComponent,
+    SaldosinversionesComponent,
+    ProcesosinversionesComponent,
+    ConciliacionesinversionesComponent,
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},

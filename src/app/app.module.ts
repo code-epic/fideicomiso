@@ -40,10 +40,7 @@ import { MatInputModule } from '@angular/material/input';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
-import { TramiteComponent } from './pages/tramite/tramite.component';
-import { ServiciosComponent } from './pages/servicios/servicios.component';
 import { CurrencyMaskModule } from 'ng2-currency-mask';
-
 
 
 @NgModule({
@@ -91,8 +88,6 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
     AppComponent,
     AdminLayoutComponent,
     AuthLayoutComponent,
-    TramiteComponent,
-    ServiciosComponent,
   ],
   providers:  [
     {

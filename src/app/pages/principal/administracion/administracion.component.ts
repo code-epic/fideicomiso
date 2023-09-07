@@ -13,18 +13,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 
 export class AdministracionComponent implements OnInit {
 
-  public xAPI: IAPICore = {
-    funcion: '',
-    parametros: ''
-  }
-
-
-  public producto : string = "0"
-
-
-  @ViewChild('hechicero', { static: true }) hechicero: TemplateRef<any>;
-
-  public lstMaestro : any
+ 
 
   constructor( private apiService: ApiService,
     public dialog: MatDialog,
@@ -34,34 +23,6 @@ export class AdministracionComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  ListarProductos(): void {
-    this.xAPI.funcion = "CCEC_CMaestro"
-    this.xAPI.parametros = "%"
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.lstMaestro = data.Cuerpo
-      },
-      (err) => {
-        console.error(err)
-      }
-    )
-
-  }
-
-  openDialog(): void {
-    const dialogRef = this.dialog.open(this.hechicero, {
-      width: '850px',
-      data: {},
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      // this.animal = result;
-    });
-  }
-
-  seleccionNavegacion(e){
-    
-  }
+ 
 
 }

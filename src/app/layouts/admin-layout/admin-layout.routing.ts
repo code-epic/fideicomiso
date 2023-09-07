@@ -23,6 +23,9 @@ import { ListadosComponent } from 'src/app/pages/principal/operaciones/listados/
 import { PrecierreComponent } from 'src/app/pages/principal/operaciones/procesos/precierre/precierre.component'
 import { CierreComponent } from 'src/app/pages/principal/operaciones/procesos/cierre/cierre.component'
 import { TablasComponent } from 'src/app/pages/principal/contabilidad/tablas/tablas.component'
+import { ConfiguracionesComponent } from 'src/app/pages/principal/administracion/configuraciones/configuraciones.component'
+import { SaldosinversionesComponent } from 'src/app/pages/principal/inversiones/saldosinversiones/saldosinversiones.component'
+import { ConsultainversionesComponent } from 'src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -70,8 +73,20 @@ export const AdminLayoutRoutes: Routes = [
         component: InversionesComponent,
         canActivate: [AuthGuardGuard]
     },{
+        path: 'consultas',
+        component: ConsultainversionesComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'saldos',
+        component: SaldosinversionesComponent,
+        canActivate: [AuthGuardGuard]
+    },{
         path: 'administracion',
         component: AdministracionComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'configuraciones',
+        component: ConfiguracionesComponent,
         canActivate: [AuthGuardGuard]
     },{
         path: 'portafolio',

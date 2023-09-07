@@ -1,69 +1,69 @@
 <div class="row">
-    <div class="col-md-12">
-        <div class="card card-profile shadow">
-            <div class="card-body">
-                <ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
-                <mat-tab-group>
-                    <mat-tab label="CARTERA">
+  <div class="col-md-12">
+      <div class="card card-profile shadow">
+          <div class="card-body">
+              <ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
+              
+              <div class="row">
 
-                        <app-portafolio></app-portafolio>
-                    </mat-tab>
-                    <mat-tab label="EMPRESA">
-                        <app-empresa></app-empresa>
-                    </mat-tab>
-                    <mat-tab label="EJECUTIVOS">
-                        <app-ejecutivos></app-ejecutivos>
-                    </mat-tab>
-                    <mat-tab label="CONFIGURADOR">
+           <div class="col-xl-4 col-lg-4">
+                      <a routerLinkActive="active" [routerLink]="['/configuraciones']">
+                          <div class="card card-stats mb-4 mb-xl-0">
+                              <div class="card-body">
+                                  <div class="row">
+                                      <div class="col">
+                                          <h5 class="card-title text-uppercase text-muted mb-0">Configuraciones</h5>
+                                          <span class="h2 font-weight-bold mb-0">Configuraciones</span>
+                                      </div>
+                                      <div class="col-auto">
+                                          <div class="icon icon-shape bg-purple text-white rounded-circle shadow">
+                                          <i class="fas fa-print"></i>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <p class="mt-3 mb-0 text-muted text-sm">
+                                      <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> Reportes</span>
+                                      <span class="text-nowrap">en el sistema</span>
+                                  </p>
+                              </div>
+                          </div>
+                      </a>
+                  </div>
 
-                        <div style="padding: 20px;">
 
-                            <div class="row">
-                                <div class="col-md-3"></div>
-                                <div class="col-md-5">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>Seleccionar productos</mat-label>
-                                        <mat-select placeholder="Ciudad" [(ngModel)]="producto" VALUE="PRODUCTO">
-                                            <mat-option *ngFor="let e of lstMaestro"
-                                                value="{{e.id}}">{{e.nombre}}</mat-option>
-                                        </mat-select>
-                                        <mat-icon matSuffix>business_center</mat-icon>
+                  <div class="col-xl-4 col-lg-4">
+                      <a routerLinkActive="active" [routerLink]="['/contratos']">
+                          <div class="card card-stats mb-4 mb-xl-0">
+                              <div class="card-body">
+                                  <div class="row">
+                                      <div class="col">
+                                          <h5 class="card-title text-uppercase text-muted mb-0">Contratos</h5>
+                                          <span class="h2 font-weight-bold mb-0">Contratos</span>
+                                      </div>
+                                      <div class="col-auto">
+                                          <div class="icon icon-shape bg-blue text-white rounded-circle shadow">
+                                            <i class="fas fa-wrench"></i>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <p class="mt-3 mb-0 text-muted text-sm">
+                                      <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> Stock</span>
+                                      <span class="text-nowrap">en el sistema</span>
+                                  </p>
+                              </div>
+                          </div>
+                      </a>
+                  </div>
+                      
+                  
+        
 
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="asistente-button-container">
+       
+              </div>
 
-                                        <button mat-button color="primary" (click)="openDialog()">
-                                            <mat-icon>add</mat-icon> Asistente
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-md-2"></div>
-
-                            </div>
-                            <div class="container">
-                                <br>
-                                <app-tabla API="{{producto}}"> </app-tabla>
-                                <br>
-                            </div>
-
-                        </div>
-
-                    </mat-tab>
-
-                    
-
-                </mat-tab-group>
-
-            </div>
-        </div>
-    </div>
+          </div>
+      </div>
+  </div>
 </div>
 
 
-
-
-<ng-template #hechicero let-modal>
-    <app-hechicero></app-hechicero>
-</ng-template>

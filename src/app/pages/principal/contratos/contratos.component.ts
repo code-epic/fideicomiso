@@ -378,6 +378,7 @@ export class ContratosComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data)
         this.lstContratos = data
       },
       (error) => {
