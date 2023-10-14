@@ -1,1 +1,0 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"419f86cb7fa14f148570396e51164bf8","collectionName":"sys-crontab","type":"collection"}
