@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Portafolio } from 'src/app/services/banfanb/portafolio.service';
+import { UtilService } from 'src/app/services/util/util.service';
 @Component({
   selector: 'app-portafolio',
   templateUrl: './portafolio.component.html',
@@ -19,7 +20,6 @@ export class PortafolioComponent implements OnInit {
     tipo: '',
     numerocuenta: '',
     valormercado: '',
-    fecha: new Date(),
     autor: ''
   }
 
@@ -35,7 +35,11 @@ export class PortafolioComponent implements OnInit {
   constructor(private apiService: ApiService,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private ngxService: NgxUiLoaderService) { }
+    private utilService : UtilService,
+    private ngxService: NgxUiLoaderService) { 
+      this.Portafolio.codigo = this.utilService.GenerarUnicId()
+
+    }
 
   ngOnInit(): void {
     this.Listar()
@@ -56,8 +60,10 @@ export class PortafolioComponent implements OnInit {
     this.xAPI.funcion = "FID_CPortafolios"
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
+
       (data) => {
-        if (data != null && data.msj == undefined) this.lstPortafolio = data
+        // console.log(data)
+        if (data != null && data.msj == undefined) this.lstPortafolio = data.Cuerpo
       },
       (error) => {
         console.log(error)
@@ -97,7 +103,7 @@ export class PortafolioComponent implements OnInit {
 
   Limpiar() {
     this.Portafolio = {
-      codigo: '',
+      codigo: this.utilService.GenerarUnicId(),
       descripcion: '',
       moneda: '',
       frecuencia: '',
@@ -105,7 +111,6 @@ export class PortafolioComponent implements OnInit {
       tipo: '',
       numerocuenta: '',
       valormercado: '',
-      fecha: new Date(),
       autor: ''
     }
 
@@ -120,15 +125,19 @@ export class PortafolioComponent implements OnInit {
       return
     }
     this.ngxService.startLoader('load-inver')
-    var obj = {
-      "coleccion": "portafolio",
-      "objeto": this.Portafolio,
-      "donde": `{\"codigo\":\"${this.Portafolio.codigo}\"}`,
-      "driver": "MDBFIDE",
-      "upsert": true
-    }
+    // var obj = {
+    //   "coleccion": "portafolio",
+    //   "objeto": this.Portafolio,
+    //   "donde": `{\"codigo\":\"${this.Portafolio.codigo}\"}`,
+    //   "driver": "MDBFIDE",
+    //   "upsert": true
+    // }
+    this.xAPI.funcion = 'FID_IPortafolio'
+    this.xAPI.parametros = ''
+    this.xAPI.valores = JSON.stringify(this.Portafolio)
 
-    this.apiService.ExecColeccion(obj).subscribe(
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data)
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')

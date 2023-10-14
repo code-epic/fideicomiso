@@ -9,6 +9,7 @@ import { Inversion, InversionesService, MovInversion } from "src/app/services/ba
 import { UtilService } from "src/app/services/util/util.service";
 import { NgbModal, NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 import { Location } from '@angular/common';
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
   selector: 'app-consultainversiones',
@@ -16,6 +17,15 @@ import { Location } from '@angular/common';
   styleUrls: ['./consultainversiones.component.scss']
 })
 export class ConsultainversionesComponent implements OnInit {
+
+
+
+  @ViewChild('wzportafolio', { static: true }) wzportafolio: TemplateRef<any>;
+
+  @ViewChild('filex', { static: true }) filex: TemplateRef<any>;
+
+
+
   public Inversiones: Inversion = {
     identificador: 0,
     tipo_moneda: 0,
@@ -97,10 +107,13 @@ export class ConsultainversionesComponent implements OnInit {
   public fecha_emision : NgbDate | null
   public fecha_compra : NgbDate | null
   public fecha_vencimiento : NgbDate | null
+  public xinver : string = ''
+
 
   constructor(
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
+    public dialog: MatDialog, 
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
     public formatter: NgbDateParserFormatter,
@@ -148,6 +161,24 @@ export class ConsultainversionesComponent implements OnInit {
     );
   }
 
+
+
+  openDialog(e): void {
+
+    this.xinver = JSON.stringify(e)
+
+    const dialogRef = this.dialog.open(this.wzportafolio, {
+      width: '850px',
+      data: {},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      // this.animal = result;
+    });
+  }
+
+  
 
   getZFill(numero : any) : string{
 
@@ -404,7 +435,8 @@ export class ConsultainversionesComponent implements OnInit {
       let intereses =
         (inv.valor_nominal * (inv.tasa_cupon / 100) * diasCaidos) /
         inv.base_calculo;
-      this.Inversiones.intereses_caidos = intereses;
+
+      this.Inversiones.intereses_caidos = parseFloat(intereses.toFixed(2));;
     }
   }
 
@@ -432,6 +464,7 @@ export class ConsultainversionesComponent implements OnInit {
     this.Inversiones.rendimiento_vencimiento = parseFloat(rendicion.toFixed(2));
     this.AmortizacionDiaria();
   }
+
 
 
   //5 inversiones en papeles comerciales
@@ -478,5 +511,9 @@ export class ConsultainversionesComponent implements OnInit {
         this._snackBar.open("No se ha generado el movimiento 711...", "Error");
       }
     );
+  }
+
+  folder(){
+    
   }
 }

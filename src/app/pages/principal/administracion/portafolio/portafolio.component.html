@@ -8,8 +8,7 @@
                     <mat-label>Codigo</mat-label>
                     <input matInput placeholder="Codigo" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="Portafolio.codigo" value="{{Portafolio.codigo}}"
-                        (blur)="Consultar()">
-                    <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
+                       disabled="disabled">
 
                 </mat-form-field>
             </div>
@@ -46,10 +45,12 @@
    
 
         <div class="row">
-
+           
             <div class="col-md-12 text-right">
                 <hr>
                 <button mat-flat-button color="primary" (click)="Guardar()">Aceptar</button>
+                &nbsp;&nbsp;&nbsp;
+                <button mat-raised-button (click)="Seleccionar()">Listar</button>
             </div>
 
         </div>
@@ -57,7 +58,6 @@
     </form>
 </div>
 <div style="padding: 20px;" [ngStyle]="{'display':porta_search}">
-    <br>
     <div class="row">
         <div class="col-md-12 text-right">
             <button mat-icon-button aria-label="volver" (click)="atras()" >
@@ -71,6 +71,10 @@
             <div class="row">
 
                 <div class="col-md-1 texto-detalle">
+                    {{ e.id }}
+                </div>
+
+                <div class="col-md-2 texto-detalle">
                     {{ e.codigo | uppercase }}
                 </div>
                 <div class="col-md-4 texto-lista">
@@ -82,10 +86,7 @@
                 <div class="col-md-2 texto-detalle">
                     {{ e.frecuencia | uppercase }}
                 </div>
-                <div class="col-md-2 texto-detalle">
-                    {{ e.valormercado | uppercase }}
-                </div>
-
+               
                 <div class="col-md-1 text-right">
 
                     <button mat-icon-button aria-label="Editar" (click)="editar(e)">

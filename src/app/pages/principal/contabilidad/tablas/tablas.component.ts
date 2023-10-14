@@ -5,11 +5,14 @@ import { MatTableDataSource } from "@angular/material/table";
 import { MatPaginator } from "@angular/material/paginator";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
-import { IConfiguracionCuenta, ILConfiguracionCuenta, LConfiguracionCuenta } from "src/app/services/banfanb/contabilidad.service";
-import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
-
+import {
+  IConfiguracionCuenta,
+  ILConfiguracionCuenta,
+  LConfiguracionCuenta,
+} from "src/app/services/banfanb/contabilidad.service";
+import { FormControl } from "@angular/forms";
+import { Observable } from "rxjs";
+import { map, startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-tablas",
@@ -28,23 +31,24 @@ export class TablasComponent implements OnInit {
   ];
   dataSource: any;
 
-
   public ELEMENT_DATA_CUENTA: ILConfiguracionCuenta[] = [];
   displayedColumnsCuenta: string[] = [
     "codigo",
     "cuenta",
+    "operacion",
     "concepto",
     "definicion",
   ];
   dataSourceCuenta: any;
 
   public ILCuenta: ILConfiguracionCuenta = {
-    cuenta: '',
-    codigo: '',
-    instrumento: '',
-    concepto: '',
-    definicion: ''
-  }
+    cuenta: "",
+    codigo: "",
+    instrumento: "",
+    concepto: "",
+    definicion: "",
+    operacion: 0,
+  };
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   public txtCuenta: string;
@@ -56,12 +60,13 @@ export class TablasComponent implements OnInit {
     parametros: "",
   };
 
-  public ICuenta : IConfiguracionCuenta = {
+  public ICuenta: IConfiguracionCuenta = {
     accion: "",
     cuenta: 0,
     instrumento: 0,
-    tipo: ""
-  }
+    tipo: "",
+    operacion: 0,
+  };
 
   public focus: boolean = false;
   public active: boolean = false;
@@ -71,28 +76,28 @@ export class TablasComponent implements OnInit {
   public selectedIndex = 0;
   public buscar = "";
 
-  public cuenta : string = ''
-  public concepto : string = ''
-  public definicion : string = ''
+  public cuenta: string = "";
+  public operaciones: string = "";
+  public concepto: string = "";
+  public definicion: string = "";
 
-  myCuentas = new FormControl('');
+  myCuentas = new FormControl("");
   Cuentas: string[] = [];
   filteredCuentas: Observable<string[]>;
 
-  public lstCuentas = []
-  public lstXC = []
-  public lstXI = []
+  public lstCuentas = [];
+  public lstXC = [];
+  public lstXI = [];
 
-
-  public instrumento: string = '';
-  myInstrumento = new FormControl('');
+  public instrumento: string = "";
+  myInstrumento = new FormControl("");
   filInstrumento: Observable<string[]>;
   public lstInstrumento = [];
 
-  public blcod : boolean = false
-  public txtInstrumento : boolean = false
-  
-  public posicion: number = 0
+  public blcod: boolean = false;
+  public txtInstrumento: boolean = false;
+
+  public posicion: number = 0;
 
   constructor(
     private apiService: ApiService,
@@ -103,9 +108,9 @@ export class TablasComponent implements OnInit {
 
   ngOnInit(): void {
     // this.Listar()
-    this.cargarContenido()
-    this.cargarCuentas()
-    this.ListarInstrumento()
+    this.cargarContenido();
+    this.cargarCuentas();
+    this.ListarInstrumento();
   }
 
   Buscar(e) {}
@@ -136,25 +141,28 @@ export class TablasComponent implements OnInit {
       accion: "",
       cuenta: 0,
       instrumento: 0,
-      tipo: ""
-    }
-    this.cuenta = ''
-    this.instrumento = ''
-    this.definicion = ''
-    this.concepto = ''
-    this.myCuentas.setValue('')
-    this.txtInstrumento = false
-    this.ELEMENT_DATA_CUENTA = []
-    this.dataSourceCuenta = new MatTableDataSource<ILConfiguracionCuenta>(this.ELEMENT_DATA_CUENTA)
-    this.dataSourceCuenta.paginator = this.paginator
+      operacion: 0,
+      tipo: "",
+    };
+    this.cuenta = "";
+    this.instrumento = "";
+    this.definicion = "";
+    this.concepto = "";
+    this.myCuentas.setValue("");
+    this.txtInstrumento = false;
+    this.ELEMENT_DATA_CUENTA = [];
+    this.dataSourceCuenta = new MatTableDataSource<ILConfiguracionCuenta>(
+      this.ELEMENT_DATA_CUENTA
+    );
+    this.dataSourceCuenta.paginator = this.paginator;
   }
 
-  agregar(){
-    let codigo = 0
+  agregar() {
+    let codigo = 0;
 
-    this.lstXC.forEach(e => {
-      if ( this.cuenta.substring(0,23) == e.substring(0,23)){
-        codigo = parseInt( e.split('|')[2].toString() )
+    this.lstXC.forEach((e) => {
+      if (this.cuenta.substring(0, 23) == e.substring(0, 23)) {
+        codigo = parseInt(e.split("|")[2].toString());
       }
     });
     this.ILCuenta = {
@@ -162,35 +170,44 @@ export class TablasComponent implements OnInit {
       codigo: codigo.toString(),
       instrumento: this.instrumento,
       concepto: this.concepto,
-      definicion: this.definicion
-    }
-    this.ELEMENT_DATA_CUENTA.push(this.ILCuenta)
-    console.log(this.ILCuenta)
+      operacion: parseInt(this.operaciones),
+      definicion: this.definicion,
+    };
+    this.ELEMENT_DATA_CUENTA.push(this.ILCuenta);
+    console.log(this.ILCuenta);
 
-    this.dataSourceCuenta = new MatTableDataSource<ILConfiguracionCuenta>(this.ELEMENT_DATA_CUENTA)
-    this.dataSourceCuenta.paginator = this.paginator
-    this.cuenta = ''
-    this.myCuentas.setValue('')
-    this.txtInstrumento = true
+    this.dataSourceCuenta = new MatTableDataSource<ILConfiguracionCuenta>(
+      this.ELEMENT_DATA_CUENTA
+    );
+    this.dataSourceCuenta.paginator = this.paginator;
+    this.cuenta = "";
+    this.myCuentas.setValue("");
+    this.txtInstrumento = true;
   }
 
   Guardar() {
-    this.ngxService.startLoader('load-config')
-    
-    this.ICuenta.accion = this.ELEMENT_DATA_CUENTA[this.posicion].definicion
-    this.ICuenta.instrumento = parseInt( this.instrumento.split('|')[0].toString() )
-    this.ICuenta.tipo =   this.ELEMENT_DATA_CUENTA[this.posicion].concepto
-    this.ICuenta.cuenta =  parseInt(this.ELEMENT_DATA_CUENTA[this.posicion].codigo)
+    this.ngxService.startLoader("load-config");
+    let cont = this.instrumento.split("|")[0].toString();
+    this.ICuenta.accion = this.ELEMENT_DATA_CUENTA[this.posicion].definicion;
+    this.ICuenta.instrumento =
+      this.instrumento != ""
+        ? parseInt(this.instrumento.split("|")[0].toString())
+        : 0;
+    this.ICuenta.tipo = this.ELEMENT_DATA_CUENTA[this.posicion].concepto;
+    this.ICuenta.operacion = this.ELEMENT_DATA_CUENTA[this.posicion].operacion;
+    this.ICuenta.cuenta = parseInt(
+      this.ELEMENT_DATA_CUENTA[this.posicion].codigo
+    );
 
-    
-    this.lstCuentas = []
-    this.xAPI.funcion = "FID_IConfiguracionCuenta"
-    this.xAPI.parametros = ''
-    this.xAPI.valores = JSON.stringify(this.ICuenta)
+    // console.log(this.ICuenta);
 
-    
+    this.lstCuentas = [];
+    this.xAPI.funcion = "FID_IConfiguracionCuenta";
+    this.xAPI.parametros = "";
+    this.xAPI.valores = JSON.stringify(this.ICuenta);
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {   
+      (data) => {
         if(this.ELEMENT_DATA_CUENTA.length - 1 == this.posicion ) {
           this.Limpiar()
           this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
@@ -199,7 +216,7 @@ export class TablasComponent implements OnInit {
           this.posicion++
           this.Guardar()
         }
-       
+
       },
       (err) => {
         console.error(err)
@@ -207,59 +224,58 @@ export class TablasComponent implements OnInit {
     )
   }
 
-
   cargarCuentas(): any {
-
-    this.lstCuentas = []
-    this.xAPI.funcion = "FID_CCuentas"
-    this.xAPI.parametros = ''
-    this.xAPI.valores = ""
+    this.lstCuentas = [];
+    this.xAPI.funcion = "FID_CCuentas";
+    this.xAPI.parametros = "";
+    this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstCuentas = data.Cuerpo
-        
-        this.lstCuentas.forEach(e => {
+        this.lstCuentas = data.Cuerpo;
+
+        this.lstCuentas.forEach((e) => {
           let cta =
-          e.codigo_padre +
-          "." +
-          e.parte +
-          "." +
-          e.moneda +
-          "." +
-          e.nivel_1 +
-          "." +
-          e.nivel_2 +
-          "." +
-          e.nivel_3 +
-          "." +
-          e.nivel_4 +
-          "." +
-          e.nivel_5;
-          let valor = cta  + ' | ' + e.descripcion.toUpperCase()  
-          this.Cuentas.push(valor)
-          this.lstXC.push(valor + '|' + e.id)
+            e.codigo_padre +
+            "." +
+            e.parte +
+            "." +
+            e.moneda +
+            "." +
+            e.nivel_1 +
+            "." +
+            e.nivel_2 +
+            "." +
+            e.nivel_3 +
+            "." +
+            e.nivel_4 +
+            "." +
+            e.nivel_5;
+          let valor = cta + " | " + e.descripcion.toUpperCase();
+          this.Cuentas.push(valor);
+          this.lstXC.push(valor + "|" + e.id);
         });
 
         this.filteredCuentas = this.myCuentas.valueChanges.pipe(
-          startWith(''),
-          map(value => this._filterCuentas(value || '')),
+          startWith(""),
+          map((value) => this._filterCuentas(value || ""))
         );
       },
       (err) => {
-        console.error(err)
+        console.error(err);
       }
-    )
+    );
   }
 
- 
   private _filterCuentas(value: string): string[] {
     const filterValue = value.toLowerCase();
-    return this.Cuentas.filter(option => option.toLowerCase().includes(filterValue));
+    return this.Cuentas.filter((option) =>
+      option.toLowerCase().includes(filterValue)
+    );
   }
 
   ListarInstrumento() {
     this.xAPI.funcion = "FID_CInstrumento";
-    this.xAPI.parametros = '';
+    this.xAPI.parametros = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data != null && data.msj == undefined) {
@@ -269,8 +285,8 @@ export class TablasComponent implements OnInit {
           });
         }
         this.filInstrumento = this.myInstrumento.valueChanges.pipe(
-          startWith(''),
-          map((value) => this._filterInstrumento(value || ''))
+          startWith(""),
+          map((value) => this._filterInstrumento(value || ""))
         );
       },
       (error) => {
@@ -279,15 +295,12 @@ export class TablasComponent implements OnInit {
     );
   }
 
-
   private _filterInstrumento(value: string): string[] {
     const filterValue = value.toLowerCase();
     return this.lstInstrumento.filter((option) =>
       option.toLowerCase().includes(filterValue)
     );
   }
-
-
 
   cargarContenido(): any {
     this.ELEMENT_DATA = [];
@@ -306,7 +319,6 @@ export class TablasComponent implements OnInit {
               tipo: e.tipo,
               definicion: e.accion,
               accion: this.getNaturaleza(e.accion),
-
             });
           });
           // this.ELEMENT_DATA = data.Cuerpo;
@@ -330,6 +342,15 @@ export class TablasComponent implements OnInit {
       case "I":
         str = "INTERESES";
         break;
+      case "D":
+        str = "D. COMISIONES";
+        break;
+      case "F":
+        str = "FINIQUITO";
+        break;
+      case "P":
+        str = "PAGO INTERESES";
+        break;
       case "C":
         str = "COMPRA";
         break;
@@ -342,6 +363,9 @@ export class TablasComponent implements OnInit {
       case "G":
         str = "COBRO DE CUPON";
         break;
+        case "Q":
+          str = "P. COMISIONES";
+          break;
       case "X":
         str = "COMPRA / VENTA";
         break;
@@ -351,9 +375,11 @@ export class TablasComponent implements OnInit {
     return str;
   }
 
-  getNaturaleza(nat : string) : string{
-    return nat=='D'?'DISMINUYE': 'AUMENTA'
+  getNaturaleza(nat: string): string {
+    return nat == "D" ? "DISMINUYE" : "AUMENTA";
   }
 
-
+  getOperaciones(e): string {
+    return e == "0" ? "CONTRATOS" : "INVERSIONES";
+  }
 }
