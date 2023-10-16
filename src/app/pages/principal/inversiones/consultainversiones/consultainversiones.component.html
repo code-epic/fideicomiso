@@ -428,6 +428,7 @@
                                       <input matInput placeholder="Dias Caidos"
                                       type="number"
                                       [(ngModel)]="Inversiones.dias_caidos"
+                                      (blur)="InteresesCaidos()"
                                       >
                                   </mat-form-field>
                               </div>

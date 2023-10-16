@@ -404,7 +404,8 @@ export class ConsultainversionesComponent implements OnInit {
       let intereses =
         (inv.valor_nominal * (inv.tasa_cupon / 100) * diasCaidos) /
         inv.base_calculo;
-      this.Inversiones.intereses_caidos = intereses;
+
+      this.Inversiones.intereses_caidos = parseFloat(intereses.toFixed(2));;
     }
   }
 
@@ -432,6 +433,7 @@ export class ConsultainversionesComponent implements OnInit {
     this.Inversiones.rendimiento_vencimiento = parseFloat(rendicion.toFixed(2));
     this.AmortizacionDiaria();
   }
+
 
 
   //5 inversiones en papeles comerciales

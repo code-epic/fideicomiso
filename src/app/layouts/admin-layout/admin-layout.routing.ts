@@ -26,6 +26,7 @@ import { TablasComponent } from 'src/app/pages/principal/contabilidad/tablas/tab
 import { ConfiguracionesComponent } from 'src/app/pages/principal/administracion/configuraciones/configuraciones.component'
 import { SaldosinversionesComponent } from 'src/app/pages/principal/inversiones/saldosinversiones/saldosinversiones.component'
 import { ConsultainversionesComponent } from 'src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component'
+import { ProcesooperacionesComponent } from 'src/app/pages/principal/operaciones/procesooperaciones/procesooperaciones.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -99,6 +100,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'operaciones',
         component: OperacionesComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'procesooperaciones',
+        component: ProcesooperacionesComponent,
         canActivate: [AuthGuardGuard]
     },{
         path: 'procesos',

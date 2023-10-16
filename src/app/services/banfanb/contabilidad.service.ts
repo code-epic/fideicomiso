@@ -49,6 +49,7 @@ export interface LPosicionInversiones {
 export interface ILConfiguracionCuenta {
   cuenta: string
   codigo: string
+  operacion: number
   instrumento: string
   concepto: string
   definicion: string
@@ -58,6 +59,7 @@ export interface ILConfiguracionCuenta {
 export interface IConfiguracionCuenta {
   accion: string
   cuenta: number
+  operacion: number
   instrumento: number
   tipo: string
 }

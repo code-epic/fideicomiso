@@ -724,29 +724,29 @@ export class ContratosComponent implements OnInit {
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.movimiento);
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.movimiento.cuenta = 18,
-        this.movimiento.debe = 0,
-        this.movimiento.haber = monto
+    // this.apiService.Ejecutar(this.xAPI).subscribe(
+    //   (data) => {
+    //     this.movimiento.cuenta = 18,
+    //     this.movimiento.debe = 0,
+    //     this.movimiento.haber = monto
 
-        this.xAPI.valores = JSON.stringify(this.movimiento);
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          (data) => {
-            this._snackBar.open("Movimientos de Comisiones Generado...", "Ok");
-          },
-          (error) => {
-            this._snackBar.open(
-              "No se ha generado el movimiento.. 712.",
-              "Error"
-            );
-          }
-        )
-      },
-      (error) => {
-        this._snackBar.open("No se ha generado el movimiento 711...", "Error");
-      }
-    );
+    //     this.xAPI.valores = JSON.stringify(this.movimiento);
+    //     this.apiService.Ejecutar(this.xAPI).subscribe(
+    //       (data) => {
+    //         this._snackBar.open("Movimientos de Comisiones Generado...", "Ok");
+    //       },
+    //       (error) => {
+    //         this._snackBar.open(
+    //           "No se ha generado el movimiento.. 712.",
+    //           "Error"
+    //         );
+    //       }
+    //     )
+    //   },
+    //   (error) => {
+    //     this._snackBar.open("No se ha generado el movimiento 711...", "Error");
+    //   }
+    // );
   }
 
 }

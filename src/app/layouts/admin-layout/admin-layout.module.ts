@@ -65,6 +65,7 @@ import { ConsultainversionesComponent } from 'src/app/pages/principal/inversione
 import { SaldosinversionesComponent } from 'src/app/pages/principal/inversiones/saldosinversiones/saldosinversiones.component';
 import { ProcesosinversionesComponent } from 'src/app/pages/principal/inversiones/procesosinversiones/procesosinversiones.component';
 import { ConciliacionesinversionesComponent } from 'src/app/pages/principal/inversiones/conciliacionesinversiones/conciliacionesinversiones.component';
+import { ProcesooperacionesComponent } from 'src/app/pages/principal/operaciones/procesooperaciones/procesooperaciones.component';
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 
 @NgModule({
@@ -139,6 +140,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     SaldosinversionesComponent,
     ProcesosinversionesComponent,
     ConciliacionesinversionesComponent,
+    ProcesooperacionesComponent
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},
