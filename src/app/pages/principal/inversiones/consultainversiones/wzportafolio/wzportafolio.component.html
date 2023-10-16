@@ -1,0 +1,120 @@
+<h3>{{titulo}}</h3>
+<hr>
+
+
+
+
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>
+                VALOR NOMINAL DE LA INVERSION: <b>{{Inversiones.valor_nominal}}</b> Bs.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <mat-form-field appearance="outline">
+                <mat-label>Portafiloio</mat-label>
+
+                <mat-select placeholder="Portafiloio"
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="portafolio"
+                    value="{{portafolio}}">
+                    <mat-option *ngFor="let e of lstDataPortafolio" 
+                    value="{{e.id + '|' + e.descripcion}}">{{e.descripcion | uppercase}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field appearance="outline">
+                <mat-label>Porcentaje</mat-label>
+                <input matInput placeholder="Porcentaje"
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="porcentaje"
+                    value="{{porcentaje}}">
+            </mat-form-field>
+        </div>
+        <div class="col-md-2 text-right">
+            <div class="asistente-button-container">
+      
+                <button mat-button color="primary" (click)="Agregar()"> 
+                  <mat-icon>add</mat-icon> Agregar
+                </button>
+              </div>
+        </div>
+
+
+    </div>
+
+
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <mat-selection-list>
+                <mat-list *ngFor="let e of lstInversiones; let i=index "
+                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                    <div class="row">
+
+                        <div class="col-md-7 texto-lista">
+                            {{ e.descripcion | uppercase }}
+                        </div>
+                        <div class="col-md-2 texto-lista">
+                             {{ e.porcentaje }} %.
+                        </div>
+
+                        <div class="col-md-2 texto-detalle">
+                            {{ getStatus(e.estatus) }}
+                        </div>
+
+                        <div class="col-md-1 text-right">
+
+                            <button mat-icon-button aria-label="Editar" (click)="editar(e)">
+                                <mat-icon class="texto-gray">edit</mat-icon>
+                            </button>
+
+                        </div>
+                    </div>
+                </mat-list>
+            </mat-selection-list>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <mat-list>
+                <div class="row">
+
+                    <div class="col-md-7 texto-lista">
+                        TOTAL DEL PORCENTAJE
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                        {{ total }} %.
+                   </div>
+
+                </div>
+
+            </mat-list>
+        </div>
+
+        <div class="col-md-12 text-right">
+            <hr>
+            <div >
+                <button mat-flat-button color="primary" (click)="Commit()" *ngIf="blSave"> 
+                    <mat-icon>save</mat-icon>&nbsp;&nbsp;Guardar
+                  </button>
+                  &nbsp;&nbsp;
+                <button mat-flat-button color="warn" (click)="Close()"> 
+                  <mat-icon>cancel</mat-icon>&nbsp;&nbsp;Cancelar
+                </button>
+              </div>
+        </div>
+        
+    </div>
+</div>

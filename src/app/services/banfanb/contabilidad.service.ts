@@ -80,6 +80,7 @@ export interface PlanFideicomiso {
   tipo_comision: number
   clasificacion: string
   tipo_fideicomiso: string
+  portafolio: number
   fideicomiso: string
 }
 

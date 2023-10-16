@@ -48,6 +48,16 @@ export interface MovInversion {
   fecha_operacion: string;
 };
 
+
+export interface InversionPortafolio {
+  id_inversion: number,
+  id_portafolio: number,
+  porcentaje: number,
+  estatus: number,
+  descripcion: string
+  usuario: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -61,9 +71,9 @@ export class InversionesService {
 
 
 
-  constructor() {}
+  constructor() { }
 
 
 
-  
+
 }

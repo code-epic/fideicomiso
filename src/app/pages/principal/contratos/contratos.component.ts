@@ -122,6 +122,7 @@ export class ContratosComponent implements OnInit {
     clasificacion: '',
     tipo_fideicomiso: '',
     fideicomiso: '',
+    portafolio : 0,
     identificador: 0
   }
 
@@ -202,6 +203,8 @@ export class ContratosComponent implements OnInit {
 
   public oficinatutora = 'Oficina Tutora'
 
+  public lstDataPortafolio = []
+
   public saldo_inicio = ''
 
   constructor(
@@ -218,6 +221,7 @@ export class ContratosComponent implements OnInit {
     this.ListarEstados()
     this.ListarEjecutivos()
     this.ListarOficinas()
+    this.ListarPortafolio()
   }
 
 
@@ -608,6 +612,8 @@ export class ContratosComponent implements OnInit {
     this.planFideicomiso.clasificacion = this.Contrato.clasificacion
     this.planFideicomiso.tipo_fideicomiso =  this.Contrato.tipo
     this.planFideicomiso.fideicomiso = this.Contrato.plan
+
+    this.planFideicomiso.portafolio = parseInt( this.Contrato.Politicas.portafolionomb)
   }
 
   Guardar() {
@@ -686,6 +692,22 @@ export class ContratosComponent implements OnInit {
 
   }
 
+  ListarPortafolio(){
+    this.xAPI.funcion = "FID_CPortafolios"
+    this.xAPI.parametros = this.Contrato.Politicas.portafolio
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+          this.lstDataPortafolio = data.Cuerpo
+      },
+      (error) => {
+        console.log(error)
+        
+      }
+    )
+
+  }
+
   ConsultarPortafolio() {
 
     this.xAPI.funcion = "FID_CPortafolio"
@@ -695,7 +717,7 @@ export class ContratosComponent implements OnInit {
       (data) => {
        
         if (data != null && data.msj == undefined) {
-          this.Contrato.Politicas.portafolionomb = data[0].descripcion
+          this.Contrato.Politicas.portafolionomb = data.Cuerpo[0].descripcion
         } else {
           let aux = this.Contrato.Politicas.portafolio
           this.Contrato.Politicas.portafolio = aux
