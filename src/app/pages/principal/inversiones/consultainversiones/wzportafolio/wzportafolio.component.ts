@@ -145,7 +145,8 @@ export class WzportafolioComponent implements OnInit {
       data => {
 
         this.lstInversiones = data.Cuerpo
-        this.total =  this.lstInversiones.reduce((sum, e) => sum + parseFloat(e.porcentaje), 0)
+        if( this.lstInversiones!= undefined ) 
+          this.total =  this.lstInversiones.reduce((sum, e) => sum + parseFloat(e.porcentaje), 0)
         this.Limpiar()
       },
       error => {
