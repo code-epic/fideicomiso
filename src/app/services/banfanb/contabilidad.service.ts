@@ -81,6 +81,7 @@ export interface PlanFideicomiso {
   clasificacion: string
   tipo_fideicomiso: string
   portafolio: number
+  porcentaje: number
   fideicomiso: string
 }
 

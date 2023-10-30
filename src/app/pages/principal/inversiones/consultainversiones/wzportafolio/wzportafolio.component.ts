@@ -27,9 +27,12 @@ export class WzportafolioComponent implements OnInit {
   }
   @Input() xinver: string
 
-  public portafolio
+  public portafolio 
 
-  public porcentaje
+  public porcentaje : any
+
+  public monto = 0
+  public monto_general = 0
 
   public lstDataPortafolio = []
 
@@ -177,6 +180,25 @@ export class WzportafolioComponent implements OnInit {
     )
 
   } 
+
+  ConsultarMontoPortafolio(){
+    let portf = this.portafolio.split('|')
+   
+    this.xAPI.funcion = 'FID_CMontoPortafolio'
+    this.xAPI.parametros = portf[0]
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {        
+        console.log(data)
+        this.monto = data.Cuerpo .reduce((sum, e) => sum + parseFloat(e.monto), 0)
+        this.monto_general = data.Cuerpo .reduce((sum, e) => sum + parseFloat(e.monto_general), 0)
+      },
+      error => {
+        console.error(error)
+
+      }
+    )
+  }
   
   Close(){
 

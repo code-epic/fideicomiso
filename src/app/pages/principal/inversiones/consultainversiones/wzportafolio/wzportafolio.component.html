@@ -10,26 +10,38 @@
     <div class="row">
         <div class="col-md-12">
             <p>
-                VALOR NOMINAL DE LA INVERSION: <b>{{Inversiones.valor_nominal}}</b> Bs.
+               SALDO DISPONIBLE DEL PORTAFOLIO: <b>{{monto}}</b> Bs.<br>
+               VALOR NOMINAL DE LA INVERSION: <b>{{Inversiones.valor_nominal}}</b> Bs.
             </p>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <mat-form-field appearance="outline">
                 <mat-label>Portafiloio</mat-label>
 
                 <mat-select placeholder="Portafiloio"
                     [ngModelOptions]="{standalone: true}"
                     [(ngModel)]="portafolio"
+                    (selectionChange)="ConsultarMontoPortafolio()"
                     value="{{portafolio}}">
                     <mat-option *ngFor="let e of lstDataPortafolio" 
                     value="{{e.id + '|' + e.descripcion}}">{{e.descripcion | uppercase}}</mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <mat-form-field appearance="outline">
+                <mat-label>Saldo para invertir</mat-label>
+                <input matInput placeholder="Saldo para invertir"
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="monto_general" currencyMask
+                    [options]="{ prefix: 'Bs. ', thousands: '.', decimal: ',' }"
+                    value="{{monto_general}}">
+            </mat-form-field>
+        </div>
+        <div class="col-md-2">
             <mat-form-field appearance="outline">
                 <mat-label>Porcentaje</mat-label>
                 <input matInput placeholder="Porcentaje"

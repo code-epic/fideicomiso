@@ -41,6 +41,24 @@
 
 
         </div>
+        <div class="row">
+            <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                    <mat-label>Máximo de inversión</mat-label>
+                    <input matInput placeholder="Máximo de inversión"
+                        [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="Portafolio.porcentaje" value="{{Portafolio.porcentaje}}">
+                </mat-form-field>
+            </div>
+            <!-- <div class="col-md-4">
+                <mat-form-field appearance="outline">
+                    <mat-label>Capital maximo para invertir</mat-label>
+                    <input matInput placeholder="Capital maximo para invertir"
+                        [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="Portafolio.tipo" value="{{Portafolio.tipo}}">
+                </mat-form-field>
+            </div> -->
+        </div>
 
    
 
@@ -83,10 +101,10 @@
                 <div class="col-md-2 texto-detalle">
                     {{ e.moneda | uppercase }}
                 </div>
-                <div class="col-md-2 texto-detalle">
-                    {{ e.frecuencia | uppercase }}
+                <div class="col-md-2 texto-lista">
+                    {{ e.porcentaje | uppercase }} %
                 </div>
-               
+              
                 <div class="col-md-1 text-right">
 
                     <button mat-icon-button aria-label="Editar" (click)="editar(e)">

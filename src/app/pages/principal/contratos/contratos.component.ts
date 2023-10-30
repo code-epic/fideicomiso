@@ -123,6 +123,7 @@ export class ContratosComponent implements OnInit {
     tipo_fideicomiso: '',
     fideicomiso: '',
     portafolio : 0,
+    porcentaje : 0,
     identificador: 0
   }
 
@@ -612,6 +613,7 @@ export class ContratosComponent implements OnInit {
     this.planFideicomiso.clasificacion = this.Contrato.clasificacion
     this.planFideicomiso.tipo_fideicomiso =  this.Contrato.tipo
     this.planFideicomiso.fideicomiso = this.Contrato.plan
+    this.planFideicomiso.porcentaje = this.Contrato.Politicas.numeromaximo
 
     this.planFideicomiso.portafolio = parseInt( this.Contrato.Politicas.portafolionomb)
   }

@@ -20,6 +20,7 @@ export class PortafolioComponent implements OnInit {
     tipo: '',
     numerocuenta: '',
     valormercado: '',
+    porcentaje: 0,
     autor: ''
   }
 
@@ -111,6 +112,7 @@ export class PortafolioComponent implements OnInit {
       tipo: '',
       numerocuenta: '',
       valormercado: '',
+      porcentaje : 0,
       autor: ''
     }
 

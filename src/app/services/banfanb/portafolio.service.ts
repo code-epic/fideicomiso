@@ -10,6 +10,7 @@ export interface Portafolio {
   tipo : string
   numerocuenta : string
   valormercado : string
+  porcentaje : number
   autor : string
 }
 

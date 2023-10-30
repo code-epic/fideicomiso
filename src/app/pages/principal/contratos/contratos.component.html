@@ -662,7 +662,18 @@
                                                                     value="{{Contrato.Politicas.tasaflat}}">
                                                             </mat-form-field>
                                                         </div>
+                                                        <div class="col-md-5">
+                                                            <mat-form-field appearance="outline">
+                                                                <mat-label>Máximo de inversión</mat-label>
+                                                                <input matInput placeholder="Máximo de inversión"
+                                                                    [ngModelOptions]="{standalone: true}"
+                                                                    [(ngModel)]="Contrato.Politicas.numeromaximo"
+                                                                    value="{{Contrato.Politicas.numeromaximo}}">
+                                                             
 
+
+                                                            </mat-form-field>
+                                                        </div>
 
 
 
