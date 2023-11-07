@@ -1,13 +1,13 @@
--- MariaDB dump 10.19  Distrib 10.6.15-MariaDB, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.32, for Linux (x86_64)
 --
 -- Host: localhost    Database: fideicomiso
 -- ------------------------------------------------------
--- Server version	10.6.15-MariaDB
+-- Server version	8.0.32
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!50503 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -16,25 +16,33 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Current Database: `fideicomiso`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `fideicomiso` /*!40100 DEFAULT CHARACTER SET utf32 */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `fideicomiso`;
+
+--
 -- Table structure for table `comprobante`
 --
 
 DROP TABLE IF EXISTS `comprobante`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `comprobante` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `plan` varchar(255) DEFAULT NULL,
   `codigo` varchar(255) DEFAULT NULL,
   `descripcion` varchar(255) DEFAULT NULL,
   `detalle` varchar(255) DEFAULT NULL,
   `fecha_operacion` date DEFAULT NULL,
   `fecha_ejercicio` date DEFAULT NULL,
-  `fecha_creacion` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `debe` decimal(15,2) DEFAULT NULL,
   `haber` decimal(15,2) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf32 COLLATE=utf32_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -53,9 +61,9 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `cuenta`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cuenta` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `codigo_padre` char(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci DEFAULT NULL,
   `parte` char(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci DEFAULT NULL,
   `moneda` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci DEFAULT NULL,
@@ -67,9 +75,9 @@ CREATE TABLE `cuenta` (
   `descripcion` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci DEFAULT NULL,
   `aumenta` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci DEFAULT NULL,
   `disminuye` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci DEFAULT NULL,
-  `totalizadora` int(11) DEFAULT NULL,
-  `fecha` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  `usuario` char(64) CHARACTER SET utf32 COLLATE utf32_general_ci DEFAULT NULL,
+  `totalizadora` int DEFAULT NULL,
+  `fecha` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `usuario` char(64) CHARACTER SET utf32 DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -90,17 +98,17 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `cuenta_configuracion`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cuenta_configuracion` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `idc` int(11) DEFAULT NULL,
-  `idi` int(11) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `idc` int DEFAULT NULL,
+  `idi` int DEFAULT NULL,
   `tip` char(1) DEFAULT NULL,
   `acc` char(1) DEFAULT NULL,
-  `fecha_creacion` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `ope` int(11) DEFAULT NULL,
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `ope` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf32 COLLATE=utf32_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -119,16 +127,16 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `detalle_comprobante`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `detalle_comprobante` (
-  `id_comprobante` int(11) DEFAULT NULL,
-  `cuenta` int(11) DEFAULT NULL,
+  `id_comprobante` int DEFAULT NULL,
+  `cuenta` int DEFAULT NULL,
   `debe` decimal(15,2) DEFAULT NULL,
   `haber` decimal(15,2) DEFAULT NULL,
   `fecha_operacion` date DEFAULT NULL,
   `fecha_ejercicio` date DEFAULT NULL,
-  `fecha_creacion` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_general_ci;
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -147,12 +155,12 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `instrumento`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `instrumento` (
-  `id` int(11) DEFAULT NULL,
+  `id` int DEFAULT NULL,
   `nombre` varchar(256) DEFAULT NULL,
-  `fecha_creacion` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_general_ci;
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -171,42 +179,42 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `inversiones`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `inversiones` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fecha` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `id` int NOT NULL AUTO_INCREMENT,
+  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `numero` varchar(6) DEFAULT NULL,
-  `id_cartera` int(11) DEFAULT NULL,
-  `id_portafolio` int(11) DEFAULT NULL,
+  `id_cartera` int DEFAULT NULL,
+  `id_portafolio` int DEFAULT NULL,
   `codigo_isin` varchar(128) DEFAULT NULL,
-  `id_instrumento` int(11) DEFAULT NULL,
+  `id_instrumento` int DEFAULT NULL,
   `instrumento` varchar(255) DEFAULT NULL,
   `custodio` varchar(255) DEFAULT NULL,
   `emisor` varchar(255) DEFAULT NULL,
   `fecha_emision` date DEFAULT NULL,
   `fecha_compra` date DEFAULT NULL,
   `fecha_vencimiento` date DEFAULT NULL,
-  `tipo_moneda` int(11) DEFAULT NULL,
+  `tipo_moneda` int DEFAULT NULL,
   `pais` varchar(255) DEFAULT NULL,
-  `estatus` int(11) DEFAULT NULL,
-  `tipo_inversion` int(11) DEFAULT NULL,
+  `estatus` int DEFAULT NULL,
+  `tipo_inversion` int DEFAULT NULL,
   `valor_nominal` decimal(15,2) DEFAULT NULL,
   `precio_compra` decimal(15,2) DEFAULT NULL,
   `costo_adquisicion` decimal(15,2) DEFAULT NULL,
   `tasa_cupon` decimal(15,2) DEFAULT NULL,
-  `base_calculo` int(11) DEFAULT NULL,
-  `plazo_cupon` int(11) DEFAULT NULL,
+  `base_calculo` int DEFAULT NULL,
+  `plazo_cupon` int DEFAULT NULL,
   `rendimiento_cupon` decimal(15,2) DEFAULT NULL,
   `interes_diario` decimal(15,2) DEFAULT NULL,
-  `plazo_vencimiento` int(11) DEFAULT NULL,
+  `plazo_vencimiento` int DEFAULT NULL,
   `rendimiento_vencimiento` decimal(15,2) DEFAULT NULL,
-  `dias_caidos` int(11) DEFAULT NULL,
+  `dias_caidos` int DEFAULT NULL,
   `intereses_caidos` decimal(15,2) DEFAULT NULL,
   `amortizacion_diaria` decimal(15,2) DEFAULT NULL,
   `primas` decimal(15,2) DEFAULT NULL,
   `descuento` decimal(15,2) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf32 COLLATE=utf32_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -225,22 +233,22 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `mov_comision`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mov_comision` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fecha` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `id_plan` int(11) DEFAULT NULL,
-  `id_cuenta` int(11) DEFAULT NULL,
-  `estatus` int(11) DEFAULT NULL,
-  `fecha_operacion` date DEFAULT '1900-01-01',
-  `fecha_precierre` date DEFAULT '1900-01-01',
-  `fecha_cierre` date DEFAULT '1900-01-01',
+  `id` int NOT NULL AUTO_INCREMENT,
+  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id_plan` int DEFAULT NULL,
+  `id_cuenta` int DEFAULT NULL,
+  `estatus` int DEFAULT NULL,
+  `fecha_operacion` date DEFAULT (_utf8mb4'1900-01-01'),
+  `fecha_precierre` date DEFAULT (_utf8mb4'1900-01-01'),
+  `fecha_cierre` date DEFAULT (_utf8mb4'1900-01-01'),
   `debe` decimal(15,2) DEFAULT NULL,
   `haber` decimal(15,2) DEFAULT NULL,
   `usuario` varchar(128) DEFAULT NULL,
   `llave` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf32 COLLATE=utf32_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -259,18 +267,18 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `mov_devengo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mov_devengo` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fecha` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `id_plan` int(11) DEFAULT NULL,
-  `estatus` int(11) DEFAULT NULL,
-  `fecha_operacion` date DEFAULT '1900-01-01',
+  `id` int NOT NULL AUTO_INCREMENT,
+  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id_plan` int DEFAULT NULL,
+  `estatus` int DEFAULT NULL,
+  `fecha_operacion` date DEFAULT (_utf8mb4'1900-01-01'),
   `monto` decimal(15,2) DEFAULT NULL,
   `usuario` varchar(128) DEFAULT NULL,
   `llave` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -288,23 +296,23 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `movimientos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `movimientos` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fecha` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `id_inversion` int(11) DEFAULT NULL,
-  `id_comprobante` int(11) DEFAULT NULL,
-  `id_cuenta` int(11) DEFAULT NULL,
-  `estatus` int(11) DEFAULT NULL,
-  `fecha_operacion` date DEFAULT '1900-01-01',
-  `fecha_cierre` date DEFAULT '1900-01-01',
+  `id` int NOT NULL AUTO_INCREMENT,
+  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id_inversion` int DEFAULT NULL,
+  `id_comprobante` int DEFAULT NULL,
+  `id_cuenta` int DEFAULT NULL,
+  `estatus` int DEFAULT NULL,
+  `fecha_operacion` date DEFAULT (_utf8mb4'1900-01-01'),
+  `fecha_cierre` date DEFAULT (_utf8mb4'1900-01-01'),
   `debe` decimal(15,2) DEFAULT NULL,
   `haber` decimal(15,2) DEFAULT NULL,
   `usuario` varchar(128) DEFAULT NULL,
   `llave` varchar(255) DEFAULT NULL,
-  `id_plan` int(11) DEFAULT NULL,
+  `id_plan` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf32 COLLATE=utf32_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -323,28 +331,28 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `plan_fideicomiso`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `plan_fideicomiso` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `fideicomiso` varchar(255) DEFAULT NULL,
   `tipo_fideicomiso` varchar(255) DEFAULT NULL,
   `clasificacion` varchar(255) DEFAULT NULL,
-  `tipo_comision` int(11) DEFAULT NULL,
+  `tipo_comision` int DEFAULT NULL,
   `tasa_comision` decimal(5,2) DEFAULT NULL,
-  `tipo_calculo` int(11) DEFAULT NULL,
-  `comision_flat` int(11) DEFAULT NULL,
+  `tipo_calculo` int DEFAULT NULL,
+  `comision_flat` int DEFAULT NULL,
   `tasa_flat` decimal(5,2) DEFAULT NULL,
-  `frecuencia` int(11) DEFAULT NULL,
-  `metodo_ganancia` int(11) DEFAULT NULL,
+  `frecuencia` int DEFAULT NULL,
+  `metodo_ganancia` int DEFAULT NULL,
   `monto_apertura` decimal(15,2) DEFAULT NULL,
-  `fecha` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `usuario` varchar(128) DEFAULT NULL,
-  `estatus` int(11) DEFAULT NULL,
+  `estatus` int DEFAULT NULL,
   `observacion` varchar(255) DEFAULT NULL,
   `fecha_apertura` date DEFAULT NULL,
-  `portafolio` int(11) DEFAULT NULL,
+  `portafolio` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -353,7 +361,7 @@ CREATE TABLE `plan_fideicomiso` (
 
 LOCK TABLES `plan_fideicomiso` WRITE;
 /*!40000 ALTER TABLE `plan_fideicomiso` DISABLE KEYS */;
-INSERT INTO `plan_fideicomiso` VALUES (1,'ADMINISTRACION','OTROS','1',1,2.50,1,1,1.00,5,2,1926224.12,'2023-10-14 16:54:59','',2,'G-20000085-6|banco nacional de habitat y vivienda (banavih)','2023-06-01',1);
+INSERT INTO `plan_fideicomiso` VALUES (1,'ADMINISTRACION','OTROS','1',1,2.50,1,1,1.00,5,2,1926224.12,'2023-09-09 19:06:31','',2,'G-20000085-6|banco nacional de habitat y vivienda (banavih)','2023-06-01',NULL);
 /*!40000 ALTER TABLE `plan_fideicomiso` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -363,19 +371,19 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `portafolio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `portafolio` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `codigo` varchar(16) DEFAULT NULL,
-  `autor` varchar(255) DEFAULT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
-  `distribucion` varchar(255) DEFAULT NULL,
-  `frecuencia` varchar(255) DEFAULT NULL,
-  `moneda` varchar(255) DEFAULT NULL,
-  `numerocuenta` varchar(255) DEFAULT NULL,
-  `tipo` varchar(255) DEFAULT NULL,
-  `valormercado` varchar(255) DEFAULT NULL,
-  `fecha` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `id` int NOT NULL AUTO_INCREMENT,
+  `codigo` varchar(16) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `autor` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `distribucion` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `frecuencia` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `moneda` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `numerocuenta` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tipo` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `valormercado` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -386,7 +394,7 @@ CREATE TABLE `portafolio` (
 
 LOCK TABLES `portafolio` WRITE;
 /*!40000 ALTER TABLE `portafolio` DISABLE KEYS */;
-INSERT INTO `portafolio` VALUES (1,'z7f3k0pt07k','','portafolio de inversiones','','','BS','','','','2023-10-14 16:31:00'),(2,'lkoi88nfrg','','portafolio de administracion','','','BS','','','','2023-10-14 16:38:01');
+INSERT INTO `portafolio` VALUES (1,'z7f3k0pt07k','','portafolio de inversiones','','','BS','','','','2023-10-14 20:31:00'),(2,'lkoi88nfrg','','portafolio de administracion','','','BS','','','','2023-10-14 20:38:01');
 /*!40000 ALTER TABLE `portafolio` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -396,19 +404,19 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `posicion_inversiones`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `posicion_inversiones` (
-  `id_inversion` int(11) NOT NULL,
-  `estatus` int(11) DEFAULT NULL,
-  `fecha_operacion` date NOT NULL DEFAULT '1900-01-01',
+  `id_inversion` int NOT NULL,
+  `estatus` int DEFAULT NULL,
+  `fecha_operacion` date NOT NULL DEFAULT (_utf8mb4'1900-01-01'),
   `monto` decimal(15,2) NOT NULL,
   `tipo` char(1) DEFAULT NULL,
   `usuario` varchar(128) DEFAULT NULL,
-  `fecha` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `llave` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id_inversion`,`fecha_operacion`,`monto`),
   KEY `fecha_operacion` (`fecha_operacion`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -427,19 +435,19 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `saldos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `saldos` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fecha` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `id_cuenta` int(11) DEFAULT NULL,
-  `estatus` int(11) DEFAULT NULL,
-  `fecha_cierre` date DEFAULT '1900-01-01',
+  `id` int NOT NULL AUTO_INCREMENT,
+  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id_cuenta` int DEFAULT NULL,
+  `estatus` int DEFAULT NULL,
+  `fecha_cierre` date DEFAULT (_utf8mb4'1900-01-01'),
   `saldo` decimal(15,2) DEFAULT NULL,
   `usuario` varchar(128) DEFAULT NULL,
   `llave` varchar(255) DEFAULT NULL,
-  `id_plan` int(11) DEFAULT NULL,
+  `id_plan` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf32 COLLATE=utf32_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -458,17 +466,17 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `zr_inversiones_portafolios`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `zr_inversiones_portafolios` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_inversion` int(11) DEFAULT NULL,
-  `id_portafolio` int(11) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_inversion` int DEFAULT NULL,
+  `id_portafolio` int DEFAULT NULL,
   `porcentaje` decimal(5,2) DEFAULT NULL,
-  `estatus` int(11) DEFAULT NULL,
+  `estatus` int DEFAULT NULL,
   `usuario` varchar(255) DEFAULT NULL,
-  `fecha` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `fecha` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -477,7 +485,6 @@ CREATE TABLE `zr_inversiones_portafolios` (
 
 LOCK TABLES `zr_inversiones_portafolios` WRITE;
 /*!40000 ALTER TABLE `zr_inversiones_portafolios` DISABLE KEYS */;
-INSERT INTO `zr_inversiones_portafolios` VALUES (1,1,1,50.00,1,'',NULL),(2,1,2,50.00,1,'',NULL);
 /*!40000 ALTER TABLE `zr_inversiones_portafolios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -490,4 +497,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-10-14 16:23:31
+-- Dump completed on 2023-10-30 14:43:16
