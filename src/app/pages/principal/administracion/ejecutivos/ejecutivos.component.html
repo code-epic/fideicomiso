@@ -23,19 +23,6 @@
                     <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
                 </mat-form-field>
             </div>
-
-            <!-- <div class="col-md-2">
-                <mat-form-field appearance="outline">
-                    <mat-label>Estatus/Ejecutivo</mat-label>
-                    <mat-select placeholder="Estatus Ejecutivo" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.estatus" value="{{Ejecutivo.estatus}}">
-                        <mat-option value=0>INACTIVO</mat-option>
-                        <mat-option value=1>ACTIVO</mat-option>
-                    </mat-select>
-                    <mat-icon matSuffix>home</mat-icon>
-
-                </mat-form-field>
-            </div> -->
             <div class="col-md-5">
                 <mat-form-field appearance="outline">
                     <mat-label>Actividad del Cliente</mat-label>
@@ -49,18 +36,6 @@
 
                 </mat-form-field>
             </div>
-            <!-- <div class="col-md-3">
-                <mat-form-field appearance="outline">
-                    <mat-label>Estado Civil</mat-label>
-                    <mat-select placeholder="Estado Civil" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.estadocivil" value="{{Ejecutivo.estadocivil}}">
-                        <mat-option value="0">SELECCIONE</mat-option>
-                        <mat-option value="CASADO">CASADO (A)</mat-option>
-                        <mat-option value="SOLTERO">SOLTERO (A) </mat-option>
-                    </mat-select>
-                    <mat-icon matSuffix>face</mat-icon>
-                </mat-form-field>
-            </div> -->
 
         </div>
 
@@ -83,93 +58,9 @@
 
                 </mat-form-field>
             </div>
-            <!-- <div class="col-md-2">
-                <mat-form-field appearance="outline">
-                    <mat-label>Sexo</mat-label>
-                    <mat-select placeholder="Sexo">
-                        <mat-option value="0">SELECCIONE</mat-option>
-                        <mat-option value="M">MASCULINO</mat-option>
-                        <mat-option value="F">FEMENINO</mat-option>
-                    </mat-select>
-                    <mat-icon matSuffix>boy</mat-icon>
-                </mat-form-field>
-            </div> -->
 
         </div>
 
-
-        <div class="row">
-            <!-- <div class="col-md-4">
-                <mat-form-field appearance="outline">
-                    <mat-label>Fecha Nacimiento</mat-label>
-                    <input matInput [matDatepicker]="picker" [(ngModel)]="Ejecutivo.nacimiento"
-                        [formControl]="nacimiento" [value]="nacimiento.value">
-                    <mat-datepicker #picker></mat-datepicker>
-                    <mat-icon matSuffix (click)="picker.open()">event</mat-icon>
-                </mat-form-field>
-            </div> -->
-            <!-- <div class="col-md-4">
-                <mat-form-field appearance="outline">
-                    <mat-label>Fecha de Ingreso</mat-label>
-                    <input matInput [matDatepicker]="picker1" [(ngModel)]="Ejecutivo.ingreso" [formControl]="ingreso"
-                        [value]="ingreso.value">
-                    <mat-datepicker #picker1></mat-datepicker>
-                    <mat-icon matSuffix (click)="picker1.open()">event</mat-icon>
-                </mat-form-field>
-            </div> -->
-
-           
-        </div>
-
-
-        <!-- <div class="row">
-            <div class="col-md-12">
-                <mat-form-field appearance="outline">
-                    <mat-label>Direccion</mat-label>
-                    <textarea matInput placeholder="Direccion completa" style="height: 70px;"
-                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Ejecutivo.Direccion.direccion"
-                        value="{{Ejecutivo.Direccion.direccion}}">
-        </textarea>
-                </mat-form-field>
-            </div>
-
-        </div> -->
-
-        <!-- <div class="row">
-            <div class="col-md-5">
-                <mat-form-field appearance="outline">
-                    <mat-label>País</mat-label>
-                    <mat-select placeholder="País" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.Direccion.pais" value="{{Ejecutivo.Direccion.pais}}">
-                        <mat-option *ngFor="let e of lstPaises" value="{{e.code}}">{{e.nombre | uppercase
-                            }}</mat-option>
-                    </mat-select>
-                    <mat-icon matSuffix>public</mat-icon>
-
-                </mat-form-field>
-            </div>
-            <div class="col-md-4">
-                <mat-form-field appearance="outline">
-                    <mat-label>Estados</mat-label>
-                    <mat-select placeholder="Estados" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.Direccion.ciudad" value="{{Ejecutivo.Direccion.ciudad}}">
-                        <mat-option *ngFor="let e of lstEstados" value="{{e.id_estado}}">{{e.estado | uppercase
-                            }}</mat-option>
-                    </mat-select>
-                    <mat-icon matSuffix>home</mat-icon>
-
-                </mat-form-field>
-            </div>
-            <div class="col-md-3">
-                <mat-form-field appearance="outline">
-                    <mat-label>Código Postal</mat-label>
-                    <input matInput placeholder="Código postal" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.Direccion.codigopostal" value="{{Ejecutivo.Direccion.codigopostal}}">
-                    <mat-icon matSuffix>pin</mat-icon>
-
-                </mat-form-field>
-            </div>
-        </div> -->
 
 
         <div class="row">
@@ -205,6 +96,8 @@
             <div class="col-md-12 text-right">
                 <hr>
                 <button mat-flat-button color="primary" (click)="Guardar()">Aceptar</button>
+                &nbsp;&nbsp;&nbsp;
+                <button mat-raised-button (click)="Seleccionar()">Listar</button>
             </div>
 
         </div>

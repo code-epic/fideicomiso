@@ -27,6 +27,7 @@ import { ConfiguracionesComponent } from 'src/app/pages/principal/administracion
 import { SaldosinversionesComponent } from 'src/app/pages/principal/inversiones/saldosinversiones/saldosinversiones.component'
 import { ConsultainversionesComponent } from 'src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component'
 import { ProcesooperacionesComponent } from 'src/app/pages/principal/operaciones/procesooperaciones/procesooperaciones.component'
+import { AporteinicialComponent } from 'src/app/pages/principal/operaciones/aportes/aporteinicial/aporteinicial.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -140,6 +141,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'tabla',
         component: TablasComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'aporteinicial',
+        component: AporteinicialComponent,
         canActivate: [AuthGuardGuard]
     },
 

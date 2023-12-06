@@ -68,6 +68,8 @@ export class TablasComponent implements OnInit {
     operacion: 0,
   };
 
+  public blInstrumento: boolean = false
+
   public focus: boolean = false;
   public active: boolean = false;
 
@@ -104,7 +106,7 @@ export class TablasComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // this.Listar()
@@ -113,7 +115,7 @@ export class TablasComponent implements OnInit {
     this.ListarInstrumento();
   }
 
-  Buscar(e) {}
+  Buscar(e) { }
 
   tabActive(event) {
     this.selectedIndex = event.index;
@@ -156,6 +158,7 @@ export class TablasComponent implements OnInit {
     );
     this.dataSourceCuenta.paginator = this.paginator;
   }
+
 
   agregar() {
     let codigo = 0;
@@ -208,11 +211,11 @@ export class TablasComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if(this.ELEMENT_DATA_CUENTA.length - 1 == this.posicion ) {
+        if (this.ELEMENT_DATA_CUENTA.length - 1 == this.posicion) {
           this.Limpiar()
           this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
           this.ngxService.stopLoader('load-config')
-        }else{
+        } else {
           this.posicion++
           this.Guardar()
         }
@@ -363,9 +366,9 @@ export class TablasComponent implements OnInit {
       case "G":
         str = "COBRO DE CUPON";
         break;
-        case "Q":
-          str = "P. COMISIONES";
-          break;
+      case "Q":
+        str = "P. COMISIONES";
+        break;
       case "X":
         str = "COMPRA / VENTA";
         break;
@@ -380,6 +383,23 @@ export class TablasComponent implements OnInit {
   }
 
   getOperaciones(e): string {
-    return e == "0" ? "CONTRATOS" : "INVERSIONES";
+    let tipo = ""
+    switch (e) {
+      case 0:
+        tipo = "C. INVERSION"
+        break;
+      case 2:
+        tipo = "C. ADMINISTRACION"
+        break;
+      default:
+        tipo = "INVERSIONES"
+        break;
+    }
+    return tipo;
+  }
+
+  validar() {
+    this.blInstrumento = false
+    if (this.operaciones == '1') this.blInstrumento = true
   }
 }
