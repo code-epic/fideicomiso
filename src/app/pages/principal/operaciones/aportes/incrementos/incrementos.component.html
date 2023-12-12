@@ -1,0 +1,127 @@
+<form>
+  <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
+  <h3>MULTIPLES OPERACIONES DE INCREMENTO</h3>
+  <hr>
+  <div class="row">
+    <div class="col-md-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Plan</mat-label>
+
+        <input matInput placeholder="Plan" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="plan" value="{{plan}}" (blur)="ConsultarContrato()">
+        <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
+
+      </mat-form-field>
+    </div>
+    <div class="col-md-9">
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre del Fideicomiso</mat-label>
+        <input matInput placeholder="Nombre General" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="rif" value="{{rif}}" readonly="readonly">
+      </mat-form-field>
+    </div>
+  </div>
+
+
+
+
+
+  <div class="row">
+    <div class="col-md-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de ultimo cierre</mat-label>
+        <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}" [(ngModel)]="fechaultimo"
+          disabled="disabled">
+        <mat-icon matSuffix>event</mat-icon>
+      </mat-form-field>
+  
+    </div>
+    <div class="col-md-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha valor</mat-label>
+        <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai" (dateInput)="onDateInput($event)">
+        <mat-datepicker #ypicker></mat-datepicker>
+        <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
+      </mat-form-field>
+  
+    </div>
+    <div class="col-md-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Monto del incremento</mat-label>
+
+        <input matInput placeholder="Monto" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="monto" value=""  currencyMask
+          [options]="{ prefix: 'Bs. ', thousands: '.', decimal: ',' }">
+        
+
+      </mat-form-field>
+    </div>
+  
+    <div class="col-md-3">
+  
+      <button mat-flat-button color="primary" (click)="Add()" style="margin-top: 5px; height: 50px;" >
+        <mat-icon>verified</mat-icon>&nbsp;Agregar
+      </button>
+  
+  
+    </div>
+  </div>
+
+
+
+
+
+  
+  <div class="row" *ngIf="blprocesar">
+    <div class="col-md-12">
+      <div class="mat-elevation-z8">
+        <table mat-table [dataSource]="dataSource">
+  
+          <ng-container matColumnDef="codigo">
+            <th mat-header-cell *matHeaderCellDef> CODIGO PLAN </th>
+            <td mat-cell *matCellDef="let e"> {{e.codigo}} </td>
+          </ng-container>
+          <!-- Position Column -->
+          <ng-container matColumnDef="plan">
+            <th mat-header-cell *matHeaderCellDef> NOMBRE DEL FIDEICOMISO</th>
+            <td mat-cell *matCellDef="let e"> {{e.plan}} </td>
+          </ng-container>
+
+          <!-- Position Column -->
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef> TIPO FIDEICOMISO</th>
+            <td mat-cell *matCellDef="let e"> {{e.tipo}} </td>
+          </ng-container>
+  
+          <!-- Weight Column -->
+          <ng-container matColumnDef="monto">
+            <th mat-header-cell *matHeaderCellDef> MONTO </th>
+            <td mat-cell *matCellDef="let e">Bs. {{getMoneda(e.monto)}} </td>
+          </ng-container>
+  
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+  
+  
+      </div>
+      <br>
+  
+    </div>
+  
+  </div>
+  
+  
+  <div class="row" *ngIf="blprocesar">
+    <div class="col-md-12  text-right" >
+        <button mat-flat-button color="accent" (click)="Procesar()" style="height: 50px;">
+         Procesar aportes
+        </button>
+  
+  
+  
+    </div>
+  </div>
+
+
+</form>

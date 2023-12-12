@@ -34,8 +34,25 @@ export interface LConfiguracionCuenta {
   tipo: string
   definicion: string
   accion: string
+  operacion: number
 }
 
+
+export interface LAporteInicial {
+  id: number
+  codigo: string
+  plan: string
+  monto: string
+}
+
+export interface LIncremento {
+  id: number
+  codigo: string
+  plan: string
+  tipo : string
+  monto: string
+  fecha: string
+}
 
 export interface LPosicionInversiones {
   codigo: string

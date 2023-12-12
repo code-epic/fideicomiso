@@ -19,7 +19,7 @@ export interface Comprobante {
 
 
 export interface FID_IComprobante {
-	plan	:	string
+	plan	:	number
 	codigo	:	string
 	descripcion	:	string
   detalle	:	string

@@ -2,3 +2,76 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+
+.cmagenta {
+  color: rgb(216, 0, 50);
+}
+
+.cblue {
+  color: rgb(47, 84, 150);
+}
+.corange {
+  color: rgb(227, 123, 19);
+}
+
+.cgray {
+  color: rgb(135, 143, 157);
+}
+
+.cyellow {
+  color: rgb(204, 214, 59);
+}
+
+.auto-descripcion {
+  //width: 200px; /* Ancho deseado para la columna */
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  color: rgb(112, 110, 110);
+}
+
+.auto-ajuste {
+  //width: 200px; /* Ancho deseado para la columna */
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 12.5px;
+  font-weight: normal;
+  text-overflow: ellipsis;
+  color: rgb(56, 55, 55);
+}
+
+.auto-texto {
+  //width: 200px; /* Ancho deseado para la columna */
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  color: rgb(49, 118, 238)
+}
+
+.auto-title {
+  
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  color: rgb(0, 38, 104);
+}
+
+.auto-marca {
+  margin-top: 20px;
+  font-size: 18.5px;
+  font-weight: bold;
+  color: rgb(69, 71, 75);
+}
+
+.grid-div {
+  padding-right: 5px;
+  padding-left: 10px;
+  padding-bottom: -20px;
+  border-bottom: 1px rgba(224, 223, 223, 0.945) solid;
+}

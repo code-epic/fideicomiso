@@ -52,19 +52,41 @@
                   </div>
 
                   <mat-selection-list>
+                    <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                      <div class="row">
+                        <div class="col-md-2 texto-detalle auto-title">
+                          FECHA/CODIGO
+                        </div>
+                        <div class="col-md-3 texto-detalle auto-title">
+                          DESCRIPCION
+                        </div>
+                        <div class="col-md-4 texto-detalle auto-title">
+                          PLAN FIDEICOMISO
+                        </div>
+                        <div class="col-md-2 texto-lista auto-title">
+                          MONTO
+                        </div>
+                        <div class="col-md-1 texto-lista auto-title">
+                          ACCION
+                        </div>
+                      </div>
+                    </mat-list>
                     <mat-list *ngFor="let e of lst; let i=index "
                       style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                       <div class="row">
-                        <div class="col-md-2 texto-detalle">
-                          {{ e.fecha_operacion }} | {{ e.codigo | uppercase }}
+                        <div class="col-md-2 texto-detalle auto-ajuste">
+                          {{ e.fecha_operacion }} | {{ CompletarCeros(e.id) }}
                         </div>
-                        <div class="col-md-5 texto-detalle">
+                        <div class="col-md-3 texto-detalle auto-ajuste">
                           {{ e.descripcion | uppercase }}
                         </div>
-                        <div class="col-md-4 texto-lista">
-                         Bs. {{ getMoneda(e) }}
+                        <div class="col-md-4 texto-detalle auto-ajuste">
+                          {{ e.detalle | uppercase }}
                         </div>
-                        <div class="col-md-1 text-right">
+                        <div class="col-md-2 texto-lista auto-ajuste">
+                          Bs. {{ getMoneda(e) }}
+                        </div>
+                        <div class="col-md-1 text-right ">
 
                           <button mat-icon-button aria-label="Editar" (click)="editar(e)">
                             <mat-icon class="texto-gray">edit</mat-icon>
@@ -224,14 +246,14 @@
                             <td mat-cell *matCellDef="let e"> {{e.haber}} </td>
                           </ng-container>
 
-                           <!-- Weight Column -->
+                          <!-- Weight Column -->
                           <ng-container matColumnDef="accion">
                             <th mat-header-cell *matHeaderCellDef> ACCION </th>
                             <td mat-cell *matCellDef="let e">
                               <button mat-icon-button aria-label="Editar" (click)="eliminar(e)">
                                 <mat-icon class="text-gray">delete</mat-icon>
                               </button>
-    
+
                             </td>
                           </ng-container>
 
@@ -301,14 +323,7 @@
 
                 </div>
               </div>
-
-
             </div>
-
-
-
-
-
 
           </mat-tab>
         </mat-tab-group>

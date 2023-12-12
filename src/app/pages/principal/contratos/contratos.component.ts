@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormControl} from '@angular/forms';
-import { Observable} from 'rxjs';
-import { map, startWith} from 'rxjs/operators';
+import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
@@ -54,7 +54,7 @@ export class ContratosComponent implements OnInit {
     tasaflat: 0
   }
 
-  public Saldos : Saldos = {
+  public Saldos: Saldos = {
     saldoinicio: 0,
     fechainicio: '',
     sse_fechainicio: '',
@@ -73,7 +73,7 @@ export class ContratosComponent implements OnInit {
   }
 
   public lstEjecutivos = []
-  
+
   public Contrato: Contrato = {
     numero: '',
     rif: '',
@@ -98,7 +98,7 @@ export class ContratosComponent implements OnInit {
     clasificacion: '1'
   }
 
-  public semillero : Semillero = {
+  public semillero: Semillero = {
     codigo: 0,
     plan: '',
     descripcion: '',
@@ -106,7 +106,7 @@ export class ContratosComponent implements OnInit {
     autor: ''
   }
 
-  public planFideicomiso : PlanFideicomiso ={
+  public planFideicomiso: PlanFideicomiso = {
     fecha_apertura: '',
     observacion: '',
     monto_apertura: 0,
@@ -122,12 +122,12 @@ export class ContratosComponent implements OnInit {
     clasificacion: '',
     tipo_fideicomiso: '',
     fideicomiso: '',
-    portafolio : 0,
-    porcentaje : 0,
+    portafolio: 0,
+    porcentaje: 0,
     identificador: 0
   }
 
-  public movimiento : MovComision = {
+  public movimiento: MovComision = {
     debe: 0,
     estatus: 0,
     fecha_cierre: '',
@@ -145,32 +145,33 @@ export class ContratosComponent implements OnInit {
   public portafolio = ''
 
   public lstTipoFideicomiso = [
-    { "key": "ADMINISTRACION", "val" : [
-      {"key": "0", "val":"OBRAS"}, 
-      {"key": "1", "val":"PRESTACIONES SOCIALES"}, 
-      {"key": "2", "val": "FONDO DE AHORRO"},
-      {"key": "3", "val": "OTROS"}
-    ] 
-    
-  },
-    { "key": "INVERSION", "val"  : [{"key": "0", "val":"PERSONAL"}, {"key": "1", "val":"JURIDICO"}, {"key": "2", "val":"GUBERNAMENTAL"}] ,},
-    { "key": "MIXTO" , "val" : [{"key": "0", "val":"JURIDICO"}] ,}
+    {
+      "key": "ADMINISTRACION", "val": [
+        { "key": "0", "val": "OBRAS" },
+        { "key": "1", "val": "PRESTACIONES SOCIALES" },
+        { "key": "2", "val": "FONDO DE AHORRO" },
+        { "key": "3", "val": "OTROS" }
+      ]
+
+    },
+    { "key": "INVERSION", "val": [{ "key": "0", "val": "PERSONAL" }, { "key": "1", "val": "JURIDICO" }, { "key": "2", "val": "GUBERNAMENTAL" }], },
+    { "key": "MIXTO", "val": [{ "key": "0", "val": "JURIDICO" }], }
   ]
 
   public lstTipoFid = []
 
   public lstContratos = []
-  
+
   public lstPaises = []
 
   public lstCiudades = []
 
   public lstEstados = []
 
-  
+
 
   public selectedIndex = 0;
-  
+
   public active: boolean = false
 
   public contrato_search: string = 'none'
@@ -181,16 +182,16 @@ export class ContratosComponent implements OnInit {
   }
 
   public fechai: any
-  public fechainicio  : any
+  public fechainicio: any
 
   public fechar: any
-  public fecharegistro  : any
+  public fecharegistro: any
 
-  public tabSaldos : boolean = false
+  public tabSaldos: boolean = false
 
-  public tabEjecutivo : boolean = false
+  public tabEjecutivo: boolean = false
 
-  public focus : boolean = false
+  public focus: boolean = false
 
   public buscar = ''
 
@@ -207,6 +208,10 @@ export class ContratosComponent implements OnInit {
   public lstDataPortafolio = []
 
   public saldo_inicio = ''
+  public total_disponible = ''
+  public saldo_disponible = ''
+  public capital_asignado = ''
+  public saldo_patrimonio = ''
 
   constructor(
     private apiService: ApiService,
@@ -214,7 +219,7 @@ export class ContratosComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
     public formatter: NgbDateParserFormatter,
-    ) { }
+  ) { }
 
   ngOnInit(): void {
     this.Listar()
@@ -227,9 +232,9 @@ export class ContratosComponent implements OnInit {
 
 
 
-  GenerarSemillero(){
+  GenerarSemillero() {
 
-    
+
     this.xAPI.funcion = "FID_CSemillero"
     this.xAPI.parametros = ""
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -237,7 +242,7 @@ export class ContratosComponent implements OnInit {
         if (data != null) {
           let codigo = parseInt(data[0].codigo) + 1
           this.Contrato.numero = this.util.zfill(codigo, 4)
-        
+
         } else {
           this.Contrato.numero = "0001"
         }
@@ -250,15 +255,15 @@ export class ContratosComponent implements OnInit {
     )
   }
 
-  ListarEjecutivos(){
+  ListarEjecutivos() {
     this.xAPI.funcion = "FID_CEjecutivos"
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
+
         if (data != null && data.msj == undefined) {
           data.forEach(e => {
-            let valor = e.nacionalidad + e.cedula + ' ' + e.papellido + ' ' + e.pnombre + ' | ' + e.actividad 
+            let valor = e.nacionalidad + e.cedula + ' ' + e.papellido + ' ' + e.pnombre + ' | ' + e.actividad
             this.options.push(valor)
           });
 
@@ -273,7 +278,7 @@ export class ContratosComponent implements OnInit {
         console.log(error)
       }
     )
-    
+
   }
 
   private _filter(value: string): string[] {
@@ -281,7 +286,7 @@ export class ContratosComponent implements OnInit {
     return this.options.filter(option => option.toLowerCase().includes(filterValue));
   }
 
-  ListarOficinas(){
+  ListarOficinas() {
     this.xAPI.funcion = "FID_COficinas"
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -289,7 +294,7 @@ export class ContratosComponent implements OnInit {
         // console.log(data)
         if (data != null && data.msj == undefined) {
           data.forEach(e => {
-            let valor = e.direccion + ' | ' + e.telefonos 
+            let valor = e.direccion + ' | ' + e.telefonos
             this.oficinas.push(valor)
           });
 
@@ -314,14 +319,14 @@ export class ContratosComponent implements OnInit {
 
 
 
-  insertar(){
+  insertar() {
     let value = this.myControl.value + ''
     this.lstEjecutivos.push({ "nombre": value.toUpperCase() })
     this.myControl.setValue('')
 
   }
   tabActive(event) {
-   
+
     this.selectedIndex = event.index
     if (!this.active) {
       this.Limpiar()
@@ -329,14 +334,14 @@ export class ContratosComponent implements OnInit {
       //this.GenerarSemillero()
       this.Contrato.numero = this.util.GenerarUnicId()
       this.Contrato.estatus = "2"
-      
+
       this.Listar()
       this.tabSaldos = false
       this.planFideicomiso.identificador = 0
       console.log(this.planFideicomiso)
     } else {
       this.active = !this.active
-      
+
     }
 
   }
@@ -347,34 +352,35 @@ export class ContratosComponent implements OnInit {
     this.active = true
     //this.contrato_search = ''
     this.fechainicio = NgbDate.from(this.formatter.parse(this.Contrato.Saldos.fechainicio))
-    
-    
+
+
     this.myOficina.setValue(this.Contrato.oficinatutora.toUpperCase())
     this.lstEjecutivos = this.Contrato.Ejecutivo
     this.getTipoFideicomiso()
     this.saldo_inicio = this.Contrato.Saldos.saldoinicio.toString()
     this.planFideicomiso.identificador = parseInt(this.Contrato.numero)
     this.tabSaldos = true
-
+    this.SaldoDisponible()
+    this.CapitalAsignado()
 
     console.log(this.planFideicomiso)
 
   }
 
   getTipoFideicomiso() {
-    
+
     let codigo = this.Contrato.plan
     // console.log(codigo)
 
     this.lstTipoFid = []
     this.lstTipoFideicomiso.forEach(e => {
-      
-      if (e.key == codigo){
+
+      if (e.key == codigo) {
         this.lstTipoFid = e.val
-        
+
       }
     });
-    
+
     // console.log(this.lstTipoFid)
   }
 
@@ -435,7 +441,7 @@ export class ContratosComponent implements OnInit {
     )
   }
 
-  Buscar(e){
+  Buscar(e) {
 
   }
 
@@ -446,7 +452,7 @@ export class ContratosComponent implements OnInit {
       (data) => {
         if (data != null) {
           this.Contrato = data[0]
-        
+
           this.fechainicio = NgbDate.from(this.formatter.parse(this.Contrato.Saldos.fechainicio))
           this.myOficina.setValue(this.Contrato.oficinatutora.toUpperCase())
           this.lstEjecutivos = this.Contrato.Ejecutivo
@@ -464,7 +470,7 @@ export class ContratosComponent implements OnInit {
     )
   }
 
-  ConsultarEmpresa(){
+  ConsultarEmpresa() {
     this.xAPI.funcion = "FID_CEmpresa"
     this.xAPI.parametros = this.Contrato.rif.toUpperCase()
 
@@ -479,7 +485,7 @@ export class ContratosComponent implements OnInit {
           this.Contrato.Politicas.tipocuenta = Empresa.tipo
           this.Contrato.Politicas.numerocuenta = Empresa.numerocuenta
           this.Contrato.Politicas.enviar = Empresa.Direccion.correo
-        } 
+        }
       },
       (error) => {
         console.log(error)
@@ -527,7 +533,7 @@ export class ContratosComponent implements OnInit {
       oficinanacional: ''
     }
 
-    this.Saldos  = {
+    this.Saldos = {
       saldoinicio: 0,
       sse_fechainicio: '',
       fechainicio: '',
@@ -538,7 +544,7 @@ export class ContratosComponent implements OnInit {
       valor: 0,
       utilidad: 0
     }
-  
+
     this.Ejecutivo = {
       negocio: '',
       cliente: '',
@@ -550,14 +556,14 @@ export class ContratosComponent implements OnInit {
       tipocuenta: '',
       numerocuenta: '',
       portafolio: '',
-      portafolionomb : '',
+      portafolionomb: '',
       metodocalculo: '',
       tipocalculo: '',
       rendicion: '',
       condicionganancia: '',
       metodoganancia: '',
       comision: '',
-      tasa : 0,
+      tasa: 0,
       enviar: '',
       numeromaximo: 0,
       intervalominimo: 0,
@@ -586,7 +592,7 @@ export class ContratosComponent implements OnInit {
       Direccion: this.Direccion,
       Ejecutivo: this.lstEjecutivos,
       Politicas: this.Politicas,
-      Saldos : this.Saldos
+      Saldos: this.Saldos
     }
 
     this.getTipoFideicomiso()
@@ -594,33 +600,33 @@ export class ContratosComponent implements OnInit {
   }
 
 
-  getPlanFideicomisoDB(){
-    
+  getPlanFideicomisoDB() {
+
 
     this.planFideicomiso.fecha_apertura = typeof this.fechai == 'object' ? this.util.ConvertirFecha(this.fechai) : this.Contrato.Saldos.fechainicio.substring(0, 10)
 
-    this.planFideicomiso.observacion = this.Contrato.rif + '|' + this.Contrato.razonsocial 
+    this.planFideicomiso.observacion = this.Contrato.rif + '|' + this.Contrato.razonsocial
     this.planFideicomiso.monto_apertura = parseFloat(this.saldo_inicio)
     this.planFideicomiso.usuario = ''
     this.planFideicomiso.estatus = parseInt(this.Contrato.estatus)
     this.planFideicomiso.metodo_ganancia = parseInt(this.Contrato.Politicas.metodoganancia)
     this.planFideicomiso.frecuencia = parseInt(this.Contrato.Politicas.condicionganancia)
-    this.planFideicomiso.tasa_flat =  parseFloat(this.Contrato.Politicas.tasaflat.toString())
+    this.planFideicomiso.tasa_flat = parseFloat(this.Contrato.Politicas.tasaflat.toString())
     this.planFideicomiso.comision_flat = parseInt(this.Contrato.Politicas.flat)
     this.planFideicomiso.tipo_calculo = parseInt(this.Contrato.Politicas.tipocalculo.toString())
     this.planFideicomiso.tasa_comision = parseFloat(this.Contrato.Politicas.tasa.toString())
     this.planFideicomiso.tipo_comision = parseInt(this.Contrato.Politicas.comision)
     this.planFideicomiso.clasificacion = this.Contrato.clasificacion
-    this.planFideicomiso.tipo_fideicomiso =  this.Contrato.tipo
+    this.planFideicomiso.tipo_fideicomiso = this.Contrato.tipo
     this.planFideicomiso.fideicomiso = this.Contrato.plan
     this.planFideicomiso.porcentaje = this.Contrato.Politicas.numeromaximo
 
-    this.planFideicomiso.portafolio = parseInt( this.Contrato.Politicas.portafolionomb)
+    this.planFideicomiso.portafolio = parseInt(this.Contrato.Politicas.portafolionomb)
   }
 
   Guardar() {
 
-    if(this.Contrato.Saldos.fechainicio == "" && this.saldo_inicio == '') {
+    if (this.Contrato.Saldos.fechainicio == "" && this.saldo_inicio == '') {
       this._snackBar.open("Debe verificar todos los campos de fecha...", "Ok");
       return
     }
@@ -631,24 +637,24 @@ export class ContratosComponent implements OnInit {
     console.log(this.planFideicomiso)
 
 
-    this.xAPI.funcion = this.planFideicomiso.identificador>0?'FID_UPlanFideicomiso': 'FID_IPlanFideicomiso'
+    this.xAPI.funcion = this.planFideicomiso.identificador > 0 ? 'FID_UPlanFideicomiso' : 'FID_IPlanFideicomiso'
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.planFideicomiso)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data)
         if (data != null && data.msj != undefined) {
-          let numero = this.planFideicomiso.identificador>0?this.planFideicomiso.identificador:data.msj
+          let numero = this.planFideicomiso.identificador > 0 ? this.planFideicomiso.identificador : data.msj
           let monto = this.planFideicomiso.monto_apertura
 
           this.Contrato.numero = this.util.zfill(numero, 4)
-          this.Contrato.Saldos.fechainicio = this.planFideicomiso.fecha_apertura 
-          this.Contrato.Saldos.saldoinicio = this.planFideicomiso.monto_apertura 
-          
-          this.AsientoContrato(numero, monto, this.planFideicomiso.fecha_apertura )
+          this.Contrato.Saldos.fechainicio = this.planFideicomiso.fecha_apertura
+          this.Contrato.Saldos.saldoinicio = this.planFideicomiso.monto_apertura
 
-          this.GuardarContrato() 
-      
+          this.AsientoContrato(numero, monto, this.planFideicomiso.fecha_apertura)
+
+          this.GuardarContrato()
+
         }
       },
       (error) => {
@@ -661,7 +667,7 @@ export class ContratosComponent implements OnInit {
   }
 
   GuardarContrato() {
-  
+
     this.Contrato.Ejecutivo = this.lstEjecutivos
     let ofc = this.myOficina.value + ''
     this.Contrato.oficinatutora = ofc.toUpperCase()
@@ -694,17 +700,17 @@ export class ContratosComponent implements OnInit {
 
   }
 
-  ListarPortafolio(){
+  ListarPortafolio() {
     this.xAPI.funcion = "FID_CPortafolios"
     this.xAPI.parametros = this.Contrato.Politicas.portafolio
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-          this.lstDataPortafolio = data.Cuerpo
+        this.lstDataPortafolio = data.Cuerpo
       },
       (error) => {
         console.log(error)
-        
+
       }
     )
 
@@ -717,7 +723,7 @@ export class ContratosComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-       
+
         if (data != null && data.msj == undefined) {
           this.Contrato.Politicas.portafolionomb = data.Cuerpo[0].descripcion
         } else {
@@ -727,15 +733,15 @@ export class ContratosComponent implements OnInit {
       },
       (error) => {
         console.log(error)
-        
+
       }
     )
   }
 
-  
+
   //18 fideicomiso de inversion
   //3 disponibilidad en cuenta operativa
-  AsientoContrato(plan: number, monto: number, fecha_operacion : string) {
+  AsientoContrato(plan: number, monto: number, fecha_operacion: string) {
     this.movimiento.plan = plan
     this.movimiento.cuenta = 3
     this.movimiento.debe = monto
@@ -771,6 +777,37 @@ export class ContratosComponent implements OnInit {
     //     this._snackBar.open("No se ha generado el movimiento 711...", "Error");
     //   }
     // );
+  }
+
+  SaldoDisponible() {
+    this.xAPI.funcion = "FID_CSaldoDisponible"
+    this.xAPI.parametros = parseInt(this.Contrato.numero).toString()
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+      
+        this.total_disponible = data.Cuerpo[0].saldo
+        this.saldo_disponible = data.Cuerpo[0].saldo
+      },
+      (error) => {
+        console.log(error)
+
+      }
+    )
+  }
+
+  CapitalAsignado() {
+    this.xAPI.funcion = "FID_CCapitalAsignado"
+    this.xAPI.parametros = parseInt(this.Contrato.numero).toString()
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+
+        this.capital_asignado = data.Cuerpo[0].saldo
+      },
+      (error) => {
+        console.log(error)
+
+      }
+    )
   }
 
 }

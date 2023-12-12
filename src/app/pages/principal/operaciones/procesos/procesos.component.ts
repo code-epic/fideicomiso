@@ -183,32 +183,7 @@ export class ProcesosComponent implements OnInit {
     )
    
   }
-  CalcularComision(){
-    
-    this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CalcularComision"
-    this.xAPI.parametros = '1,360'
-    this.xAPI.valores = ''
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-
-          let ultc = data.Cuerpo
-          if (ultc.length > 0 ) {
-            console.log(ultc)
-          }
-          
-          this.ngxService.stopLoader('load-precierre')
-        
-      },
-      (error) => {
-        console.log(error)
-      }
-    )
-
-
-    
-  }
 
 
   ConsultarAsientos(){

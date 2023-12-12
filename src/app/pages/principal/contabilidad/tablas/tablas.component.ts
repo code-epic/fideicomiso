@@ -321,6 +321,7 @@ export class TablasComponent implements OnInit {
               instrumento: e.instrumento,
               tipo: e.tipo,
               definicion: e.accion,
+              operacion: parseInt(e.operacion),
               accion: this.getNaturaleza(e.accion),
             });
           });
@@ -354,6 +355,9 @@ export class TablasComponent implements OnInit {
       case "P":
         str = "PAGO INTERESES";
         break;
+      case "R":
+        str = "RETIROS";
+        break;
       case "C":
         str = "COMPRA";
         break;
@@ -361,7 +365,7 @@ export class TablasComponent implements OnInit {
         str = "VENCIMIENTO";
         break;
       case "A":
-        str = "APERTURA";
+        str = "APORTE INICIAL";
         break;
       case "G":
         str = "COBRO DE CUPON";
@@ -391,6 +395,9 @@ export class TablasComponent implements OnInit {
       case 2:
         tipo = "C. ADMINISTRACION"
         break;
+      case 3:
+        tipo = "NO APLICA"
+        break;
       default:
         tipo = "INVERSIONES"
         break;
@@ -401,5 +408,14 @@ export class TablasComponent implements OnInit {
   validar() {
     this.blInstrumento = false
     if (this.operaciones == '1') this.blInstrumento = true
+  }
+
+  getInstrumento(e): string {
+    let data = ''
+    data = e.instrumento;
+    if (e.instrumento == null) {
+      data = this.getOperaciones(e.operacion)
+    }
+    return data;
   }
 }

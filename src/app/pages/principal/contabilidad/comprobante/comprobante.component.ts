@@ -93,7 +93,7 @@ export class ComprobanteComponent implements OnInit {
   };
 
   public Comprobante: FID_IComprobante = {
-    plan: "",
+    plan: 0,
     codigo: "",
     descripcion: "",
     detalle: "",
@@ -155,13 +155,18 @@ export class ComprobanteComponent implements OnInit {
     this.ListarComprobantes();
   }
 
+  CompletarCeros(e : string ) : string{
+    return this.util.zfill(e, 4)
+  }
+
+  
   ListarComprobantes() {
     this.xAPI.funcion = "FID_CComprobantes";
     this.xAPI.parametros = "";
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data.Cuerpo)
+        // console.log(data.Cuerpo)
         this.lst = data.Cuerpo;
         
       },
@@ -173,7 +178,7 @@ export class ComprobanteComponent implements OnInit {
 
   ConsultarContrato() {
     this.xAPI.funcion = "FID_CContrato";
-    this.xAPI.parametros = this.Comprobante.plan;
+    this.xAPI.parametros = this.Comprobante.plan.toString();
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data != null) {
@@ -243,7 +248,7 @@ export class ComprobanteComponent implements OnInit {
 
   Limpiar() {
     this.Comprobante = {
-      plan: "",
+      plan: 0,
       codigo: "",
       descripcion: "",
       detalle: "",
@@ -466,7 +471,7 @@ export class ComprobanteComponent implements OnInit {
     this.xAPI.valores = JSON.stringify(this.Comprobante);
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
-        console.log(data);
+        // console.log(data);
         await this.GuardarDetalle(data.msj);
         this.ngxService.stopLoader("load-cont");
         this.ELEMENT_DATA = [];

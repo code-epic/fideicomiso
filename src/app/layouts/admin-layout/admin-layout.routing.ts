@@ -28,6 +28,9 @@ import { SaldosinversionesComponent } from 'src/app/pages/principal/inversiones/
 import { ConsultainversionesComponent } from 'src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component'
 import { ProcesooperacionesComponent } from 'src/app/pages/principal/operaciones/procesooperaciones/procesooperaciones.component'
 import { AporteinicialComponent } from 'src/app/pages/principal/operaciones/aportes/aporteinicial/aporteinicial.component'
+import { IncrementosComponent } from 'src/app/pages/principal/operaciones/aportes/incrementos/incrementos.component'
+import { RetirosComponent } from 'src/app/pages/principal/operaciones/aportes/retiros/retiros.component'
+import { ProcesocontablesComponent } from 'src/app/pages/principal/contabilidad/procesocontables/procesocontables.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -65,6 +68,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'afiliado',
         component: AfiliadosComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'procesocontable',
+        component: ProcesocontablesComponent,
         canActivate: [AuthGuardGuard]
     },{
         path: 'contabilidad',
@@ -146,6 +153,14 @@ export const AdminLayoutRoutes: Routes = [
         path: 'aporteinicial',
         component: AporteinicialComponent,
         canActivate: [AuthGuardGuard]
-    },
+    },{
+        path: 'incrementos',
+        component: IncrementosComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'retiros',
+        component: RetirosComponent,
+        canActivate: [AuthGuardGuard]
+    }
 
 ];

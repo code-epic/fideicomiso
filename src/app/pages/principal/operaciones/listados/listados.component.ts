@@ -93,7 +93,7 @@ export class ListadosComponent implements OnInit {
 
   consultarBalance() {
     this.xAPI.funcion = "FID_CBalanceComprobacion";
-    this.xAPI.parametros = '2023-07-01,2023-07-31,2023-06-30'
+    this.xAPI.parametros = '2023-12-01,2023-12-31,2023-11-30'
     // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'
     this.xAPI.valores = "";
 
@@ -304,7 +304,7 @@ export class ListadosComponent implements OnInit {
    
     this.xAPI.funcion = "FID_CBalanceComprobacion";
     // this.xAPI.parametros = "2023-08-01,2023-08-31,2023-07-31";
-    this.xAPI.parametros = '2023-07-01,2023-07-31,2023-06-30'
+    this.xAPI.parametros = '2023-12-01,2023-12-31,2023-11-30'
     // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'
     this.xAPI.valores = "";
 

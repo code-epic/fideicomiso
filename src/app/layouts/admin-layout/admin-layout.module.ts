@@ -68,6 +68,9 @@ import { ConciliacionesinversionesComponent } from 'src/app/pages/principal/inve
 import { ProcesooperacionesComponent } from 'src/app/pages/principal/operaciones/procesooperaciones/procesooperaciones.component';
 import { WzportafolioComponent } from 'src/app/pages/principal/inversiones/consultainversiones/wzportafolio/wzportafolio.component';
 import { AporteinicialComponent } from 'src/app/pages/principal/operaciones/aportes/aporteinicial/aporteinicial.component';
+import { IncrementosComponent } from 'src/app/pages/principal/operaciones/aportes/incrementos/incrementos.component';
+import { RetirosComponent } from 'src/app/pages/principal/operaciones/aportes/retiros/retiros.component';
+import { ProcesocontablesComponent } from 'src/app/pages/principal/contabilidad/procesocontables/procesocontables.component';
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 
 @NgModule({
@@ -144,7 +147,10 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     ConciliacionesinversionesComponent,
     ProcesooperacionesComponent,
     WzportafolioComponent,
-    AporteinicialComponent
+    AporteinicialComponent,
+    IncrementosComponent,
+    RetirosComponent,
+    ProcesocontablesComponent
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},
