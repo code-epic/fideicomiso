@@ -1,1 +1,1 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"97d3d09cebbe4720a57851b8ef1f0f9d","collectionName":"sys-sensors","type":"collection"}
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"d883858ab71746cca1202abb943bb99a","collectionName":"sys-sensors","type":"collection"}

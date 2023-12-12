@@ -1,1 +1,0 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"8d90d83d398a4574bd66f4a7967b6b95","collectionName":"motfa-api","type":"collection"}
