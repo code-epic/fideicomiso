@@ -11,12 +11,6 @@
   
           <br>
           <table mat-table [dataSource]="dataSource">
-
-            <!-- <ng-container matColumnDef="codigo">
-              <th mat-header-cell *matHeaderCellDef> CODIGO </th>
-              <td mat-cell *matCellDef="let e"> {{e.codigo | uppercase}} </td>
-            </ng-container> -->
-
              <!-- Weight Column -->
              <ng-container matColumnDef="cuenta">
               <th mat-header-cell *matHeaderCellDef> CUENTA </th>
@@ -32,7 +26,7 @@
 
             <!-- Weight Column -->
             <ng-container matColumnDef="accion">
-              <th mat-header-cell *matHeaderCellDef> NATURALEZA </th>
+              <th mat-header-cell *matHeaderCellDef> NATURA. </th>
               <td mat-cell *matCellDef="let e"> {{ e.accion }} </td>
             </ng-container>
 
@@ -44,11 +38,15 @@
 
               <!-- Weight Column -->
               <ng-container matColumnDef="disparador">
-                <th mat-header-cell *matHeaderCellDef> ACCION </th>
+                <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
                 <td mat-cell *matCellDef="let e">
                   <button mat-icon-button aria-label="Editar"
                     (click)="editar(e)" >
                     <mat-icon class="texto-gray">edit</mat-icon>
+                  </button>
+                  <button mat-icon-button aria-label="Eliminar"
+                    (click)="eliminar(e)" >
+                    <mat-icon class="texto-gray">delete</mat-icon>
                   </button>
                 </td>
               </ng-container>

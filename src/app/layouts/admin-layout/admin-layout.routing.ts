@@ -31,6 +31,9 @@ import { AporteinicialComponent } from 'src/app/pages/principal/operaciones/apor
 import { IncrementosComponent } from 'src/app/pages/principal/operaciones/aportes/incrementos/incrementos.component'
 import { RetirosComponent } from 'src/app/pages/principal/operaciones/aportes/retiros/retiros.component'
 import { ProcesocontablesComponent } from 'src/app/pages/principal/contabilidad/procesocontables/procesocontables.component'
+import { GeneralyresultadoComponent } from 'src/app/pages/principal/contabilidad/generalyresultado/generalyresultado.component'
+import { ComprobacionComponent } from 'src/app/pages/principal/contabilidad/comprobacion/comprobacion.component'
+import { MayoranaliticoComponent } from 'src/app/pages/principal/contabilidad/mayoranalitico/mayoranalitico.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -130,8 +133,16 @@ export const AdminLayoutRoutes: Routes = [
         component: TransaccionesComponent,
         canActivate: [AuthGuardGuard]
     },{
-        path: 'listados',
-        component: ListadosComponent,
+        path: 'generalyresultado',
+        component: GeneralyresultadoComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'comprobacion',
+        component: ComprobacionComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'mayoranalitico',
+        component: MayoranaliticoComponent,
         canActivate: [AuthGuardGuard]
     },{
         path: 'plancontable',

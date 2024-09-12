@@ -9,6 +9,7 @@ import {
   ICuenta,
   LCuenta,
 } from "src/app/services/banfanb/contabilidad.service";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-cuenta",
@@ -350,5 +351,43 @@ export class CuentaComponent implements OnInit {
         break;
     }
     return nat;
+  }
+  eliminar(e){
+    console.log(e)
+    
+    Swal.fire({
+      title: `Va a eliminar`,
+      text: e.descripcion.toUpperCase(),
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'No',
+      allowEscapeKey: true,
+    }).then((result) => {
+       
+       if ( result.isConfirmed )  {
+        this.ngxService.startLoader('loader-document')
+        this.xAPI.funcion = 'FID_DCuentaContable'
+        this.xAPI.parametros = e.codigo
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          async data => {
+            await this.cargarContenido() 
+            
+            this.ngxService.stopLoader('loader-document')
+          },
+          err => {
+            this.ngxService.stopLoader('loader-document')
+            console.error(err)
+          }
+        )
+      
+      }else {
+        console.log("NO")
+      }
+
+    })
+
   }
 }

@@ -75,3 +75,47 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   padding-bottom: -20px;
   border-bottom: 1px rgba(224, 223, 223, 0.945) solid;
 }
+
+
+.mat-form-field {
+  width: 100%;
+}
+
+.mat-tab {
+  margin-top: 48px;
+  padding: 50px;
+}
+
+
+.asientos{
+  font-weight: bold;
+  font-size: 15px;
+  width: 100%;
+}
+
+.asientos thead > tr{
+  border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154;
+  height: 30px;
+}
+
+
+.asientos tr > th {
+  border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154;
+  font-size: 13px;
+  height: 30px;
+}
+
+.asientos td{
+  font-weight: normal;
+  font-size: 13px;
+}
+
+
+.asientos text-right {
+  text-align: right;
+}
+
+.asientos text-center {
+  text-align: center;
+  font-size: 15px;
+}

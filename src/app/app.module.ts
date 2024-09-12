@@ -42,7 +42,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
 import { CurrencyMaskModule } from 'ng2-currency-mask';
 
-
 @NgModule({
   imports: [
     BrowserAnimationsModule,

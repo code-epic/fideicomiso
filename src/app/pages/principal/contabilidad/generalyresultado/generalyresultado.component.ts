@@ -1,133 +1,166 @@
-import { Component, OnInit, ViewEncapsulation } from "@angular/core";
+import { Component, OnInit } from '@angular/core';
+import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgbDateParserFormatter } from "@ng-bootstrap/ng-bootstrap";
 import { NgxUiLoaderService } from "ngx-ui-loader";
-import { elementAt } from "rxjs";
-import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { UtilService } from "src/app/services/util/util.service";
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
-  selector: "app-listados",
-  templateUrl: "./listados.component.html",
-  styleUrls: ["./listados.component.scss"],
-  encapsulation: ViewEncapsulation.None,
+  selector: 'app-generalyresultado',
+  templateUrl: './generalyresultado.component.html',
+  styleUrls: ['./generalyresultado.component.scss']
 })
-export class ListadosComponent implements OnInit {
+export class GeneralyresultadoComponent implements OnInit {
+
   public codigo = "";
   public xAPI: IAPICore = {
     funcion: "",
     parametros: "",
   };
-  public lstTotales = [];
-  public lstDetalles = [];
-  public lstBalance = [];
-  public lstComprobacion = [];
+  public lstTotales = []
+  public lstDetalles = []
+  public lstBalance = []
+  public lstComprobacion = []
+  public printv : boolean = false
 
-  public acumuladord = 0;
-  public acumuladorh = 0;
-  public acum_saldo_inicial = 0;
-  public acum_saldo_actual = 0;
+  public fechaultimo = ''
+  public fechaTexto = ''
+  public fechai: any
 
-  public posicion = 0;
+  public acumuladord = 0
+  public acumuladorh = 0
+  public acum_saldo_inicial = 0
+  public acum_saldo_actual = 0
+
+  public posicion = 0
   public tiempo = 0
-  public cambio = false;
-  public HTMLBalance = "";
-  public HTMLComprobacion = "";
-  public HTMLResultados = "";
+  public cambio = false
+  public HTMLBalance = ""
+  public HTMLComprobacion = ""
+  public HTMLResultados = ""
   public fecha : string = ''
   public fdesde : string = '2023-12-01'
   public fhasta : string = '2023-12-31'
   public fecha_vienen : string = '2023-11-30'
+  public estatus : string = 'M'
+  public bAntes : boolean = true
 
-  public lstFecha = [
-    {id : '2023-12-01,2023-12-31,2023-11-30', value: 'DICIEMBRE'},
-    {id : '2024-01-01,2024-01-31,2023-12-31', value: 'ENERO'},
-    {id : '2024-02-01,2024-02-28,2024-01-31', value: 'FEBRERO'},
-    {id : '2024-03-01,2024-03-31,2024-02-28', value: 'MARZO'},
-    {id : '2024-04-01,2024-04-30,2024-03-31', value: 'ABRIL'},
-    {id : '2024-05-01,2024-05-31,2024-04-30', value: 'MAYO'},
-    {id : '2024-06-01,2024-06-30,2024-05-31', value: 'JUNIO'},
-    {id : '2024-07-01,2024-07-31,2024-06-30', value: 'JULIO'},
-    {id : '2024-08-01,2024-08-31,2024-07-31', value: 'AGOSTO'},
-    {id : '2024-09-01,2024-09-30,2024-08-31', value: 'SEPTIEMBRE'},
-    {id : '2024-10-01,2024-10-31,2024-09-30', value: '0CTUBRE'},
-    {id : '2024-11-01,2024-11-30,2024-10-31', value: 'NOVIEMBRE'},
-    {id : '2024-12-01,2024-12-31,2024-11-30', value: 'DICIEMBRE'},
-  ]
+  public lstIndex = [] //Cuentas totalizadores de Fideicomiso
 
-  public lstIndex = [
-    {
-      id: "71",
-      total: 0,
-      nombre: "TOTAL DE ACTIVOS",
-      debe: 0,
-      haber: 0,
-      acc: 0,
-    },
-    {
-      id: "72",
-      total: 0,
-      nombre: "TOTAL DE PASIVOS",
-      debe: 0,
-      haber: 0,
-      acc: 0,
-    },
-    {
-      id: "73",
-      total: 0,
-      nombre: "TOTAL DE PATRIMONIO",
-      debe: 0,
-      haber: 0,
-      acc: 0,
-    },
-    {
-      id: "74",
-      total: 0,
-      nombre: "TOTAL DE GASTOS",
-      debe: 0,
-      haber: 0,
-      acc: 1,
-    },
-    {
-      id: "75",
-      total: 0,
-      nombre: "TOTAL DE INGRESOS",
-      debe: 0,
-      haber: 0,
-      acc: 1,
-    },
-  ]; //Cuentas totalizadores de Fideicomiso
-
-  constructor(
-    private apiService: ApiService,
+  constructor(   private apiService: ApiService,
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
+    private toasService : ToastrService,
     private util: UtilService,
-    public formatter: NgbDateParserFormatter
-  ) {}
+    public formatter: NgbDateParserFormatter) { }
 
   ngOnInit(): void {
   }
 
 
   ConsultarComprobante(){
-    // console.log(this.fecha)
-    this.consultarBalance();
-    this.generarBalanceComprobacion()
-    this.lstBalance = []
+   
+    if (this.fechai == undefined ) {
+      this.toasService.warning("Debe seleccionar una fecha ", "Fideicomiso")
+      return
+    }
+
+    let antes = new Date (this.fechai).setHours(-23)
+    console.log(antes)
+    let despues = new Date (this.fechai).setHours(23)
+    console.log(despues)
+
+    let sHoy = new Date (this.fechai).toISOString().substring(0,10)
+    let sAntes = new Date(antes).toISOString().substring(0,10)
+    let sDesspues = new Date(despues).toISOString().substring(0,10)
+
+    // console.log(sAntes.substring(0,10), sDesspues.substring(0,10))
+
     
+    this.printv = false
+    this.fecha = `${sAntes},${sHoy},${sHoy}`
+    let fini = this.util.ConvertirFechaHumana(this.fechai)
+    this.fechaTexto = fini
+    this.iniciarIndex()
+    this.lstBalance = []
+    this.HTMLBalance = ''
+    this.HTMLResultados = ''
+    this.acumuladord = 0
+    this.acumuladorh = 0
+    this.acum_saldo_inicial = 0
+    this.posicion = 0
+    this.acum_saldo_actual = 0
+    this.consultarBalance()
+  }
+
+  iniciarIndex(){
+    this.lstIndex = [
+      {
+        id: "71",
+        total: 0,
+        nombre: "TOTAL DE ACTIVOS",
+        debe: 0,
+        haber: 0,
+        acc: 0,
+      },
+      {
+        id: "72",
+        total: 0,
+        nombre: "TOTAL DE PASIVOS",
+        debe: 0,
+        haber: 0,
+        acc: 0,
+      },
+      {
+        id: "73",
+        total: 0,
+        nombre: "TOTAL DE PATRIMONIO",
+        debe: 0,
+        haber: 0,
+        acc: 0,
+      },
+      {
+        id: "74",
+        total: 0,
+        nombre: "TOTAL DE GASTOS",
+        debe: 0,
+        haber: 0,
+        acc: 1,
+      },
+      {
+        id: "75",
+        total: 0,
+        nombre: "TOTAL DE INGRESOS",
+        debe: 0,
+        haber: 0,
+        acc: 1,
+      },
+    ]
+  }
+
+  validarCombo(){
+    let fini = this.util.ConvertirFechaHumana(this.fechai)
+    console.log(fini)
   }
 
   consultarBalance() {
-    this.xAPI.funcion = "FID_CBalanceComprobacion";
-    this.xAPI.parametros = `${this.fecha}`
-    // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'
+
+    this.xAPI.funcion = "FID_CBalanceComprobacion"
+    // this.xAPI.parametros = `${this.fecha},${this.estatus}`
+    this.xAPI.parametros = '2024-01-01,2024-01-31,2024-01-01'
     this.xAPI.valores = "";
-    console.log(this.xAPI.parametros)
+    //console.log(this.xAPI.parametros)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
-        console.log(data);
+        this.printv = true
+        if (data.Cuerpo.length == 0 ) {
+          this.toasService.warning("No se encontraron datos para la fecha ", "Fideicomiso")
+          return
+        }
+        //console.log(data)
+        
         this.lstBalance = data.Cuerpo;
         this.HTMLBalance = `
           <table class="asientos" >
@@ -135,7 +168,7 @@ export class ListadosComponent implements OnInit {
           <thead background-color: #e1e1d154; height: 35px;>
             <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">
               <th style="text-align:left">DESCRIPCION DE LA CUENTA</th>
-              <th style="text-align:right">SALDO ACTUAL</th>
+              <th class='text-right'></th>
             </tr>
           </thead>
           <tbody>
@@ -143,7 +176,6 @@ export class ListadosComponent implements OnInit {
         this.HTMLResultados += this.HTMLBalance;
         
         this.lstBalance.forEach((e) => {
-          // console.log(e.codigo_padre.indexOf("74"));
           if (
             e.codigo_padre.indexOf("74") == -1 &&
             e.codigo_padre.indexOf("75") == -1
@@ -154,9 +186,6 @@ export class ListadosComponent implements OnInit {
           }
         });
 
-        // this.lstBalance.forEach(e => {
-        //   this.getDetalle(e)
-        // });
 
         this.lstIndex[this.posicion].debe = this.acumuladord;
         this.lstIndex[this.posicion].haber = this.acumuladorh;
@@ -172,20 +201,20 @@ export class ListadosComponent implements OnInit {
             ? "-"
             : this.getMoneda(this.acum_saldo_actual)
         }</th>
-      </tr>
-      <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-        <td colspan="5"> &nbsp; </td>
-      </tr>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-              <th colspan=5 class="text-center total" > RESULTADO NETO </th>
-            </tr>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-              <th colspan=5 class="text-center total"> 
-                Bs. ${this.getMoneda(result)}
-              </th>
-            </tr>
-          </tbody>
-        </table>
+        </tr>
+        <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
+          <td colspan="5"> &nbsp; </td>
+        </tr>
+              <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
+                <th colspan=5 class="text-center total" > RESULTADO NETO </th>
+              </tr>
+              <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
+                <th colspan=5 class="text-center total"> 
+                  Bs. ${ this.estatus==''?'-': this.getMoneda(result) }
+                </th>
+              </tr>
+            </tbody>
+          </table>
           `;
         // this.ngxService.stopLoader('load-precierre')
       },
@@ -200,7 +229,7 @@ export class ListadosComponent implements OnInit {
     let haber = e.haber == null ? 0 : e.haber;
     let saldo_inicial = e.saldo_inicial == null ? 0 : e.saldo_inicial;
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
-
+    //console.log(e.codigo_padre, this.lstIndex[this.posicion], this.posicion)
     if (e.codigo_padre.substring(0, 2) == this.lstIndex[this.posicion].id) {
       this.acumuladord += parseFloat(debe);
       this.acumuladorh += parseFloat(haber);
@@ -244,17 +273,17 @@ export class ListadosComponent implements OnInit {
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
 
     if (e.codigo_padre.substring(0, 2) == this.lstIndex[this.posicion].id) {
-      this.acumuladord += parseFloat(debe);
-      this.acumuladorh += parseFloat(haber);
-      this.acum_saldo_inicial += parseFloat(saldo_inicial);
-      this.acum_saldo_actual += parseFloat(saldo_actual);
+      this.acumuladord += parseFloat(debe)
+      this.acumuladorh += parseFloat(haber)
+      this.acum_saldo_inicial += parseFloat(saldo_inicial)
+      this.acum_saldo_actual += parseFloat(saldo_actual)
       
-      this.HTMLResultados += this.getTitulosACuentasBalance(e);
+      this.HTMLResultados += this.getTitulosACuentasBalance(e)
       
      
     } else {
-      this.lstIndex[this.posicion].debe = this.acumuladord;
-      this.lstIndex[this.posicion].haber = this.acumuladorh;
+      this.lstIndex[this.posicion].debe = this.acumuladord
+      this.lstIndex[this.posicion].haber = this.acumuladorh
       let cadena = `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th >${this.lstIndex[this.posicion].nombre} </th>
@@ -267,7 +296,7 @@ export class ListadosComponent implements OnInit {
        
       `;
       if (this.tiempo == 0) {
-        this.HTMLBalance += cadena;
+        this.HTMLBalance += cadena
         this.HTMLResultados += `
         <tr>  
           <td  colspan="5">${this.getTitulosACuentasBalance(e)} </td>
@@ -275,20 +304,55 @@ export class ListadosComponent implements OnInit {
       } else {
         this.HTMLResultados += cadena
       }
-      this.cambio = true;
-      this.acumuladord = parseFloat(debe);
-      this.acumuladorh = parseFloat(haber);
-      this.acum_saldo_inicial = parseFloat(saldo_inicial);
-      this.acum_saldo_actual = parseFloat(saldo_actual);
+      this.cambio = true
+      this.acumuladord = parseFloat(debe)
+      this.acumuladorh = parseFloat(haber)
+      this.acum_saldo_inicial = parseFloat(saldo_inicial)
+      this.acum_saldo_actual = parseFloat(saldo_actual)
       this.posicion++
       this.tiempo++
     }
   }
 
   getTitulosACuentasBalance(e): string {
+
+    let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
+    let titulo = "";
+    if (e.totalizadora == "0" || e.totalizadora == "3") {
+      let txt =
+        "&nbsp;&nbsp;&nbsp;" +
+        e.codigo_padre +
+        "." +
+        e.parte +
+        "." +
+        e.moneda +
+        "." +
+        e.nivel_1 +
+        "." +
+        e.nivel_2;
+      titulo = `
+      <tr>  
+          <td>${txt + ". " + e.descripcion.toUpperCase()}</td>
+          <td class="text-right">${
+            this.getMoneda(saldo_actual) == "0"
+              ? "-"
+              : this.getMoneda(saldo_actual) + "$$$"
+          }</td>
+        </tr>`;
+    } else {
+      titulo = `
+      <tr>  
+        <td colspan="5" style="background-color: #eeeee4;">${
+          e.codigo_padre + ". " + e.descripcion.toUpperCase()
+        }</td>
+      </tr>`;
+    }
+    return titulo;
+  }
+
+  getTitulosACuentas(e): string {
     let debe = e.debe == null ? 0 : e.debe;
     let haber = e.haber == null ? 0 : e.haber;
-    let saldo_inicial = e.saldo_inicial == null ? 0 : e.saldo_inicial;
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
     let titulo = "";
     if (e.totalizadora == "0") {
@@ -309,142 +373,13 @@ export class ListadosComponent implements OnInit {
           <td class="text-right">${
             this.getMoneda(saldo_actual) == "0"
               ? "-"
-              : this.getMoneda(saldo_actual)
-          }</td>
-        </tr>`;
-    } else {
-      titulo = `
-      <tr>  
-        <td colspan="5" style="background-color: #eeeee4;">${
-          e.codigo_padre + ". " + e.descripcion.toUpperCase()
-        }</td>
-      </tr>`;
-    }
-    return titulo;
-  }
-
-  generarBalanceComprobacion() {
-    // this.ngxService.stopLoader('load-precierre')
-    // this.acumuladord = parseFloat(debe);
-    // this.acumuladorh = parseFloat(haber);
-    // this.acum_saldo_inicial = parseFloat(saldo_inicial);
-    // this.acum_saldo_actual = parseFloat(saldo_actual);
-   
-    this.xAPI.funcion = "FID_CBalanceComprobacion";
-    // this.xAPI.parametros = "2023-08-01,2023-08-31,2023-07-31";
-    this.xAPI.parametros = `${this.fdesde},${this.fhasta},${this.fecha_vienen}`
-    // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'
-    this.xAPI.valores = "";
-
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (data) => {
-        this.lstComprobacion = data.Cuerpo;
-        this.HTMLComprobacion = `
-          <table class="asientos" >
-                          
-          <thead background-color: #e1e1d154; height: 35px;>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">
-              <th style="text-align: left; " >DESCRIPCION DE LA CUENTA</th>
-              <th style="text-align: center;">SALDO INICIAL</th>
-              <th style="text-align: center;">MONTO DEBE</th>
-              <th style="text-align: center;">MONTO HABER</th>
-              <th style="text-align: center;">SALDO ACTUAL</th>
-            </tr>
-          </thead>
-          <tbody>
-          `;
-        // console.log(this.lstComprobacion)
-        this.posicion = 0;
-        this.acumuladord = 0
-        this.acumuladorh = 0
-        this.acum_saldo_inicial = 0
-        this.acum_saldo_actual = 0
-        this.lstComprobacion.forEach((e) => {
-          this.getPaso(e);
-        });
-
-        this.lstIndex[this.posicion].debe = this.acumuladord;
-        this.lstIndex[this.posicion].haber = this.acumuladorh;
-        console.log(this.lstIndex);
-        let result = this.lstIndex[4].haber - this.lstIndex[3].debe;
-
-        this.HTMLComprobacion += `
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
-              <th >${this.lstIndex[this.posicion].nombre} </th>
-              <th class="text-right">${
-                this.getMoneda(this.acum_saldo_inicial) == "0"
-                  ? "-"
-                  : this.getMoneda(this.acum_saldo_inicial)
-              }</th>
-              <th class="text-right">${
-                this.getMoneda(this.acumuladord) == "0"
-                  ? "-"
-                  : this.getMoneda(this.acumuladord)
-              }</th>
-              <th class="text-right">${
-                this.getMoneda(this.acumuladorh) == "0"
-                  ? "-"
-                  : this.getMoneda(this.acumuladorh)
-              }</th>
-              <th class="text-right">${
-                this.getMoneda(this.acum_saldo_actual) == "0"
-                  ? "-"
-                  : this.getMoneda(this.acum_saldo_actual)
-              }</th>
-            </tr>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-              <td colspan="5"> &nbsp; </td>
-            </tr>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-              <th colspan=5 class="text-center total" > RESULTADO NETO </th>
-            </tr>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-              <th colspan=5 class="text-center total"> 
-                Bs. ${this.getMoneda(result)}
-              </th>
-            </tr>
-          </tbody>
-        </table>
-          `;
-        // this.ngxService.stopLoader('load-precierre')
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  }
-
-  getTitulosACuentas(e): string {
-    let debe = e.debe == null ? 0 : e.debe;
-    let haber = e.haber == null ? 0 : e.haber;
-    let saldo_inicial = e.saldo_inicial == null ? 0 : e.saldo_inicial;
-    let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
-    let titulo = "";
-    if (e.totalizadora == "0") {
-      let txt =
-        "&nbsp;&nbsp;&nbsp;" +
-        e.codigo_padre +
-        "." +
-        e.parte +
-        "." +
-        e.moneda +
-        "." +
-        e.nivel_1 +
-        "." +
-        e.nivel_2;
-      titulo = `
-      <tr>  
-          <td>${txt + ". " + e.descripcion.toUpperCase()}</td>
-          <td class="text-right">${
-            this.getMoneda(saldo_inicial) == "0"
-              ? "-"
-              : this.getMoneda(saldo_inicial)
+              : this.getMoneda(saldo_actual) + "==="
           }</td>
           <td class="text-right">${
-            this.getMoneda(debe) == "0" ? "-" : this.getMoneda(debe)
+            this.getMoneda(debe) == "0" ? "-" : this.getMoneda(debe) + "***"
           }</td>
           <td class="text-right">${
-            this.getMoneda(haber) == "0" ? "-" : this.getMoneda(haber)
+            this.getMoneda(haber) == "0" ? "-" : this.getMoneda(haber) + "=+++"
           }</td>
           <td class="text-right">${
             this.getMoneda(saldo_actual) == "0"
@@ -484,9 +419,9 @@ export class ListadosComponent implements OnInit {
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th >${this.lstIndex[this.posicion].nombre} </th>
           <th class="text-right">${
-            this.getMoneda(this.acum_saldo_inicial) == "0"
+            this.getMoneda(this.acum_saldo_actual) == "0"
               ? "-"
-              : this.getMoneda(this.acum_saldo_inicial)
+              : this.getMoneda(this.acum_saldo_actual)
           }</th>
           <th class="text-right">${
             this.getMoneda(this.acumuladord) == "0"
@@ -522,4 +457,10 @@ export class ListadosComponent implements OnInit {
   getMoneda(numero: number): string {
     return this.util.ConvertirMoneda(numero);
   }
+
+  PrintPage(){
+
+  }
+
 }
+

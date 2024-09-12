@@ -1,4 +1,31 @@
+
+
 <div class="row">
+
+  <div class="col-md-7">
+    <mat-form-field appearance="outline">
+      <mat-label>FECHA DEL PLAN</mat-label>
+
+      <mat-select placeholder="FECHA DEL PLAN"
+          [ngModelOptions]="{standalone: true}"
+          (selectionChange)="ConsultarComprobante()" [(ngModel)]="fecha"
+          value="{{fecha}}">
+          <mat-option  *ngFor="let e of lstFecha"
+          [value]="e.id">
+          {{e.value | uppercase}}</mat-option>
+      </mat-select>
+
+
+  </mat-form-field>
+  </div>
+
+
+  <div class="col-md-3"></div>
+
+</div>
+
+<div class="row">
+
   <div class="col-md-12">
     <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
     <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" style="padding:10px;">
@@ -80,7 +107,7 @@
         <p align="center" style="font-weight: bold;font-size: 13px;">
           BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
           DIRECCION DE FIDEICOMISO<br>
-          BALANCE DE COMPROBACION DEL MES JULIO 
+          BALANCE DE COMPROBACION DEL MES {{this.fecha}} 
         </p>
         <div class="example-large-box mat-elevation-z4">
           <div style="padding: 20px; width: 100%; margin-bottom: 0px;">

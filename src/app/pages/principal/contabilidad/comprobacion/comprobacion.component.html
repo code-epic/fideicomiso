@@ -1,0 +1,19 @@
+
+<ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
+
+<br>
+<p align="center" style="font-weight: bold;font-size: 13px;">
+  BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
+  DIRECCION DE FIDEICOMISO<br>
+  BALANCE DE COMPROBACION DEL MES {{lstFecha[mes].value}}
+</p>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <br>
+    <div [innerHtml]="HTMLComprobacion"></div>
+    <br>
+    <br>
+  </div>
+</div>
