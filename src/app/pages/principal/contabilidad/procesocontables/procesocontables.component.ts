@@ -60,6 +60,8 @@ export class ProcesocontablesComponent implements OnInit {
     // this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
     this.consultarUltimoCierre()
 
+
+
   }
 
   consultarUltimoCierre() {
@@ -67,7 +69,7 @@ export class ProcesocontablesComponent implements OnInit {
     this.xAPI.funcion = "FID_CUltimoCierre"
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
-
+    // console.log('hola')
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
 
@@ -76,8 +78,10 @@ export class ProcesocontablesComponent implements OnInit {
           let fecha = ultc[0].fecha_cierre
           let d = fecha.split('-')
           this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
+          this.fechai = ultc[0].siguiente
         }
 
+        
 
         this.ngxService.stopLoader('load-precierre')
 
@@ -104,6 +108,9 @@ export class ProcesocontablesComponent implements OnInit {
       this._snackBar.open('Recuerde seleccionar un rango de fechas', 'OK')
       return
     }
+
+
+    
     let fini = this.util.ConvertirFechaDB(this.fechai)
     let ffin = this.util.ConvertirFechaDB(this.fechaf)
     this.ELEMENT_DATA = []

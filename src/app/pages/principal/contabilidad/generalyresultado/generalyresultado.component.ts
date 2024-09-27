@@ -148,7 +148,7 @@ export class GeneralyresultadoComponent implements OnInit {
 
     this.xAPI.funcion = "FID_CBalanceComprobacion"
     // this.xAPI.parametros = `${this.fecha},${this.estatus}`
-    this.xAPI.parametros = '2024-01-01,2024-01-31,2024-01-01'
+    this.xAPI.parametros = '2024-01-02,2024-01-03,2024-01-01,%'
     this.xAPI.valores = "";
     //console.log(this.xAPI.parametros)
 
@@ -315,7 +315,7 @@ export class GeneralyresultadoComponent implements OnInit {
   }
 
   getTitulosACuentasBalance(e): string {
-
+    console.log(e)
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
     let titulo = "";
     if (e.totalizadora == "0" || e.totalizadora == "3") {
@@ -336,7 +336,7 @@ export class GeneralyresultadoComponent implements OnInit {
           <td class="text-right">${
             this.getMoneda(saldo_actual) == "0"
               ? "-"
-              : this.getMoneda(saldo_actual) + "$$$"
+              : this.getMoneda(saldo_actual)
           }</td>
         </tr>`;
     } else {
