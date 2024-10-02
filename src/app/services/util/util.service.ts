@@ -79,6 +79,7 @@ export class UtilService {
   //Recibe  Fecha Formato: AAAA-MM-DD 00:00:00
   //Retorna Fecha Formato: DD/MM/AAAA
   ConvertirFechaHumana(f) {
+    if (f == undefined ) return "1900-01-01"
     var ISODate = new Date(f).toISOString();
     var fe = ISODate.substr(0, 10);
     var fa = fe.split("-");

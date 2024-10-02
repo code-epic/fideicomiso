@@ -22,7 +22,7 @@ export class GeneralyresultadoComponent implements OnInit {
   public lstDetalles = []
   public lstBalance = []
   public lstComprobacion = []
-  public printv : boolean = false
+  public printv: boolean = false
 
   public fechaultimo = ''
   public fechaTexto = ''
@@ -39,19 +39,20 @@ export class GeneralyresultadoComponent implements OnInit {
   public HTMLBalance = ""
   public HTMLComprobacion = ""
   public HTMLResultados = ""
-  public fecha : string = ''
-  public fdesde : string = '2023-12-01'
-  public fhasta : string = '2023-12-31'
-  public fecha_vienen : string = '2023-11-30'
-  public estatus : string = 'M'
-  public bAntes : boolean = true
+  public fecha: string = ''
+  public fdesde: string = '2023-12-01'
+  public fhasta: string = '2023-12-31'
+  public fecha_vienen: string = '2023-11-30'
+  public estatus: string = '%'
+  public bAntes: boolean = true
+  public calcularacero : number = 0
 
   public lstIndex = [] //Cuentas totalizadores de Fideicomiso
 
-  constructor(   private apiService: ApiService,
+  constructor(private apiService: ApiService,
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
-    private toasService : ToastrService,
+    private toasService: ToastrService,
     private util: UtilService,
     public formatter: NgbDateParserFormatter) { }
 
@@ -59,25 +60,19 @@ export class GeneralyresultadoComponent implements OnInit {
   }
 
 
-  ConsultarComprobante(){
-   
-    if (this.fechai == undefined ) {
+  ConsultarComprobante() {
+    if (this.fechai == undefined) {
       this.toasService.warning("Debe seleccionar una fecha ", "Fideicomiso")
       return
     }
 
-    let antes = new Date (this.fechai).setHours(-23)
-    console.log(antes)
-    let despues = new Date (this.fechai).setHours(23)
-    console.log(despues)
+    let antes = new Date(this.fechai).setHours(-23)
+    let despues = new Date(this.fechai).setHours(23)
 
-    let sHoy = new Date (this.fechai).toISOString().substring(0,10)
-    let sAntes = new Date(antes).toISOString().substring(0,10)
-    let sDesspues = new Date(despues).toISOString().substring(0,10)
+    let sHoy = new Date(this.fechai).toISOString().substring(0, 10)
+    let sAntes = new Date(antes).toISOString().substring(0, 10)
+    let sDesspues = new Date(despues).toISOString().substring(0, 10)
 
-    // console.log(sAntes.substring(0,10), sDesspues.substring(0,10))
-
-    
     this.printv = false
     this.fecha = `${sAntes},${sHoy},${sHoy}`
     let fini = this.util.ConvertirFechaHumana(this.fechai)
@@ -91,10 +86,11 @@ export class GeneralyresultadoComponent implements OnInit {
     this.acum_saldo_inicial = 0
     this.posicion = 0
     this.acum_saldo_actual = 0
+    this.calcularacero = 0
     this.consultarBalance()
   }
 
-  iniciarIndex(){
+  iniciarIndex() {
     this.lstIndex = [
       {
         id: "71",
@@ -139,42 +135,38 @@ export class GeneralyresultadoComponent implements OnInit {
     ]
   }
 
-  validarCombo(){
+  validarCombo() {
     let fini = this.util.ConvertirFechaHumana(this.fechai)
-    console.log(fini)
+    // console.log(fini)
   }
 
   consultarBalance() {
 
     this.xAPI.funcion = "FID_CBalanceComprobacion"
-    // this.xAPI.parametros = `${this.fecha},${this.estatus}`
-    this.xAPI.parametros = '2024-01-02,2024-01-03,2024-01-01,%'
+    this.xAPI.parametros = `${this.fecha},${this.estatus}`
+    // this.xAPI.parametros = '2024-01-02,2024-01-03,2024-01-01,%'
     this.xAPI.valores = "";
-    //console.log(this.xAPI.parametros)
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (data) => {
+      async data => {
         this.printv = true
-        if (data.Cuerpo.length == 0 ) {
+        if (data.Cuerpo.length == 0) {
           this.toasService.warning("No se encontraron datos para la fecha ", "Fideicomiso")
           return
         }
-        //console.log(data)
-        
+
         this.lstBalance = data.Cuerpo;
         this.HTMLBalance = `
           <table class="asientos" >
-                          
           <thead background-color: #e1e1d154; height: 35px;>
             <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">
               <th style="text-align:left">DESCRIPCION DE LA CUENTA</th>
               <th class='text-right'></th>
             </tr>
           </thead>
-          <tbody>
-          `;
-        this.HTMLResultados += this.HTMLBalance;
-        
+          <tbody>`
+          
+        this.HTMLResultados += this.HTMLBalance
+
         this.lstBalance.forEach((e) => {
           if (
             e.codigo_padre.indexOf("74") == -1 &&
@@ -182,25 +174,25 @@ export class GeneralyresultadoComponent implements OnInit {
           ) {
             this.getDetalle(e);
           } else {
-            this.getDetalleResultados(e, this.tiempo);
+            this.getDetalleResultados(e, this.tiempo)
           }
         });
 
 
         this.lstIndex[this.posicion].debe = this.acumuladord;
         this.lstIndex[this.posicion].haber = this.acumuladorh;
-        console.log(this.lstIndex);
+        // console.log(this.lstIndex)
+        // console.log(this.lstIndex[4].haber, this.lstIndex[3].debe);
         let result = this.lstIndex[4].haber - this.lstIndex[3].debe;
 
         this.HTMLBalance += ``;
         this.HTMLResultados += `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
         <th >${this.lstIndex[this.posicion].nombre} </th>
-        <th class="text-right">${
-          this.getMoneda(this.acum_saldo_actual) == "0"
+        <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
             ? "-"
             : this.getMoneda(this.acum_saldo_actual)
-        }</th>
+          }</th>
         </tr>
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
           <td colspan="5"> &nbsp; </td>
@@ -210,7 +202,7 @@ export class GeneralyresultadoComponent implements OnInit {
               </tr>
               <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
                 <th colspan=5 class="text-center total"> 
-                  Bs. ${ this.estatus==''?'-': this.getMoneda(result) }
+                  Bs. ${ this.calcularacero==1?'-':this.getMoneda(result) }
                 </th>
               </tr>
             </tbody>
@@ -244,16 +236,18 @@ export class GeneralyresultadoComponent implements OnInit {
       this.HTMLBalance += `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th >${this.lstIndex[this.posicion].nombre} </th>
-          <th class="text-right">${
-            this.getMoneda(this.acum_saldo_actual) == "0"
-              ? "-"
-              : this.getMoneda(this.acum_saldo_actual)
-          }</th>
+          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          ? "-$$"
+          : this.getMoneda(this.acum_saldo_actual)
+        }</th>
         </tr>
         <tr>  
           <td  colspan="5">${this.getTitulosACuentasBalance(e)} </td>
-        </tr>
-      `;
+        </tr>`
+        // console.log('imprimiendo valores ', this.acum_saldo_actual, this.calcularacero )
+        // if (this.acum_saldo_actual != 0) this.calcularacero = 1
+        
+     
 
       this.cambio = true;
       this.acumuladord = parseFloat(debe);
@@ -266,7 +260,7 @@ export class GeneralyresultadoComponent implements OnInit {
 
   getDetalleResultados(e, tiempo) {
 
-    console.log(e.codigo_padre, this.tiempo)
+    // console.log(e.codigo_padre, this.tiempo)
     let debe = e.debe == null ? 0 : e.debe;
     let haber = e.haber == null ? 0 : e.haber;
     let saldo_inicial = e.saldo_inicial == null ? 0 : e.saldo_inicial;
@@ -277,24 +271,23 @@ export class GeneralyresultadoComponent implements OnInit {
       this.acumuladorh += parseFloat(haber)
       this.acum_saldo_inicial += parseFloat(saldo_inicial)
       this.acum_saldo_actual += parseFloat(saldo_actual)
-      
       this.HTMLResultados += this.getTitulosACuentasBalance(e)
-      
-     
     } else {
       this.lstIndex[this.posicion].debe = this.acumuladord
       this.lstIndex[this.posicion].haber = this.acumuladorh
       let cadena = `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th >${this.lstIndex[this.posicion].nombre} </th>
-          <th class="text-right">${
-            this.getMoneda(this.acum_saldo_actual) == "0"
-              ? "-"
-              : this.getMoneda(this.acum_saldo_actual)
-          }</th>
+          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          ? "-"
+          : this.getMoneda(this.acum_saldo_actual)
+        }</th>
         </tr>
        
       `;
+      // console.log('imprimiendo valores ', this.acum_saldo_actual, this.calcularacero )
+      if (this.acum_saldo_actual == 0) this.calcularacero = 1
+      
       if (this.tiempo == 0) {
         this.HTMLBalance += cadena
         this.HTMLResultados += `
@@ -315,7 +308,7 @@ export class GeneralyresultadoComponent implements OnInit {
   }
 
   getTitulosACuentasBalance(e): string {
-    console.log(e)
+    // console.log(e)
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
     let titulo = "";
     if (e.totalizadora == "0" || e.totalizadora == "3") {
@@ -333,17 +326,15 @@ export class GeneralyresultadoComponent implements OnInit {
       titulo = `
       <tr>  
           <td>${txt + ". " + e.descripcion.toUpperCase()}</td>
-          <td class="text-right">${
-            this.getMoneda(saldo_actual) == "0"
-              ? "-"
-              : this.getMoneda(saldo_actual)
-          }</td>
+          <td class="text-right">${this.getMoneda(saldo_actual) == "0"
+          ? "-"
+          : this.getMoneda(saldo_actual)
+        }</td>
         </tr>`;
     } else {
       titulo = `
       <tr>  
-        <td colspan="5" style="background-color: #eeeee4;">${
-          e.codigo_padre + ". " + e.descripcion.toUpperCase()
+        <td colspan="5" style="background-color: #eeeee4;">${e.codigo_padre + ". " + e.descripcion.toUpperCase()
         }</td>
       </tr>`;
     }
@@ -370,28 +361,23 @@ export class GeneralyresultadoComponent implements OnInit {
       titulo = `
       <tr>  
           <td>${txt + ". " + e.descripcion.toUpperCase()}</td>
-          <td class="text-right">${
-            this.getMoneda(saldo_actual) == "0"
-              ? "-"
-              : this.getMoneda(saldo_actual) + "==="
-          }</td>
-          <td class="text-right">${
-            this.getMoneda(debe) == "0" ? "-" : this.getMoneda(debe) + "***"
-          }</td>
-          <td class="text-right">${
-            this.getMoneda(haber) == "0" ? "-" : this.getMoneda(haber) + "=+++"
-          }</td>
-          <td class="text-right">${
-            this.getMoneda(saldo_actual) == "0"
-              ? "-"
-              : this.getMoneda(saldo_actual)
-          }</td>
+          <td class="text-right">${this.getMoneda(saldo_actual) == "0"
+          ? "-"
+          : this.getMoneda(saldo_actual) 
+        }</td>
+          <td class="text-right">${this.getMoneda(debe) == "0" ? "-" : this.getMoneda(debe) + "***"
+        }</td>
+          <td class="text-right">${this.getMoneda(haber) == "0" ? "-" : this.getMoneda(haber) + "=+++"
+        }</td>
+          <td class="text-right">${this.getMoneda(saldo_actual) == "0"
+          ? "-"
+          : this.getMoneda(saldo_actual)
+        }</td>
         </tr>`;
     } else {
       titulo = `
       <tr>  
-        <td colspan="5" style="background-color: #eeeee4;">${
-          e.codigo_padre + ". " + e.descripcion.toUpperCase()
+        <td colspan="5" style="background-color: #eeeee4;">${e.codigo_padre + ". " + e.descripcion.toUpperCase()
         }</td>
       </tr>`;
     }
@@ -418,26 +404,22 @@ export class GeneralyresultadoComponent implements OnInit {
       this.HTMLComprobacion += `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th >${this.lstIndex[this.posicion].nombre} </th>
-          <th class="text-right">${
-            this.getMoneda(this.acum_saldo_actual) == "0"
-              ? "-"
-              : this.getMoneda(this.acum_saldo_actual)
-          }</th>
-          <th class="text-right">${
-            this.getMoneda(this.acumuladord) == "0"
-              ? "-"
-              : this.getMoneda(this.acumuladord)
-          }</th>
-          <th class="text-right">${
-            this.getMoneda(this.acumuladorh) == "0"
-              ? "-"
-              : this.getMoneda(this.acumuladorh)
-          }</th>
-          <th class="text-right">${
-            this.getMoneda(this.acum_saldo_actual) == "0"
-              ? "-"
-              : this.getMoneda(this.acum_saldo_actual)
-          }</th>
+          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          ? "-"
+          : this.getMoneda(this.acum_saldo_actual)
+        }</th>
+          <th class="text-right">${this.getMoneda(this.acumuladord) == "0"
+          ? "-"
+          : this.getMoneda(this.acumuladord)
+        }</th>
+          <th class="text-right">${this.getMoneda(this.acumuladorh) == "0"
+          ? "-"
+          : this.getMoneda(this.acumuladorh)
+        }</th>
+          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          ? "-"
+          : this.getMoneda(this.acum_saldo_actual)
+        }</th>
         </tr>
         <tr>  
           <td  colspan="5">${this.getTitulosACuentas(e)} </td>
@@ -458,7 +440,7 @@ export class GeneralyresultadoComponent implements OnInit {
     return this.util.ConvertirMoneda(numero);
   }
 
-  PrintPage(){
+  PrintPage() {
 
   }
 
