@@ -19,7 +19,6 @@ import { ComprobanteComponent } from 'src/app/pages/principal/contabilidad/compr
 import { CuentaComponent } from 'src/app/pages/principal/contabilidad/cuenta/cuenta.component'
 import { OperacionesComponent } from 'src/app/pages/principal/operaciones/operaciones.component'
 import { ProcesosComponent } from 'src/app/pages/principal/operaciones/procesos/procesos.component'
-import { ListadosComponent } from 'src/app/pages/principal/operaciones/listados/listados.component'
 import { PrecierreComponent } from 'src/app/pages/principal/operaciones/procesos/precierre/precierre.component'
 import { CierreComponent } from 'src/app/pages/principal/operaciones/procesos/cierre/cierre.component'
 import { TablasComponent } from 'src/app/pages/principal/contabilidad/tablas/tablas.component'
@@ -34,6 +33,8 @@ import { ProcesocontablesComponent } from 'src/app/pages/principal/contabilidad/
 import { GeneralyresultadoComponent } from 'src/app/pages/principal/contabilidad/generalyresultado/generalyresultado.component'
 import { ComprobacionComponent } from 'src/app/pages/principal/contabilidad/comprobacion/comprobacion.component'
 import { MayoranaliticoComponent } from 'src/app/pages/principal/contabilidad/mayoranalitico/mayoranalitico.component'
+import { CcierreComponent } from 'src/app/pages/principal/contabilidad/ccierre/ccierre.component'
+import { NpanelComponent } from 'src/app/pages/principal/negocios/npanel/npanel.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -129,6 +130,10 @@ export const AdminLayoutRoutes: Routes = [
         component: CierreComponent,
         canActivate: [AuthGuardGuard]
     },{
+        path: 'ccierre',
+        component: CcierreComponent,
+        canActivate: [AuthGuardGuard]
+    },{
         path: 'transacciones',
         component: TransaccionesComponent,
         canActivate: [AuthGuardGuard]
@@ -171,6 +176,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'retiros',
         component: RetirosComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'npanel',
+        component: NpanelComponent,
         canActivate: [AuthGuardGuard]
     }
 

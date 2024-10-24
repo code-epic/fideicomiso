@@ -59,6 +59,7 @@ import { ProcesosComponent } from 'src/app/pages/principal/operaciones/procesos/
 import { ListadosComponent } from 'src/app/pages/principal/operaciones/listados/listados.component';
 import { PrecierreComponent } from 'src/app/pages/principal/operaciones/procesos/precierre/precierre.component';
 import { CierreComponent } from 'src/app/pages/principal/operaciones/procesos/cierre/cierre.component';
+
 import { TablasComponent } from 'src/app/pages/principal/contabilidad/tablas/tablas.component';
 import { ConfiguracionesComponent } from 'src/app/pages/principal/administracion/configuraciones/configuraciones.component';
 import { ConsultainversionesComponent } from 'src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component';
@@ -75,6 +76,8 @@ import { GeneralyresultadoComponent } from 'src/app/pages/principal/contabilidad
 import { ComprobacionComponent } from 'src/app/pages/principal/contabilidad/comprobacion/comprobacion.component';
 import { MayoranaliticoComponent } from 'src/app/pages/principal/contabilidad/mayoranalitico/mayoranalitico.component';
 import { ToastContainerModule, ToastrModule } from 'ngx-toastr';
+import { CcierreComponent } from 'src/app/pages/principal/contabilidad/ccierre/ccierre.component';
+import { NpanelComponent } from 'src/app/pages/principal/negocios/npanel/npanel.component';
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 
 @NgModule({
@@ -165,6 +168,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     GeneralyresultadoComponent,
     ComprobacionComponent,
     MayoranaliticoComponent,
+    CcierreComponent,
+    NpanelComponent,
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},

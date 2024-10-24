@@ -1,0 +1,181 @@
+<div class="row">
+  <div class="col-md-12">
+    <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
+
+
+
+
+    <div class="row">
+      <div class="col-md-3">
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de Contable</mat-label>
+          <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="fechaultimo" disabled="disabled">
+          <mat-icon matSuffix>event</mat-icon>
+        </mat-form-field>
+        <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+      </div>
+
+      <div class="col-md-3">
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de Inicio</mat-label>
+          <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai">
+          <mat-datepicker #ypicker></mat-datepicker>
+          <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
+        </mat-form-field>
+        <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+      </div>
+
+      <div class="col-md-3">
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha Fin</mat-label>
+          <input matInput [matDatepicker]="zpicker" [(ngModel)]="fechaf" (dateInput)="CalcularDias('input', $event)"
+            (dateChange)="CalcularDias('change', $event)">
+          <mat-datepicker #zpicker></mat-datepicker>
+          <mat-icon matSuffix (click)="zpicker.open()">event</mat-icon>
+        </mat-form-field>
+        <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
+
+      </div>
+
+      <div class="col-md-3">
+        <mat-form-field appearance="outline">
+          <mat-label>N&uacute;mero de dias </mat-label>
+          <input matInput placeholder="N&uacute;mero de dias" [ngModelOptions]="{standalone: true}" [(ngModel)]="dias">
+          <mat-icon matSuffix>folder</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+
+      <div class="col-md-12 text-right">
+
+        
+      
+        <button mat-flat-button color="primary" (click)="CrearSaldos()" style="height: 50px;">
+          <mat-icon>search</mat-icon>&nbsp;Consultar comprobantes / movimientos
+        </button>
+
+
+      </div>
+
+    </div>
+
+    <div class="row" *ngIf="blista">
+      <div class="col-md-12">
+        <mat-selection-list>
+          <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+            <div class="row">
+              <div class="col-md-2 texto-detalle auto-title">
+                CUENTA
+              </div>
+              <div class="col-md-6 texto-detalle auto-title">
+                DESCRIPCION
+              </div>
+              <div class="col-md-2 texto-detalle auto-title">
+                DEBE
+              </div>
+              <div class="col-md-2 texto-lista auto-title">
+                HABER
+              </div>
+            </div>
+          </mat-list>
+          <mat-list *ngFor="let e of lstMovimientos; let i=index "
+            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+            <div class="row">
+              <div class="col-md-2 texto-detalle auto-ajuste">
+                {{ e.cuenta }}
+              </div>
+              <div class="col-md-6 texto-detalle auto-ajuste">
+                {{ e.descripcion | uppercase }}
+              </div>
+              <div class="col-md-2 texto-detalle auto-ajuste">
+                Bs. {{(e.debe) }}
+              </div>
+              <div class="col-md-2 texto-lista auto-ajuste">
+                Bs. {{(e.haber) }}
+              </div>
+              
+            </div>
+          </mat-list>
+        </mat-selection-list>
+        <br><br>
+      </div>
+    </div>
+  
+
+
+
+
+    <div class="row" *ngIf="bauxiliar">
+      <div class="col-md-12">
+        <mat-selection-list>
+          <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+            <div class="row">
+              <div class="col-md-3 texto-detalle auto-title">
+                CUENTA
+              </div>
+              <div class="col-md-7 texto-detalle auto-title">
+                DESCRIPCION
+              </div>
+              <div class="col-md-2 texto-detalle auto-title">
+                SALDO
+              </div>
+            </div>
+          </mat-list>
+          <mat-list *ngFor="let e of lstMovimientosAuxliares; let i=index "
+            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+            <div class="row">
+              <div class="col-md-3 texto-detalle auto-ajuste">
+                {{ e.cuenta }}
+              </div>
+              <div class="col-md-7 texto-detalle auto-ajuste">
+                {{ e.descripcion | uppercase }}
+              </div>
+              <div class="col-md-2 texto-detalle auto-ajuste">
+                Bs. {{(e.saldo) }}
+              </div>
+              
+            </div>
+          </mat-list>
+        </mat-selection-list>
+        <br><br>
+      </div>
+    </div>
+    <hr>
+    <div class="row"  *ngIf="blista">
+
+      <div class="col-md-12 text-right">
+
+        <button mat-flat-button color="primary" (click)="GenerarPrecierre()" style="height: 50px;">
+          <mat-icon>verified</mat-icon>&nbsp;Generar precierre
+        </button>
+
+
+      </div>
+
+    </div>
+    <div class="row"  *ngIf="bauxiliar">
+
+      <div class="col-md-12 text-right">
+
+        <button mat-flat-button color="primary" (click)="GenerarCierre()" style="height: 50px;">
+          <mat-icon>verified</mat-icon>&nbsp;Generar Cierre
+        </button>
+
+
+      </div>
+
+    </div>
+
+
+
+
+
+
+
+  </div>
+</div>

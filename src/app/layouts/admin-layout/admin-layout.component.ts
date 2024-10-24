@@ -24,7 +24,8 @@ export class AdminLayoutComponent implements OnInit {
     
     this.pagina = pagina[1].toUpperCase()
     this.msj.contenido$.subscribe( e => {
-      this.pagina = e
+      console.log(e)
+      this.pagina = e == 'NPANEL'?'NEGOCIO':e
     })
 
   }
@@ -33,7 +34,8 @@ export class AdminLayoutComponent implements OnInit {
 
   IrA(url : string){
     
-    this.pagina = url.toUpperCase()
+    this.pagina =  url.toUpperCase() == 'NPANEL'?'NEGOCIO': url.toUpperCase()
+   
     this.ruta.navigate(['/' + url]);
   }
 

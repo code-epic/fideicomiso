@@ -74,7 +74,7 @@ export class GeneralyresultadoComponent implements OnInit {
     let sDesspues = new Date(despues).toISOString().substring(0, 10)
 
     this.printv = false
-    this.fecha = `${sAntes},${sHoy},${sHoy}`
+    this.fecha = `${sHoy},${sAntes}`
     let fini = this.util.ConvertirFechaHumana(this.fechai)
     this.fechaTexto = fini
     this.iniciarIndex()
@@ -142,10 +142,11 @@ export class GeneralyresultadoComponent implements OnInit {
 
   consultarBalance() {
 
-    this.xAPI.funcion = "FID_CBalanceComprobacion"
+    this.xAPI.funcion = "FID_CBalanceFecha"
     this.xAPI.parametros = `${this.fecha},${this.estatus}`
     // this.xAPI.parametros = '2024-01-02,2024-01-03,2024-01-01,%'
     this.xAPI.valores = "";
+    console.log(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.printv = true
@@ -153,7 +154,7 @@ export class GeneralyresultadoComponent implements OnInit {
           this.toasService.warning("No se encontraron datos para la fecha ", "Fideicomiso")
           return
         }
-
+        console.log(data.Cuerpo)
         this.lstBalance = data.Cuerpo;
         this.HTMLBalance = `
           <table class="asientos" >
@@ -328,7 +329,7 @@ export class GeneralyresultadoComponent implements OnInit {
           <td>${txt + ". " + e.descripcion.toUpperCase()}</td>
           <td class="text-right">${this.getMoneda(saldo_actual) == "0"
           ? "-"
-          : this.getMoneda(saldo_actual)
+          : this.getMoneda(saldo_actual) 
         }</td>
         </tr>`;
     } else {
