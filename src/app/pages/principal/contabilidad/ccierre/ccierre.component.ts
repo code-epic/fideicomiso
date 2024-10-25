@@ -95,12 +95,39 @@ export class CcierreComponent implements OnInit {
   }
 
   CrearSaldos(){
+    let d = this.fechaultimo.split('/')
+    let fultimo =  d[2] + '-' + d[1] + '-' + d[0];
+    let dt = new Date(this.fechai).toISOString()
 
+    d =  dt.split('T')
+    let fopera =  d[0]
+    let usuario = 'Administrador'
+    let llave = ''
+    let plan = '1'
+
+
+
+    this.ngxService.startLoader('load-precierre')
+    this.xAPI.funcion = "FID_ISaldosCierre"
+    this.xAPI.parametros = `${fopera},${usuario},${llave},${plan},${fultimo}`
+    this.xAPI.valores = ''
+    // console.log('hola')
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+
+        console.log(data)
+        this.ngxService.stopLoader('load-precierre')
+
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+
+    
   }
 
-  onFechaChange(newDate: Date): void {
-    console.log('Fecha seleccionada:', newDate);
-  }
+
 
 
 }
