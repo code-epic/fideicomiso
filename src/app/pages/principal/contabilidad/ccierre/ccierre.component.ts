@@ -115,7 +115,13 @@ export class CcierreComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
 
-        console.log(data)
+        this.apiService.Mensaje(
+          "Proceso exitoso",
+          "Se ha realizado el cierre para el dia: " + this.util.ConvertirFechaHumana(this.fechai),
+          "success",
+          "Cierres"
+        )
+        this.consultarUltimoCierre()
         this.ngxService.stopLoader('load-precierre')
 
       },
