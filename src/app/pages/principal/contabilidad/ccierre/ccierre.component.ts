@@ -71,10 +71,15 @@ export class CcierreComponent implements OnInit {
 
         let ultc = data.Cuerpo
         if (ultc.length > 0) {
-          let fecha = ultc[0].fecha_cierre
-          let d = fecha.split('-')
-          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
-          this.fechai = ultc[0].siguiente
+          let fecha = ultc[0].fecha_cierre;
+          let d = fecha.split('-');
+          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
+          let fechaCierre = new Date(`${d[0]}-${d[1]}-${d[2]}`);
+          fechaCierre.setDate(fechaCierre.getDate() + 2);
+          fechaCierre.setHours(0, 0, 0, 0);
+          this.fechai = fechaCierre;   
+          this.fechaf = fechaCierre;
+          this.dias = 1
         }
         this.ngxService.stopLoader('load-precierre')
 
@@ -91,6 +96,10 @@ export class CcierreComponent implements OnInit {
 
   CrearSaldos(){
 
+  }
+
+  onFechaChange(newDate: Date): void {
+    console.log('Fecha seleccionada:', newDate);
   }
 
 

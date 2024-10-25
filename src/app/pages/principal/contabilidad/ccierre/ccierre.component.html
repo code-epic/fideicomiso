@@ -20,8 +20,7 @@
       <div class="col-md-3">
         <mat-form-field appearance="outline">
           <mat-label>Fecha de Inicio</mat-label>
-          <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai">
-          <mat-datepicker #ypicker></mat-datepicker>
+          <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai" (ngModelChange)="onFechaChange($event)">          <mat-datepicker #ypicker></mat-datepicker>
           <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
         </mat-form-field>
         <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
