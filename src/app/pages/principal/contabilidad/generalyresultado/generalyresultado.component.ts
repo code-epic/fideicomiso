@@ -5,6 +5,7 @@ import { NgbDateParserFormatter } from "@ng-bootstrap/ng-bootstrap";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { UtilService } from "src/app/services/util/util.service";
 import { ToastrService } from 'ngx-toastr';
+import { log } from 'console';
 
 @Component({
   selector: 'app-generalyresultado',
@@ -57,13 +58,51 @@ export class GeneralyresultadoComponent implements OnInit {
     public formatter: NgbDateParserFormatter) { }
 
   ngOnInit(): void {
+    this.consultarUltimoCierre()
+  }
+
+  consultarUltimoCierre() {
+    this.ngxService.stopLoader('load-precierre')
+    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.parametros = ''
+    this.xAPI.valores = ''
+    // console.log('hola')
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+
+        let ultc = data.Cuerpo
+        if (ultc.length > 0) {
+          let fecha = ultc[0].fecha_cierre;
+          let d = fecha.split('-');
+          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
+        }
+        this.ngxService.stopLoader('load-precierre')
+
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
   }
 
 
   ConsultarComprobante() {
+    this.printv = false
+
     if (this.fechai == undefined) {
       this.toasService.warning("Debe seleccionar una fecha ", "Fideicomiso")
       return
+    }
+
+    const opciones = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    let fechaiAux = this.fechai.toLocaleDateString('es-ES', opciones);
+
+    const fechaInicio = new Date(fechaiAux);
+    const fechaUltimo = new Date(this.fechaultimo);
+
+    if (fechaInicio > fechaUltimo) {
+      this.toasService.warning("El Ultimo Cierre es Menor a la Fecha Seleccionada", "Fideicomiso");
+      return;
     }
 
     let antes = new Date(this.fechai).setHours(-23)
@@ -73,7 +112,6 @@ export class GeneralyresultadoComponent implements OnInit {
     let sAntes = new Date(antes).toISOString().substring(0, 10)
     let sDesspues = new Date(despues).toISOString().substring(0, 10)
 
-    this.printv = false
     this.fecha = `${sHoy},${sAntes}`
     let fini = this.util.ConvertirFechaHumana(this.fechai)
     this.fechaTexto = fini
