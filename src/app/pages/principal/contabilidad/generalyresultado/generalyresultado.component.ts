@@ -26,6 +26,7 @@ export class GeneralyresultadoComponent implements OnInit {
   public printv: boolean = false
 
   public fechaultimo = ''
+  public fechaUltimoComparacion = ''
   public fechaTexto = ''
   public fechai: any
 
@@ -75,6 +76,7 @@ export class GeneralyresultadoComponent implements OnInit {
           let fecha = ultc[0].fecha_cierre;
           let d = fecha.split('-');
           this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
+          this.fechaUltimoComparacion = d[1] + '/' + d[2] + '/' + d[0];
         }
         this.ngxService.stopLoader('load-precierre')
 
@@ -94,13 +96,13 @@ export class GeneralyresultadoComponent implements OnInit {
       return
     }
 
-    const opciones = { day: '2-digit', month: '2-digit', year: 'numeric' };
-    let fechaiAux = this.fechai.toLocaleDateString('es-ES', opciones);
+    const fechaInicio = new Date(this.fechai)
+    const fechaUltimo = new Date(this.fechaUltimoComparacion)
 
-    const fechaInicio = new Date(fechaiAux);
-    const fechaUltimo = new Date(this.fechaultimo);
-
-    if (fechaInicio > fechaUltimo) {
+    const fechaUltimoMasUnDia = new Date(fechaUltimo)
+    fechaUltimoMasUnDia.setDate(fechaUltimo.getDate() + 1)
+    
+    if (fechaInicio > fechaUltimoMasUnDia) {
       this.toasService.warning("El Ultimo Cierre es Menor a la Fecha Seleccionada", "Fideicomiso");
       return;
     }
