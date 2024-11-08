@@ -89,8 +89,6 @@ export class GeneralyresultadoComponent implements OnInit {
 
 
   ConsultarComprobante() {
-    this.printv = false
-
     if (this.fechai == undefined) {
       this.toasService.warning("Debe seleccionar una fecha ", "Fideicomiso")
       return
@@ -103,8 +101,9 @@ export class GeneralyresultadoComponent implements OnInit {
     fechaUltimoMasUnDia.setDate(fechaUltimo.getDate() + 1)
     
     if (fechaInicio > fechaUltimoMasUnDia) {
-      this.toasService.warning("El Ultimo Cierre es Menor a la Fecha Seleccionada", "Fideicomiso");
-      return;
+      this.toasService.warning("La fecha del último cierre es menor a la fecha seleccionada", "Fideicomiso");
+      this.fechai = new Date(fechaUltimoMasUnDia)
+      console.log(this.fechai);
     }
 
     let antes = new Date(this.fechai).setHours(-23)
