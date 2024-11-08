@@ -1,0 +1,49 @@
+
+
+table{
+  border-collapse: collapse;
+  font-size: 10.5px;
+  width: 100%;
+}
+
+.titulo th {
+  border: 1px solid black;
+}
+
+.cabecera th {
+  border: 1px solid black;
+  text-align: center;
+  background-color: rgb(182, 167, 167);
+  color: white;
+}
+
+tr td {
+  border: 1px solid black;
+  text-align: center;
+}
+
+
+td, th{
+  padding: 0.5rem;
+}
+
+.right {
+  text-align: right;
+}
+
+.bgblue {
+  background-color: rgb(182, 167, 167);
+  color: white;
+}
+
+.none {
+  border:none ;
+}
+
+.linea {
+  background-color: rgb(255, 255, 255);
+}
+
+.yellow {
+background-color: rgb(97, 97, 75);
+}

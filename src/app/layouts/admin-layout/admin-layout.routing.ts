@@ -35,6 +35,7 @@ import { ComprobacionComponent } from 'src/app/pages/principal/contabilidad/comp
 import { MayoranaliticoComponent } from 'src/app/pages/principal/contabilidad/mayoranalitico/mayoranalitico.component'
 import { CcierreComponent } from 'src/app/pages/principal/contabilidad/ccierre/ccierre.component'
 import { NpanelComponent } from 'src/app/pages/principal/negocios/npanel/npanel.component'
+import { CarteraComponent } from 'src/app/pages/principal/inversiones/cartera/cartera.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -180,6 +181,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'npanel',
         component: NpanelComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'cartera',
+        component: CarteraComponent,
         canActivate: [AuthGuardGuard]
     }
 

@@ -1,0 +1,119 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-profile shadow">
+      <div class="card-body">
+        <ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
+
+
+
+        <div class="row">
+          <div class="col-md-4"></div>
+
+          <div class="col-md-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha valor</mat-label>
+              <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai">
+              <mat-datepicker #ypicker></mat-datepicker>
+              <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
+            </mat-form-field>
+        
+          </div>
+         
+        
+          <div class="col-md-4 text-left">
+            <button mat-flat-button color="primary" (click)="ConsultarCarteraAl()" style="margin-top: 5px; height: 50px;">
+              <mat-icon>verified</mat-icon>&nbsp;Procesar reporte
+            </button>
+          </div>
+        
+        </div>
+        
+        
+      
+        <div class="row" *ngIf="bVista">
+          <div class="col-md-12">
+          
+
+            <table>
+              <thead>
+                <tr class="cabecera">
+                  <th>EMISOR</th>
+                  <th>TIPO DE INVERSION</th>
+                  <!-- <th>PRECIO DE COMPRA</th> -->
+                  <th>VALOR DE COMPRA</th>
+                  <th>SALDOS LIBROS</th>
+                  <!-- <th>FECHA DE EMISION</th> -->
+                  <th>FECHA DE COMPRA</th>
+                  <th>FECHA DE VENCIMIENTO</th>
+                  <th>PLAZO</th>
+                  <th>TASA DE INTERES</th>
+                  <th>DIAS DEVENGADOS</th>
+                  <th>INTERESES DEVENGADOS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of lstCartera;let i=index; ">
+                  <td>{{e.emisor}}</td>
+                  <td>{{e.instrumento}}</td>
+                  <!-- <td>0</td> -->
+                  <td class="right">{{ getMoneda(e.valor_nominal) }}</td>
+                  <td class="right">{{  getMoneda(e.costo_adquisicion) }}</td>
+                  <!-- <td>0</td> -->
+                  <td>{{ e.fecha_compra | date:"dd/MM/yyyy" }}</td>
+                  <td>{{ e.fecha_vencimiento | date:"dd/MM/yyyy" }}</td>
+                  <td>{{ e.plazo_cupon }}</td>
+                  <td>{{ e.tasa_cupon }} %</td>
+                  <td>{{ CalcularDias( e.fecha_compra, fecha_al ) }}</td>
+                  <td class="right"> {{ getMoneda(InteresDiarioCupon(e, CalcularDias( e.fecha_compra, fecha_al ) )) }} </td>
+                </tr>
+
+               
+
+
+                <tr>
+                  <td class="yellow" colspan="11"></td>
+                </tr>
+
+                <tr class="descripcion4">
+                  <td class="none"></td>
+                  <td class="linea" colspan="2">TOTAL 712</td>
+                  <td class="bgblue right">{{ getMoneda(total_a) }}</td>
+                  <td class="none" colspan="2"></td>
+                  <td class="linea" colspan="3">TOTAL 714</td>
+                  <td class="bgblue right">{{ getMoneda(total_b) }}</td>
+                </tr>
+
+
+                <tr class="descripcion5">
+                  <td class="none"></td>
+                  <td class="linea" colspan="2">SALDO BALANCE</td>
+                  <td class="bgblue">{{ getMoneda(balance_a)}}</td>
+                  <td class="none" colspan="2"></td>
+                  <td class="linea" colspan="3">SALDO BALANCE</td>
+                  <td class="bgblue">{{ getMoneda(balance_b) }}</td>
+                </tr>
+
+
+                <!-- <tr class="descripcion6">
+                  <td class="none"></td>
+                  <td class="linea" colspan="2">DIF</td>
+                  <td class="linea right">0,00</td>
+                  <td class="none" colspan="2"></td>
+                  <td class="linea" colspan="3">DIF</td>
+                  <td class="linea right">0,00</td>
+                </tr> -->
+
+              </tbody>
+            </table>
+
+            <br>
+            <br>
+            <br>
+
+          </div>
+        </div>
+    
+      </div>
+    </div>
+  </div>
+</div>

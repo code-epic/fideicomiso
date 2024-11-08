@@ -78,6 +78,7 @@ import { MayoranaliticoComponent } from 'src/app/pages/principal/contabilidad/ma
 import { ToastContainerModule, ToastrModule } from 'ngx-toastr';
 import { CcierreComponent } from 'src/app/pages/principal/contabilidad/ccierre/ccierre.component';
 import { NpanelComponent } from 'src/app/pages/principal/negocios/npanel/npanel.component';
+import { CarteraComponent } from 'src/app/pages/principal/inversiones/cartera/cartera.component';
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 
 @NgModule({
@@ -170,6 +171,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     MayoranaliticoComponent,
     CcierreComponent,
     NpanelComponent,
+    CarteraComponent,
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2500}},

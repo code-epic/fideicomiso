@@ -182,8 +182,8 @@ export class GeneralyresultadoComponent implements OnInit {
 
         this.lstIndex[this.posicion].debe = this.acumuladord;
         this.lstIndex[this.posicion].haber = this.acumuladorh;
-        // console.log(this.lstIndex)
-        // console.log(this.lstIndex[4].haber, this.lstIndex[3].debe);
+        console.log(this.lstIndex)
+        console.log(this.lstIndex[4].haber, this.lstIndex[3].debe);
         let result = this.lstIndex[4].haber - this.lstIndex[3].debe;
 
         this.HTMLBalance += ``;
@@ -222,7 +222,7 @@ export class GeneralyresultadoComponent implements OnInit {
     let haber = e.haber == null ? 0 : e.haber;
     let saldo_inicial = e.saldo_inicial == null ? 0 : e.saldo_inicial;
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
-    //console.log(e.codigo_padre, this.lstIndex[this.posicion], this.posicion)
+    console.log(e.codigo_padre, this.lstIndex[this.posicion], this.posicion)
     if (e.codigo_padre.substring(0, 2) == this.lstIndex[this.posicion].id) {
       this.acumuladord += parseFloat(debe);
       this.acumuladorh += parseFloat(haber);
