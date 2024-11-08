@@ -1,35 +1,46 @@
 <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
 
-<div class="row">
-  <div class="col-md-2"></div>
-  <div class="col-md-3">
-    <mat-form-field appearance="outline">
-      <mat-label>Fecha valor</mat-label>
-      <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai" (blur)="validarCombo()">
-      <mat-datepicker #ypicker></mat-datepicker>
-      <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
-    </mat-form-field>
-
+<div class="centrar">
+  <div class="row">
+    <div class="col-md-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Ultimo Cierre</mat-label>
+        <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="fechaultimo" disabled="disabled">
+        <mat-icon matSuffix>event</mat-icon>
+      </mat-form-field>
+    </div>
+  
+    <div class="col-md-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha valor</mat-label>
+        <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai" (blur)="validarCombo()">
+        <mat-datepicker #ypicker></mat-datepicker>
+        <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
+      </mat-form-field>
+  
+    </div>
+    <div class="col-md-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de evaluación</mat-label>
+        <mat-select placeholder="Tipo de evaluación" [(ngModel)]="estatus" value="{{estatus}}">
+          <mat-option value='%'>MENSUAL</mat-option>
+          <mat-option value='S'>CIERRE SEMESTRAL</mat-option>
+          <mat-option value='M' *ngIf="bAntes">ANTES DEL CIERRE SEMESTRAL</mat-option>
+          <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
+        </mat-select>
+  
+      </mat-form-field>
+    </div>
+  
+    <div class="col-md-2 text-left">
+      <button mat-flat-button color="primary" (click)="ConsultarComprobante()" style="margin-top: 5px; height: 50px;">
+        <mat-icon>verified</mat-icon>&nbsp;Procesar reporte
+      </button>
+    </div>
+  
+  
   </div>
-  <div class="col-md-3">
-    <mat-form-field appearance="outline">
-      <mat-label>Tipo de evaluación</mat-label>
-      <mat-select placeholder="Tipo de evaluación" [(ngModel)]="estatus" value="{{estatus}}">
-        <mat-option value='%'>MENSUAL</mat-option>
-        <mat-option value='S'>CIERRE SEMESTRAL</mat-option>
-        <mat-option value='M' *ngIf="bAntes">ANTES DEL CIERRE SEMESTRAL</mat-option>
-        <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
-      </mat-select>
-
-    </mat-form-field>
-  </div>
-
-  <div class="col-md-4 text-left">
-    <button mat-flat-button color="primary" (click)="ConsultarComprobante()" style="margin-top: 5px; height: 50px;">
-      <mat-icon>verified</mat-icon>&nbsp;Procesar reporte
-    </button>
-  </div>
-
 </div>
 
 
