@@ -376,6 +376,9 @@ export class TablasComponent implements OnInit {
       case "X":
         str = "COMPRA / VENTA";
         break;
+      case "Z":
+        str = "CIERRE SEMESTRAL";
+        break;
       default:
         break;
     }

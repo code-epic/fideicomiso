@@ -48,6 +48,9 @@ export class GeneralyresultadoComponent implements OnInit {
   public estatus: string = '%'
   public bAntes: boolean = true
   public calcularacero : number = 0
+  public total_gastos  : number = 0
+
+  public plan : string = ''
 
   public lstIndex = [] //Cuentas totalizadores de Fideicomiso
 
@@ -219,11 +222,11 @@ export class GeneralyresultadoComponent implements OnInit {
         });
 
 
-        this.lstIndex[this.posicion].debe = this.acumuladord;
-        this.lstIndex[this.posicion].haber = this.acumuladorh;
-        console.log(this.lstIndex)
-        console.log(this.lstIndex[4].haber, this.lstIndex[3].debe);
-        let result = this.lstIndex[4].haber - this.lstIndex[3].debe;
+        // this.lstIndex[this.posicion].debe = this.acumuladord;
+        // this.lstIndex[this.posicion].haber = this.acumuladorh;
+        // console.log(this.lstIndex)
+        // console.log(this.acum_saldo_actual, this.total_gastos);
+        let result = this.acum_saldo_actual - this.total_gastos;
 
         this.HTMLBalance += ``;
         this.HTMLResultados += `
@@ -231,7 +234,7 @@ export class GeneralyresultadoComponent implements OnInit {
         <th >${this.lstIndex[this.posicion].nombre} </th>
         <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
             ? "-"
-            : this.getMoneda(this.acum_saldo_actual)
+            : this.getMoneda(this.acum_saldo_actual) 
           }</th>
         </tr>
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
@@ -248,6 +251,8 @@ export class GeneralyresultadoComponent implements OnInit {
             </tbody>
           </table>
           `;
+
+          // 
         // this.ngxService.stopLoader('load-precierre')
       },
       (error) => {
@@ -261,7 +266,7 @@ export class GeneralyresultadoComponent implements OnInit {
     let haber = e.haber == null ? 0 : e.haber;
     let saldo_inicial = e.saldo_inicial == null ? 0 : e.saldo_inicial;
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
-    console.log(e.codigo_padre, this.lstIndex[this.posicion], this.posicion)
+    // console.log(e.codigo_padre, this.lstIndex[this.posicion], this.posicion)
     if (e.codigo_padre.substring(0, 2) == this.lstIndex[this.posicion].id) {
       this.acumuladord += parseFloat(debe);
       this.acumuladorh += parseFloat(haber);
@@ -277,8 +282,8 @@ export class GeneralyresultadoComponent implements OnInit {
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th >${this.lstIndex[this.posicion].nombre} </th>
           <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
-          ? "-$$"
-          : this.getMoneda(this.acum_saldo_actual)
+          ? ""
+          : this.getMoneda(this.acum_saldo_actual) 
         }</th>
         </tr>
         <tr>  
@@ -305,7 +310,7 @@ export class GeneralyresultadoComponent implements OnInit {
     let haber = e.haber == null ? 0 : e.haber;
     let saldo_inicial = e.saldo_inicial == null ? 0 : e.saldo_inicial;
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
-
+    
     if (e.codigo_padre.substring(0, 2) == this.lstIndex[this.posicion].id) {
       this.acumuladord += parseFloat(debe)
       this.acumuladorh += parseFloat(haber)
@@ -313,14 +318,15 @@ export class GeneralyresultadoComponent implements OnInit {
       this.acum_saldo_actual += parseFloat(saldo_actual)
       this.HTMLResultados += this.getTitulosACuentasBalance(e)
     } else {
-      this.lstIndex[this.posicion].debe = this.acumuladord
-      this.lstIndex[this.posicion].haber = this.acumuladorh
+      // this.lstIndex[this.posicion].debe = this.acumuladord
+      // this.lstIndex[this.posicion].haber = this.acumuladorh
+      this.total_gastos = this.posicion==3?this.acum_saldo_actual: 0
       let cadena = `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th >${this.lstIndex[this.posicion].nombre} </th>
           <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
           ? "-"
-          : this.getMoneda(this.acum_saldo_actual)
+          : this.getMoneda(this.acum_saldo_actual) 
         }</th>
         </tr>
        
@@ -332,7 +338,7 @@ export class GeneralyresultadoComponent implements OnInit {
         this.HTMLBalance += cadena
         this.HTMLResultados += `
         <tr>  
-          <td  colspan="5">${this.getTitulosACuentasBalance(e)} </td>
+          <td  colspan="5">${this.getTitulosACuentasBalance(e)}</td>
         </tr>`
       } else {
         this.HTMLResultados += cadena

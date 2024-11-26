@@ -12,6 +12,7 @@ import { Semillero } from 'src/app/services/banfanb/semillero';
 import { UtilService } from 'src/app/services/util/util.service';
 import { PlanFideicomiso } from 'src/app/services/banfanb/contabilidad.service';
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-contratos',
@@ -212,12 +213,19 @@ export class ContratosComponent implements OnInit {
   public saldo_disponible = ''
   public capital_asignado = ''
   public saldo_patrimonio = ''
+  public fechaultimo = ''
+  public fechaUltimoComparacion = ''
+  public fecha: string = ''
+  public fdesde: string = '2023-12-01'
+  public fhasta: string = '2023-12-31'
+  public estatus: string = '%'
 
   constructor(
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
+    private toasService: ToastrService,
     public formatter: NgbDateParserFormatter,
   ) { }
 
@@ -228,9 +236,91 @@ export class ContratosComponent implements OnInit {
     this.ListarEjecutivos()
     this.ListarOficinas()
     this.ListarPortafolio()
+    this.consultarUltimoCierre()
   }
 
 
+  consultarUltimoCierre() {
+    this.ngxService.stopLoader('load-precierre')
+    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.parametros = ''
+    this.xAPI.valores = ''
+    // console.log('hola')
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+
+        let ultc = data.Cuerpo
+        if (ultc.length > 0) {
+          let fecha = ultc[0].fecha_cierre;
+          let d = fecha.split('-');
+          this.fechaultimo = d[0] + '-' + d[1] + '-' + d[2];
+          this.fechaUltimoComparacion = d;
+        }
+        
+
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+  }
+
+
+  ConsultarSaldos(){
+    
+
+    let antes = new Date(this.fechaUltimoComparacion).setHours(+23)
+
+    let sHoy = this.fechaultimo
+    let sAntes = new Date(antes).toISOString().substring(0, 10)
+
+    this.fecha = `${sAntes},${sHoy}`
+    this.xAPI.funcion = "FID_CBalanceFecha"
+    this.xAPI.parametros = `${this.fecha},${this.estatus}`
+
+    //console.log(this.xAPI.parametros)
+    this.saldo_disponible = '0'
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      
+      async data => {
+        let sdd = 0
+        let tdd = 0
+        let cdd = 0
+        let pdd = 0
+        data.Cuerpo.forEach((e) => {
+          console.log(e.codigo_padre)
+          if (e.codigo_padre.indexOf("711") == 0 ) {
+            sdd +=  parseFloat(e.saldo_inicial)
+            
+          } else if (e.codigo_padre.indexOf("71") == 0 ){
+            tdd +=  parseFloat(e.saldo_inicial)
+          } else if (e.codigo_padre.indexOf("731") == 0 ){
+            cdd +=  parseFloat(e.saldo_inicial)
+          }else if (e.codigo_padre.indexOf("73") == 0 ){
+            pdd +=  parseFloat(e.saldo_inicial)
+          }
+
+        })
+        tdd += sdd
+        pdd += cdd
+        this.saldo_disponible = sdd.toFixed(2)
+        this.total_disponible = tdd.toFixed(2)
+        this.capital_asignado = cdd.toFixed(2)
+        this.saldo_patrimonio = pdd.toFixed(2)
+
+        // console.log(sdd, tdd, cdd, pdd)
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+
+    this.ngxService.stopLoader('load-precierre')
+
+
+
+  }
 
   GenerarSemillero() {
 
@@ -360,8 +450,10 @@ export class ContratosComponent implements OnInit {
     this.saldo_inicio = this.Contrato.Saldos.saldoinicio.toString()
     this.planFideicomiso.identificador = parseInt(this.Contrato.numero)
     this.tabSaldos = true
-    this.SaldoDisponible()
-    this.CapitalAsignado()
+    // this.SaldoDisponible()
+    // this.CapitalAsignado()
+
+    this.ConsultarSaldos()
 
     console.log(this.planFideicomiso)
 
@@ -779,35 +871,39 @@ export class ContratosComponent implements OnInit {
     // );
   }
 
-  SaldoDisponible() {
-    this.xAPI.funcion = "FID_CSaldoDisponible"
-    this.xAPI.parametros = parseInt(this.Contrato.numero).toString()
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+  // SaldoDisponible() {
+  //   this.xAPI.funcion = "FID_CSaldoDisponible"
+  //   this.xAPI.parametros = parseInt(this.Contrato.numero).toString()
+  //   this.apiService.Ejecutar(this.xAPI).subscribe(
+  //     (data) => {
       
-        this.total_disponible = data.Cuerpo[0].saldo
-        this.saldo_disponible = data.Cuerpo[0].saldo
-      },
-      (error) => {
-        console.log(error)
+  //       this.total_disponible = data.Cuerpo[0].saldo
+  //       this.saldo_disponible = data.Cuerpo[0].saldo
+  //     },
+  //     (error) => {
+  //       console.log(error)
 
-      }
-    )
-  }
+  //     }
+  //   )
+  // }
 
-  CapitalAsignado() {
-    this.xAPI.funcion = "FID_CCapitalAsignado"
-    this.xAPI.parametros = parseInt(this.Contrato.numero).toString()
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+  // CapitalAsignado() {
+  //   this.xAPI.funcion = "FID_CCapitalAsignado"
+  //   this.xAPI.parametros = parseInt(this.Contrato.numero).toString()
+  //   this.apiService.Ejecutar(this.xAPI).subscribe(
+  //     (data) => {
 
-        this.capital_asignado = data.Cuerpo[0].saldo
-      },
-      (error) => {
-        console.log(error)
+  //       this.capital_asignado = data.Cuerpo[0].saldo
+  //     },
+  //     (error) => {
+  //       console.log(error)
 
-      }
-    )
+  //     }
+  //   )
+  // }
+
+  Imprimir(){
+
   }
 
 }

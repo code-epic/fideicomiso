@@ -147,13 +147,20 @@ export class ProcesocontablesComponent implements OnInit {
 
     this.ngxService.stopLoader('load-precierre')
     this.xAPI.funcion = "FID_IMovimientosComprobantes"
-    this.xAPI.parametros = this.util.ConvertirFechaDB(this.fechai)
+    this.xAPI.parametros = this.util.ConvertirFechaDB(this.fechai) + ',' + 'M'
     this.xAPI.valores = ''
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-          console.log(data)
+        this.apiService.Mensaje(
+          "Proceso exitoso",
+          "Se ha realizado el Precierre",
+          "success",
+          "Cierre"
+        )
           this.ngxService.stopLoader('load-precierre')
+          this.lstMovimientos = []
+          this.blista = false
       },
       (error) => {
         console.log(error)

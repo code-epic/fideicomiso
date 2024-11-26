@@ -2,7 +2,7 @@
 
 <div class="centrar">
   <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-2">
       <mat-form-field appearance="outline">
         <mat-label>Ultimo Cierre</mat-label>
         <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
@@ -10,8 +10,19 @@
         <mat-icon matSuffix>event</mat-icon>
       </mat-form-field>
     </div>
-  
+    
     <div class="col-md-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Plan</mat-label>
+        <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}">
+          <mat-option value='%'>TODOS</mat-option>
+          <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
+        </mat-select>
+  
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-2">
       <mat-form-field appearance="outline">
         <mat-label>Fecha valor</mat-label>
         <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai" (blur)="validarCombo()">
@@ -22,8 +33,8 @@
     </div>
     <div class="col-md-3">
       <mat-form-field appearance="outline">
-        <mat-label>Tipo de evaluación</mat-label>
-        <mat-select placeholder="Tipo de evaluación" [(ngModel)]="estatus" value="{{estatus}}">
+        <mat-label>Frecuencia</mat-label>
+        <mat-select placeholder="Frecuencia" [(ngModel)]="estatus" value="{{estatus}}">
           <mat-option value='%'>MENSUAL</mat-option>
           <mat-option value='S'>CIERRE SEMESTRAL</mat-option>
           <mat-option value='M' *ngIf="bAntes">ANTES DEL CIERRE SEMESTRAL</mat-option>
