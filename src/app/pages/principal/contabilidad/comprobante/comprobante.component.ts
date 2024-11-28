@@ -101,6 +101,7 @@ export class ComprobanteComponent implements OnInit {
     fecha_ejercicio: "",
     debe: 0,
     haber: 0,
+    llave: ""
   };
 
   public IDComprobante: FID_IDetalleComprobante = {
@@ -249,13 +250,14 @@ export class ComprobanteComponent implements OnInit {
   Limpiar() {
     this.Comprobante = {
       plan: 0,
-      codigo: "",
-      descripcion: "",
-      detalle: "",
-      fecha_operacion: "",
-      fecha_ejercicio: "",
+      codigo: '',
+      descripcion: '',
+      detalle: '',
+      fecha_operacion: '',
+      fecha_ejercicio: '',
       debe: 0,
       haber: 0,
+      llave: ''
     };
   }
 

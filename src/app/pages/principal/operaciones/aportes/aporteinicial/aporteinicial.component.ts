@@ -48,6 +48,7 @@ export class AporteinicialComponent implements OnInit {
     fecha_ejercicio: "",
     debe: 0,
     haber: 0,
+    llave: ''
   };
 
 
@@ -135,6 +136,7 @@ export class AporteinicialComponent implements OnInit {
       fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
       debe: monto,
       haber: monto,
+      llave: 'M'
     }
 
     this.xAPI.funcion = "FID_IComprobante"

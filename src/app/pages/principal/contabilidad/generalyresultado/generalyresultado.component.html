@@ -36,7 +36,7 @@
         <mat-label>Frecuencia</mat-label>
         <mat-select placeholder="Frecuencia" [(ngModel)]="estatus" value="{{estatus}}">
           <mat-option value='%'>MENSUAL</mat-option>
-          <mat-option value='S'>CIERRE SEMESTRAL</mat-option>
+          <!-- <mat-option value='S'>CIERRE SEMESTRAL</mat-option> -->
           <mat-option value='M' *ngIf="bAntes">ANTES DEL CIERRE SEMESTRAL</mat-option>
           <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
         </mat-select>

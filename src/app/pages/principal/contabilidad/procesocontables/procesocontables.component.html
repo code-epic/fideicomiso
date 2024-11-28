@@ -6,7 +6,7 @@
 
 
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-md-2">
         <mat-form-field appearance="outline">
           <mat-label>Fecha de Contable</mat-label>
           <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
@@ -39,28 +39,46 @@
         <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
 
       </div>
+      <div class="col-md-1">
+        <mat-form-field appearance="outline">
+          <mat-label>Dias </mat-label>
+          <input matInput placeholder="N&uacute;mero de dias" [ngModelOptions]="{standalone: true}" [(ngModel)]="dias">
+          
+        </mat-form-field>
+      </div>
 
       <div class="col-md-3">
         <mat-form-field appearance="outline">
-          <mat-label>N&uacute;mero de dias </mat-label>
-          <input matInput placeholder="N&uacute;mero de dias" [ngModelOptions]="{standalone: true}" [(ngModel)]="dias">
-          <mat-icon matSuffix>folder</mat-icon>
+          <mat-label>Frecuencia</mat-label>
+          <mat-select placeholder="Frecuencia" [(ngModel)]="estatus" value="{{estatus}}">
+            <mat-option value='M'>MENSUAL</mat-option>
+            <mat-option value='S'>CIERRE SEMESTRAL</mat-option>
+            <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
+          </mat-select>
+    
         </mat-form-field>
       </div>
+
+      
     </div>
 
     <div class="row">
 
-      <div class="col-md-12 text-right">
+      <div class="col-md-6 ">
+        <button *ngIf="semestral" mat-flat-button color="warn" (click)="consultarValoresSemestrales()" style="height: 50px;">
+          <mat-icon>print</mat-icon>&nbsp;Generar comprobante semestral
+        </button>
+      </div>
+      <div class="col-md-6 text-right">
 
         
         <!-- <button mat-flat-button color="warn" (click)="ConsultarMovimientosAuxiliares()" style="height: 50px;">
           <mat-icon>search</mat-icon>&nbsp;Consultar auxiliar
         </button> -->
-        &nbsp;&nbsp;&nbsp;
         <button mat-flat-button color="primary" (click)="ConsultarComprobante()" style="height: 50px;">
           <mat-icon>search</mat-icon>&nbsp;Consultar comprobantes
         </button>
+        
 
 
       </div>
@@ -104,6 +122,20 @@
               
             </div>
           </mat-list>
+          <mat-list 
+          style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+          <div class="row">
+            <div class="col-md-8 texto-detalle auto-title auto-ajuste">
+              TOTAL DE CUENTAS
+            </div>
+            <div class="col-md-2 texto-detalle auto-ajuste auto-title">
+              Bs. {{ getMoneda( total_debe ) }}
+            </div>
+            <div class="col-md-2 texto-detalle auto-ajuste auto-title">
+              Bs. {{ getMoneda( total_haber ) }}
+            </div>
+          </div>
+        </mat-list>
         </mat-selection-list>
         <br><br>
       </div>
@@ -141,9 +173,10 @@
               <div class="col-md-2 texto-detalle auto-ajuste">
                 Bs. {{(e.saldo) }}
               </div>
-              
             </div>
           </mat-list>
+
+         
         </mat-selection-list>
         <br><br>
       </div>
@@ -153,9 +186,12 @@
 
       <div class="col-md-12 text-right">
 
-        <button mat-flat-button color="primary" (click)="GenerarPrecierre()" style="height: 50px;">
+        <button *ngIf="total_debe>0"
+         mat-flat-button color="primary" (click)="GenerarPrecierre()" style="height: 50px;">
           <mat-icon>verified</mat-icon>&nbsp;Generar precierre
         </button>
+       
+
 
 
       </div>
@@ -168,6 +204,7 @@
         <button mat-flat-button color="primary" (click)="GenerarCierre()" style="height: 50px;">
           <mat-icon>verified</mat-icon>&nbsp;Generar Cierre
         </button>
+       
 
 
       </div>

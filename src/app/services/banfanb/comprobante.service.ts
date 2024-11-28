@@ -27,6 +27,7 @@ export interface FID_IComprobante {
   fecha_ejercicio	:	string
 	debe	:	number,
 	haber	:	number,
+  llave : string
 }
 
 export interface FID_IDetalleComprobante {
