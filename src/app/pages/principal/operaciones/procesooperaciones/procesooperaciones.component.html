@@ -65,7 +65,7 @@
 
     <div class="row">
       <div class="col-md-12">
-        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" style="padding:10px;">
+        <mat-tab-group *ngIf="visible" mat-stretch-tabs class="example-stretched-tabs" style="padding:10px;">
           <mat-tab>
             <ng-template mat-tab-label>
               <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
@@ -74,14 +74,13 @@
     
             <div class="example-large-box mat-elevation-z4">
               <div style="padding: 20px; width: 100%; margin-bottom: 0px;">
-                <table class="asientos" >
+                <table class="asientos" style="padding: 5px;">
                           
                   <thead style="background-color: #e1e1d154; height: 35px;">
                     <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;padding: 5px;">
                       <th style="text-align:left">CODIGO</th>
                       <th style="text-align:left">DESCRIPCION</th>
-                      <th style="text-align:right">CAPITAL</th>
-                      <th style="text-align:right">RESULTADO ACUM.</th>
+                      <th style="text-align:right">PATRIMONIO</th>
                       <th style="text-align:right">TASA % </th>
                       <th style="text-align:right">CALCULO</th>
                       <!-- <th style="text-align:right">CALCULO + CAPITAL</th> -->
@@ -92,7 +91,6 @@
                     <tr *ngFor="let e of lstComisiones" >
                       <td>{{ getCodigo(e.id) }}</td>
                       <td>{{ e.plan}}</td>
-                      <td style="text-align:right">Bs. {{   getMoneda(e.monto) }}</td>
                       <td style="text-align:right">Bs. {{   getMoneda(e.capital) }}</td>
                       <td style="text-align:right; font-weight: bold;"> {{e.tasa }} %</td>
                       <!-- <td style="text-align:right">Bs. {{  getMoneda(e.calculo) }}</td> -->
@@ -105,18 +103,23 @@
                 
 
                 <br>
-                <div class="row">
-                  <div class="col-md-12 text-right" style="margin-top: 5px;">
-                    <button mat-flat-button color="warn" (click)="ListarDevengo()" style="height: 50px;">
-                      <mat-icon>verified</mat-icon>&nbsp;Generar Movimientos
-                    </button>
-                    
-                    
-                  </div>
-                </div>
+                
     
               </div>
             </div>
+            <br>
+            
+            <div class="row">
+              <div class="col-md-12 text-right" style="margin-top: 5px;">
+                <button mat-flat-button color="warn" (click)="GenerarComprobante()" style="height: 50px;">
+                  Generar comprobantes
+                </button>
+                
+                
+              </div>
+            </div>
+            <br>
+            <br>
             
     
     
@@ -147,7 +150,7 @@
           <mat-tab>
             <ng-template mat-tab-label>
               <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
-              &nbsp;INTERESES
+              &nbsp;PAGO DE INTERESES
             </ng-template>
             <br>
           </mat-tab>

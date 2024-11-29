@@ -63,11 +63,12 @@
         
         
       </div>
+      <br><br>
 
     </div>
 
 
-    <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" style="padding:10px;">
+    <mat-tab-group *ngIf="visible" mat-stretch-tabs class="example-stretched-tabs" style="padding:4px;">
       <mat-tab>
         <ng-template mat-tab-label>
           <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
@@ -80,53 +81,99 @@
             <div class="row">
               <div class="col-md-12">
                 <div class="mat-elevation-z8">
-                  <table mat-table [dataSource]="dataSource">
+            
 
-                    <ng-container matColumnDef="codigo">
-                      <th mat-header-cell *matHeaderCellDef> CODIGO </th>
-                      <td mat-cell *matCellDef="let e"> {{e.codigo}} </td>
-                    </ng-container>
-                    <!-- Position Column -->
-                    <ng-container matColumnDef="instrumento">
-                      <th mat-header-cell *matHeaderCellDef> INSTRUMENTO </th>
-                      <td mat-cell *matCellDef="let e"> {{e.instrumento}} </td>
-                    </ng-container>
-
-
-                    <!-- Weight Column -->
-                    <ng-container matColumnDef="valor_nominal">
-                      <th mat-header-cell *matHeaderCellDef> VALOR NOMINAL </th>
-                      <td mat-cell *matCellDef="let e"> {{ e.valor_nominal }} </td>
-                    </ng-container>
-
-                    <!-- Weight Column -->
-                    <ng-container matColumnDef="costo_adquisicion">
-                      <th mat-header-cell *matHeaderCellDef> COSTO ADQUISICION </th>
-                      <td mat-cell *matCellDef="let e"> {{ e.costo_adquisicion }} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="interes_diario">
-                      <th mat-header-cell *matHeaderCellDef> INTERES DIARIO </th>
-                      <td mat-cell *matCellDef="let e"> {{ e.interes_diario }} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="interes_acumulado">
-                      <th mat-header-cell *matHeaderCellDef> INTERES ACUMULADO </th>
-                      <td mat-cell *matCellDef="let e"> {{ e.interes_acumulado }} </td>
-                    </ng-container>
-
-
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                  </table>
-
-
+                  <div class="col-md-12">
+                    <mat-selection-list>
+                      <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                          <div class="col-md-2 texto-detalle auto-title">
+                            INSTRUMENTOS
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-title">
+                             COMPRA
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-title">
+                             VENCIMIENTO
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-title">
+                            VALOR NOMINAL
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-title">
+                            INT. DIARIO
+                          </div>
+                          <div class="col-md-2 texto-lista auto-title">
+                            INT. ACUMULADO
+                          </div>
+                        </div>
+                      </mat-list>
+                      <mat-list *ngFor="let e of lstAsientos; let i=index "
+                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                         
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            {{ e.instrumento | uppercase }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            {{ e.fecha_compra | date: 'dd/mm/YYYY' }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            {{ e.fecha_vencimiento | date: 'dd/mm/YYYY' }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            Bs. {{ getMoneda(e.valor_nominal) }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            Bs. {{ getMoneda(e.interes_diario) }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            Bs. {{ getMoneda(InteresDiarioCupon(e, CalcularDiasInterese( e.fecha_compra, fecha_al ))) }}
+                          </div>
+                        </div>
+                      </mat-list>
+                      <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                          <div class="col-md-8 texto-detalle auto-title">
+                            TOTAL DE DEVENGO GENERAL
+                          </div>
+                          
+                          <div class="col-md-2 texto-detalle auto-title">
+                            Bs. {{ getMoneda(acum_debe) }}
+                          </div>
+                          <div class="col-md-2 texto-lista auto-title">
+                            
+                          </div>
+                        </div>
+                      </mat-list>
+                      
+                    </mat-selection-list>
+                    
+                    
+                  </div>
+                  <br>
+                    
                 </div>
                 <br>
 
               </div>
 
             </div>
+            <br>
+            <div class="row">
+
+
+              <div class="col-md-12 text-right">
+        
+               
+                <button mat-flat-button color="accent" (click)="GenerarComprobante()" style="height: 50px;">
+                  Generar comprobante
+                </button>
+                
+                
+              </div>
+        
+            </div>
+            <br>
 
 
           </div>
