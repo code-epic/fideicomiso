@@ -21,7 +21,7 @@ export class ProcesooperacionesComponent implements OnInit {
   public lstAsientos = []
   public lstComisiones = []
   public bcuentat = false
-  public dias : number = 0
+  public dias: number = 0
   public acum_debe = 0
   public acum_haber = 0
 
@@ -43,7 +43,7 @@ export class ProcesooperacionesComponent implements OnInit {
     llave: ''
   };
 
-  visible : boolean = false
+  visible: boolean = false
 
   constructor(private apiService: ApiService,
     private _snackBar: MatSnackBar,
@@ -56,11 +56,11 @@ export class ProcesooperacionesComponent implements OnInit {
   }
 
 
-  
+
 
   consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.funcion = "FID_CUltimoPreCierre"
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     // console.log('hola')
@@ -71,21 +71,16 @@ export class ProcesooperacionesComponent implements OnInit {
         if (ultc.length > 0) {
           let fecha = ultc[0].fecha_cierre;
           let d = fecha.split('-');
+          this.fechau = fecha
           this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
           let fechaCierre = new Date(`${d[0]}-${d[1]}-${d[2]}`);
           fechaCierre.setDate(fechaCierre.getDate() + 2);
           fechaCierre.setHours(0, 0, 0, 0);
-          this.fechai = fechaCierre;   
+          this.fechai = fechaCierre;
           this.fechaf = fechaCierre;
           this.dias = 1
         }
-
-        //console.log(this.fechaultimo)
-        // if ( this.fechaultimo == "30/06/2024" || this.fechaultimo == "31/12/2024"  ) {
-        //   this.semestral = true
-        // }
         this.ngxService.stopLoader('load-precierre')
-
       },
       (error) => {
         console.log(error)
@@ -93,9 +88,9 @@ export class ProcesooperacionesComponent implements OnInit {
     )
   }
 
-  consultarComisiones(){
+  consultarComisiones() {
 
-    let dia = parseInt( this.dias.toString() )
+    let dia = parseInt(this.dias.toString())
     this.ngxService.stopLoader('load-precierre')
     this.xAPI.funcion = "FID_CalcularComision"
     this.xAPI.parametros = dia + ',360'
@@ -103,16 +98,16 @@ export class ProcesooperacionesComponent implements OnInit {
     this.visible = false
     this.acum_debe = 0
     this.acum_haber = 0
-    
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-          this.lstComisiones = data.Cuerpo
-          this.lstComisiones.map( e => {
-            this.acum_debe += parseFloat(e.calculo_capital)
-            this.acum_haber += parseFloat(e.calculo_capital)
-          })
-          if(this.lstComisiones.length > 0 ) this.visible = true
-          this.ngxService.stopLoader('load-precierre')
+        this.lstComisiones = data.Cuerpo
+        this.lstComisiones.map(e => {
+          this.acum_debe += parseFloat(e.calculo_capital)
+          this.acum_haber += parseFloat(e.calculo_capital)
+        })
+        if (this.lstComisiones.length > 0) this.visible = true
+        this.ngxService.stopLoader('load-precierre')
       },
       (error) => {
         console.log(error)
@@ -120,8 +115,8 @@ export class ProcesooperacionesComponent implements OnInit {
     )
   }
 
-  CalcularDias(type: string){
-    this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf)+1
+  CalcularDias(type: string) {
+    this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1
   }
 
 
@@ -141,23 +136,23 @@ export class ProcesooperacionesComponent implements OnInit {
   //   this.xAPI.parametros = fope + ',' + fini + ',' + ffin + ',' + usuario + ',' + llave
   //   this.xAPI.valores = ''
   // }
-  
 
-   getMoneda(numero: number): string {
+
+  getMoneda(numero: number): string {
     return this.util.ConvertirMoneda(numero);
   }
-  
-  getCodigo(id ) : string{
+
+  getCodigo(id): string {
     return "CON-" + this.util.zfill(id, 4)
   }
 
 
 
 
-  
-  GenerarComprobante(){
 
-    
+  GenerarComprobante() {
+
+
     let fecha = this.util.ConvertirFechaDB(this.fechai)
 
     this.Comprobante = {
@@ -175,14 +170,14 @@ export class ProcesooperacionesComponent implements OnInit {
     this.xAPI.funcion = "FID_IComprobante"
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Comprobante)
-    
+
     console.log(this.Comprobante)
     // this.InsertData(cant)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
         console.log(data)
-        this.InsertData(data, this.lstComisiones.length) 
+        this.InsertData(data, this.lstComisiones.length)
       },
       (error) => {
         console.log(error)
@@ -192,11 +187,11 @@ export class ProcesooperacionesComponent implements OnInit {
 
   }
 
-  InsertData(dt, cant : number){
+  InsertData(dt, cant: number) {
     let fecha = this.util.ConvertirFechaDB(this.fechai)
     cant++
     this.xAPI.funcion = "FID_IComisionesAdministrativas"
-    this.xAPI.parametros = dt.msj  + ',360,1,' + fecha
+    this.xAPI.parametros = dt.msj + ',360,1,' + fecha
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {

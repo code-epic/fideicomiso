@@ -115,10 +115,10 @@
                             {{ e.instrumento | uppercase }}
                           </div>
                           <div class="col-md-2 texto-detalle auto-ajuste">
-                            {{ e.fecha_compra | date: 'dd/mm/YYYY' }}
+                            {{ e.fecha_compra | date : 'dd/MM/YYYY'   }}
                           </div>
                           <div class="col-md-2 texto-detalle auto-ajuste">
-                            {{ e.fecha_vencimiento | date: 'dd/mm/YYYY' }}
+                            {{ e.fecha_vencimiento | date : 'dd/MM/YYYY'   }}
                           </div>
                           <div class="col-md-2 texto-detalle auto-ajuste">
                             Bs. {{ getMoneda(e.valor_nominal) }}
@@ -136,12 +136,10 @@
                           <div class="col-md-8 texto-detalle auto-title">
                             TOTAL DE DEVENGO GENERAL
                           </div>
-                          
                           <div class="col-md-2 texto-detalle auto-title">
                             Bs. {{ getMoneda(acum_debe) }}
                           </div>
-                          <div class="col-md-2 texto-lista auto-title">
-                            
+                          <div class="col-md-2 texto-detalle auto-title">
                           </div>
                         </div>
                       </mat-list>
@@ -159,21 +157,7 @@
 
             </div>
             <br>
-            <div class="row">
-
-
-              <div class="col-md-12 text-right">
-        
-               
-                <button mat-flat-button color="accent" (click)="GenerarComprobante()" style="height: 50px;">
-                  Generar comprobante
-                </button>
-                
-                
-              </div>
-        
-            </div>
-            <br>
+       
 
 
           </div>
@@ -187,6 +171,96 @@
         <ng-template mat-tab-label>
           <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
           &nbsp;VENCIMIENTO
+        </ng-template>
+
+
+        <div class="example-large-box mat-elevation-z4">
+          <div style="padding: 20px; width: 100%; margin-bottom: 0px;">
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mat-elevation-z8">
+            
+
+                  <div class="col-md-12">
+                    <mat-selection-list>
+                      <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                          <div class="col-md-4 texto-detalle auto-title">
+                            INSTRUMENTOS
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-title">
+                             COMPRA
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-title">
+                             VENCIMIENTO
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-title">
+                            VALOR NOMINAL
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-title">
+                            RENDIMIENTO
+                          </div>
+                        </div>
+                      </mat-list>
+                      <mat-list *ngFor="let e of lstVencimiento; let i=index "
+                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                         
+                          <div class="col-md-4 texto-detalle auto-ajuste">
+                            {{ e.instrumento | uppercase }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            {{ e.fecha_compra | date : 'dd/MM/YYYY' }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            {{ e.fecha_vencimiento | date : 'dd/MM/YYYY'   }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            Bs. {{ getMoneda(e.valor_nominal) }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            Bs. {{ getMoneda(  RendicionCupon(e) ) }}
+                          </div>
+                        </div>
+                      </mat-list>
+                      <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                          <div class="col-md-10 texto-detalle auto-title">
+                            TOTAL DE VENCIMIENTO GENERAL
+                          </div>
+                          
+                          <div class="col-md-2 texto-detalle auto-title">
+                            Bs. {{ getMoneda(acum_debev) }}
+                          </div>
+                        </div>
+                      </mat-list>
+                      
+                    </mat-selection-list>
+                    
+                    
+                  </div>
+                  <br>
+                    
+                </div>
+                <br>
+
+              </div>
+
+            </div>
+            <br>
+           
+
+
+          </div>
+        </div>
+
+        <br>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
+          &nbsp;COMPRAS
         </ng-template>
         <br>
       </mat-tab>
@@ -269,6 +343,21 @@
 
     </mat-tab-group>
 
+    <div class="row" *ngIf="visible" >
+
+
+      <div class="col-md-12 text-right">
+
+       
+        <button mat-flat-button color="accent" (click)="GenerarComprobante()" style="height: 50px;">
+          Generar comprobante
+        </button>
+        
+        
+      </div>
+
+    </div>
+    <br>
 
 
   </div>

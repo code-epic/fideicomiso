@@ -53,7 +53,7 @@ export class ProcesocontablesComponent implements OnInit {
   blista: boolean = false
   bauxiliar: boolean = false
   bAntes = false
-  estatus: string = ''
+  estatus: string = 'M'
 
   public Comprobante: FID_IComprobante = {
     plan: 0,
@@ -90,7 +90,7 @@ export class ProcesocontablesComponent implements OnInit {
 
   ngOnInit(): void {
     this.semestral = false
-    this.estatus = '%'
+    this.estatus = 'M'
     this.consultarUltimoCierre()
   }
 

@@ -83,25 +83,25 @@ export class ComprobanteComponent implements OnInit {
   public lstTipoFid = [];
 
   public lstContratos = [];
-  public razonsocial = "";
+  public razonsocial = '';
   public semillero: Semillero = {
     codigo: 0,
-    plan: "",
-    descripcion: "",
+    plan: '',
+    descripcion: '',
     fecha: new Date(),
-    autor: "",
+    autor: '',
   };
 
   public Comprobante: FID_IComprobante = {
     plan: 0,
-    codigo: "",
-    descripcion: "",
-    detalle: "",
-    fecha_operacion: "",
-    fecha_ejercicio: "",
+    codigo: '',
+    descripcion: '',
+    detalle: '',
+    fecha_operacion: '',
+    fecha_ejercicio: '',
     debe: 0,
     haber: 0,
-    llave: ""
+    llave: 'M'
   };
 
   public IDComprobante: FID_IDetalleComprobante = {
@@ -109,13 +109,13 @@ export class ComprobanteComponent implements OnInit {
     cuenta: 0,
     debe: 0,
     haber: 0,
-    fecha_operacion: "",
-    fecha_ejercicio: "",
+    fecha_operacion: '',
+    fecha_ejercicio: '',
   };
 
   public xAPI: IAPICore = {
-    funcion: "",
-    parametros: "",
+    funcion: '',
+    parametros: '',
   };
 
   public fechacreacion = new FormControl(new Date());
@@ -257,7 +257,7 @@ export class ComprobanteComponent implements OnInit {
       fecha_ejercicio: '',
       debe: 0,
       haber: 0,
-      llave: ''
+      llave: 'M'
     };
   }
 
@@ -358,10 +358,10 @@ export class ComprobanteComponent implements OnInit {
       debe: parseFloat(debe.toFixed(2)),
       haber: parseFloat(haber.toFixed(2)),
       fecha: fecha.substr(0, 10),
-      referencia: "",
-      auxiliar: "",
-      cc: "",
-      tipo: "",
+      referencia: '',
+      auxiliar: '',
+      cc: '',
+      tipo: '',
       estatus: false,
     };
     // if ( this.IComprobante.plan == '' ) {
@@ -425,7 +425,7 @@ export class ComprobanteComponent implements OnInit {
     });
 
     this.Comprobante.detalle =
-      this.Contrato.rif + " - " + this.Contrato.razonsocial.toUpperCase();
+      this.Contrato.rif + ' - ' + this.Contrato.razonsocial.toUpperCase();
     this.Comprobante.fecha_operacion = this.util.ConvertirFechaDB(
       this.fechaejercicio.value
     );
@@ -467,15 +467,15 @@ export class ComprobanteComponent implements OnInit {
   Acepar(){
     
     this.getComprobante();
-    this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = "FID_IComprobante";
-    this.xAPI.parametros = "";
+    this.ngxService.startLoader('load-cont');
+    this.xAPI.funcion = 'FID_IComprobante';
+    this.xAPI.parametros = '';
     this.xAPI.valores = JSON.stringify(this.Comprobante);
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         // console.log(data);
         await this.GuardarDetalle(data.msj);
-        this.ngxService.stopLoader("load-cont");
+        this.ngxService.stopLoader('load-cont');
         this.ELEMENT_DATA = [];
         this.dataSource = new MatTableDataSource<IComprobante>(this.ELEMENT_DATA);
         this.dataSource.paginator = this.paginator;
@@ -487,7 +487,6 @@ export class ComprobanteComponent implements OnInit {
 
   async GuardarDetalle(comprobante: number) {
     this.IDComprobante.comprobante = comprobante;
-
     await this.ELEMENT_DATA.map(async (e) => {
       this.IDComprobante.debe = e.debe;
       this.IDComprobante.haber = e.haber;
@@ -498,15 +497,13 @@ export class ComprobanteComponent implements OnInit {
         this.fechacreacion.value
       );
       this.IDComprobante.cuenta = this.getIDCuenta(e.cuenta);
-
-      this.xAPI.funcion = "FID_IDetalleComprobante";
-      this.xAPI.parametros = "";
-
+      this.xAPI.funcion = 'FID_IDetalleComprobante';
+      this.xAPI.parametros = '';
       this.xAPI.valores = JSON.stringify(this.IDComprobante);
 
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log("detalle insertado ", data);
+          console.log('detalle insertado ', data);
         },
         (err) => {}
       );
