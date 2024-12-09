@@ -56,44 +56,43 @@
 
 
 
-<div class="row">
-  <div class="col-md-12">
-    <br>
-    <p align="center" style="font-weight: bold;font-size: 13px;" *ngIf="printv">
-      BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
-      DIRECCION DE FIDEICOMISO<br>
-      BALANCE GENERAL AL - {{fechaTexto}}
-    </p>
-    <div [innerHtml]="HTMLBalance"></div>
-    <br>
+<div id="contenido">
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <p align="center" style="font-weight: bold;font-size: 13px;" *ngIf="printv">
+        BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
+        DIRECCION DE FIDEICOMISO<br>
+        BALANCE GENERAL AL - {{fechaTexto}}
+      </p>
+      <div [innerHtml]="HTMLBalance"></div>
+      <br>
+    </div>
+  </div>
+  
+  
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <p align="center" style="font-weight: bold;font-size: 13px;" *ngIf="printv">
+        BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
+        DIRECCION DE FIDEICOMISO<br>
+        ESTADO DE RESULTADOS AL - {{fechaTexto}}
+      </p>
+      <div [innerHtml]="HTMLResultados"></div>
+      <br>
+    </div>
   </div>
 </div>
-
-
-<div class="row">
-  <div class="col-md-12">
-    <br>
-    <p align="center" style="font-weight: bold;font-size: 13px;" *ngIf="printv">
-      BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
-      DIRECCION DE FIDEICOMISO<br>
-      ESTADO DE RESULTADOS AL - {{fechaTexto}}
-    </p>
-    <div [innerHtml]="HTMLResultados"></div>
-    <br>
-  </div>
-</div>
-
-
-
 
 <div class="row" *ngIf="printv">
   <div class="col-md-6"></div>
 
   <div class="col-md-6 text-right">
-    <button mat-flat-button color="warn" (click)="PrintPage()" style="margin-top: 5px; height: 50px;">
+    <button mat-flat-button color="warn" (click)="downloadCSVEx()" style="margin-top: 5px; height: 50px;">
       &nbsp;Generar XLS
     </button> &nbsp;&nbsp;&nbsp;
-    <button mat-flat-button color="warn" (click)="PrintPage()" style="margin-top: 5px; height: 50px;">
+    <button mat-flat-button color="warn" (click)="imprimir()" style="margin-top: 5px; height: 50px;">
       &nbsp;Imprimir reporte
     </button>
   </div>

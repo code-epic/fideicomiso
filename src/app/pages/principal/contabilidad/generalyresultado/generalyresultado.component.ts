@@ -6,6 +6,7 @@ import { NgxUiLoaderService } from "ngx-ui-loader";
 import { UtilService } from "src/app/services/util/util.service";
 import { ToastrService } from 'ngx-toastr';
 import { log } from 'console';
+import { ImprimirService } from 'src/app/services/util/imprimir.service';
 
 @Component({
   selector: 'app-generalyresultado',
@@ -19,6 +20,11 @@ export class GeneralyresultadoComponent implements OnInit {
     funcion: "",
     parametros: "",
   };
+
+  public csvHead;
+  public csvBody;
+  public delimitador = ";";
+
   public lstTotales = []
   public lstDetalles = []
   public lstBalance = []
@@ -59,7 +65,9 @@ export class GeneralyresultadoComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private toasService: ToastrService,
     private util: UtilService,
-    public formatter: NgbDateParserFormatter) { }
+    public formatter: NgbDateParserFormatter,
+    private _imprimir: ImprimirService
+  ) { }
 
   ngOnInit(): void {
     this.consultarUltimoCierre()
@@ -196,6 +204,8 @@ export class GeneralyresultadoComponent implements OnInit {
           this.toasService.warning("No se encontraron datos para la fecha ", "Fideicomiso")
           return
         }
+        this.csvHead = data.Cabecera;
+        this.csvBody = data.Cuerpo
         console.log(data.Cuerpo)
         this.lstBalance = data.Cuerpo;
         this.HTMLBalance = `
@@ -486,9 +496,23 @@ export class GeneralyresultadoComponent implements OnInit {
     return this.util.ConvertirMoneda(numero);
   }
 
-  PrintPage() {
-
+  imprimir() {
+    const imprimir = document.getElementById("contenido")?.innerHTML;
+    if(imprimir){
+      this._imprimir.createHtmlSectionForPrint(imprimir);
+    }
   }
 
+  downloadCSVEx() {
+    let head = this.csvHead.map((e) => {
+      return e.nombre;
+    });
+    this.util.downloadFile(
+      head,
+      this.csvBody,
+      "RC-" + this.util.GenerarUnicId(),
+      this.delimitador
+    );
+  }
 }
 

@@ -16,6 +16,8 @@ import { Contrato } from "src/app/services/banfanb/contrato.service";
 import { MatTableDataSource } from "@angular/material/table";
 import { MatPaginator } from "@angular/material/paginator";
 import Swal, { SweetAlertIcon } from 'sweetalert2';
+import { MatDialog } from "@angular/material/dialog";
+import { ComprobanteDialogComponent } from "./comprobante-dialog/comprobante-dialog.component";
 
 @Component({
   selector: "app-comprobante",
@@ -146,7 +148,8 @@ export class ComprobanteComponent implements OnInit {
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
-    private util: UtilService
+    private util: UtilService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -524,6 +527,13 @@ export class ComprobanteComponent implements OnInit {
 
   getMoneda(e) : string {
     return this.util.ConvertirMoneda(e.debe);
+  }
+
+  abrirDialogo(){
+    this.dialog.open(ComprobanteDialogComponent, {
+      width: '60%',
+      data: {datos: this.ELEMENT_DATA}
+    });
   }
 }
 
