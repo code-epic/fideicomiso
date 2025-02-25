@@ -1,0 +1,33 @@
+<h1 mat-dialog-title>Vista Previa</h1>
+<div mat-dialog-content>
+    <div id="contenido">
+
+        
+        <h1 style="text-align: center; margin: 1rem 0;">REGISTRO DE COMPROBANTE</h1>
+        
+        <img src="./assets/img/brand/logo-de-banfanb.png" style="width: 25rem; margin-bottom: 10px;">
+        <table>
+            <thead>
+                <tr>
+                    <th>CUENTA</th>
+                    <th>FECHA</th>
+                    <th>DESCRIPCION</th>
+                    <th>DEBE</th>
+                    <th>HABER</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of d.datos">
+                    <td>{{ item.cuenta }}</td>
+                    <td>{{ item.fecha }}</td>
+                    <td>{{ item.descripcion }}</td>
+                    <td>{{ item.debe }}</td>
+                    <td>{{ item.haber }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="imprimir()">Imprimir</button>
+</div>

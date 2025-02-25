@@ -41,6 +41,7 @@ import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
 import { CurrencyMaskModule } from 'ng2-currency-mask';
+import { ComprobanteDialogComponent } from './pages/principal/contabilidad/comprobante/comprobante-dialog/comprobante-dialog.component';
 
 @NgModule({
   imports: [
@@ -87,6 +88,7 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
     AppComponent,
     AdminLayoutComponent,
     AuthLayoutComponent,
+    ComprobanteDialogComponent,
   ],
   providers:  [
     {
