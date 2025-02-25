@@ -128,6 +128,40 @@ export class CcierreComponent implements OnInit {
     this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1
   }
 
+
+  ValidarPreCierre(llave ) {
+    this.xAPI.funcion = 'FID_CFechaMaxPreCierre'
+    this.xAPI.parametros = ''
+    this.xAPI.valores = ''
+    this.ngxService.startLoader('load-precierre')
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        if (data.Cuerpo != undefined ){
+          
+          let fentrada = data.Cuerpo[0].fecha
+          let finicio = this.util.ConvertirFechaDB(this.fechai)
+
+          if (fentrada == finicio){
+            this.CrearSaldos(llave)
+          }else{
+            this.apiService.Mensaje(
+              "Pendiente",
+              "Tiene pendiente el Precierre para el dia: " + this.util.ConvertirFechaHumana(this.fechai),
+              "error",
+              "Cierre"
+            )
+            this.consultarUltimoCierre()
+            this.ngxService.stopLoader('load-precierre')
+          }
+        }
+      },
+      err => {
+
+      }
+    )
+  }
+
   CrearSaldos(llave){
     let d = this.fechaultimo.split('/')
     let fultimo =  d[2] + '-' + d[1] + '-' + d[0];

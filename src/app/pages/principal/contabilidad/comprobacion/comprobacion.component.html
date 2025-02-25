@@ -1,6 +1,55 @@
 
 <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
 
+<div class="centrar">
+  <div class="row">
+    <div class="col-md-2">
+      <mat-form-field appearance="outline">
+        <mat-label>Ultimo Cierre</mat-label>
+        <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="fechaultimo" disabled="disabled">
+        <mat-icon matSuffix>event</mat-icon>
+      </mat-form-field>
+    </div>
+    
+    <div class="col-md-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Plan</mat-label>
+        <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}">
+          <mat-option value='%'>TODOS</mat-option>
+          <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
+        </mat-select>
+  
+      </mat-form-field>
+    </div>
+
+
+    <div class="col-md-4">
+      <mat-form-field appearance="outline">
+        <mat-label>Mes</mat-label>
+        <mat-select placeholder="CUENTAS CONTABLES" [(ngModel)]="mes" value="{{mes}}">
+          
+          <mat-option *ngFor="let e of lstFecha" value='{{e.id}}'>{{e.nombre}}</mat-option>
+         
+        </mat-select>
+  
+      </mat-form-field>
+    </div>
+
+    
+  
+    <div class="col-md-2 text-left">
+      <button mat-flat-button color="primary" (click)="ConsultarComprobacion()" style="margin-top: 5px; height: 50px;">
+        <mat-icon>verified</mat-icon>&nbsp;Procesar reporte
+      </button>
+    </div>
+  
+  
+  </div>
+</div>
+
+
+
 <br>
 <p align="center" style="font-weight: bold;font-size: 13px;">
   BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>

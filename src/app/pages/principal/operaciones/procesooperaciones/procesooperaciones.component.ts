@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { FID_IComprobante } from 'src/app/services/banfanb/comprobante.service';
@@ -25,6 +26,8 @@ export class ProcesooperacionesComponent implements OnInit {
   public acum_debe = 0
   public acum_haber = 0
 
+  blComprobante = true
+  
   public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
@@ -48,6 +51,7 @@ export class ProcesooperacionesComponent implements OnInit {
   constructor(private apiService: ApiService,
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
+    private toastrService: ToastrService,
     private util: UtilService,
     public formatter: NgbDateParserFormatter) { }
 
@@ -96,6 +100,7 @@ export class ProcesooperacionesComponent implements OnInit {
     this.xAPI.parametros = dia + ',360'
     this.xAPI.valores = ''
     this.visible = false
+    this.blComprobante = true
     this.acum_debe = 0
     this.acum_haber = 0
 
@@ -107,6 +112,14 @@ export class ProcesooperacionesComponent implements OnInit {
           this.acum_haber += parseFloat(e.calculo_capital)
         })
         if (this.lstComisiones.length > 0) this.visible = true
+        
+        let factual = new Date(this.fechau + ' 00:00:00')
+        let fcalculo = new Date(this.fechai)
+
+        
+        if( factual.getTime() >= fcalculo.getTime() ) this.blComprobante = false
+
+      
         this.ngxService.stopLoader('load-precierre')
       },
       (error) => {
@@ -120,22 +133,6 @@ export class ProcesooperacionesComponent implements OnInit {
   }
 
 
-  // CalcularDevengo(){
-  //   if (this.fechai == undefined || this.fechaf == undefined) {
-  //     this._snackBar.open('Recuerde seleccionar un rango de fechas', 'OK')
-  //     return
-  //   }
-  //   let fini = this.util.ConvertirFechaDB(this.fechai)
-  //   let ffin = this.util.ConvertirFechaDB(this.fechaf)
-  //   let fope = new Date().toISOString().substring(0,10)
-  //   let usuario = ''
-  //   let llave = ''
-
-  //   this.ngxService.startLoader('load-cont')
-  //   this.xAPI.funcion = "FID_BashIntereses"
-  //   this.xAPI.parametros = fope + ',' + fini + ',' + ffin + ',' + usuario + ',' + llave
-  //   this.xAPI.valores = ''
-  // }
 
 
   getMoneda(numero: number): string {
@@ -171,12 +168,13 @@ export class ProcesooperacionesComponent implements OnInit {
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Comprobante)
 
-    console.log(this.Comprobante)
+    // console.log(this.Comprobante)
     // this.InsertData(cant)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log(data)
+       
+        
         this.InsertData(data, this.lstComisiones.length)
       },
       (error) => {
@@ -195,8 +193,14 @@ export class ProcesooperacionesComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log(data)
+        // console.log(data)
         // this.InsertData(dt, cant)
+        this.toastrService.success(
+          'Finalizó el proceso correctamente',
+          `Fideicomiso`
+        );
+        this.visible = false
+        this.lstComisiones = []
       },
       (error) => {
         console.log(error)

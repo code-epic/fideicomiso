@@ -6,7 +6,7 @@
 
 
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-md-2">
         <mat-form-field appearance="outline">
           <mat-label>Fecha de Contable</mat-label>
           <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
@@ -16,57 +16,54 @@
         <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
 
       </div>
+      
 
-      <div class="col-md-3">
+      <div class="col-md-2">
         <mat-form-field appearance="outline">
           <mat-label>Fecha de Inicio</mat-label>
-          <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai" >          
+          <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai">
           <mat-datepicker #ypicker></mat-datepicker>
           <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
         </mat-form-field>
         <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
 
       </div>
-
-      <div class="col-md-3">
+      <div class="col-md-4">
         <mat-form-field appearance="outline">
-          <mat-label>Fecha Fin</mat-label>
-          <input matInput [matDatepicker]="zpicker" [(ngModel)]="fechaf" (dateInput)="CalcularDias('input', $event)"
-            (dateChange)="CalcularDias('change', $event)">
-          <mat-datepicker #zpicker></mat-datepicker>
-          <mat-icon matSuffix (click)="zpicker.open()">event</mat-icon>
-        </mat-form-field>
-        <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
-
-      </div>
-
-      <div class="col-md-3">
-        <mat-form-field appearance="outline">
-          <mat-label>N&uacute;mero de dias </mat-label>
-          <input matInput placeholder="N&uacute;mero de dias" [ngModelOptions]="{standalone: true}" [(ngModel)]="dias">
-          <mat-icon matSuffix>folder</mat-icon>
+          <mat-label>Plan</mat-label>
+          <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}">
+            <mat-option value='%'>TODOS</mat-option>
+            <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
+          </mat-select>
+    
         </mat-form-field>
       </div>
+
+     
+      
+
+      <div class="col-md-4">
+        <mat-form-field appearance="outline">
+          <mat-label>Cuentas Contables</mat-label>
+          <mat-select placeholder="CUENTAS CONTABLES" [(ngModel)]="cuenta" value="{{cuenta}}">
+            <mat-option  value='X'>DEBE SELECCIONAR CUENTA</mat-option>
+            <mat-option *ngFor="let e of lstIndex" value='{{e.id}}'>{{e.id}} - {{e.nombre}}</mat-option>
+           
+          </mat-select>
+    
+        </mat-form-field>
+      </div>
+
+      
     </div>
 
     <div class="row">
 
       <div class="col-md-12 text-right">
-        <button mat-flat-button color="primary" (click)="ValidarPreCierre('M')" style="height: 50px;">
-          &nbsp;Cierre diario
+        <button mat-flat-button color="primary" (click)="ConsultarDetalles()" style="height: 50px;">
+          <mat-icon>search</mat-icon>&nbsp;Consultar
         </button>
-        &nbsp;&nbsp;
-        <button mat-flat-button color="warn"  style="height: 50px;">
-          &nbsp;Cierre mensual
-        </button>
-        &nbsp;&nbsp;
-        <button *ngIf="semestral"
-        mat-flat-button color="warn" (click)="CrearSemestral('S')" style="height: 50px;">
-          &nbsp;Cierre semestral
-        </button>
-
       </div>
-
     </div>
 
     <div class="row" *ngIf="blista">
@@ -98,14 +95,28 @@
                 {{ e.descripcion | uppercase }}
               </div>
               <div class="col-md-2 texto-detalle auto-ajuste">
-                Bs. {{(e.debe) }}
+                {{ getMoneda(e.debe) }}
               </div>
               <div class="col-md-2 texto-lista auto-ajuste">
-                Bs. {{(e.haber) }}
+                {{ getMoneda(e.haber) }}
               </div>
               
             </div>
           </mat-list>
+          <!-- <mat-list 
+          style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+          <div class="row">
+            <div class="col-md-8 texto-detalle auto-title auto-ajuste">
+              TOTAL DE CUENTAS
+            </div>
+            <div class="col-md-2 texto-detalle auto-ajuste auto-title">
+              Bs. {{ getMoneda( total_debe ) }}
+            </div>
+            <div class="col-md-2 texto-detalle auto-ajuste auto-title">
+              Bs. {{ getMoneda( total_haber ) }}
+            </div>
+          </div>
+        </mat-list> -->
         </mat-selection-list>
         <br><br>
       </div>
@@ -143,33 +154,24 @@
               <div class="col-md-2 texto-detalle auto-ajuste">
                 Bs. {{(e.saldo) }}
               </div>
-              
             </div>
           </mat-list>
+
+         
         </mat-selection-list>
         <br><br>
       </div>
     </div>
     <hr>
-    <div class="row"  *ngIf="blista">
-
-      <div class="col-md-12 text-right">
-
-        <button mat-flat-button color="primary" (click)="GenerarPrecierre()" style="height: 50px;">
-          <mat-icon>verified</mat-icon>&nbsp;Generar precierre
-        </button>
-
-
-      </div>
-
-    </div>
+    
     <div class="row"  *ngIf="bauxiliar">
 
       <div class="col-md-12 text-right">
 
-        <button mat-flat-button color="primary" (click)="GenerarCierre()" style="height: 50px;">
-          <mat-icon>verified</mat-icon>&nbsp;Generar Cierre
+        <button mat-flat-button color="primary" (click)="GenerarDetalle()" style="height: 50px;">
+          <mat-icon>verified</mat-icon>&nbsp;Imprimir
         </button>
+       
 
 
       </div>

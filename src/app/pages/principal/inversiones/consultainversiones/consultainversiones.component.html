@@ -20,23 +20,25 @@
 
                                         <div class="row">
                                             <div class="col-md-1 texto-lista">
-                                                NUMERO
+                                                # NUM.
                                             </div>
-                                            <div class="col-md-2 texto-lista">
-                                                COD. INST.
+                                            <div class="col-md-1 texto-lista">
+                                                COD.
                                             </div>
-                                            <div class="col-md-3 texto-lista">
+                                            <div class="col-md-3 texto-lista auto-ajuste">
                                                 INSTRUMENTO
                                             </div>
-                                            <div class="col-md-2 texto-lista">
+                                            <div class="col-md-2 texto-lista auto-ajuste text-right">
                                                 VALOR NOMINAL
                                             </div>
-                                            <div class="col-md-2 texto-lista">
-                                                INTERES DIARIO
+                                            <div class="col-md-1 texto-lista auto-ajuste text-right">
+                                                INTERES D.
+                                            </div>
+                                            <div class="col-md-2 texto-lista auto-ajuste">
+                                                EMISION / VENCIMIENTO
                                             </div>
                                             <div class="col-md-2 text-right texto-lista">
-                                                # ACCION
-
+                                                ACCION
                                             </div>
                                         </div>
                                         <mat-divider></mat-divider>
@@ -47,20 +49,23 @@
 
                                             <div class="row">
 
-                                                <div class="col-md-1 texto-detalle">
+                                                <div class="col-md-1 texto-detalle auto-ajuste">
                                                     {{ getZFill(e.identificador) }}
                                                 </div>
-                                                <div class="col-md-2 texto-detalle">
+                                                <div class="col-md-1 texto-detalle auto-ajuste ">
                                                     {{ e.codigo_isin | uppercase}}
                                                 </div>
-                                                <div class="col-md-3 texto-detalle">
+                                                <div class="col-md-3 texto-detalle auto-ajuste">
                                                     {{ e.instrumento | uppercase }}
                                                 </div>
-                                                <div class="col-md-2 texto-detalle">
-                                                    {{ e.valor_nominal }}
+                                                <div class="col-md-2 texto-lista text-right">
+                                                    {{ getMoneda(e.valor_nominal) }}
+                                                </div>
+                                                <div class="col-md-1 texto-lista text-right">
+                                                    {{ getMoneda(e.interes_diario) }}
                                                 </div>
                                                 <div class="col-md-2 texto-detalle">
-                                                    {{ e.interes_diario }}
+                                                    {{ getFecha(e.fecha_emision) }} - {{ getFecha(e.fecha_vencimiento) }}
                                                 </div>
                                                 <div class="col-md-2 text-right">
 

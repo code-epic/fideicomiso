@@ -36,6 +36,7 @@ import { MayoranaliticoComponent } from 'src/app/pages/principal/contabilidad/ma
 import { CcierreComponent } from 'src/app/pages/principal/contabilidad/ccierre/ccierre.component'
 import { NpanelComponent } from 'src/app/pages/principal/negocios/npanel/npanel.component'
 import { CarteraComponent } from 'src/app/pages/principal/inversiones/cartera/cartera.component'
+import { AuxiliarComponent } from 'src/app/pages/principal/contabilidad/auxiliar/auxiliar.component'
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -149,6 +150,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'mayoranalitico',
         component: MayoranaliticoComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'auxiliarcontable',
+        component: AuxiliarComponent,
         canActivate: [AuthGuardGuard]
     },{
         path: 'plancontable',

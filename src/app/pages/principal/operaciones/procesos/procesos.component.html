@@ -53,12 +53,14 @@
 
       <div class="col-md-12 text-right">
 
-        <button mat-flat-button color="primary" (click)="CalculoPosicion()" style="height: 50px;">
-          <mat-icon>verified</mat-icon>&nbsp;Procesar
-        </button>
-        &nbsp;&nbsp;
+        
+        
         <button mat-flat-button color="accent" (click)="ListarInversiones()" style="height: 50px;">
           <mat-icon>search</mat-icon>&nbsp;Consultar
+        </button>
+        &nbsp;&nbsp;
+        <button *ngIf="blProcesar" mat-flat-button color="primary" (click)="CalculoPosicion()" style="height: 50px;">
+          <mat-icon>verified</mat-icon>&nbsp;Procesar
         </button>
         
         
@@ -262,11 +264,82 @@
           <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
           &nbsp;COMPRAS
         </ng-template>
+        <div class="example-large-box mat-elevation-z4">
+          <div style="padding: 20px; width: 100%; margin-bottom: 0px;">
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mat-elevation-z8">
+            
+
+                  <div class="col-md-12">
+                    <mat-selection-list>
+                      <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                          <div class="col-md-8 texto-detalle auto-title">
+                            INSTRUMENTOS
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-title">
+                             COMPRA
+                          </div>
+                        
+                          <div class="col-md-2 texto-detalle auto-title">
+                            RENDICION CUPON
+                          </div>
+                        </div>
+                      </mat-list>
+                      <mat-list *ngFor="let e of lstCompra; let i=index "
+                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                         
+                          <div class="col-md-8 texto-detalle auto-ajuste">
+                            {{ e.instrumento | uppercase }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            Bs. {{ getMoneda(e.valor_nominal) }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-ajuste">
+                            Bs. {{ getMoneda(  RendicionCupon(e) ) }}
+                          </div>
+                        </div>
+                      </mat-list>
+                      <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                          <div class="col-md-8 texto-detalle auto-title">
+                            TOTAL DE VENCIMIENTO GENERAL
+                          </div>
+                          
+                          <div class="col-md-2 texto-detalle auto-title">
+                            Bs. {{ getMoneda(acum_debec) }}
+                          </div>
+                          <div class="col-md-2 texto-detalle auto-title">
+                          </div>
+                        </div>
+                      </mat-list>
+                      
+                    </mat-selection-list>
+                    
+                    
+                  </div>
+                  <br>
+                    
+                </div>
+                <br>
+
+              </div>
+
+            </div>
+            <br>
+           
+
+
+          </div>
+        </div>
+
         <br>
       </mat-tab>
-      <mat-tab>
+      <!-- <mat-tab>
         <ng-template mat-tab-label>
-          <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
           &nbsp;VISTA CONTABLE
         </ng-template>
 
@@ -338,7 +411,7 @@
 
 
         <br>
-      </mat-tab>
+      </mat-tab> -->
 
 
     </mat-tab-group>
@@ -349,7 +422,7 @@
       <div class="col-md-12 text-right">
 
        
-        <button mat-flat-button color="accent" (click)="GenerarComprobante()" style="height: 50px;">
+        <button *ngIf="blComprobante" mat-flat-button color="accent" (click)="GenerarComprobante()" style="height: 50px;">
           Generar comprobante
         </button>
         

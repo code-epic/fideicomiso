@@ -7,12 +7,12 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Direccion } from 'src/app/services/banfanb/afiliado.service';
 import { Contrato, Ejecutivo, MovComision, Politicas, Saldos } from 'src/app/services/banfanb/contrato.service';
-import { SemilleroService } from 'src/app/services/banfanb/semillero';
 import { Semillero } from 'src/app/services/banfanb/semillero';
 import { UtilService } from 'src/app/services/util/util.service';
 import { PlanFideicomiso } from 'src/app/services/banfanb/contabilidad.service';
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
   selector: 'app-contratos',
@@ -142,6 +142,7 @@ export class ContratosComponent implements OnInit {
   }
 
 
+  @ViewChild('estadocuenta', { static: true }) estadocuenta: TemplateRef<any>;
 
   public portafolio = ''
 
@@ -226,6 +227,7 @@ export class ContratosComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
     private toasService: ToastrService,
+    public dialog: MatDialog,
     public formatter: NgbDateParserFormatter,
   ) { }
 
@@ -904,6 +906,23 @@ export class ContratosComponent implements OnInit {
 
   Imprimir(){
 
+  }
+
+  openDialog(): void {
+
+    //this.xinver = JSON.stringify(e)
+
+    
+
+    const dialogRef = this.dialog.open(this.estadocuenta, {
+      width: '100px',
+      data: {},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      // this.animal = result;
+    });
   }
 
 }

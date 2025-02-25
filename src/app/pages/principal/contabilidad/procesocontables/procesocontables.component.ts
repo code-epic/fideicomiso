@@ -105,12 +105,6 @@ export class ProcesocontablesComponent implements OnInit {
 
         let ultc = data.Cuerpo
         if (ultc.length > 0) {
-          // let fecha = ultc[0].fecha_cierre
-          // let d = fecha.split('-')
-          // this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
-          // console.log( ultc[0].siguiente )
-          // this.fechai = new Date(ultc[0].siguiente)
-          // this.fechaf = new Date(ultc[0].siguiente)
           let fecha = ultc[0].fecha_cierre;
           let d = fecha.split('-');
           this.fechau = fecha
@@ -440,6 +434,39 @@ export class ProcesocontablesComponent implements OnInit {
       );
     })
     this.ConsultarComprobante()
+  }
+
+  ValidarPreCierre( ) {
+    this.xAPI.funcion = 'FID_CFechaMaxPreCierre'
+    this.xAPI.parametros = ''
+    this.xAPI.valores = ''
+    this.ngxService.startLoader('load-precierre')
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        if (data.Cuerpo != undefined ){
+          
+          let fentrada = data.Cuerpo[0].fecha
+          let finicio = this.util.ConvertirFechaDB(this.fechai)
+
+          if (fentrada == finicio){
+            this.apiService.Mensaje(
+              "Pendiente",
+              "Ya fue procesado el Precierre: " + this.util.ConvertirFechaHumana(this.fechai),
+              "error",
+              "Cierre"
+            )
+           
+            this.ngxService.stopLoader('load-precierre')
+          }else{
+            this.GenerarPrecierre()
+          }
+        }
+      },
+      err => {
+
+      }
+    )
   }
 
 

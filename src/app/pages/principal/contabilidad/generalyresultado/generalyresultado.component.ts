@@ -50,7 +50,7 @@ export class GeneralyresultadoComponent implements OnInit {
   public calcularacero : number = 0
   public total_gastos  : number = 0
 
-  public plan : string = ''
+  public plan : string = '%'
 
   public lstIndex = [] //Cuentas totalizadores de Fideicomiso
 
@@ -62,6 +62,7 @@ export class GeneralyresultadoComponent implements OnInit {
     public formatter: NgbDateParserFormatter) { }
 
   ngOnInit(): void {
+    
     this.consultarUltimoCierre()
   }
 
@@ -77,9 +78,12 @@ export class GeneralyresultadoComponent implements OnInit {
         let ultc = data.Cuerpo
         if (ultc.length > 0) {
           let fecha = ultc[0].fecha_cierre;
-          let d = fecha.split('-');
-          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
-          this.fechaUltimoComparacion = d[1] + '/' + d[2] + '/' + d[0];
+          let d = fecha.split('-')
+          let xf = new Date(fecha)
+          xf.setDate(xf.getDate() + 2)
+          this.fechai =  xf
+          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
+          this.fechaUltimoComparacion = d[1] + '/' + d[2] + '/' + d[0]
         }
         this.ngxService.stopLoader('load-precierre')
 
@@ -487,6 +491,30 @@ export class GeneralyresultadoComponent implements OnInit {
   }
 
   PrintPage() {
+
+    var ventana = window.open("", "_blank");
+    var localtime = new Date().toLocaleString();
+    var contenido = document.getElementById('DivPrintPage').innerHTML
+    ventana.document.write(contenido)
+
+    ventana.document.head.innerHTML = ` <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Gestion de Documentos</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    
+    <style type="text/css">
+        @media print {
+            body {
+                  margin: 0px;
+                  font-family: Calibri;
+              }
+           
+        }
+    </style>
+     `;
+    ventana.print()
+    ventana.close()
+  
 
   }
 

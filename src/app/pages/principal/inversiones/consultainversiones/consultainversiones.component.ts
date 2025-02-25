@@ -5,10 +5,9 @@ import { map, startWith } from "rxjs/operators";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
-import { Inversion, InversionesService, MovInversion } from "src/app/services/banfanb/inversiones.service";
+import { Inversion, MovInversion } from "src/app/services/banfanb/inversiones.service";
 import { UtilService } from "src/app/services/util/util.service";
-import { NgbModal, NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
-import { Location } from '@angular/common';
+import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 import { MatDialog } from "@angular/material/dialog";
 
 @Component({
@@ -197,10 +196,6 @@ export class ConsultainversionesComponent implements OnInit {
     this.fecha_emision = NgbDate.from(this.formatter.parse(e.fecha_emision))
     this.fecha_compra = NgbDate.from(this.formatter.parse(e.fecha_compra))
     this.fecha_vencimiento = NgbDate.from(this.formatter.parse(e.fecha_vencimiento))
-
-
-    // console.log(this.planFideicomiso)
-
   }
 
   private _filter(value: string): string[] {
@@ -516,4 +511,14 @@ export class ConsultainversionesComponent implements OnInit {
   folder(){
     
   }
+
+  getMoneda(e) : string {
+    return this.util.ConvertirMoneda(e);
+  }
+
+  getFecha(f) : string {
+    return this.util.ConvertirFechaHumana(f) 
+  }
+
+
 }

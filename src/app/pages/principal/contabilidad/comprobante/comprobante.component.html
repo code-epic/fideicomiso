@@ -75,7 +75,7 @@
                       style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                       <div class="row">
                         <div class="col-md-2 texto-detalle auto-ajuste">
-                          {{ e.fecha_operacion }} | {{ CompletarCeros(e.id) }}
+                          {{ getFecha(e.fecha_operacion) }} | {{ CompletarCeros(e.id) }}
                         </div>
                         <div class="col-md-3 texto-detalle auto-ajuste">
                           {{ e.descripcion | uppercase }}
@@ -87,7 +87,9 @@
                           Bs. {{ getMoneda(e) }}
                         </div>
                         <div class="col-md-1 text-right ">
-
+                          <button mat-icon-button aria-label="Editar" (click)="eliminarComprobante(e.id, e.descripcion )">
+                            <mat-icon class="texto-gray">delete</mat-icon>
+                          </button>
                           <button mat-icon-button aria-label="Editar" (click)="editar(e)">
                             <mat-icon class="texto-gray">edit</mat-icon>
                           </button>

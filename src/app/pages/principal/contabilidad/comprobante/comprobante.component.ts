@@ -16,6 +16,7 @@ import { Contrato } from "src/app/services/banfanb/contrato.service";
 import { MatTableDataSource } from "@angular/material/table";
 import { MatPaginator } from "@angular/material/paginator";
 import Swal, { SweetAlertIcon } from 'sweetalert2';
+import { ToastrService } from "ngx-toastr";
 
 @Component({
   selector: "app-comprobante",
@@ -146,6 +147,7 @@ export class ComprobanteComponent implements OnInit {
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
+    private toastrService: ToastrService,
     private util: UtilService
   ) {}
 
@@ -525,6 +527,54 @@ export class ComprobanteComponent implements OnInit {
   getMoneda(e) : string {
     return this.util.ConvertirMoneda(e.debe);
   }
+  
+  getFecha(f) : string {
+    return this.util.ConvertirFechaHumana(f) 
+  }
+
+  eliminarComprobante(id, detalle){
+    
+    Swal.fire({
+      title: `¿Estás seguro que desea eliminar? \n\n ${detalle} `,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'No',
+      allowEscapeKey: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteData(id)
+      }
+    })
+
+  }
+
+  deleteData(id) {
+    this.ngxService.startLoader('load-cont');
+    this.xAPI.funcion = 'FID_EComprobante'
+    this.xAPI.parametros = `${id}`
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        this.toastrService.success(
+          'Se ha eliminado comprobante con exito',
+          `Fideicomiso`
+        );
+        this.ngxService.stopLoader('load-cont')
+        this.ListarComprobantes()
+      },
+      err => {
+        this.toastrService.error(
+          'No se ha logrado eliminar el comprobante',
+          `Fideicomiso`
+        );
+        this.ngxService.stopLoader('load-cont');
+      }
+    )
+  }
+
 }
 
 

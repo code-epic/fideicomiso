@@ -36,21 +36,22 @@ export class ComprobacionComponent implements OnInit {
   public fdesde : string = '2023-12-01'
   public fhasta : string = '2023-12-31'
   public fecha_vienen : string = '2023-11-30'
+  public plan = '%'
 
   public lstFecha = [
-    {id : '2023-12-01,2023-12-31,2023-11-30', value: 'DICIEMBRE'},
-    {id : '2024-01-01,2024-01-31,2023-12-31', value: 'ENERO'},
-    {id : '2024-02-01,2024-02-28,2024-01-31', value: 'FEBRERO'},
-    {id : '2024-03-01,2024-03-31,2024-02-28', value: 'MARZO'},
-    {id : '2024-04-01,2024-04-30,2024-03-31', value: 'ABRIL'},
-    {id : '2024-05-01,2024-05-31,2024-04-30', value: 'MAYO'},
-    {id : '2024-06-01,2024-06-30,2024-05-31', value: 'JUNIO'},
-    {id : '2024-07-01,2024-07-31,2024-06-30', value: 'JULIO'},
-    {id : '2024-08-01,2024-08-31,2024-07-31', value: 'AGOSTO'},
-    {id : '2024-09-01,2024-09-30,2024-08-31', value: 'SEPTIEMBRE'},
-    {id : '2024-10-01,2024-10-31,2024-09-30', value: '0CTUBRE'},
-    {id : '2024-11-01,2024-11-30,2024-10-31', value: 'NOVIEMBRE'},
-    {id : '2024-12-01,2024-12-31,2024-11-30', value: 'DICIEMBRE'},
+    {id : 0, value: '2023-12-01,2023-12-31,2023-11-30', nombre: 'DICIEMBRE - 2023'},
+    {id : 1, value:  '2024-01-01,2024-01-31,2023-12-31', nombre: 'ENERO - 2024'},
+    {id : 2, value:  '2024-02-01,2024-02-28,2024-01-31', nombre: 'FEBRERO - 2024'},
+    {id : 3, value:  '2024-03-01,2024-03-31,2024-02-28', nombre: 'MARZO - 2024'},
+    {id : 4, value:  '2024-04-01,2024-04-30,2024-03-31', nombre: 'ABRIL - 2024'},
+    {id : 5, value:  '2024-05-01,2024-05-31,2024-04-30', nombre: 'MAYO - 2024'},
+    {id : 6, value:  '2024-06-01,2024-06-30,2024-05-31', nombre: 'JUNIO - 2024'},
+    {id : 7, value:  '2024-07-01,2024-07-31,2024-06-30', nombre: 'JULIO - 2024'},
+    {id : 9, value:  '2024-08-01,2024-08-31,2024-07-31', nombre: 'AGOSTO - 2024'},
+    {id : 10, value:  '2024-09-01,2024-09-30,2024-08-31', nombre: 'SEPTIEMBRE - 2024'},
+    {id : 11, value:  '2024-10-01,2024-10-31,2024-09-30', nombre: '0CTUBRE - 2024'},
+    {id : 12, value:  '2024-11-01,2024-11-30,2024-10-31', nombre: 'NOVIEMBRE - 2024'},
+    {id : 13, value:  '2024-12-01,2024-12-31,2024-11-30', nombre: 'DICIEMBRE - 2024'},
   ]
 
   public lstIndex = [
@@ -96,7 +97,11 @@ export class ComprobacionComponent implements OnInit {
     },
   ]; //Cuentas totalizadores de Fideicomiso
 
+  public fechaultimo = ''
+  public fechaTexto = ''
+  public fechai: any
   public mes = 0
+
   constructor(
     private apiService: ApiService,
     private ngxService: NgxUiLoaderService,
@@ -105,18 +110,46 @@ export class ComprobacionComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.generarBalanceComprobacion()
+    this.consultarUltimoCierre()
+    
+  }
+
+  consultarUltimoCierre() {
+    this.ngxService.stopLoader('load-precierre')
+    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.parametros = ''
+    this.xAPI.valores = ''
+    // console.log('hola')
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+
+        let ultc = data.Cuerpo
+        if (ultc.length > 0) {
+          let fecha = ultc[0].fecha_cierre;
+          let d = fecha.split('-');
+          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
+        }
+        this.ngxService.stopLoader('load-precierre')
+
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
   }
 
 
 
 
-  generarBalanceComprobacion() {
+
+
+  ConsultarComprobacion() {
     this.ngxService.startLoader('load-cont')
+    console.log(this.mes)
    
     this.xAPI.funcion = "FID_CBalanceComprobacion";
     // this.xAPI.parametros = "2023-08-01,2023-08-31,2023-07-31";
-    this.xAPI.parametros = `${this.lstFecha[this.mes].id},S`
+    this.xAPI.parametros = `${this.lstFecha[this.mes].value},S`
     // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'
     this.xAPI.valores = "";
     console.log(this.xAPI)
@@ -176,20 +209,23 @@ export class ComprobacionComponent implements OnInit {
                   : this.getMoneda(this.acum_saldo_actual)
               }</th>
             </tr>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-              <td colspan="5"> &nbsp; </td>
-            </tr>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-              <th colspan=5 class="text-center total" > RESULTADO NETO </th>
-            </tr>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-              <th colspan=5 class="text-center total"> 
-                Bs. ${this.getMoneda(result)}
-              </th>
-            </tr>
+            
           </tbody>
         </table>
           `;
+
+
+          // <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
+          //     <td colspan="5"> &nbsp; </td>
+          //   </tr>
+          //   <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
+          //     <th colspan=5 class="text-center total" > RESULTADO NETO </th>
+          //   </tr>
+          //   <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
+          //     <th colspan=5 class="text-center total"> 
+          //       Bs. ${this.getMoneda(result)}
+          //     </th>
+          //   </tr>
         this.ngxService.stopLoader('load-cont')
       },
       (error) => {
