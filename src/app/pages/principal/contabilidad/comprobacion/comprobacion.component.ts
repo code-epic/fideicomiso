@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { UtilService } from 'src/app/services/util/util.service';
 
 @Component({
@@ -37,6 +38,8 @@ export class ComprobacionComponent implements OnInit {
   public fhasta : string = '2023-12-31'
   public fecha_vienen : string = '2023-11-30'
   public plan = '%'
+
+  printv: boolean = false
 
   public lstFecha = [
     {id : 0, value: '2023-12-01,2023-12-31,2023-11-30', nombre: 'DICIEMBRE - 2023'},
@@ -106,7 +109,8 @@ export class ComprobacionComponent implements OnInit {
     private apiService: ApiService,
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
-    public formatter: NgbDateParserFormatter
+    public formatter: NgbDateParserFormatter,
+    private _imprimir: ImprimirService
   ) { }
 
   ngOnInit(): void {
@@ -226,6 +230,7 @@ export class ComprobacionComponent implements OnInit {
           //       Bs. ${this.getMoneda(result)}
           //     </th>
           //   </tr>
+          this.printv = true,
         this.ngxService.stopLoader('load-cont')
       },
       (error) => {
@@ -341,5 +346,10 @@ export class ComprobacionComponent implements OnInit {
 
   getMoneda(numero: number): string {
     return this.util.ConvertirMoneda(numero);
+  }
+
+  imprimir(){
+    const p = document.getElementById("DivPrintPage").innerHTML;
+    this._imprimir.createHtmlSectionForPrint(p);
   }
 }

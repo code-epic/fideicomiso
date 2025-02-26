@@ -3,6 +3,7 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { UtilService } from 'src/app/services/util/util.service';
 
 @Component({
@@ -36,7 +37,9 @@ export class CarteraComponent implements OnInit {
     private util: UtilService,
     private ngxService: NgxUiLoaderService,
     private toasService: ToastrService,
-    private apiService: ApiService) { }
+    private apiService: ApiService,
+    private _imprimir: ImprimirService
+  ) { }
 
   ngOnInit(): void {
   }
@@ -121,6 +124,8 @@ export class CarteraComponent implements OnInit {
     return parseFloat(rendicion.toFixed(2));
   }
 
-
-
+  imprimir(){
+    const p = document.getElementById("DivPrintPage").innerHTML;
+    this._imprimir.createHtmlSectionForPrint(p, 1);
+  }
 }

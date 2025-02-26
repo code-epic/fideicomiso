@@ -17,6 +17,8 @@ import { MatTableDataSource } from "@angular/material/table";
 import { MatPaginator } from "@angular/material/paginator";
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 import { ToastrService } from "ngx-toastr";
+import { ComprobanteDialogComponent } from "./comprobante-dialog/comprobante-dialog.component";
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
   selector: "app-comprobante",
@@ -148,7 +150,8 @@ export class ComprobanteComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
     private toastrService: ToastrService,
-    private util: UtilService
+    private util: UtilService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -576,10 +579,10 @@ export class ComprobanteComponent implements OnInit {
   }
 
   abrirDialogo(){
-    // this.dialog.open(ComprobanteDialogComponent, {
-    //   width: '60%',
-    //   data: {datos: this.ELEMENT_DATA}
-    // });
+    this.dialog.open(ComprobanteDialogComponent, {
+      width: '60%',
+      data: {datos: this.ELEMENT_DATA}
+    });
   }
 
 }

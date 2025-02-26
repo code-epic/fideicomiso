@@ -12,6 +12,8 @@ import { ImprimirService } from 'src/app/services/util/imprimir.service';
 export class ComprobanteDialogComponent implements OnInit {
 
   d: any
+  totalDebe: any = 0;
+  totalHaber: any = 0;
 
   constructor(public dialogRef: MatDialogRef<ComprobanteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -21,7 +23,9 @@ export class ComprobanteDialogComponent implements OnInit {
     }
 
   ngOnInit(): void {
-    console.log(this.d);
+    this.totalDebeHaber();
+    this.totalDebe = Number(this.totalDebe).toFixed(2);
+    this.totalHaber = Number(this.totalHaber).toFixed(2);
   }
 
   imprimir(){
@@ -31,4 +35,10 @@ export class ComprobanteDialogComponent implements OnInit {
     }
   }
 
+  totalDebeHaber(){
+    this.d.datos.forEach((item: any) => {
+      this.totalDebe += item.debe;
+      this.totalHaber += item.haber;
+    });
+  }
 }

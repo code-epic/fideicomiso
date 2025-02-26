@@ -49,20 +49,33 @@
 </div>
 
 
+<div id="DivPrintPage" name="DivPrintPage" *ngIf="printv">
+    <div class="row" style="display: flex; align-items: center;">
+      <div style="width: 33%;">
+        <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 5rem;">
+      </div>
+      <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
+        <p align="center" style="font-weight: bold;font-size: 13px;">
+          BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
+          DIRECCION DE FIDEICOMISO<br>
+          BALANCE DE COMPROBACION DEL MES {{lstFecha[mes].value}}
+        </p>
+      </div>
+      <div style="width: 33%;"></div>
+    </div>
 
-<br>
-<p align="center" style="font-weight: bold;font-size: 13px;">
-  BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
-  DIRECCION DE FIDEICOMISO<br>
-  BALANCE DE COMPROBACION DEL MES {{lstFecha[mes].value}}
-</p>
+  <br>
+  <div class="row" [innerHtml]="HTMLComprobacion"></div>
+</div>
 
+<div class="row" *ngIf="printv">
+  <div class="col-md-6"></div>
 
-<div class="row">
-  <div class="col-md-12">
-    <br>
-    <div [innerHtml]="HTMLComprobacion"></div>
-    <br>
-    <br>
+  <div class="col-md-6 text-right">
+    <button mat-flat-button color="primary" (click)="imprimir()" style="margin-top: 5px; height: 50px;">
+      &nbsp;Imprimir reporte
+    </button>
   </div>
+
+
 </div>

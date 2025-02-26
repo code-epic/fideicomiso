@@ -539,5 +539,10 @@ export class GeneralyresultadoComponent implements OnInit {
       this.delimitador
     );
   }
+
+  imprimir(){
+    const p = document.getElementById("DivPrintPage").innerHTML;
+    this._imprimir.createHtmlSectionForPrint(p);
+  }
 }
 

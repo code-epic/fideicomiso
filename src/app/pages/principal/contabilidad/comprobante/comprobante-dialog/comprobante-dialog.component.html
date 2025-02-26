@@ -2,10 +2,19 @@
 <div mat-dialog-content>
     <div id="contenido">
 
-        
-        <h1 style="text-align: center; margin: 1rem 0;">REGISTRO DE COMPROBANTE</h1>
-        
-        <img src="./assets/img/brand/logo-de-banfanb.png" style="width: 25rem; margin-bottom: 10px;">
+        <div class="row" style="display: flex; align-items: center;">
+            <div style="width: 33%;">
+                <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 5rem;">
+            </div>
+            <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
+                <p align="center" style="font-weight: bold;font-size: 13px;">
+                    BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
+                    DIRECCION DE FIDEICOMISO
+                </p>
+            </div>
+            <div style="width: 33%;"></div>
+        </div>
+
         <table>
             <thead>
                 <tr>
@@ -24,10 +33,18 @@
                     <td>{{ item.debe }}</td>
                     <td>{{ item.haber }}</td>
                 </tr>
+                <tr>
+                    <td colspan="3">
+                        <b>TOTAL</b>
+                    </td>
+                    <td>{{ totalDebe }}</td>
+                    <td>{{ totalHaber }}</td>
+                </tr>
             </tbody>
         </table>
     </div>
 </div>
-<div mat-dialog-actions>
-    <button mat-button (click)="imprimir()">Imprimir</button>
+<div mat-dialog-actions align="end">
+    <button mat-button color="primary" (click)="imprimir()">Imprimir</button>
+    <button mat-button color="warn" mat-dialog-close>Cerrar</button>
 </div>

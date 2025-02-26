@@ -5,12 +5,12 @@
     <div class="col-md-2">
       <mat-form-field appearance="outline">
         <mat-label>Ultimo Cierre</mat-label>
-        <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
-          [(ngModel)]="fechaultimo" disabled="disabled">
+        <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}" [(ngModel)]="fechaultimo"
+          disabled="disabled">
         <mat-icon matSuffix>event</mat-icon>
       </mat-form-field>
     </div>
-    
+
     <div class="col-md-3">
       <mat-form-field appearance="outline">
         <mat-label>Plan</mat-label>
@@ -18,7 +18,7 @@
           <mat-option value='%'>TODOS</mat-option>
           <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
         </mat-select>
-  
+
       </mat-form-field>
     </div>
 
@@ -29,7 +29,7 @@
         <mat-datepicker #ypicker></mat-datepicker>
         <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
       </mat-form-field>
-  
+
     </div>
     <div class="col-md-3">
       <mat-form-field appearance="outline">
@@ -40,50 +40,52 @@
           <mat-option value='M' *ngIf="bAntes">ANTES DEL CIERRE SEMESTRAL</mat-option>
           <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
         </mat-select>
-  
+
       </mat-form-field>
     </div>
-  
+
     <div class="col-md-2 text-left">
       <button mat-flat-button color="primary" (click)="ConsultarComprobante()" style="margin-top: 5px; height: 50px;">
         <mat-icon>verified</mat-icon>&nbsp;Procesar reporte
       </button>
     </div>
-  
-  
+
+
   </div>
 </div>
 
 
-<div id="DivPrintPage" name="DivPrintPage">
-<div class="row">
-  <div class="col-md-12">
-    <br>
-    <p align="center" style="font-weight: bold;font-size: 13px;" *ngIf="printv">
-      BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
-      DIRECCION DE FIDEICOMISO<br>
-      BALANCE GENERAL AL - {{fechaTexto}}
-    </p>
-    <div [innerHtml]="HTMLBalance"></div>
-    <br>
+<div id="DivPrintPage" name="DivPrintPage" *ngIf="printv">
+  <div class="row" style="display: flex; align-items: center;">
+    <div style="width: 33%;">
+      <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 5rem;">
+    </div>
+    <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
+      <p style="font-weight: bold; font-size: 13px; margin: 0;">
+        BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
+        DIRECCION DE FIDEICOMISO<br>
+        ESTADO DE RESULTADOS AL - {{fechaTexto}}
+      </p>
+    </div>
+    <div style="width: 33%;"></div>
   </div>
-</div>
+  <div class="row" [innerHtml]="HTMLBalance"></div>
 
-
-<div class="row">
-  <div class="col-md-12">
-    <br>
-    <p align="center" style="font-weight: bold;font-size: 13px;" *ngIf="printv">
-      BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
-      DIRECCION DE FIDEICOMISO<br>
-      ESTADO DE RESULTADOS AL - {{fechaTexto}}
-    </p>
-    <div [innerHtml]="HTMLResultados"></div>
-    <br>
+  <div class="row" style="display: flex; align-items: center;">
+    <div style="width: 33%;">
+      <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 5rem;">
+    </div>
+    <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
+      <p style="font-weight: bold; font-size: 13px; margin: 0;">
+        BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
+        DIRECCION DE FIDEICOMISO<br>
+        ESTADO DE RESULTADOS AL - {{fechaTexto}}
+      </p>
+    </div>
+    <div style="width: 33%;"></div>
   </div>
+  <div class="row" [innerHtml]="HTMLResultados"></div>
 </div>
-</div>
-
 
 
 <div class="row" *ngIf="printv">
