@@ -403,11 +403,12 @@ export class ProcesosComponent implements OnInit {
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(vencimiento);
 
-    console.log("Insertando Comprobante de Vencimiento");
+    
     // this.InsertData(cant)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log("Insertando Comprobante de Vencimiento");
         this.InsertDataVencimiento(data, this.lstVencimiento.length);
       },
       (error) => {
@@ -425,9 +426,12 @@ export class ProcesosComponent implements OnInit {
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log('registro completado vencimiento')
+        console.log(data)
         this.lstVencimiento = [];
         this.ngxService.stopLoader("load-cont");
         this.visible = false;
+        
         if (this.lstCompra.length > 0) this.GenerarComprobanteCompra();
         this.visible = false;
         this.blProcesar = false;
@@ -484,7 +488,8 @@ export class ProcesosComponent implements OnInit {
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data);
+        console.log('registro completado')
+        console.log(data)
         // this.InsertData(dt, cant)
         this.lstCompra = [];
         this.visible = false;
