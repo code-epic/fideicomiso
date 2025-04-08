@@ -475,7 +475,9 @@ export class ComprobanteComponent implements OnInit {
     this.ngxService.startLoader('load-cont');
     this.xAPI.funcion = 'FID_IComprobante';
     this.xAPI.parametros = '';
+    this.Comprobante.fecha_ejercicio = this.Comprobante.fecha_operacion
     this.xAPI.valores = JSON.stringify(this.Comprobante);
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         // console.log(data);

@@ -6,7 +6,7 @@ import { Inject, Injectable } from '@angular/core';
 })
 export class ImprimirService {
 
-    createHtmlSectionForPrint(printContents: any, i: number = 0) {
+    createHtmlSectionForPrint(printContents: any, i: number = 0, xsize : string = '') {
         const printWindow = window.open('', '_blank');
         printWindow?.document.write(`
             <html>
@@ -21,7 +21,7 @@ export class ImprimirService {
             <style  type="text/css">
             @media print {
                 @page { 
-                    size: landscape; 
+                    ${xsize} 
                 
                 }
                 body{ width: 1200px }

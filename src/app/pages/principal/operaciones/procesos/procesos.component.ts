@@ -196,6 +196,8 @@ export class ProcesosComponent implements OnInit {
             this.acum_haber += parseFloat(e.interes_acumulado);
           });
 
+          console.log(data.Cuerpo)
+
           this.visible = true;
 
           let factual = new Date(this.fechau + " 00:00:00");

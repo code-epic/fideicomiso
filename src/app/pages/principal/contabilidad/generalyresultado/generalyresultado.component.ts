@@ -524,9 +524,8 @@ export class GeneralyresultadoComponent implements OnInit {
      `;
     ventana.print()
     ventana.close()
-  
-
   }
+  
 
   downloadCSVEx() {
     let head = this.csvHead.map((e) => {
@@ -542,7 +541,7 @@ export class GeneralyresultadoComponent implements OnInit {
 
   imprimir(){
     const p = document.getElementById("DivPrintPage").innerHTML;
-    this._imprimir.createHtmlSectionForPrint(p);
+    this._imprimir.createHtmlSectionForPrint(p, 0, 'size: vertical;');
   }
 }
 

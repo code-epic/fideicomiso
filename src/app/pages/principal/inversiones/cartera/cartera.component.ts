@@ -126,6 +126,6 @@ export class CarteraComponent implements OnInit {
 
   imprimir(){
     const p = document.getElementById("DivPrintPage").innerHTML;
-    this._imprimir.createHtmlSectionForPrint(p, 1);
+    this._imprimir.createHtmlSectionForPrint(p, 1,  'size: landscape;');
   }
 }
