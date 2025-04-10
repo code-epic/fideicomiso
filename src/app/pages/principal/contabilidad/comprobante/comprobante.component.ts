@@ -435,7 +435,7 @@ export class ComprobanteComponent implements OnInit {
       this.fechaejercicio.value
     );
     this.Comprobante.fecha_ejercicio = this.util.ConvertirFechaDB(
-      this.fechacreacion.value
+      this.fechaejercicio.value
     );
 
     this.Comprobante.debe = debe;
@@ -475,7 +475,6 @@ export class ComprobanteComponent implements OnInit {
     this.ngxService.startLoader('load-cont');
     this.xAPI.funcion = 'FID_IComprobante';
     this.xAPI.parametros = '';
-    this.Comprobante.fecha_operacion = this.Comprobante.fecha_ejercicio
     this.xAPI.valores = JSON.stringify(this.Comprobante);
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -501,7 +500,7 @@ export class ComprobanteComponent implements OnInit {
         this.fechaejercicio.value
       );
       this.IDComprobante.fecha_operacion = this.util.ConvertirFechaDB(
-        this.fechacreacion.value
+        this.fechaejercicio.value
       );
       this.IDComprobante.cuenta = this.getIDCuenta(e.cuenta);
       this.xAPI.funcion = 'FID_IDetalleComprobante';
