@@ -12,7 +12,7 @@ export interface Inversion {
   instrumento: string;
   numero: string;
   pais: string;
-  codigo_isin: string;
+  codigo_isin: any;
   emisor: string;
   custodio: string;
   fecha_emision: any; // fecha

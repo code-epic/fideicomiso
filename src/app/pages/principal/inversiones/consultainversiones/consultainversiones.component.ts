@@ -362,6 +362,7 @@ export class ConsultainversionesComponent implements OnInit {
     this.Inversiones.tipo_moneda = parseInt(this.tipo_moneda)
     this.Inversiones.estatus = parseInt(this.estatus)
     this.Inversiones.tipo_inversion = parseInt(this.tipo_inversion)
+    this.Inversiones.codigo_isin = parseInt(this.Inversiones.codigo_isin)
     this.Inversiones.fecha_emision = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_emi) : this.Inversiones.fecha_emision.substring(0, 10)
     this.Inversiones.fecha_compra = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_com) : this.Inversiones.fecha_compra.substring(0, 10)
     this.Inversiones.fecha_vencimiento = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_ven) : this.Inversiones.fecha_vencimiento.substring(0, 10)
