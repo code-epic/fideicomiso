@@ -334,7 +334,7 @@ export class CcierreComponent implements OnInit {
 
     this.ngxService.startLoader('load-precierre')
     this.xAPI.funcion = "FID_DCierreSemestral"
-    this.xAPI.parametros = `2024-06-30`
+    this.xAPI.parametros = `2024-12-31`
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {

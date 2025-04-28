@@ -329,7 +329,7 @@ export class ProcesocontablesComponent implements OnInit {
 
 
   consultarValoresSemestrales() {
-    let fecha = '2024-06-30'
+    let fecha = '2024-12-31'
     this.xAPI.funcion = 'FID_CMovimientosSemestrales'
     this.xAPI.parametros = fecha
     this.xAPI.valores = ''
