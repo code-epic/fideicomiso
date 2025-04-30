@@ -78,17 +78,21 @@ export class CarteraComponent implements OnInit {
 
     this.xAPI.parametros = `${fini},${ffin},${ffin}`
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
+      data => {        
         this.lstCartera = data.Cuerpo
-        this.lstCartera.forEach(e => {
-          this.total_a += parseFloat(e.costo_adquisicion)
-          this.balance_a += parseFloat(e.costo_adquisicion)
+        if (this.lstCartera.length > 0) {
+          this.lstCartera.forEach(e => {
+            this.total_a += parseFloat(e.costo_adquisicion)
+            this.balance_a += parseFloat(e.costo_adquisicion)
 
-          this.total_b += this.InteresDiarioCupon(e, this.CalcularDias( e.fecha_compra, this.fecha_al ))
-          this.balance_b = this.total_b
-        });
+            this.total_b += this.InteresDiarioCupon(e, this.CalcularDias( e.fecha_compra, this.fecha_al ))
+            this.balance_b = this.total_b
+          });
 
-        this.bVista = true
+          this.bVista = true
+        }else{
+          this.toasService.warning("No existen inversiones este dia", "Fideicomiso")
+        }
       },
       error => {
         console.error('Saliendo, ', error)
