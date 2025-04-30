@@ -43,7 +43,7 @@
       <div class="col-md-3">
         <mat-form-field appearance="outline">
           <mat-label>N&uacute;mero de dias </mat-label>
-          <input matInput placeholder="N&uacute;mero de dias" [ngModelOptions]="{standalone: true}" [(ngModel)]="dias">
+          <input matInput placeholder="N&uacute;mero de dias" [ngModelOptions]="{standalone: true}" [(ngModel)]="dias" disabled>
           <mat-icon matSuffix>folder</mat-icon>
         </mat-form-field>
       </div>
@@ -73,7 +73,6 @@
     <mat-tab-group *ngIf="visible" mat-stretch-tabs class="example-stretched-tabs" style="padding:4px;">
       <mat-tab>
         <ng-template mat-tab-label>
-          <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
           &nbsp;POSICION FINANCIERA
         </ng-template>
 
@@ -112,7 +111,7 @@
                       <mat-list *ngFor="let e of lstAsientos; let i=index "
                         style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                         <div class="row">
-                         
+                          
                           <div class="col-md-2 texto-detalle auto-ajuste">
                             {{ e.instrumento | uppercase }}
                           </div>
@@ -291,7 +290,7 @@
                       <mat-list *ngFor="let e of lstCompra; let i=index "
                         style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                         <div class="row">
-                         
+                          
                           <div class="col-md-8 texto-detalle auto-ajuste">
                             {{ e.instrumento | uppercase }}
                           </div>
@@ -330,7 +329,7 @@
 
             </div>
             <br>
-           
+            
 
 
           </div>
@@ -338,100 +337,17 @@
 
         <br>
       </mat-tab>
-      <!-- <mat-tab>
-        <ng-template mat-tab-label>
-          &nbsp;VISTA CONTABLE
-        </ng-template>
-
-        <div class="example-large-box mat-elevation-z4">
-          <div style="padding: 20px; width: 100%; margin-bottom: 0px;">
-
-            <div class="row" *ngIf="bcuentat">
-              <div class="col-md-3">
-                <table >
-                  <tr style="border: 0px; border-bottom: 1px solid #ccc;">
-                    <td colspan="2" style="text-align: center; font-weight: bold;">DISPONIBLES <BR>
-                    711.01.1.00.00.00.00.00
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="border: 0px; border-right: 1px solid  #ccc; text-align: center;font-weight: bold;">DEBE</td>
-                    <td style="border: 0px; border-left: 1px solid  #ccc; text-align: center;font-weight: bold;">HABER</td>
-                  </tr>
-                    <tr>
-                      <td style="border: 0px;border-right:  1px solid  #ccc;">645.59</td>
-                      <td style="border: 0px;border-left: 1px solid  #ccc;"></td>
-                    </tr>
-                </table>
-              </div>
-            </div>
-
-
-            <div class="row" >
-              <div class="col-md-12">
-                <br>
-                
-                <table style="font-size: 15px;" padding="5" class="asientos">
-                  
-                  <thead>
-                    <tr style="border: 0px; border-bottom: 1px solid #ccc;">
-                      <th>CUENTA</th>
-                      <th style="text-align: left;">DESCRIPCION DE LA CUENTA</th>
-                      <th style="text-align: center;">DEBE</th>
-                      <th style="text-align: center;">HABER</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let e of lstAsientos;" >
-                      <td>{{ getCuenta(e) }}</td>
-                      <td>{{ e.descripcion | uppercase }}</td>
-                      <td style="border: 0px;border-right:  1px solid  #ccc; text-align: right;">{{ e.debe }}&nbsp;&nbsp;</td>
-                      <td style="border: 0px; text-align: right;">{{ e.haber }}&nbsp;&nbsp;</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colspan="2"></td>
-                      <td style="border: 0px;border-top:  1px solid  #ccc; text-align: right; font-weight: bold; font-size: 15px;"> {{ acum_debe }}&nbsp;&nbsp;</td>
-                      <td style="border: 0px;border-top:  1px solid  #ccc;text-align: right; font-weight: bold; font-size: 15px;"> {{ acum_haber }}&nbsp;&nbsp;</td>
-                    </tr>
-                  </tfoot>
-                </table>
-
-                <br>
-                <br>
-                DETALLE DE LAS CUENTAS ESTE PROCESO SOLO SIRVE PARA VISUALIZAR LOS MOVIMIENTOS DE LA POSICION FINANCIERA 
-                <br>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-
-
-        <br>
-      </mat-tab> -->
-
 
     </mat-tab-group>
 
     <div class="row" *ngIf="visible" >
-
-
       <div class="col-md-12 text-right">
-
-       
         <button *ngIf="blComprobante" mat-flat-button color="accent" (click)="GenerarComprobante()" style="height: 50px;">
           Generar comprobante
         </button>
-        
-        
       </div>
-
     </div>
     <br>
-
 
   </div>
 </div>

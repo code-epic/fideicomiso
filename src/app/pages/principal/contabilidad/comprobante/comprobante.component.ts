@@ -221,7 +221,7 @@ export class ComprobanteComponent implements OnInit {
 
   Buscar(e) {}
 
-  editar(e) {
+  editar(e, x = true) {
     console.log(e)
     this.Comprobante = e
     this.ELEMENT_DATA = JSON.parse( e.definicion).map(ev => {
@@ -231,10 +231,11 @@ export class ComprobanteComponent implements OnInit {
       
       return ev
     });
-    console.log(this.ELEMENT_DATA)
     this.dataSource = new MatTableDataSource<IComprobante>(this.ELEMENT_DATA);
     this.dataSource.paginator = this.paginator;
-    this.selectedIndex = 1
+    if (x) {
+      this.selectedIndex = 1
+    }
     this.active = true
     this.TotalizarElement()
   }
@@ -347,7 +348,7 @@ export class ComprobanteComponent implements OnInit {
     // this.saldo_debe = parseFloat(this.saldo_debe * 1
     // this.saldo_haber = this.saldo_haber * 1
 
-    if (this.debe <= 0 && this.haber <= 0) {
+    if (this.debe <= 0 && this.haber <= 0 || this.debe == null || this.haber == null) {
       this._snackBar.open("Por favor verifique los campos ", "ok");
       return;
     }
@@ -579,7 +580,10 @@ export class ComprobanteComponent implements OnInit {
     )
   }
 
-  abrirDialogo(){
+  abrirDialogo(e: any = null){
+    if (e) {
+      this.editar(e, false)
+    }
     this.dialog.open(ComprobanteDialogComponent, {
       width: '60%',
       data: {datos: this.ELEMENT_DATA}

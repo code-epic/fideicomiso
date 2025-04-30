@@ -52,7 +52,8 @@ import { PlancontableComponent } from 'src/app/pages/principal/contabilidad/plan
 import { ComprobanteComponent } from 'src/app/pages/principal/contabilidad/comprobante/comprobante.component';
 import { CurrencyMaskModule } from "ng2-currency-mask";
 import { CuentaComponent } from 'src/app/pages/principal/contabilidad/cuenta/cuenta.component';
-  
+import {MatTooltipModule} from '@angular/material/tooltip';
+
 import { NgxMaskModule, IConfig } from 'ngx-mask'
 import { OperacionesComponent } from 'src/app/pages/principal/operaciones/operaciones.component';
 import { ProcesosComponent } from 'src/app/pages/principal/operaciones/procesos/procesos.component';
@@ -113,6 +114,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     MatDialogModule,
     MatToolbarModule,
     MatSelectModule,
+    MatTooltipModule,
     MatStepperModule,
     MatDatepickerModule,
     MatNativeDateModule,

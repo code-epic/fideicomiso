@@ -67,8 +67,6 @@ export class ProcesosComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // let d = new Date().toISOString().substring(0,10).split('-')
-    // this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
     this.lstVencimiento = [];
     this.lstCompra = [];
     this.consultarUltimoCierre();
@@ -79,7 +77,6 @@ export class ProcesosComponent implements OnInit {
     this.xAPI.funcion = "FID_CUltimoPreCierre";
     this.xAPI.parametros = "";
     this.xAPI.valores = "";
-    // console.log('hola')
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         console.log(data)
@@ -189,25 +186,31 @@ export class ProcesosComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         this.lstAsientos = data.Cuerpo;
-
         if (this.lstAsientos.length > 0) {
           data.Cuerpo.forEach((e) => {
             this.acum_debe += parseFloat(e.interes_acumulado);
             this.acum_haber += parseFloat(e.interes_acumulado);
           });
-
-          console.log(data.Cuerpo)
-
+        
           this.visible = true;
-
+        
           let factual = new Date(this.fechau + " 00:00:00");
           let fcalculo = new Date(this.fechai);
 
-          if (factual.getTime() > fcalculo.getTime()) {
+          const partes = this.fechaultimo.split('/'); // Divide la fecha en [día, mes, año]
+          const dia = parseInt(partes[0], 10); // Día
+          const mes = parseInt(partes[1], 10) - 1; // Mes (resta 1 porque los meses en Date comienzan en 0)
+          const anio = parseInt(partes[2], 10); // Año
+
+          const fechaConvertida = new Date(anio, mes, dia); // Crea un objeto Date
+          
+        
+          if (factual.getTime() > fcalculo.getTime() && fechaConvertida.getTime() < fcalculo.getTime()) {
             this.blProcesar = true;
             this.blComprobante = true;
           }
-
+        
+          this.consultarUltimoComprobante();
           this.ListarVencimiento();
           this.Listarcompra();
         } else {
@@ -219,6 +222,36 @@ export class ProcesosComponent implements OnInit {
       (error) => {
         console.log(error);
         this.ngxService.stopLoader("load-cont");
+      }
+    );
+  }
+
+  consultarUltimoComprobante(){
+    let xApiAux: IAPICore = {
+      funcion: "FID_CUltimoComprobante",
+      parametros: "",
+      valores: "",
+    };
+    let fechaiAux = ''
+
+    if (this.fechai) {
+      const fecha = new Date(this.fechai);
+      fecha.setDate(fecha.getDate() - 1); 
+      const anio = fecha.getFullYear();
+      const mes = String(fecha.getMonth() + 1).padStart(2, '0'); 
+      const dia = String(fecha.getDate()).padStart(2, '0');
+      fechaiAux = `${anio}-${mes}-${dia}`;
+    }
+
+    this.apiService.Ejecutar(xApiAux).subscribe(
+      (data) => {
+        let ultc = data.Cuerpo[0].ultimaFechaComprobante;
+        if (ultc == fechaiAux) {
+          this.blComprobante = true
+        }
+      },
+      (error) => {
+        console.log(error);
       }
     );
   }

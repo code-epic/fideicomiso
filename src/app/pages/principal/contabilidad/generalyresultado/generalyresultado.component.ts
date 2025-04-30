@@ -294,14 +294,14 @@ export class GeneralyresultadoComponent implements OnInit {
 
       this.HTMLBalance += `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
-          <th >${this.lstIndex[this.posicion].nombre} </th>
-          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          <th class="th-general">${this.lstIndex[this.posicion].nombre} </th>
+          <th class="text-right class="th-general">${this.getMoneda(this.acum_saldo_actual) == "0"
           ? ""
           : this.getMoneda(this.acum_saldo_actual) 
         }</th>
         </tr>
         <tr>  
-          <td  colspan="5">${this.getTitulosACuentasBalance(e)} </td>
+          <td  colspan="5" class="td-general">${this.getTitulosACuentasBalance(e)} </td>
         </tr>`
         // console.log('imprimiendo valores ', this.acum_saldo_actual, this.calcularacero )
         // if (this.acum_saldo_actual != 0) this.calcularacero = 1
@@ -337,8 +337,8 @@ export class GeneralyresultadoComponent implements OnInit {
       this.total_gastos = this.posicion==3?this.acum_saldo_actual: 0
       let cadena = `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
-          <th >${this.lstIndex[this.posicion].nombre} </th>
-          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          <th class="th-general">${this.lstIndex[this.posicion].nombre} </th>
+          <th class="text-right th-general">${this.getMoneda(this.acum_saldo_actual) == "0"
           ? "-"
           : this.getMoneda(this.acum_saldo_actual) 
         }</th>
@@ -463,20 +463,20 @@ export class GeneralyresultadoComponent implements OnInit {
 
       this.HTMLComprobacion += `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
-          <th >${this.lstIndex[this.posicion].nombre} </th>
-          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          <th class="th-general" >${this.lstIndex[this.posicion].nombre} </th>
+          <th class="text-right th-general">${this.getMoneda(this.acum_saldo_actual) == "0"
           ? "-"
           : this.getMoneda(this.acum_saldo_actual)
         }</th>
-          <th class="text-right">${this.getMoneda(this.acumuladord) == "0"
+          <th class="text-right th-general">${this.getMoneda(this.acumuladord) == "0"
           ? "-"
           : this.getMoneda(this.acumuladord)
         }</th>
-          <th class="text-right">${this.getMoneda(this.acumuladorh) == "0"
+          <th class="text-right th-general">${this.getMoneda(this.acumuladorh) == "0"
           ? "-"
           : this.getMoneda(this.acumuladorh)
         }</th>
-          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          <th class="text-right th-general">${this.getMoneda(this.acum_saldo_actual) == "0"
           ? "-"
           : this.getMoneda(this.acum_saldo_actual)
         }</th>

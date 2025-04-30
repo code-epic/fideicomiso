@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { ToastrService } from 'ngx-toastr';
-import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -19,15 +17,15 @@ export class CarteraComponent implements OnInit {
     parametros: ''
   }
 
-  public total_a = 0
-  public balance_a = 0
-  public total_b = 0
-  public balance_b = 0
-  public dif_a = 0
-  public dif_b = 0
+  public total_a: number = 0
+  public balance_a: number = 0
+  public total_b: number = 0
+  public balance_b: number = 0
+  public dif_a: number = 0
+  public dif_b: number = 0
   public fechai: any
-  public bVista = false
-  public fecha_al = ''
+  public bVista: boolean = false
+  public fecha_al: string = ''
 
   public lstCartera = []
 
@@ -35,15 +33,12 @@ export class CarteraComponent implements OnInit {
 
   constructor(
     private util: UtilService,
-    private ngxService: NgxUiLoaderService,
     private toasService: ToastrService,
     private apiService: ApiService,
     private _imprimir: ImprimirService
   ) { }
 
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void { }
 
   CalcularDias(fechai, fechaf): number {
     let calculo = this.util.CalcuarDiasTranscurridos(fechai, fechaf) + 1
@@ -82,10 +77,8 @@ export class CarteraComponent implements OnInit {
     this.iniciarContadores()
 
     this.xAPI.parametros = `${fini},${ffin},${ffin}`
-    console.log(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log(data)
         this.lstCartera = data.Cuerpo
         this.lstCartera.forEach(e => {
           this.total_a += parseFloat(e.costo_adquisicion)
@@ -122,6 +115,17 @@ export class CarteraComponent implements OnInit {
 
     
     return parseFloat(rendicion.toFixed(2));
+  }
+
+  getFechaIFormateada():string{
+    if (!this.fechai) {
+      return '';
+    }
+    const fecha = new Date(this.fechai);
+    const dia = String(fecha.getDate()).padStart(2, '0'); 
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const anio = fecha.getFullYear();
+    return `${dia}-${mes}-${anio}`;
   }
 
   imprimir(){

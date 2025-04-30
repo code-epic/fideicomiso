@@ -86,12 +86,17 @@
                         <div class="col-md-2 texto-lista auto-ajuste">
                           Bs. {{ getMoneda(e) }}
                         </div>
-                        <div class="col-md-1 text-right ">
-                          <button mat-icon-button aria-label="Editar" (click)="eliminarComprobante(e.id, e.descripcion )">
+                        <div class="col-md-1 text-right d-flex flex-column justify-content-center align-items-end">
+                          <button mat-icon-button aria-label="ELiminar" (click)="eliminarComprobante(e.id, e.descripcion )" matTooltip="Eliminar">
                             <mat-icon class="texto-gray">delete</mat-icon>
                           </button>
-                          <button mat-icon-button aria-label="Editar" (click)="editar(e)">
+
+                          <button mat-icon-button aria-label="Editar" (click)="editar(e)" matTooltip="Editar">
                             <mat-icon class="texto-gray">edit</mat-icon>
+                          </button>
+
+                          <button mat-icon-button aria-label="Imprimir" (click)="abrirDialogo(e)" matTooltip="Imprimir">
+                            <mat-icon class="texto-gray">print</mat-icon>
                           </button>
 
                         </div>

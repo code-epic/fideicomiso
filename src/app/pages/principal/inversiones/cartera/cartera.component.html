@@ -39,43 +39,41 @@
             </div>
             <div style="width: 33%;"></div>
           </div>
+
+          <p style="font-weight: bold; font-size: 13px; text-align: center; padding: 1rem 0 0;">
+            CARTERA DE INVERSIONES - AL {{getFechaIFormateada()}}
+          </p>
+          
           <div class="row">
             <div class="col-md-12">
               <table>
                 <thead>
                   <tr class="cabecera">
-                    <th>EMISOR</th>
-                    <th>TIPO DE INVERSION</th>
-                    <!-- <th>PRECIO DE COMPRA</th> -->
-                    <th>VALOR DE COMPRA</th>
-                    <th>SALDOS LIBROS</th>
-                    <!-- <th>FECHA DE EMISION</th> -->
-                    <th>FECHA DE COMPRA</th>
-                    <th>FECHA DE VENCIMIENTO</th>
-                    <th>PLAZO</th>
-                    <th>TASA DE INTERES</th>
-                    <th>DIAS DEVENGADOS</th>
-                    <th>INTERESES DEVENGADOS</th>
+                    <th style="font-weight: bold; color: #252525;">EMISOR</th>
+                    <th style="font-weight: bold; color: #252525;">TIPO DE INVERSION</th>
+                    <th style="font-weight: bold; color: #252525;">VALOR DE COMPRA</th>
+                    <th style="font-weight: bold; color: #252525;">SALDOS LIBROS</th>
+                    <th style="font-weight: bold; color: #252525;">FECHA DE COMPRA</th>
+                    <th style="font-weight: bold; color: #252525;">FECHA DE VENCIMIENTO</th>
+                    <th style="font-weight: bold; color: #252525;">PLAZO</th>
+                    <th style="font-weight: bold; color: #252525;">TASA DE INTERES</th>
+                    <th style="font-weight: bold; color: #252525;">DIAS DEVENGADOS</th>
+                    <th style="font-weight: bold; color: #252525;">INTERESES DEVENGADOS</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let e of lstCartera;let i=index; ">
                     <td>{{e.emisor}}</td>
                     <td>{{e.instrumento}}</td>
-                    <!-- <td>0</td> -->
                     <td class="right">{{ getMoneda(e.valor_nominal) }}</td>
                     <td class="right">{{  getMoneda(e.costo_adquisicion) }}</td>
-                    <!-- <td>0</td> -->
                     <td>{{ e.fecha_compra | date:"dd/MM/yyyy" }}</td>
                     <td>{{ e.fecha_vencimiento | date:"dd/MM/yyyy" }}</td>
                     <td>{{ e.plazo_cupon }}</td>
                     <td>{{ e.tasa_cupon }} %</td>
                     <td>{{ CalcularDias( e.fecha_compra, fecha_al ) }}</td>
                     <td class="right"> {{ getMoneda(InteresDiarioCupon(e, CalcularDias( e.fecha_compra, fecha_al ) )) }} </td>
-                  </tr>
-  
-                 
-  
+                  </tr>  
   
                   <tr>
                     <td class="yellow" colspan="11"></td>
@@ -100,16 +98,6 @@
                     <td class="bgblue">{{ getMoneda(balance_b) }}</td>
                   </tr>
   
-  
-                  <!-- <tr class="descripcion6">
-                    <td class="none"></td>
-                    <td class="linea" colspan="2">DIF</td>
-                    <td class="linea right">0,00</td>
-                    <td class="none" colspan="2"></td>
-                    <td class="linea" colspan="3">DIF</td>
-                    <td class="linea right">0,00</td>
-                  </tr> -->
-  
                 </tbody>
               </table>
   
@@ -123,14 +111,11 @@
 
         <div class="row" *ngIf="bVista">
           <div class="col-md-6"></div>
-        
           <div class="col-md-6 text-right">
             <button mat-flat-button color="primary" (click)="imprimir()" style="margin-top: 5px; height: 50px;">
               &nbsp;Imprimir reporte
             </button>
           </div>
-        
-        
         </div>
     
       </div>

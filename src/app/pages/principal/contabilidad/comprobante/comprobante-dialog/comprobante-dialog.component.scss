@@ -1,3 +1,16 @@
+.w-33{
+    width: 33%;
+}
+
+.titulo{
+    flex-grow: 1; text-align: center;
+    p{
+        text-align: center;
+        font-weight: bold;
+        font-size: 13px;
+    }
+}
+
 table {
     border-collapse: collapse; width: 100%;         
     th,
@@ -30,4 +43,8 @@ table {
 }
 th, td { 
     border: 1px solid #ddd;  padding: 8px 16px; text-align: center; 
+}
+
+.imagen{
+    margin-right: 20px; height: 5rem;
 }

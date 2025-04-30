@@ -24,11 +24,21 @@ export class ImprimirService {
                     ${xsize} 
                 
                 }
-                body{ width: 1200px }
+                body{ width: 1200px, padding: 2rem}
                 div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Roboto"; font-size:x-small }
                 section { 
                     page-break-before: always; 
                 }
+
+                .membrete{
+                    font-size: 13px;
+                }
+
+                .membrete-div{
+                    margin-top: 20px;
+                    margin-bottom: 40px
+                }
+
                 .mat-drawer-content {height: auto !important; }
                 .mat-drawer-container {overflow: inherit !important; }
                 .logo { margin-right: 10px; }
@@ -40,6 +50,7 @@ export class ImprimirService {
                     th,
                     td {
                         padding: .25em .5em;
+                        font-size: 12px
                         text-align: left;
 
                         &:nth-child(2) {
@@ -51,6 +62,7 @@ export class ImprimirService {
                         background-color:rgb(228, 228, 228);
                         color: #252525;
                         text-align: center;
+                        font-size: 13px;
                     }
 
                     tr {
@@ -87,6 +99,7 @@ export class ImprimirService {
                 td {
                     padding: .25em .5em;
                     text-align: left;
+                    font-size: 12px;
 
                     &:nth-child(2) {
                         text-align: left;
@@ -96,6 +109,7 @@ export class ImprimirService {
                 th {
                     background-color: #F5F5F0;
                     color: #252525;
+                    font-size: 13px;
                 }
 
                 tr {
@@ -142,7 +156,6 @@ export class ImprimirService {
                 border: 1px solid black;
                 text-align: center;
                 background-color: rgb(182, 167, 167);
-                color: white;
             }
             
             tr td {
@@ -193,7 +206,6 @@ export class ImprimirService {
                 border: 1px solid black;
                 text-align: center;
                 background-color: rgb(182, 167, 167);
-                color: white;
             }
             
             tr td {

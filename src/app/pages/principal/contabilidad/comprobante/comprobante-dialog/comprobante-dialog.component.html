@@ -15,6 +15,14 @@
             <div style="width: 33%;"></div>
         </div>
 
+        <div style="display: flex; align-items: center; justify-content: center;">
+            <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
+                <p align="center" style="font-weight: bold;font-size: 13px;">
+                    COMPROBANTE CONTABLE
+                </p>
+            </div>
+        </div>
+
         <table>
             <thead>
                 <tr>
@@ -26,12 +34,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let item of d.datos">
-                    <td>{{ item.cuenta }}</td>
-                    <td>{{ item.fecha }}</td>
-                    <td>{{ item.descripcion }}</td>
-                    <td>{{ item.debe }}</td>
-                    <td>{{ item.haber }}</td>
+                <tr *ngFor="let e of xData">
+                    <td>{{ e.cuenta }}</td>
+                    <td>{{ e.fecha }}</td>
+                    <td>{{ e.descripcion }}</td>
+                    <td>{{ e.debe }}</td>
+                    <td>{{ e.haber }}</td>
                 </tr>
                 <tr>
                     <td colspan="3">

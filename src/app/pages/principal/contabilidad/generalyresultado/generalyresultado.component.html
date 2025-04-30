@@ -56,12 +56,12 @@
 
 
 <div id="DivPrintPage" name="DivPrintPage" *ngIf="printv">
-  <div class="row" style="display: flex; align-items: center;">
+  <div class="row membrete-div" style="display: flex; align-items: center;">
     <div style="width: 33%;">
-      <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 5rem;">
+      <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 4.5rem;">
     </div>
     <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
-      <p style="font-weight: bold; font-size: 13px; margin: 0;">
+      <p class="membrete">
         BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
         DIRECCION DE FIDEICOMISO<br>
         ESTADO DE RESULTADOS AL - {{fechaTexto}}
@@ -71,15 +71,15 @@
   </div>
   <div class="row" [innerHtml]="HTMLBalance"></div>
 
-  <div class="row" style="display: flex; align-items: center;">
+  <div class="row membrete-div" style="display: flex; align-items: center;">
     <div style="width: 33%;">
-      <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 5rem;">
+      <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 4.5rem;">
     </div>
     <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
-      <p style="font-weight: bold; font-size: 13px; margin: 0;">
+      <p class="membrete">
         BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
         DIRECCION DE FIDEICOMISO<br>
-        ESTADO DE RESULTADOS AL - {{fechaTexto}}
+        ESTADO DE RESULTADOS - AL {{fechaTexto}}
       </p>
     </div>
     <div style="width: 33%;"></div>
