@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { truncateSync } from 'fs';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banfanb/comprobante.service';
@@ -43,6 +44,8 @@ export class ProcesocontablesComponent implements OnInit {
   public dias: number = 0
   public acum_debe = 0
   public acum_haber = 0
+
+  public yaProcesadoCierreSemestral = false
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -91,18 +94,17 @@ export class ProcesocontablesComponent implements OnInit {
   ngOnInit(): void {
     this.semestral = false
     this.estatus = 'M'
-    this.consultarUltimoCierre()
+    this.consultarUltimoPreCierre()
   }
 
-  consultarUltimoCierre() {
+  consultarUltimoPreCierre() {
     this.ngxService.stopLoader('load-precierre')
     this.xAPI.funcion = "FID_CUltimoPreCierre"
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
-    // console.log('hola')
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-
         let ultc = data.Cuerpo
         if (ultc.length > 0) {
           let fecha = ultc[0].fecha_cierre;
@@ -117,12 +119,67 @@ export class ProcesocontablesComponent implements OnInit {
           this.dias = 1
         }
 
+        if (this.fechaultimo == "30/06/2024" || this.fechaultimo == "31/12/2024" || this.fechaultimo == "30/06/2025") {
+          
+          let fecha = ultc[0].fecha_cierre;
+          let d = fecha.split('-');
+          this.fechau = fecha
+          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
+          let fechaCierre = new Date(`${d[0]}-${d[1]}-${d[2]}`);
+          fechaCierre.setDate(fechaCierre.getDate() + 1);
+          fechaCierre.setHours(0, 0, 0, 0);
+          this.fechai = fechaCierre;   
+          this.fechaf = fechaCierre;
 
-        if ( this.fechaultimo == "30/06/2024" || this.fechaultimo == "31/12/2024"  ) {
-          this.semestral = true
-          this.estatus = 'S'
+          this.ValidarPreCierreSemestral(false, ultc)
         }
 
+        this.ngxService.stopLoader('load-precierre')
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  }
+
+  consultarUltimoCierre(): boolean {
+    this.ngxService.stopLoader('load-precierre')
+    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.parametros = ''
+    this.xAPI.valores = ''
+    // console.log('hola')
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+
+        let ultc = data.Cuerpo
+        if (ultc.length > 0) {
+          let fecha = ultc[0].fecha_cierre;
+          let d = fecha.split('-');
+          let fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
+          let fechaCierre = new Date(`${d[0]}-${d[1]}-${d[2]}`);
+          fechaCierre.setDate(fechaCierre.getDate() + 2);
+          fechaCierre.setHours(0, 0, 0, 0);          
+
+          if ( fechaultimo == "30/06/2024" || fechaultimo == "31/12/2024" || fechaultimo == "30/06/2025" || fechaultimo == "31/12/2025" ) {                                    
+            console.log('ya procesado');
+            if (this.yaProcesadoCierreSemestral) {
+              console.log("aqui");
+              this.semestral = true;
+              this.estatus = 'S'
+            }
+          }else{
+            if(!this.yaProcesadoCierreSemestral){
+              let fecha = ultc[0].fecha_cierre;
+              let d = fecha.split('-');
+              let aux = new Date(`${d[0]}-${d[1]}-${d[2]}`);
+              aux.setDate(aux.getDate() + 2);
+              aux.setHours(0, 0, 0, 0);
+              this.fechai = aux;   
+              this.fechaf = aux;
+            }
+            return false
+          }
+        }        
         this.ngxService.stopLoader('load-precierre')
 
       },
@@ -130,17 +187,12 @@ export class ProcesocontablesComponent implements OnInit {
         console.log(error)
       }
     )
+    return false
   }
 
   CalcularDias(type: string, event: MatDatepickerInputEvent<Date>) {
     this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1
   }
-
-
-
-
-
-
 
   ConsultarComprobante() {
 
@@ -162,14 +214,11 @@ export class ProcesocontablesComponent implements OnInit {
     if(this.estatus == "S") fini = this.fechau
     this.xAPI.parametros = fini + ',' + this.estatus
 
-    //console.log(this.xAPI)
+    //console.error(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        // console.log(data)
-        
         this.lstMovimientos = data.Cuerpo
         this.lstMovimientos.map(e => {
-          //console.log(e)
           this.total_debe += parseFloat(e.debe)
           this.total_haber += parseFloat(e.haber)
         })
@@ -178,14 +227,11 @@ export class ProcesocontablesComponent implements OnInit {
         await this.ngxService.stopLoader('load-cont')
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.ngxService.stopLoader('load-cont')
       }
     )
   }
-
-
-
 
   GenerarPrecierre() {
 
@@ -200,7 +246,6 @@ export class ProcesocontablesComponent implements OnInit {
     if(this.estatus == "S") fini = this.fechau
     this.xAPI.parametros = fini + ',' + this.estatus
     this.xAPI.valores = ''
-    console.log(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.apiService.Mensaje(
@@ -209,109 +254,23 @@ export class ProcesocontablesComponent implements OnInit {
           "success",
           "Cierre"
         )
+
+        this.semestral = false;
+        this.estatus = 'M';
+        this.consultarUltimoPreCierre()
         this.ngxService.stopLoader('load-precierre')
         this.lstMovimientos = []
         this.blista = false
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
-
-
-
   }
-
-
-
-  // ConsultarMovimientosAuxiliares() {
-  //   if (this.fechai == undefined || this.fechaf == undefined) {
-  //     this._snackBar.open('Recuerde seleccionar un rango de fechas', 'OK')
-  //     return
-  //   }
-  //   let fini = this.util.ConvertirFechaDB(this.fechai)
-  //   let ffin = this.util.ConvertirFechaDB(this.fechaf)
-  //   this.ELEMENT_DATA = []
-  //   this.ngxService.startLoader('load-cont')
-  //   this.xAPI.funcion = "FID_CMovimientosAuxiliares"
-  //   this.xAPI.parametros = fini + ',' + ffin
-  //   this.xAPI.valores = ''
-
-  //   this.apiService.Ejecutar(this.xAPI).subscribe(
-  //     async data => {
-  //       this.lstMovimientosAuxliares = data.Cuerpo
-
-  //       this.blista = false
-  //       this.bauxiliar = true
-  //       await this.ngxService.stopLoader('load-cont')
-  //     },
-  //     (error) => {
-  //       console.log(error)
-  //       this.ngxService.stopLoader('load-cont')
-  //     }
-  //   )
-  // }
-
-
-  // GenerarCierre() {
-
-  //   if (this.fechai == undefined || this.fechaf == undefined) {
-  //     this._snackBar.open('Recuerde seleccionar un rango de fechas', 'OK')
-  //     return
-  //   }
-
-  //   this.ngxService.stopLoader('load-precierre')
-  //   this.xAPI.funcion = "FID_UPlanFideicomiso"
-  //   this.xAPI.parametros = '1,' + this.util.ConvertirFechaDB(this.fechai)
-  //   this.xAPI.valores = ''
-
-  //   this.apiService.Ejecutar(this.xAPI).subscribe(
-  //     async data => {
-  //       this.xAPI.funcion = "FID_IMovimientosSaldos"
-  //       this.xAPI.parametros = this.util.ConvertirFechaDB(this.fechai)
-  //       this.xAPI.valores = ''
-
-  //       this.apiService.Ejecutar(this.xAPI).subscribe(
-  //         async data => {
-  //           this.lstMovimientosAuxliares = []
-  //           this.bauxiliar = false
-  //           this.blista = false
-  //           this.apiService.Mensaje(
-  //             "Felicitaciones, Proceso exitoso",
-  //             "Se ha realizado el cierre para el dia: " + this.util.ConvertirFechaDB(this.fechai),
-  //             "success",
-  //             "contratos"
-  //           );
-  //           this.ngxService.stopLoader('load-precierre')
-  //         },
-  //         (error) => {
-  //           console.log(error)
-  //         }
-  //       )
-
-  //     },
-  //     (error) => {
-  //       console.log(error)
-  //     }
-  //   )
-
-
-
-  // }
-
-
-
 
   getMoneda(monto: number): string {
     return this.util.ConvertirMoneda( monto );
   }
-
-
-
-
-
-
-
 
   //Recorrer cada plan y realizar cierres individuales **pendientes
   registrarComprobante(fecha) {
@@ -323,10 +282,7 @@ export class ProcesocontablesComponent implements OnInit {
     this.Comprobante.debe = 0.00
     this.Comprobante.haber = 0.00
     this.Comprobante.llave = 'S'
-
-
   }
-
 
   consultarValoresSemestrales() {
     let fecha = '2024-12-31'
@@ -338,7 +294,6 @@ export class ProcesocontablesComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log(data.Cuerpo)
         let debe = 0
         let haber = 0
         data.Cuerpo.forEach(e => {
@@ -350,7 +305,7 @@ export class ProcesocontablesComponent implements OnInit {
             'debe': e.disminuye == "DEBE" ? parseFloat(e.saldo) : 0,
             'haber': e.disminuye == "HABER" ? parseFloat(e.saldo) : 0,
             'fecha_ejercicio': fecha,
-            'fecha_operacion': this.util.FechaActual()
+            'fecha_operacion': fecha
           }
           this.lstData.push(dc)
         });
@@ -362,7 +317,7 @@ export class ProcesocontablesComponent implements OnInit {
           'debe': 0,
           'haber': saldo,
           'fecha_ejercicio': fecha,
-          'fecha_operacion': this.util.FechaActual()
+          'fecha_operacion': fecha
         }
         this.lstData.push(dcx)
         this.Comprobante.debe = debe
@@ -381,26 +336,18 @@ export class ProcesocontablesComponent implements OnInit {
             this.Acepar()
           }
         })
-
       },
-      error => {
-
-      }
+      error => { }
     )
-
-
   }
 
   Acepar() {
-
-
     this.ngxService.startLoader("load-cont");
     this.xAPI.funcion = "FID_IComprobante";
     this.xAPI.parametros = "";
-    // this.Comprobante.codigo = this.util.GenerarUnicId()
-    
+    this.Comprobante.codigo = this.util.GenerarUnicId()
+        
     this.xAPI.valores = JSON.stringify(this.Comprobante);
-    //console.log(this.xAPI);
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         
@@ -414,7 +361,7 @@ export class ProcesocontablesComponent implements OnInit {
 
   async GuardarDetalle(comprobante: number) {
     this.IDComprobante.comprobante = comprobante;
-    await this.lstData.map(async (e) => {
+    await this.lstData.map(async (e) => {      
       this.IDComprobante.debe = e.debe
       this.IDComprobante.haber = e.haber
       this.IDComprobante.fecha_ejercicio = e.fecha_ejercicio
@@ -423,13 +370,10 @@ export class ProcesocontablesComponent implements OnInit {
 
       this.xAPI.funcion = "FID_IDetalleComprobante";
       this.xAPI.parametros = "";
-
-      this.xAPI.valores = JSON.stringify(this.IDComprobante);
+      this.xAPI.valores = JSON.stringify(this.IDComprobante);      
 
       await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          console.log("detalle insertado ", data);
-        },
+        (data) => { },
         (err) => { }
       );
     })
@@ -445,7 +389,6 @@ export class ProcesocontablesComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
         if (data.Cuerpo != undefined ){
-          
           let fentrada = data.Cuerpo[0].fecha
           let finicio = this.util.ConvertirFechaDB(this.fechai)
 
@@ -456,19 +399,62 @@ export class ProcesocontablesComponent implements OnInit {
               "error",
               "Cierre"
             )
-           
             this.ngxService.stopLoader('load-precierre')
           }else{
             this.GenerarPrecierre()
+          }      
+
+          if (finicio == '2024-12-31' || finicio == '2024-06-30' || finicio == '2025-12-31' ) {            
+            this.ValidarPreCierreSemestral()
           }
         }
       },
       err => {
-
+        console.error(err)
+        this.ngxService.stopLoader('load-precierre')
       }
     )
   }
 
+  ValidarPreCierreSemestral(x: boolean = true, ultc = null) {
+    this.xAPI.funcion = 'FID_CFechaMaxPreCierreSemestral'
+    this.xAPI.parametros = ''
+    this.xAPI.valores = ''
+    this.ngxService.startLoader('load-precierre')
 
-
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        if (data.Cuerpo != undefined ){
+          let fentrada = data.Cuerpo[0].fecha;
+          let finicio = this.util.ConvertirFechaDB(this.fechai);
+          
+          if (fentrada == finicio){            
+            if (x) {
+              this.apiService.Mensaje(
+                "Pendiente",
+                "Ya fue procesado el Precierre Semestral: " + this.util.ConvertirFechaHumana(this.fechai),
+                "error",
+                "Cierre"
+              )
+              this.ngxService.stopLoader('load-precierre')
+            }else{
+              this.yaProcesadoCierreSemestral = false
+              this.consultarUltimoCierre()       
+            }
+          }else{
+            if (x) {
+              this.GenerarPrecierre()
+            }else{
+              this.yaProcesadoCierreSemestral = true       
+              this.consultarUltimoCierre()       
+            }
+          }      
+        }
+      },
+      err => {
+        console.error(err)
+        this.ngxService.stopLoader('load-precierre')
+      }
+    )    
+  }
 }
