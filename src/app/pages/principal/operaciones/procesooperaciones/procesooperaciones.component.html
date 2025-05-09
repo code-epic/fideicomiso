@@ -91,7 +91,7 @@
                     <tr *ngFor="let e of lstComisiones" >
                       <td>{{ getCodigo(e.id) }}</td>
                       <td>{{ e.plan}}</td>
-                      <td style="text-align:right">Bs. {{   getMoneda(e.capital) }}</td>
+                      <td style="text-align:right">Bs. {{   getMoneda(e.monto) }}</td>
                       <td style="text-align:right; font-weight: bold;"> {{e.tasa }} %</td>
                       <!-- <td style="text-align:right">Bs. {{  getMoneda(e.calculo) }}</td> -->
                       <td style="text-align:right">Bs. {{  getMoneda(e.calculo_capital) }}</td>
