@@ -37,6 +37,7 @@ export interface FID_IDetalleComprobante {
 	haber	 :	number
 	fecha_operacion	 :	string
 	fecha_ejercicio	 :	string
+  plan?: number
 }
 
 //no posee una sola transaccion

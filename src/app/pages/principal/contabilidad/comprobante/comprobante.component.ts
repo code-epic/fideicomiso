@@ -114,6 +114,7 @@ export class ComprobanteComponent implements OnInit {
     haber: 0,
     fecha_operacion: '',
     fecha_ejercicio: '',
+    plan: 1
   };
 
   public xAPI: IAPICore = {
@@ -358,6 +359,14 @@ export class ComprobanteComponent implements OnInit {
     let debe = parseFloat(this.debe.toString())
     let haber = parseFloat(this.haber.toString())
 
+    // Validar si debe y haber son números
+    if (isNaN(debe) || isNaN(haber)) {
+      this._snackBar.open("Por favor verifique los campos ", "ok");
+      return;
+    }
+    
+    
+
     let detalle = {
       cuenta: cta[0].trim(),
       descripcion: cta[1].trim(),
@@ -506,7 +515,7 @@ export class ComprobanteComponent implements OnInit {
       this.IDComprobante.cuenta = this.getIDCuenta(e.cuenta);
       this.xAPI.funcion = 'FID_IDetalleComprobante';
       this.xAPI.parametros = '';
-      this.xAPI.valores = JSON.stringify(this.IDComprobante);
+      this.xAPI.valores = JSON.stringify(this.IDComprobante);      
 
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {

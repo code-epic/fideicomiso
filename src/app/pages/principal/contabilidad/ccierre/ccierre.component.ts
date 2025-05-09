@@ -129,7 +129,7 @@ export class CcierreComponent implements OnInit {
   }
 
 
-  ValidarPreCierre(llave ) {
+  ValidarPreCierre() {
     this.xAPI.funcion = 'FID_CFechaMaxPreCierre'
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
@@ -142,8 +142,27 @@ export class CcierreComponent implements OnInit {
           let fentrada = data.Cuerpo[0].fecha
           let finicio = this.util.ConvertirFechaDB(this.fechai)
 
-          if (fentrada == finicio){
-            this.CrearSaldos(llave)
+          let fentradaDate = new Date(fentrada).toISOString(); // Convertir fentrada a formato UTC
+          let finicioDate = new Date(finicio).toISOString();   // Convertir finicio a formato UTC
+
+          if (fentradaDate >= finicioDate){
+            let fechaultimoDate = new Date(this.util.ConvertirFechaDB(this.fechaultimo)).toISOString();
+
+            if (fechaultimoDate < finicioDate) {
+              this.CrearSaldos()
+            } else {
+              this.apiService.Mensaje(
+                "Pendiente",
+                "Ya ha cerrado el dia " + this.util.ConvertirFechaHumana(this.fechai),
+                "error",
+                "Cierre"
+              )
+              this.consultarUltimoCierre()
+            }
+
+            // this.CrearSaldos()
+            console.log("AQUI");
+            
           }else{
             this.apiService.Mensaje(
               "Pendiente",
@@ -162,7 +181,7 @@ export class CcierreComponent implements OnInit {
     )
   }
 
-  CrearSaldos(llave){
+  CrearSaldos(llave = 'M'){
     let d = this.fechaultimo.split('/')
     let fultimo =  d[2] + '-' + d[1] + '-' + d[0];
     let dt = new Date(this.fechai).toISOString()
@@ -170,15 +189,11 @@ export class CcierreComponent implements OnInit {
     d =  dt.split('T')
     let fopera =  d[0]
     if (llave == 'S') {
-      console.log(fultimo, fopera)
       fopera = fultimo
       let f = new Date(fultimo);
       f.setDate(f.getDate());
       f.setHours(0, 0, 0, 0);
-      
-      
       fultimo = f.toISOString().split('T')[0]
-      console.log( fultimo )
     }
     let usuario = 'Administrador'
     let plan = '1'
@@ -207,126 +222,7 @@ export class CcierreComponent implements OnInit {
         console.log(error)
       }
     )
-
-    
   }
-
-  // //Recorrer cada plan y realizar cierres individuales **pendientes
-  // registrarComprobante(fecha ){
-  //   this.Comprobante.descripcion = 'CIERRE SEMESTRAL ASIENTO ' + fecha
-  //   this.Comprobante.detalle = 'CIERRE SEMESTRAL ASIENTO ' + fecha
-  //   this.Comprobante.plan = 1
-  //   this.Comprobante.fecha_ejercicio = this.util.FechaActual()
-  //   this.Comprobante.fecha_operacion = fecha
-  //   this.Comprobante.debe = 0.00
-  //   this.Comprobante.haber = 0.00
-
-  // }
-
-
-  // consultarValoresSemestrales(){
-  //   let fecha = '2024-06-30'
-  //   this.xAPI.funcion = 'FID_CMovimientosSemestrales'
-  //   this.xAPI.parametros = fecha
-  //   this.xAPI.valores = ''
-
-  //   this.registrarComprobante(fecha)
-
-  //   this.apiService.Ejecutar(this.xAPI).subscribe(
-  //     data => {
-  //       console.log(data.Cuerpo)
-  //       let debe = 0
-  //       let haber = 0
-  //       data.Cuerpo.forEach(e => {
-  //         debe += e.disminuye=="DEBE"? parseFloat(e.saldo) :0
-  //         haber += e.disminuye=="HABER"? parseFloat(e.saldo) :0
-  //         let dc = {
-  //           'comprobante' : 0,
-  //           'cuenta' :  e.id_cuenta,
-  //           'debe' : e.disminuye=="DEBE"? parseFloat(e.saldo) :0,
-  //           'haber' : e.disminuye=="HABER"? parseFloat(e.saldo) :0,
-  //           'fecha_ejercicio' : this.util.FechaActual(),
-  //           'fecha_operacion' : fecha
-  //         }
-  //         this.lstData.push(dc)
-  //       });
-
-  //       let saldo = debe - haber
-  //       let dcx = {
-  //         'comprobante' : 0,
-  //         'cuenta' :  '40',
-  //         'debe' : 0,
-  //         'haber' : saldo,
-  //         'fecha_ejercicio' : this.util.FechaActual(),
-  //         'fecha_operacion' : fecha
-  //       }
-  //       this.lstData.push(dcx)
-  //       this.Comprobante.debe = debe
-  //       this.Comprobante.haber = debe
-  //       Swal.fire({
-  //         title: 'Esta seguro que desea realizar la operación de cierre semestral',
-  //         icon: "question",
-  //         showCancelButton: true,
-  //         confirmButtonColor: '#3085d6',
-  //         cancelButtonColor: '#d33',
-  //         confirmButtonText: 'Si',
-  //         cancelButtonText: 'No',
-  //         allowEscapeKey: true,
-  //       }).then((result) => {
-  //         if (result.isConfirmed) {
-  //           this.Acepar()
-  //         }
-  //       })
-
-  //     },
-  //     error => {
-
-  //     }
-  //   )
-    
-
-  // }
-
-  // Acepar(){
-    
-   
-  //   this.ngxService.startLoader("load-cont");
-  //   this.xAPI.funcion = "FID_IComprobante";
-  //   this.xAPI.parametros = "";
-  //   this.xAPI.valores = JSON.stringify(this.Comprobante);
-  //   this.apiService.Ejecutar(this.xAPI).subscribe(
-  //     async (data) => {
-  //       console.log(data);
-  //       await this.GuardarDetalle(data.msj);
-  //       this.ngxService.stopLoader("load-cont");
-  //       this.lstData = [];
-  //     },
-  //     (err) => {}
-  //   );
-  // }
-
-  // async GuardarDetalle(comprobante: number) {
-  //   this.IDComprobante.comprobante = comprobante;
-  //   await this.lstData.map(async (e) => {
-  //     this.IDComprobante.debe = e.debe
-  //     this.IDComprobante.haber = e.haber
-  //     this.IDComprobante.fecha_ejercicio = e.fecha_ejercicio
-  //     this.IDComprobante.fecha_operacion = e.fecha_operacion
-  //     this.IDComprobante.cuenta = e.cuenta
-
-  //     this.xAPI.funcion = "FID_IDetalleComprobante";
-  //     this.xAPI.parametros = "";
-
-  //     this.xAPI.valores = JSON.stringify(this.IDComprobante);
-
-  //     await this.apiService.Ejecutar(this.xAPI).subscribe(
-  //       (data) => {
-  //         console.log("detalle insertado ", data);
-  //       },
-  //       (err) => {}
-  //     );
-  //   });
-  // }
 
 
   CrearSemestral(llave){
@@ -338,7 +234,6 @@ export class CcierreComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-
         this.CrearSaldos(llave)
         this.ngxService.stopLoader('load-precierre')
 

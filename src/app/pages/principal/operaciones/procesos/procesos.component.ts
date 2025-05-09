@@ -188,6 +188,8 @@ export class ProcesosComponent implements OnInit {
         this.lstAsientos = data.Cuerpo;
         if (this.lstAsientos.length > 0) {
           data.Cuerpo.forEach((e) => {
+            console.log("E", e);
+            
             this.acum_debe += parseFloat(e.interes_acumulado);
             this.acum_haber += parseFloat(e.interes_acumulado);
           });
@@ -271,9 +273,10 @@ export class ProcesosComponent implements OnInit {
         this.lstVencimiento = data.Cuerpo;
 
         this.lstVencimiento.map((e) => {
-          this.acum_debev += this.RendicionCupon(e);
+          this.acum_debev += this.RendicionCupon(e);          
+          this.acum_debev += parseFloat(e.valor_nominal)
         });
-
+        
         await this.ngxService.stopLoader("load-cont");
       },
       (error) => {
@@ -365,12 +368,11 @@ export class ProcesosComponent implements OnInit {
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.Comprobante);
     this.ngxService.startLoader("load-cont");
-    // console.log(this.Comprobante);
-    // this.InsertData(cant)
+    console.log("Comprobante 1", this.Comprobante);
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        // console.log(data);
+        console.log(data);
         this.InsertData(data, this.lstAsientos.length);
       },
       (error) => {
@@ -386,6 +388,7 @@ export class ProcesosComponent implements OnInit {
     this.xAPI.parametros =
       dt.msj + "," + this.util.ConvertirFechaDB(this.fechai);
     this.xAPI.valores = "";
+    
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         
@@ -432,6 +435,9 @@ export class ProcesosComponent implements OnInit {
       llave: "M",
     };
 
+    console.log("Comprobante Vencimiento", vencimiento);
+    
+
     this.xAPI.funcion = "FID_IComprobante";
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(vencimiento);
@@ -452,15 +458,16 @@ export class ProcesosComponent implements OnInit {
   }
 
   InsertDataVencimiento(dt, cant: number) {
+    console.log("dt", dt);
+    
     cant++;
     this.xAPI.funcion = "FID_IVencimientoInversiones";
-    this.xAPI.parametros =
-      dt.msj + "," + this.util.ConvertirFechaDB(this.fechai);
+    this.xAPI.parametros = dt.msj + "," + this.util.ConvertirFechaDB(this.fechai);
+    console.log("API DETALLE VENCIMIENTO", this.xAPI);
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log('registro completado vencimiento')
-        console.log(data)
         this.lstVencimiento = [];
         this.ngxService.stopLoader("load-cont");
         this.visible = false;
