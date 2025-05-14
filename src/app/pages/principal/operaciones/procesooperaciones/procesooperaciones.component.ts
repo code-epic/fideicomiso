@@ -150,8 +150,6 @@ export class ProcesooperacionesComponent implements OnInit {
 
 
   GenerarComprobante() {
-
-
     let fecha = this.util.ConvertirFechaDB(this.fechai)
     console.log(this.lstComisiones);
 
@@ -160,7 +158,6 @@ export class ProcesooperacionesComponent implements OnInit {
       parametros: '',
       valores: ''
     }
-
 
     this.lstComisiones.forEach((e) =>{
       let Comprobante = {
@@ -187,6 +184,13 @@ export class ProcesooperacionesComponent implements OnInit {
         }
       )
     })
+
+    this.apiService.Mensaje(
+      "Proceso exitoso",
+      "Se realizaron los comprobantes para el dia: " + this.util.ConvertirFechaHumana(this.fechai),
+      "success",
+      "Comprobantes"
+    )
   }
 
   InsertData(dt: any, cant: number, e: any) {
@@ -201,10 +205,6 @@ export class ProcesooperacionesComponent implements OnInit {
       data => {
         // console.log(data)
         // this.InsertData(dt, cant)
-        this.toastrService.success(
-          'Finalizó el proceso correctamente',
-          `Fideicomiso`
-        );
         this.visible = false
         this.lstComisiones = []
       },
@@ -214,7 +214,4 @@ export class ProcesooperacionesComponent implements OnInit {
       }
     )
   }
-
-
-
 }
