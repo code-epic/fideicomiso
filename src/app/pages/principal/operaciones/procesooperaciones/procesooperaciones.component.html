@@ -80,7 +80,7 @@
                     <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;padding: 5px;">
                       <th style="text-align:left">CODIGO</th>
                       <th style="text-align:left">DESCRIPCION</th>
-                      <th style="text-align:right">PATRIMONIO</th>
+                      <th style="text-align:right">CAPITAL</th>
                       <th style="text-align:right">TASA % </th>
                       <th style="text-align:right">CALCULO</th>
                       <!-- <th style="text-align:right">CALCULO + CAPITAL</th> -->
@@ -91,7 +91,7 @@
                     <tr *ngFor="let e of lstComisiones" >
                       <td>{{ getCodigo(e.id) }}</td>
                       <td>{{ e.plan}}</td>
-                      <td style="text-align:right">Bs. {{   getMoneda(e.monto) }}</td>
+                      <td style="text-align:right">Bs. {{   getMoneda(e.capital) }}</td>
                       <td style="text-align:right; font-weight: bold;"> {{e.tasa }} %</td>
                       <!-- <td style="text-align:right">Bs. {{  getMoneda(e.calculo) }}</td> -->
                       <td style="text-align:right">Bs. {{  getMoneda(e.calculo_capital) }}</td>

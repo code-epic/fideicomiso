@@ -107,6 +107,8 @@ export class ProcesooperacionesComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.lstComisiones = data.Cuerpo
+        console.log(data);
+        
         this.lstComisiones.map(e => {
           this.acum_debe += parseFloat(e.calculo_capital)
           this.acum_haber += parseFloat(e.calculo_capital)
@@ -151,45 +153,49 @@ export class ProcesooperacionesComponent implements OnInit {
 
 
     let fecha = this.util.ConvertirFechaDB(this.fechai)
+    console.log(this.lstComisiones);
 
-    this.Comprobante = {
-      plan: 1,
-      codigo: this.util.GenerarUnicId(),
-      descripcion: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
-      detalle: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
-      fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
-      fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
-      debe: this.acum_debe,
-      haber: this.acum_haber,
-      llave: 'M'
+    let xApi: IAPICore = {
+      funcion: "FID_IComprobante",
+      parametros: '',
+      valores: ''
     }
 
-    this.xAPI.funcion = "FID_IComprobante"
-    this.xAPI.parametros = ''
-    this.xAPI.valores = JSON.stringify(this.Comprobante)
 
-    // console.log(this.Comprobante)
-    // this.InsertData(cant)
-
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-       
-        
-        this.InsertData(data, this.lstComisiones.length)
-      },
-      (error) => {
-        console.log(error)
-        this.ngxService.stopLoader('load-cont')
+    this.lstComisiones.forEach((e) =>{
+      let Comprobante = {
+        plan: e.id,
+        codigo: this.util.GenerarUnicId(),
+        descripcion: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
+        detalle: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
+        fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
+        fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
+        debe: e.calculo_capital,
+        haber: e.calculo_capital,
+        llave: 'M'
       }
-    )
 
+      xApi.valores = JSON.stringify(Comprobante)      
+
+      this.apiService.Ejecutar(xApi).subscribe(
+        data => {
+          this.InsertData(data, this.lstComisiones.length, Comprobante)
+        },
+        (error) => {
+          console.log(error)
+          this.ngxService.stopLoader('load-cont')
+        }
+      )
+    })
   }
 
-  InsertData(dt, cant: number) {
+  InsertData(dt: any, cant: number, e: any) {
+    console.log('e', e)
     let fecha = this.util.ConvertirFechaDB(this.fechai)
     cant++
     this.xAPI.funcion = "FID_IComisionesAdministrativas"
-    this.xAPI.parametros = dt.msj + ',360,1,' + fecha
+    this.xAPI.parametros = `${dt.msj}, 360, ${e.plan}, ${fecha}, ${e.debe}, ${e.haber}`
+    
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
