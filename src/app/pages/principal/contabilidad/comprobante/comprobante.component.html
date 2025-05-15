@@ -87,7 +87,8 @@
                           Bs. {{ getMoneda(e) }}
                         </div>
                         <div class="col-md-1 text-right d-flex flex-column justify-content-center align-items-end">
-                          <button mat-icon-button aria-label="ELiminar" (click)="eliminarComprobante(e.id, e.descripcion )" matTooltip="Eliminar">
+                          <button mat-icon-button aria-label="ELiminar"
+                            (click)="eliminarComprobante(e.id, e.descripcion )" matTooltip="Eliminar">
                             <mat-icon class="texto-gray">delete</mat-icon>
                           </button>
 
@@ -119,25 +120,23 @@
             <br>
 
             <div class="card">
-              <div class="card-body" style="padding:20px;">
-
-                <form>
-
+              <form (ngSubmit)="onSubmit()" [formGroup]="formComprobante">
+                <div class="card-body" style="padding:20px;">
                   <div class="row">
                     <div class="col-md-3">
+
                       <mat-form-field appearance="outline">
                         <mat-label>Plan</mat-label>
-
-                        <input matInput placeholder="Plan" [ngModelOptions]="{standalone: true}"
-                          [(ngModel)]="Comprobante.plan" value="{{Comprobante.plan}}" (blur)="ConsultarContrato()">
+                        <input matInput placeholder="Plan"
+                          formControlName="plan" (blur)="ConsultarContrato()">
                         <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
-
                       </mat-form-field>
+
                     </div>
                     <div class="col-md-9">
                       <mat-form-field appearance="outline">
                         <mat-label>Nombre del Fideicomiso</mat-label>
-                        <input matInput placeholder="Nombre General" [ngModelOptions]="{standalone: true}"
+                        <input matInput placeholder="Nombre General"
                           [(ngModel)]="Contrato.razonsocial" value="{{Contrato.razonsocial}}" readonly="readonly">
                       </mat-form-field>
                     </div>
@@ -149,8 +148,7 @@
                     <div class="col-md-3">
                       <mat-form-field appearance="outline">
                         <mat-label>Fecha Valor</mat-label>
-                        <input matInput [matDatepicker]="picker" [formControl]="fechaejercicio"
-                          [value]="fechaejercicio.value">
+                        <input matInput [matDatepicker]="picker" formControlName="fechaEjercicio" >
                         <mat-datepicker #picker></mat-datepicker>
                         <mat-icon matSuffix (click)="picker.open()">event</mat-icon>
                       </mat-form-field>
@@ -161,16 +159,14 @@
                     <div class="col-md-2">
                       <mat-form-field appearance="outline">
                         <mat-label>Numero</mat-label>
-                        <input matInput placeholder="Numero" [ngModelOptions]="{standalone: true}"
-                          [(ngModel)]="Comprobante.codigo" value="{{Comprobante.codigo}}">
+                        <input matInput placeholder="Numero" formControlName="codigo">
                       </mat-form-field>
                     </div>
 
                     <div class="col-md-7">
                       <mat-form-field appearance="outline">
                         <mat-label>Descripcion </mat-label>
-                        <input matInput placeholder="Descripcion" [ngModelOptions]="{standalone: true}"
-                          [(ngModel)]="Comprobante.descripcion" value="{{Comprobante.descripcion}}">
+                        <input matInput placeholder="Descripcion" formControlName="descripcion">
                       </mat-form-field>
                     </div>
                   </div>
@@ -200,7 +196,7 @@
                       <mat-form-field appearance="outline">
                         <mat-label>DEBE</mat-label>
                         <input tyle="text-align:right;" matInput placeholder="DEBE"
-                          [ngModelOptions]="{standalone: true}" [(ngModel)]="debe">
+                          [(ngModel)]="debe" [ngModelOptions]="{standalone: true}"> 
                       </mat-form-field>
                     </div>
 
@@ -208,11 +204,11 @@
                       <mat-form-field appearance="outline">
                         <mat-label>HABER</mat-label>
                         <input style="text-align:right;" matInput placeholder="HABER"
-                          [ngModelOptions]="{standalone: true}" [(ngModel)]="haber">
+                          [(ngModel)]="haber" [ngModelOptions]="{standalone: true}">
                       </mat-form-field>
                     </div>
                     <div class="col-md-1 asistente-button-container">
-                      <button mat-mini-fab color="primary" title="Registrar" (click)="addElement()">
+                      <button mat-mini-fab color="primary" title="Registrar" type="button" (click)="addElement()">
                         <mat-icon>add</mat-icon>
                       </button>
                     </div>
@@ -284,8 +280,7 @@
                     <div class="col-md-3">
                       <mat-form-field appearance="outline">
                         <mat-label>Fecha Creacion</mat-label>
-                        <input matInput [matDatepicker]="xpicker" [formControl]="fechacreacion" readonly="readonly"
-                          [value]="fechacreacion.value">
+                        <input matInput [matDatepicker]="xpicker" formControlName="fechaOperacion" readonly>
                         <mat-datepicker #xpicker></mat-datepicker>
                         <mat-icon matSuffix>event</mat-icon>
                       </mat-form-field>
@@ -299,8 +294,7 @@
                     <div class="col-md-2">
                       <mat-form-field appearance="outline">
                         <mat-label>Saldo Debe</mat-label>
-                        <input style="text-align:right;" readonly="readonly" matInput placeholder="Saldo Debe"
-                          [ngModelOptions]="{standalone: true}" [(ngModel)]="saldo_debe" [value]="saldo_debe">
+                        <input style="text-align:right;" readonly="readonly" matInput placeholder="Saldo Debe" formControlName="totalDebe">
                       </mat-form-field>
                     </div>
 
@@ -308,7 +302,7 @@
                       <mat-form-field appearance="outline">
                         <mat-label>Saldo Haber</mat-label>
                         <input style="text-align:right;" readonly="readonly" matInput placeholder="Saldo Haber"
-                          [ngModelOptions]="{standalone: true}" [(ngModel)]="saldo_haber" [value]="saldo_haber">
+                          formControlName="totalHaber">
                       </mat-form-field>
                     </div>
                     <div class="col-md-1 asistente-button-container">
@@ -316,21 +310,19 @@
                     </div>
                   </div>
 
+                </div>
+                <div class="card-footer">
+                  <div class="row">
 
-                </form>
-
-
-              </div>
-              <div class="card-footer">
-                <div class="row">
-
-                  <div class="col-md-12 text-right">
-                    <button mat-flat-button color="primary" (click)="abrirDialogo()">Imprimir Comprobante</button>
-                    &nbsp; &nbsp;
-                    <button mat-flat-button color="warn" (click)="Guardar()">Registrar Comprobante</button>
+                    <div class="col-md-12 text-right">
+                      <button *ngIf="mostrarImprimir" mat-flat-button color="accent" (click)="abrirDialogo()">Imprimir
+                        Comprobante</button>
+                      &nbsp; &nbsp;
+                      <button mat-flat-button color="primary" type="submit">Registrar Comprobante</button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </form>
             </div>
 
           </mat-tab>
