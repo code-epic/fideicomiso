@@ -17,6 +17,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox'
 import { MatListModule } from '@angular/material/list'
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { CustomPaginator } from './paginator-intl'; //NLS configuracion de idiomas
+import {MatRippleModule} from '@angular/material/core';
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 import { MatPaginatorIntl } from '@angular/material/paginator';
 
@@ -74,6 +76,8 @@ import { ComprobanteDialogComponent } from './pages/principal/contabilidad/compr
     ToastContainerModule,
     NgxUiLoaderModule,
     MatToolbarModule,
+    MatRippleModule,
+    MatSidenavModule,
     ToastrModule.forRoot({
       closeButton: false,
       newestOnTop: false,

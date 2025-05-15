@@ -11,7 +11,6 @@ import { Semillero } from 'src/app/services/banfanb/semillero';
 import { UtilService } from 'src/app/services/util/util.service';
 import { PlanFideicomiso } from 'src/app/services/banfanb/contabilidad.service';
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from "@angular/material/dialog";
 
 @Component({
@@ -226,7 +225,6 @@ export class ContratosComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
-    private toasService: ToastrService,
     public dialog: MatDialog,
     public formatter: NgbDateParserFormatter,
   ) { }
@@ -241,7 +239,6 @@ export class ContratosComponent implements OnInit {
     this.consultarUltimoCierre()
   }
 
-
   consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
     this.xAPI.funcion = "FID_CUltimoCierre"
@@ -250,7 +247,6 @@ export class ContratosComponent implements OnInit {
     // console.log('hola')
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-
         let ultc = data.Cuerpo
         if (ultc.length > 0) {
           let fecha = ultc[0].fecha_cierre;
@@ -258,8 +254,6 @@ export class ContratosComponent implements OnInit {
           this.fechaultimo = d[0] + '-' + d[1] + '-' + d[2];
           this.fechaUltimoComparacion = d;
         }
-        
-
       },
       (error) => {
         console.log(error)
@@ -269,8 +263,6 @@ export class ContratosComponent implements OnInit {
 
 
   ConsultarSaldos(){
-    
-
     let antes = new Date(this.fechaUltimoComparacion).setHours(+23)
 
     let sHoy = this.fechaultimo
@@ -279,7 +271,6 @@ export class ContratosComponent implements OnInit {
     this.fecha = `${sAntes},${sHoy}`
     this.xAPI.funcion = "FID_CBalanceFecha"
     this.xAPI.parametros = `${this.fecha},${this.estatus}`
-
     //console.log(this.xAPI.parametros)
     this.saldo_disponible = '0'
 
@@ -319,14 +310,9 @@ export class ContratosComponent implements OnInit {
     );
 
     this.ngxService.stopLoader('load-precierre')
-
-
-
   }
 
   GenerarSemillero() {
-
-
     this.xAPI.funcion = "FID_CSemillero"
     this.xAPI.parametros = ""
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -334,7 +320,6 @@ export class ContratosComponent implements OnInit {
         if (data != null) {
           let codigo = parseInt(data[0].codigo) + 1
           this.Contrato.numero = this.util.zfill(codigo, 4)
-
         } else {
           this.Contrato.numero = "0001"
         }
@@ -358,7 +343,6 @@ export class ContratosComponent implements OnInit {
             let valor = e.nacionalidad + e.cedula + ' ' + e.papellido + ' ' + e.pnombre + ' | ' + e.actividad
             this.options.push(valor)
           });
-
         }
 
         this.filteredOptions = this.myControl.valueChanges.pipe(
@@ -370,7 +354,6 @@ export class ContratosComponent implements OnInit {
         console.log(error)
       }
     )
-
   }
 
   private _filter(value: string): string[] {
@@ -389,7 +372,6 @@ export class ContratosComponent implements OnInit {
             let valor = e.direccion + ' | ' + e.telefonos
             this.oficinas.push(valor)
           });
-
         }
 
         this.filteredOficinas = this.myOficina.valueChanges.pipe(
@@ -405,18 +387,15 @@ export class ContratosComponent implements OnInit {
 
   private _filteroficinas(value: string): string[] {
     const filterValue = value.toLowerCase();
-
     return this.oficinas.filter(option => option.toLowerCase().includes(filterValue));
   }
-
-
 
   insertar() {
     let value = this.myControl.value + ''
     this.lstEjecutivos.push({ "nombre": value.toUpperCase() })
     this.myControl.setValue('')
-
   }
+
   tabActive(event) {
 
     this.selectedIndex = event.index

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
 
@@ -8,14 +8,8 @@ import { MensajeService } from 'src/app/services/util/mensaje.service';
   styleUrls: ['./admin-layout.component.scss']
 })
 export class AdminLayoutComponent implements OnInit {
-
-  public datasets: any;
-  public data: any;
-  public salesChart;
-  public clicked: boolean = true;
-  public clicked1: boolean = false;
   public pagina : string = '';
-
+  public opened: boolean = true;
 
   constructor(private ruta : Router, private msj: MensajeService) { }
 
@@ -27,16 +21,14 @@ export class AdminLayoutComponent implements OnInit {
       console.log(e)
       this.pagina = e == 'NPANEL'?'NEGOCIO':e
     })
-
   }
 
-  
-
   IrA(url : string){
-    
     this.pagina =  url.toUpperCase() == 'NPANEL'?'NEGOCIO': url.toUpperCase()
-   
     this.ruta.navigate(['/' + url]);
   }
 
+  onChangeSidenav(e: any){
+    this.opened = !this.opened;
+  }
 }
