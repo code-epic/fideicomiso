@@ -27,6 +27,7 @@ export class ConsultainversionesComponent implements OnInit {
 
   public Inversiones: Inversion = {
     identificador: 0,
+    id_instrumento: -1,
     tipo_moneda: 0,
     estatus: 0,
     tipo_inversion: 0,
@@ -367,12 +368,21 @@ export class ConsultainversionesComponent implements OnInit {
     this.Inversiones.fecha_compra = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_com) : this.Inversiones.fecha_compra.substring(0, 10)
     this.Inversiones.fecha_vencimiento = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_ven) : this.Inversiones.fecha_vencimiento.substring(0, 10)
 
-    this.xAPI.funcion =
-      this.Inversiones.identificador == 0 ? "FID_IInversion" : "FID_UInversion"
+    const instrumentoSeleccionado = this.myInstrumento.value;
+    if (instrumentoSeleccionado) {
+      const idInstrumento = parseInt(instrumentoSeleccionado.split(" - ")[0]);
+      this.Inversiones.id_instrumento = isNaN(idInstrumento) ? -1 : idInstrumento;
+    } else {
+      this.Inversiones.id_instrumento = -1; // Valor por defecto si no hay selección
+    }
+
+    console.log(this.Inversiones);
+
+    this.xAPI.funcion = this.Inversiones.identificador == 0 ? "FID_IInversion" : "FID_UInversion"
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Inversiones)
 
-    // console.log(this.Inversiones)
+    console.log(this.Inversiones)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         if (this.Inversiones.identificador > 0 ) {
