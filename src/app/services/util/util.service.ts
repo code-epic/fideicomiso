@@ -122,8 +122,9 @@ export class UtilService {
     return diff / (1000 * 60 * 60 * 24);
   }
 
-  ConvertirMoneda(numero : number) : any {
-    return  new Intl.NumberFormat("es-VE").format(numero)
+  ConvertirMoneda(numero: number): any {
+    let formatted = new Intl.NumberFormat("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(numero);
+    return formatted;
   }
 
   downloadFile(head, data, filename = "data", delimitador) {
