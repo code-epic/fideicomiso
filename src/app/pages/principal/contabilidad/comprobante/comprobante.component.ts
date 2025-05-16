@@ -475,12 +475,6 @@ export class ComprobanteComponent implements OnInit {
 
     this.Comprobante.detalle =
       this.Contrato.rif + ' - ' + this.Contrato.razonsocial.toUpperCase();
-    this.Comprobante.fecha_operacion = this.util.ConvertirFechaDB(
-      this.fechaejercicio.value
-    );
-    this.Comprobante.fecha_ejercicio = this.util.ConvertirFechaDB(
-      this.fechaejercicio.value
-    );
 
     this.Comprobante.debe = debe;
     this.Comprobante.haber = haber;
@@ -488,7 +482,7 @@ export class ComprobanteComponent implements OnInit {
   }
 
   async Guardar() {
-    this.convertirComprobante()    
+    this.convertirComprobante()        
     
     if (this.saldo_debe != this.saldo_haber) {
       let saldo = parseFloat(this.saldo_debe) - parseFloat(this.saldo_haber)
@@ -519,7 +513,7 @@ export class ComprobanteComponent implements OnInit {
     this.Comprobante.plan = this.formComprobante.get('plan').value
     this.Comprobante.codigo = this.formComprobante.get('codigo').value
     this.Comprobante.descripcion = this.formComprobante.get('descripcion').value
-    this.Comprobante.fecha_operacion = this.util.ConvertirFechaDB(this.formComprobante.get('fechaOperacion').value)
+    this.Comprobante.fecha_operacion = this.util.ConvertirFechaDB(this.formComprobante.get('fechaEjercicio').value)
     this.Comprobante.fecha_ejercicio = this.util.ConvertirFechaDB(this.formComprobante.get('fechaEjercicio').value)
   }
 
