@@ -282,6 +282,7 @@ export class ContratosComponent implements OnInit {
         let cdd = 0
         let pdd = 0
         data.Cuerpo.forEach((e) => {
+          
           console.log(e.codigo_padre)
           if (e.codigo_padre.indexOf("711") == 0 ) {
             sdd +=  parseFloat(e.saldo_inicial)
@@ -301,6 +302,12 @@ export class ContratosComponent implements OnInit {
         this.total_disponible = tdd.toFixed(2)
         this.capital_asignado = cdd.toFixed(2)
         this.saldo_patrimonio = pdd.toFixed(2)
+
+        console.log('this.saldo_disponible ', this.saldo_disponible)
+        console.log('this.total_disponible ', this.total_disponible)
+        console.log('this.capital_asignado ', this.capital_asignado)
+        console.log('this.saldo_patrimonio ', this.saldo_patrimonio)
+
 
         // console.log(sdd, tdd, cdd, pdd)
       },
@@ -409,7 +416,6 @@ export class ContratosComponent implements OnInit {
       this.Listar()
       this.tabSaldos = false
       this.planFideicomiso.identificador = 0
-      console.log(this.planFideicomiso)
     } else {
       this.active = !this.active
 
@@ -418,7 +424,7 @@ export class ContratosComponent implements OnInit {
   }
 
   editar(e) {
-    this.Contrato = e
+    this.Contrato = e    
     this.selectedIndex = 1
     this.active = true
     //this.contrato_search = ''
@@ -707,8 +713,6 @@ export class ContratosComponent implements OnInit {
     this.ngxService.startLoader('load-cont')
 
     this.getPlanFideicomisoDB()
-    console.log(this.planFideicomiso)
-
 
     this.xAPI.funcion = this.planFideicomiso.identificador > 0 ? 'FID_UPlanFideicomiso' : 'FID_IPlanFideicomiso'
     this.xAPI.parametros = ''
@@ -740,8 +744,7 @@ export class ContratosComponent implements OnInit {
   }
 
   GuardarContrato() {
-
-    this.Contrato.Ejecutivo = this.lstEjecutivos
+    this.Contrato.Ejecutivo = this.lstEjecutivos || []
     let ofc = this.myOficina.value + ''
     this.Contrato.oficinatutora = ofc.toUpperCase()
 
@@ -750,14 +753,13 @@ export class ContratosComponent implements OnInit {
       "objeto": this.Contrato,
       "donde": `{\"numero\":\"${this.Contrato.numero}\"}`,
       "driver": "MDBFIDE",
-      "upsert": true
+      "upsert": false
     }
-
-    console.log(obj)
 
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
         this.ngxService.stopLoader('load-cont')
+        console.log(data);
         this.apiService.Mensaje(
           "Felicitaciones, Proceso exitoso",
           "Codigo de plan #" + this.Contrato.numero,
@@ -765,7 +767,7 @@ export class ContratosComponent implements OnInit {
           "contratos"
         );
       },
-      (error) => {
+      (error) => {        
         console.log(error)
         this.ngxService.stopLoader('load-cont')
       }

@@ -201,7 +201,7 @@ export class ComprobanteComponent implements OnInit {
 
   ConsultarContrato() {
     this.xAPI.funcion = "FID_CContrato";
-    this.xAPI.parametros = this.Comprobante.plan.toString();
+    this.xAPI.parametros = (this.formComprobante.get('plan').value).toString()
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data != null) {
