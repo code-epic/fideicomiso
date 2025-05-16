@@ -255,7 +255,7 @@ export class ProcesocontablesComponent implements OnInit {
     this.ngxService.stopLoader('load-precierre')
     this.xAPI.funcion = "FID_IMovimientosComprobantes"
     if(this.estatus == "S") fini = this.fechau
-    this.xAPI.parametros = fini + ',' + this.estatus
+    this.xAPI.parametros = fini + ',' + this.estatus    
     this.xAPI.valores = ''
     
     this.apiService.Ejecutar(this.xAPI).subscribe(

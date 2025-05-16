@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { ROUTES } from '../sidebar/sidebar.component';
 import { Location} from '@angular/common';
 import Swal from 'sweetalert2';
@@ -9,9 +9,12 @@ import Swal from 'sweetalert2';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  public focus;
+@Output() onChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   public listTitles: any[];
   public location: Location;
+  booleanIsSidenav: boolean = false;
+
   constructor(location: Location) {
     this.location = location;
   }
@@ -19,6 +22,7 @@ export class NavbarComponent implements OnInit {
   ngOnInit() {
     this.listTitles = ROUTES.filter(listTitle => listTitle);
   }
+
   getTitle(){
     var titlee = this.location.prepareExternalUrl(this.location.path());
     if(titlee.charAt(0) === '#'){
@@ -31,6 +35,11 @@ export class NavbarComponent implements OnInit {
         }
     }
     return 'Principal';
+  }
+
+  onChangeSidenav() {
+    this.booleanIsSidenav = !this.booleanIsSidenav;
+    this.onChange.emit(true);
   }
 
   cerrar(){

@@ -2,23 +2,20 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatTableDataSource } from '@angular/material/table';
-import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-ccierre',
   templateUrl: './ccierre.component.html',
   styleUrls: ['./ccierre.component.scss']
 })
+
 export class CcierreComponent implements OnInit {
-
-
   public ELEMENT_DATA: LPosicionInversiones[] = [];
   displayedColumns: string[] = [
     "codigo",
@@ -48,7 +45,6 @@ export class CcierreComponent implements OnInit {
     parametros: '',
   }
 
-
   public Comprobante: FID_IComprobante = {
     plan: 0,
     codigo: "",
@@ -61,7 +57,6 @@ export class CcierreComponent implements OnInit {
     llave: ''
   };
 
-
   public IDComprobante: FID_IDetalleComprobante = {
     comprobante: 0,
     cuenta: 0,
@@ -70,7 +65,6 @@ export class CcierreComponent implements OnInit {
     fecha_operacion: "",
     fecha_ejercicio: "",
   };
-
 
   lstData = []
   public semestral: boolean = false
@@ -158,11 +152,7 @@ export class CcierreComponent implements OnInit {
                 "Cierre"
               )
               this.consultarUltimoCierre()
-            }
-
-            // this.CrearSaldos()
-            console.log("AQUI");
-            
+            }            
           }else{
             this.apiService.Mensaje(
               "Pendiente",
@@ -198,13 +188,10 @@ export class CcierreComponent implements OnInit {
     let usuario = 'Administrador'
     let plan = '1'
 
-
-
     this.ngxService.startLoader('load-precierre')
     this.xAPI.funcion = "FID_ISaldosCierre"
     this.xAPI.parametros = `${fopera},${usuario},${llave},${plan},${fultimo}`
     this.xAPI.valores = ''
-    console.log(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
 

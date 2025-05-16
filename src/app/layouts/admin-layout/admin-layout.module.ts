@@ -11,6 +11,7 @@ import { NgxUiLoaderModule } from "ngx-ui-loader";
 import { PerfilComponent } from 'src/app/pages/generico/perfil/perfil.component';
 import { ConfigurarComponent } from 'src/app/pages/configurar/configurar.component';
 import { ReportesComponent } from 'src/app/pages/reportes/reportes.component';
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -60,6 +61,7 @@ import { ProcesosComponent } from 'src/app/pages/principal/operaciones/procesos/
 import { ListadosComponent } from 'src/app/pages/principal/operaciones/listados/listados.component';
 import { PrecierreComponent } from 'src/app/pages/principal/operaciones/procesos/precierre/precierre.component';
 import { CierreComponent } from 'src/app/pages/principal/operaciones/procesos/cierre/cierre.component';
+import {MatRippleModule} from '@angular/material/core';
 
 import { TablasComponent } from 'src/app/pages/principal/contabilidad/tablas/tablas.component';
 import { ConfiguracionesComponent } from 'src/app/pages/principal/administracion/configuraciones/configuraciones.component';
@@ -122,6 +124,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     MatAutocompleteModule,
     CurrencyMaskModule,
     ToastContainerModule,
+    MatRippleModule,
+    MatSidenavModule,
     ToastrModule.forRoot({
       closeButton: false,
       newestOnTop: false,

@@ -1,0 +1,17 @@
+.nav-item {
+    border-radius: 8px;
+    margin: auto 0.75rem 0.05rem;
+    color: #252525;
+    cursor: pointer;
+    padding: 4px 2px; 
+    transition: background-color 0.2s ease; 
+
+    &:hover {
+        transition: background-color 0.1s ease-in-out; 
+        background-color: #f1f3f4; 
+    }
+}
+
+.navbar-collapse:before{
+    margin: 0;
+}

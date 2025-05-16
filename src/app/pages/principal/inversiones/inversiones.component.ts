@@ -10,17 +10,7 @@ import { UtilService } from "src/app/services/util/util.service";
   styleUrls: ["./inversiones.component.scss"],
 })
 export class InversionesComponent implements OnInit {
-  
+  constructor() {}
 
-  constructor(
-    private apiService: ApiService,
-    private _snackBar: MatSnackBar,
-    private ngxService: NgxUiLoaderService,
-    private util: UtilService
-  ) {}
-
-  ngOnInit(): void {
-    
-  }
-
+  ngOnInit(): void { }
 }

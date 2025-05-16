@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
-import { ApiService, IAPICore } from "../apicore/api.service";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { IAPICore } from "../apicore/api.service";
 
 export interface Inversion {
   identificador: number;
@@ -15,6 +14,7 @@ export interface Inversion {
   codigo_isin: any;
   emisor: string;
   custodio: string;
+  id_instrumento?: number;
   fecha_emision: any; // fecha
   fecha_compra: any; // fecha
   fecha_vencimiento: any; // fecha

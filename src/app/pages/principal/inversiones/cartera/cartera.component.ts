@@ -29,8 +29,6 @@ export class CarteraComponent implements OnInit {
 
   public lstCartera = []
 
-
-
   constructor(
     private util: UtilService,
     private toasService: ToastrService,

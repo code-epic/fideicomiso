@@ -5,12 +5,18 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { FooterComponent } from './footer/footer.component';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import {MatRippleModule} from '@angular/material/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule,
-    NgbModule
+    NgbModule,
+    MatRippleModule,
+    MatButtonModule,
+    MatTooltipModule
   ],
   declarations: [
     FooterComponent,
