@@ -420,6 +420,9 @@ export class ComprobanteComponent implements OnInit {
     this.saldo_debe = sd.toFixed(2);
     this.saldo_haber = sh.toFixed(2);
 
+    this.formComprobante.get('totalHaber').setValue(this.saldo_haber)
+    this.formComprobante.get('totalDebe').setValue(this.saldo_debe)
+
     this.ELEMENT_DATA.push(detalle);
 
     this.dataSource = new MatTableDataSource<IComprobante>(this.ELEMENT_DATA);
