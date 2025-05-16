@@ -485,33 +485,30 @@ export class ComprobanteComponent implements OnInit {
   }
 
   async Guardar() {
-    this.convertirComprobante()
-
-    console.log(this.Comprobante);
+    this.convertirComprobante()    
     
+    if (this.saldo_debe != this.saldo_haber) {
+      let saldo = parseFloat(this.saldo_debe) - parseFloat(this.saldo_haber)
+      let msj = 'Existe una diferencia de Bs. ' + (saldo * -1) 
+      if( parseFloat(this.saldo_debe) > parseFloat(this.saldo_haber) ) msj = 'Existe una diferencia de Bs. '  + saldo 
+      this.apiService.Mensaje(msj, 'Advertencia', 'warning', 'comprobante')
+      return
+    }
     
-    // if (this.saldo_debe != this.saldo_haber) {
-    //   let saldo = parseFloat(this.saldo_debe) - parseFloat(this.saldo_haber)
-    //   let msj = 'Existe una diferencia de Bs. ' + (saldo * -1) 
-    //   if( parseFloat(this.saldo_debe) > parseFloat(this.saldo_haber) ) msj = 'Existe una diferencia de Bs. '  + saldo 
-    //   this.apiService.Mensaje(msj, 'Advertencia', 'warning', 'comprobante')
-    //   return
-    // }
-    
-    // Swal.fire({
-    //   title: 'Esta seguro que desea realizar la operación',
-    //   icon: "question",
-    //   showCancelButton: true,
-    //   confirmButtonColor: '#3085d6',
-    //   cancelButtonColor: '#d33',
-    //   confirmButtonText: 'Si',
-    //   cancelButtonText: 'No',
-    //   allowEscapeKey: true,
-    // }).then((result) => {
-    //   if (result.isConfirmed) {
-    //     this.Acepar()
-    //   }
-    // })
+    Swal.fire({
+      title: 'Esta seguro que desea realizar la operación',
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'No',
+      allowEscapeKey: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.Acepar()
+      }
+    })
 
   }
 
