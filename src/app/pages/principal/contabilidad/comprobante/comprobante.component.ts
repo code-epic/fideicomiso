@@ -543,12 +543,8 @@ export class ComprobanteComponent implements OnInit {
     await this.ELEMENT_DATA.map(async (e) => {
       this.IDComprobante.debe = e.debe;
       this.IDComprobante.haber = e.haber;
-      this.IDComprobante.fecha_ejercicio = this.util.ConvertirFechaDB(
-        this.fechaejercicio.value
-      );
-      this.IDComprobante.fecha_operacion = this.util.ConvertirFechaDB(
-        this.fechaejercicio.value
-      );
+      this.IDComprobante.fecha_ejercicio = this.Comprobante.fecha_ejercicio
+      this.IDComprobante.fecha_operacion = this.Comprobante.fecha_ejercicio
       this.IDComprobante.cuenta = this.getIDCuenta(e.cuenta);
       this.xAPI.funcion = 'FID_IDetalleComprobante';
       this.xAPI.parametros = '';
