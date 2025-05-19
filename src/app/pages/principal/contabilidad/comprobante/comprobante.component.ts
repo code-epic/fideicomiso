@@ -295,6 +295,7 @@ export class ComprobanteComponent implements OnInit {
 
     this.formComprobante.reset()
     this.dataSource = null
+    this.formComprobante.get('fechaOperacion').setValue(this.Comprobante.fecha_operacion || this.fechacreacion.value)
   }
 
   Consultar() {}
