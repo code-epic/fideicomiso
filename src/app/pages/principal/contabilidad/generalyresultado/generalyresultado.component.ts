@@ -115,12 +115,6 @@ export class GeneralyresultadoComponent implements OnInit {
 
     const fechaUltimoMasUnDia = new Date(fechaUltimo)
     fechaUltimoMasUnDia.setDate(fechaUltimo.getDate() + 1)
-    
-    if (fechaInicio > fechaUltimoMasUnDia) {
-      this.toasService.warning("La fecha del último cierre es menor a la fecha seleccionada", "Fideicomiso");
-      this.fechai = new Date(fechaUltimoMasUnDia)
-      console.log(this.fechai);
-    }
 
     let antes = new Date(this.fechai).setHours(-23)
     let despues = new Date(this.fechai).setHours(23)

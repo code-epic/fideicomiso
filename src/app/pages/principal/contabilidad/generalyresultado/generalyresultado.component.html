@@ -58,7 +58,7 @@
 <div id="DivPrintPage" name="DivPrintPage" *ngIf="printv">
   <div class="row membrete-div" style="display: flex; align-items: center;">
     <div style="width: 33%;">
-      <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 4.5rem;">
+      <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 2.75rem;">
     </div>
     <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
       <p class="membrete">
@@ -71,9 +71,9 @@
   </div>
   <div class="row" [innerHtml]="HTMLBalance"></div>
 
-  <div class="row membrete-div" style="display: flex; align-items: center;">
+  <div class="row membrete-div mt-100" style="display: flex; align-items: center; ">
     <div style="width: 33%;">
-      <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 4.5rem;">
+      <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 2.75rem;">
     </div>
     <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
       <p class="membrete">
@@ -85,6 +85,12 @@
     <div style="width: 33%;"></div>
   </div>
   <div class="row" [innerHtml]="HTMLResultados"></div>
+
+  <div class="flex-print" style="margin-top: 200px; justify-content: center; align-items: center; flex-direction: column;">
+    <hr style="width: 1px; border-color: #252525; border-width: 1px; margin-bottom: 5px; width: 40%;">
+    <h2 style="text-align: center;">FIRMA AUTORIZADA</h2>
+  </div>
+
 </div>
 
 
