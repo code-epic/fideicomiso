@@ -125,6 +125,8 @@ export class ProcesosComponent implements OnInit {
     this.ngxService.startLoader("load-cont");
     this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIENTOS_LOTE
     this.xAPI.parametros = fini + ",I," + usuario + "," + llave;
+    console.log(this.xAPI.parametros);
+    
     this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -488,50 +490,46 @@ export class ProcesosComponent implements OnInit {
   GenerarComprobanteCompra() {
     let fecha = this.util.ConvertirFechaDB(this.fechai);
 
-    let compra = {
-      plan: 1,
-      codigo: this.util.GenerarUnicId(),
-      descripcion: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(
-        fecha
-      )}`,
-      detalle: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
-      fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
-      fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
-      debe: this.acum_debec,
-      haber: this.acum_debec,
-      llave: "M",
-    };
+    this.lstCompra.map(e => {
+      let compra = {
+        plan: 1,
+        codigo: this.util.GenerarUnicId(),
+        descripcion: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(
+          fecha
+        )}`,
+        detalle: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+        fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
+        fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
+        debe: e.valor_nominal,
+        haber: e.valor_nominal,
+        llave: "M",
+      };
 
-    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
-    this.xAPI.parametros = "";
-    this.xAPI.valores = JSON.stringify(compra);
+      this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
+      this.xAPI.parametros = "";
+      this.xAPI.valores = JSON.stringify(compra);
 
-    // this.InsertData(cant)
-
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (xd) => {
-        console.log("Cargando Compra");
-        this.InsertDataCompra(xd, this.lstCompra.length)
-        
-      },
-      (error) => {
-        console.log(error);
-        this.ngxService.stopLoader("load-cont");
-      }
-    );
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        (xd) => {
+          this.InsertDataCompra(xd, e.codigo)
+        },
+        (error) => {
+          console.log(error);
+          this.ngxService.stopLoader("load-cont");
+        }
+      );
+    });
   }
 
-  InsertDataCompra(dt, cant: number) {
-    cant++;
+  InsertDataCompra(dt: any, codigo: any) {
     this.xAPI.funcion = environment.xApi.INSERTAR_COMPRA_INVERSIONES
-    this.xAPI.parametros =
-      dt.msj + "," + this.util.ConvertirFechaDB(this.fechai);
+    this.xAPI.parametros = dt.msj + "," + this.util.ConvertirFechaDB(this.fechai) + "," + codigo;
     this.xAPI.valores = "";
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log('registro completado')
         console.log(data)
-        // this.InsertData(dt, cant)
         this.lstCompra = [];
         this.visible = false;
         this.blProcesar = false;
