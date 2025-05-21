@@ -5,6 +5,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Portafolio } from 'src/app/services/banfanb/portafolio.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-portafolio',
   templateUrl: './portafolio.component.html',
@@ -58,7 +59,7 @@ export class PortafolioComponent implements OnInit {
   }
 
   Listar() {
-    this.xAPI.funcion = "FID_CPortafolios"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIOS
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
 
@@ -75,7 +76,7 @@ export class PortafolioComponent implements OnInit {
 
   Consultar() {
 
-    this.xAPI.funcion = "FID_CPortafolio"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIO
     this.xAPI.parametros = this.Portafolio.codigo
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -134,7 +135,7 @@ export class PortafolioComponent implements OnInit {
     //   "driver": "MDBFIDE",
     //   "upsert": true
     // }
-    this.xAPI.funcion = 'FID_IPortafolio'
+    this.xAPI.funcion = environment.xApi.INSERTAR_PORTAFOLIO
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Portafolio)
 

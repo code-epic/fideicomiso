@@ -9,6 +9,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -114,7 +115,7 @@ export class AuxiliarComponent implements OnInit {
   consultarUltimoCierre() {
 
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CUltimoPreCierre"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_FECHA_PRECIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     // console.log('hola')

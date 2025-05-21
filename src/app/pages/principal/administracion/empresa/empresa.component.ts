@@ -5,6 +5,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Empresa } from 'src/app/services/banfanb/administracion';
 import { Direccion } from 'src/app/services/banfanb/afiliado.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-empresa',
@@ -74,7 +75,7 @@ export class EmpresaComponent implements OnInit {
   }
 
   Listar() {
-    this.xAPI.funcion = "FID_CEmpresas"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_EMPRESAS
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -88,7 +89,7 @@ export class EmpresaComponent implements OnInit {
     )
   }
   ListarPaises() {
-    this.xAPI.funcion = "ListarPaises"
+    this.xAPI.funcion = environment.xApi.LISTAR_PAISES
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {

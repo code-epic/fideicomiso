@@ -7,6 +7,7 @@ import { UtilService } from "src/app/services/util/util.service";
 import { ToastrService } from 'ngx-toastr';
 import { log } from 'console';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-generalyresultado',
@@ -76,7 +77,7 @@ export class GeneralyresultadoComponent implements OnInit {
 
   consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     // console.log('hola')
@@ -196,7 +197,7 @@ export class GeneralyresultadoComponent implements OnInit {
 
   consultarBalance() {
 
-    this.xAPI.funcion = "FID_CBalanceFecha"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
     this.xAPI.parametros = `${this.fecha},${this.estatus}`
     // this.xAPI.parametros = '2024-01-02,2024-01-03,2024-01-01,%'
     this.xAPI.valores = "";

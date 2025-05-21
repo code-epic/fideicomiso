@@ -8,6 +8,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { FID_IComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { LAporteInicial } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-aporteinicial',
@@ -75,7 +76,7 @@ export class AporteinicialComponent implements OnInit {
     }
     let fini = this.util.ConvertirFechaDB(this.fechai)
     this.ngxService.startLoader('load-cont')
-    this.xAPI.funcion = "FID_CAporteInicial"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_APORTE_INICIAL
     this.xAPI.parametros = fini
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -139,18 +140,14 @@ export class AporteinicialComponent implements OnInit {
       llave: 'M'
     }
 
-    this.xAPI.funcion = "FID_IComprobante"
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Comprobante)
     cant++
-    // console.log(this.xAPI)
-    // this.InsertData(cant)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log(data)
-
-        this.xAPI.funcion = "FID_IAporteInicial"
+        this.xAPI.funcion = environment.xApi.INSERTAR_APORTE_INICIAL
         this.xAPI.parametros = data.msj + ',' + idplan
         this.xAPI.valores = ''
         this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -162,7 +159,6 @@ export class AporteinicialComponent implements OnInit {
             this.ngxService.stopLoader('load-cont')
           }
         )
-        // this.InsertData(cant)
       },
       (error) => {
         console.log(error)

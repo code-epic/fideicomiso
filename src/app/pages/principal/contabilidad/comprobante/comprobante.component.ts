@@ -19,6 +19,7 @@ import Swal, { SweetAlertIcon } from 'sweetalert2';
 import { ToastrService } from "ngx-toastr";
 import { ComprobanteDialogComponent } from "./comprobante-dialog/comprobante-dialog.component";
 import { MatDialog } from "@angular/material/dialog";
+import { environment } from "src/environments/environment";
 
 @Component({
   selector: "app-comprobante",
@@ -182,16 +183,13 @@ export class ComprobanteComponent implements OnInit {
     return this.util.zfill(e, 4)
   }
 
-  
   ListarComprobantes() {
-    this.xAPI.funcion = "FID_CComprobantes";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_COMPROBANTES
     this.xAPI.parametros = "";
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        // console.log(data.Cuerpo)
         this.lst = data.Cuerpo;
-        
       },
       (err) => {}
     );
@@ -200,7 +198,7 @@ export class ComprobanteComponent implements OnInit {
   ConsultarComprobante() {}
 
   ConsultarContrato() {
-    this.xAPI.funcion = "FID_CContrato";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATO
     this.xAPI.parametros = (this.formComprobante.get('plan').value).toString()
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -303,7 +301,7 @@ export class ComprobanteComponent implements OnInit {
   Seleccionar() {}
 
   GenerarSemillero() {
-    this.xAPI.funcion = "FID_CSemilleroContable";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_SEMILLERO_CONTABLE
     this.xAPI.parametros = "";
     this.xAPI.valores = {};
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -325,7 +323,7 @@ export class ComprobanteComponent implements OnInit {
 
   cargarContenido(): any {
     this.lstComprobante = [];
-    this.xAPI.funcion = "FID_CCuentas";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CUENTAS
     this.xAPI.parametros = "";
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -521,7 +519,7 @@ export class ComprobanteComponent implements OnInit {
   Acepar(){
     this.getComprobante();
     this.ngxService.startLoader('load-cont');
-    this.xAPI.funcion = 'FID_IComprobante';
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
     this.xAPI.parametros = '';
     this.xAPI.valores = JSON.stringify(this.Comprobante);
 
@@ -547,7 +545,7 @@ export class ComprobanteComponent implements OnInit {
       this.IDComprobante.fecha_ejercicio = this.Comprobante.fecha_ejercicio
       this.IDComprobante.fecha_operacion = this.Comprobante.fecha_ejercicio
       this.IDComprobante.cuenta = this.getIDCuenta(e.cuenta);
-      this.xAPI.funcion = 'FID_IDetalleComprobante';
+      this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE
       this.xAPI.parametros = '';
       this.xAPI.valores = JSON.stringify(this.IDComprobante);      
 
@@ -601,7 +599,7 @@ export class ComprobanteComponent implements OnInit {
 
   deleteData(id) {
     this.ngxService.startLoader('load-cont');
-    this.xAPI.funcion = 'FID_EComprobante'
+    this.xAPI.funcion = environment.xApi.EDITAR_COMPROBANTE
     this.xAPI.parametros = `${id}`
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(

@@ -7,6 +7,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import {  LIncremento } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-retiros',
@@ -67,7 +68,7 @@ export class RetirosComponent implements OnInit {
     this.ngxService.startLoader('load-cont')
     this.plan = this.util.zfill(this.plan, 4)
 
-    this.xAPI.funcion = "FID_CContrato"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATO
     this.xAPI.parametros = this.plan
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -150,7 +151,7 @@ export class RetirosComponent implements OnInit {
       haber: monto,
     }
 
-    this.xAPI.funcion = "FID_IComprobante"
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(Comprobante)
     cant++
@@ -160,7 +161,7 @@ export class RetirosComponent implements OnInit {
       data => {
         console.log(data)
 
-        this.xAPI.funcion = "FID_IRetiros"
+        this.xAPI.funcion = environment.xApi.INSERTAR_RETIROS
         this.xAPI.parametros = `${data.msj},${monto},${fecha},${idplan}`, 
         this.xAPI.valores = ''
         this.apiService.Ejecutar(this.xAPI).subscribe(

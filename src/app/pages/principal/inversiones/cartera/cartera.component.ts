@@ -3,6 +3,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-cartera',
@@ -71,7 +72,7 @@ export class CarteraComponent implements OnInit {
 
     this.fecha_al = ffin
 
-    this.xAPI.funcion = 'FID_CCarteraInversiones'
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CARTERA_INVERSIONES
     this.iniciarContadores()
 
     this.xAPI.parametros = `${fini},${ffin},${ffin}`

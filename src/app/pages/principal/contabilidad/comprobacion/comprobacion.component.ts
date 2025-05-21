@@ -4,6 +4,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-comprobacion',
@@ -120,7 +121,7 @@ export class ComprobacionComponent implements OnInit {
 
   consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     // console.log('hola')
@@ -151,7 +152,7 @@ export class ComprobacionComponent implements OnInit {
     this.ngxService.startLoader('load-cont')
     console.log(this.mes)
    
-    this.xAPI.funcion = "FID_CBalanceComprobacion";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
     // this.xAPI.parametros = "2023-08-01,2023-08-31,2023-07-31";
     this.xAPI.parametros = `${this.lstFecha[this.mes].value},S`
     // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'

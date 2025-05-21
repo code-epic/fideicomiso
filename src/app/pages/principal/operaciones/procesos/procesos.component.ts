@@ -9,6 +9,7 @@ import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { FID_IComprobante } from "src/app/services/banfanb/comprobante.service";
 import { LPosicionInversiones } from "src/app/services/banfanb/contabilidad.service";
 import { UtilService } from "src/app/services/util/util.service";
+import { environment } from "src/environments/environment";
 
 @Component({
   selector: "app-procesos",
@@ -74,7 +75,7 @@ export class ProcesosComponent implements OnInit {
 
   consultarUltimoCierre() {
     this.ngxService.stopLoader("load-precierre");
-    this.xAPI.funcion = "FID_CUltimoPreCierre";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_FECHA_PRECIERRE
     this.xAPI.parametros = "";
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -122,7 +123,7 @@ export class ProcesosComponent implements OnInit {
     let llave = "";
 
     this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = "FID_BashIPosicion";
+    this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIENTOS_LOTE
     this.xAPI.parametros = fini + ",I," + usuario + "," + llave;
     this.xAPI.valores = "";
 
@@ -150,7 +151,7 @@ export class ProcesosComponent implements OnInit {
     let llave = "";
 
     this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = "FID_BashIntereses";
+    this.xAPI.funcion = environment.xApi.DISTRIBUIR_INTERESES
     this.xAPI.parametros =
       fope + "," + fini + "," + ffin + "," + usuario + "," + llave;
     this.xAPI.valores = "";
@@ -176,7 +177,7 @@ export class ProcesosComponent implements OnInit {
 
     this.fecha_al = fini;
     this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = "FID_CPosicionInversiones";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_POSICIONES_INVERSIONES
     this.xAPI.parametros = fini + "," + ffin;
     this.xAPI.valores = "";
     this.lstAsientos = [];
@@ -264,7 +265,7 @@ export class ProcesosComponent implements OnInit {
     let ffin = this.util.ConvertirFechaDB(this.fechaf);
 
     this.fecha_al = fini;
-    this.xAPI.funcion = "FID_CVencimientoInversiones";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_VENCIMIENTO_INVERSIONES
     this.xAPI.parametros = fini + "," + ffin;
     this.xAPI.valores = "";
     this.acum_debev = 0;
@@ -292,7 +293,7 @@ export class ProcesosComponent implements OnInit {
     let ffin = this.util.ConvertirFechaDB(this.fechaf);
 
     this.fecha_al = fini;
-    this.xAPI.funcion = "FID_CCompraInversiones";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_COMPRA_INVERSIONES
     this.xAPI.parametros = fini + "," + ffin;
     this.xAPI.valores = "";
     console.log(this.xAPI);
@@ -364,7 +365,7 @@ export class ProcesosComponent implements OnInit {
       llave: "M",
     };
 
-    this.xAPI.funcion = "FID_IComprobante";
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.Comprobante);
     this.ngxService.startLoader("load-cont");
@@ -384,7 +385,7 @@ export class ProcesosComponent implements OnInit {
 
   InsertData(dt, cant: number) {
     cant++;
-    this.xAPI.funcion = "FID_IDevengoInversiones";
+    this.xAPI.funcion = environment.xApi.INSERTAR_DEVENGO_INVERIONES
     this.xAPI.parametros =
       dt.msj + "," + this.util.ConvertirFechaDB(this.fechai);
     this.xAPI.valores = "";
@@ -438,7 +439,7 @@ export class ProcesosComponent implements OnInit {
     console.log("Comprobante Vencimiento", vencimiento);
     
 
-    this.xAPI.funcion = "FID_IComprobante";
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(vencimiento);
 
@@ -461,7 +462,7 @@ export class ProcesosComponent implements OnInit {
     console.log("dt", dt);
     
     cant++;
-    this.xAPI.funcion = "FID_IVencimientoInversiones";
+    this.xAPI.funcion = environment.xApi.INSERTAR_VENCIMIENTO_INVERSIONES
     this.xAPI.parametros = dt.msj + "," + this.util.ConvertirFechaDB(this.fechai);
     console.log("API DETALLE VENCIMIENTO", this.xAPI);
     this.xAPI.valores = "";
@@ -501,7 +502,7 @@ export class ProcesosComponent implements OnInit {
       llave: "M",
     };
 
-    this.xAPI.funcion = "FID_IComprobante";
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(compra);
 
@@ -522,7 +523,7 @@ export class ProcesosComponent implements OnInit {
 
   InsertDataCompra(dt, cant: number) {
     cant++;
-    this.xAPI.funcion = "FID_ICompraInversiones";
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMPRA_INVERSIONES
     this.xAPI.parametros =
       dt.msj + "," + this.util.ConvertirFechaDB(this.fechai);
     this.xAPI.valores = "";

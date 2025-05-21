@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
+import { environment } from 'src/environments/environment';
 
 declare interface RouteInfo {
     path: string;
@@ -73,7 +74,7 @@ export class SidebarComponent implements OnInit {
       valores: ''
     }
 
-    xAPI.funcion = 'FID_CFechaMaxPreCierre'
+    xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_PRECIERRE
     xAPI.parametros = ''
     xAPI.valores = ''
 
@@ -95,7 +96,7 @@ export class SidebarComponent implements OnInit {
       parametros: '',
       valores: ''
     }
-    xAPI.funcion = "FID_CUltimoCierre"
+    xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     xAPI.parametros = ''
     xAPI.valores = ''
 

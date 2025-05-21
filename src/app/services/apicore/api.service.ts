@@ -94,7 +94,7 @@ export class ApiService {
   }
 
    //EnviarArchivos generales
-   EnviarArchivos(frm : FormData ) : Observable<any>{
+  EnviarArchivos(frm : FormData ) : Observable<any>{
     var httpOptions = {
       headers: new HttpHeaders({
         'Authorization': 'Bearer ' + sessionStorage.getItem('token') 

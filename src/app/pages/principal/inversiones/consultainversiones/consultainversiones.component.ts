@@ -9,6 +9,7 @@ import { Inversion, MovInversion } from "src/app/services/banfanb/inversiones.se
 import { UtilService } from "src/app/services/util/util.service";
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 import { MatDialog } from "@angular/material/dialog";
+import { environment } from "src/environments/environment";
 
 @Component({
   selector: 'app-consultainversiones',
@@ -130,17 +131,13 @@ export class ConsultainversionesComponent implements OnInit {
     this.selectedIndex = event.index;
     if (this.selectedIndex == 0)this.LimpiarInver()
     if (!this.active) {
-      
-      //this.contrato_search = 'none'
-      //this.GenerarSemillero()
-      // this.Listar()
     } else {
       this.active = !this.active;
     }
   }
 
   ListarEmisor() {
-    this.xAPI.funcion = "FID_CEmisor";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_EMISOR
     this.xAPI.parametros = '';
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -207,7 +204,7 @@ export class ConsultainversionesComponent implements OnInit {
   }
 
   ListarCustodia() {
-    this.xAPI.funcion = "FID_CCustodia";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CUSTODIA
     this.xAPI.parametros = '';
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -236,7 +233,7 @@ export class ConsultainversionesComponent implements OnInit {
   }
 
   ListarInstrumento() {
-    this.xAPI.funcion = "FID_CInstrumento";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INSTRUMENTO
     this.xAPI.parametros = '';
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -311,7 +308,7 @@ export class ConsultainversionesComponent implements OnInit {
   ListarInver() {
     this.ngxService.startLoader("load-inver");
     this.lstInversiones = [];
-    this.xAPI.funcion = "FID_CInversiones";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES
     this.xAPI.parametros = '';
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -328,7 +325,7 @@ export class ConsultainversionesComponent implements OnInit {
   }
 
   ConsultarInver() {
-    this.xAPI.funcion = "FID_CInversion";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSION
     this.xAPI.parametros = this.Inversiones.identificador.toString();
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -378,7 +375,7 @@ export class ConsultainversionesComponent implements OnInit {
 
     console.log(this.Inversiones);
 
-    this.xAPI.funcion = this.Inversiones.identificador == 0 ? "FID_IInversion" : "FID_UInversion"
+    this.xAPI.funcion = this.Inversiones.identificador == 0 ? environment.xApi.INSERTAR_INVESION : environment.xApi.ACTUALIZAR_INVERSION
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Inversiones)
 
@@ -486,7 +483,7 @@ export class ConsultainversionesComponent implements OnInit {
     this.movimiento.fecha_precierre = "1900-01-01"
     this.movimiento.fecha_cierre = "1900-01-01"
 
-    this.xAPI.funcion = "FID_IMovInversion";
+    this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIENTOS_INVERSION
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.movimiento);
 

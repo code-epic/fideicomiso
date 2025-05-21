@@ -12,6 +12,7 @@ import { UtilService } from 'src/app/services/util/util.service';
 import { PlanFideicomiso } from 'src/app/services/banfanb/contabilidad.service';
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { MatDialog } from "@angular/material/dialog";
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-contratos',
@@ -241,10 +242,9 @@ export class ContratosComponent implements OnInit {
 
   consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
-    // console.log('hola')
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         let ultc = data.Cuerpo
@@ -269,7 +269,7 @@ export class ContratosComponent implements OnInit {
     let sAntes = new Date(antes).toISOString().substring(0, 10)
 
     this.fecha = `${sAntes},${sHoy}`
-    this.xAPI.funcion = "FID_CBalanceFecha"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
     this.xAPI.parametros = `${this.fecha},${this.estatus}`
     //console.log(this.xAPI.parametros)
     this.saldo_disponible = '0'
@@ -320,7 +320,7 @@ export class ContratosComponent implements OnInit {
   }
 
   GenerarSemillero() {
-    this.xAPI.funcion = "FID_CSemillero"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_SEMILLERO
     this.xAPI.parametros = ""
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -340,7 +340,7 @@ export class ContratosComponent implements OnInit {
   }
 
   ListarEjecutivos() {
-    this.xAPI.funcion = "FID_CEjecutivos"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_EJECUTIVOS
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -369,7 +369,7 @@ export class ContratosComponent implements OnInit {
   }
 
   ListarOficinas() {
-    this.xAPI.funcion = "FID_COficinas"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_OFICINAS
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -464,7 +464,7 @@ export class ContratosComponent implements OnInit {
   }
 
   Listar() {
-    this.xAPI.funcion = "FID_CContratos"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATOS
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -479,7 +479,7 @@ export class ContratosComponent implements OnInit {
   }
 
   ListarPaises() {
-    this.xAPI.funcion = "ListarPaises"
+    this.xAPI.funcion = environment.xApi.LISTAR_PAISES
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -493,7 +493,7 @@ export class ContratosComponent implements OnInit {
   }
 
   ListarEstados() {
-    this.xAPI.funcion = "ListarEstados"
+    this.xAPI.funcion = environment.xApi.LISTAR_ESTADOS
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -507,7 +507,7 @@ export class ContratosComponent implements OnInit {
   }
 
   ListarCiudades() {
-    this.xAPI.funcion = "ListarCiudad"
+    this.xAPI.funcion = environment.xApi.LISTAR_CIUDAD
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -525,7 +525,7 @@ export class ContratosComponent implements OnInit {
   }
 
   Consultar() {
-    this.xAPI.funcion = "FID_CContrato"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATO
     this.xAPI.parametros = this.Contrato.numero
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -550,7 +550,7 @@ export class ContratosComponent implements OnInit {
   }
 
   ConsultarEmpresa() {
-    this.xAPI.funcion = "FID_CEmpresa"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_EMPRESA
     this.xAPI.parametros = this.Contrato.rif.toUpperCase()
 
 
@@ -572,30 +572,6 @@ export class ContratosComponent implements OnInit {
       }
     )
   }
-
-
-  // ConsultarEjecutivo() {
-
-  //   this.xAPI.funcion = "FID_CEjecutivo"
-  //   this.xAPI.parametros = this.Ejecutivo.cedula
-
-  //   this.apiService.Ejecutar(this.xAPI).subscribe(
-  //     (data) => {
-  //       console.log(data)
-  //       if (data != null && data.msj == undefined) {
-  //         this.Ejecutivo = data[0]
-  //       } else {
-  //         let aux = this.Ejecutivo.cedula
-  //         this.Limpiar()
-  //         this.Ejecutivo.cedula = aux
-  //       }
-  //     },
-  //     (error) => {
-  //       console.log(error)
-  //       this.Limpiar()
-  //     }
-  //   )
-  // }
 
   Limpiar() {
     this.Direccion = {
@@ -776,7 +752,7 @@ export class ContratosComponent implements OnInit {
   }
 
   ListarPortafolio() {
-    this.xAPI.funcion = "FID_CPortafolios"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIOS
     this.xAPI.parametros = this.Contrato.Politicas.portafolio
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -793,7 +769,7 @@ export class ContratosComponent implements OnInit {
 
   ConsultarPortafolio() {
 
-    this.xAPI.funcion = "FID_CPortafolio"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIO
     this.xAPI.parametros = this.Contrato.Politicas.portafolio
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -825,7 +801,7 @@ export class ContratosComponent implements OnInit {
     this.movimiento.fecha_precierre = "1900-01-01"
     this.movimiento.fecha_cierre = "1900-01-01"
 
-    this.xAPI.funcion = "FID_IMovComision";
+    this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIENTO_COMISION
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.movimiento);
 
@@ -855,7 +831,7 @@ export class ContratosComponent implements OnInit {
   }
 
   // SaldoDisponible() {
-  //   this.xAPI.funcion = "FID_CSaldoDisponible"
+  //   this.xAPI.funcion = environment.xApi.CONSULTAR_SALDO_DISPONIBLE
   //   this.xAPI.parametros = parseInt(this.Contrato.numero).toString()
   //   this.apiService.Ejecutar(this.xAPI).subscribe(
   //     (data) => {
@@ -871,7 +847,7 @@ export class ContratosComponent implements OnInit {
   // }
 
   // CapitalAsignado() {
-  //   this.xAPI.funcion = "FID_CCapitalAsignado"
+  //   this.xAPI.funcion = environment.xApi.CONSULTAR_CAPITAL_ASIGNADO
   //   this.xAPI.parametros = parseInt(this.Contrato.numero).toString()
   //   this.apiService.Ejecutar(this.xAPI).subscribe(
   //     (data) => {

@@ -10,6 +10,7 @@ import {
   LCuenta,
 } from "src/app/services/banfanb/contabilidad.service";
 import Swal from "sweetalert2";
+import { environment } from "src/environments/environment";
 
 @Component({
   selector: "app-cuenta",
@@ -85,23 +86,9 @@ export class CuentaComponent implements OnInit {
     console.log(e)
   }
 
-  // Listar() {
-  //   this.xAPI.funcion = "FID_CCuentas"
-  //   this.xAPI.parametros = ''
-  //   this.apiService.Ejecutar(this.xAPI).subscribe(
-  //     (data) => {
-  //       if (data != null && data.msj == undefined) this.lstCuenta = data
-  //     },
-  //     (error) => {
-  //       console.log(error)
-  //       this.Limpiar()
-  //     }
-  //   )
-  // }
-
   Consultar() {
     this.getSegmento();
-    this.xAPI.funcion = "FID_CCuenta";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CUENTA;
     this.xAPI.parametros =
       this.Cuenta.codigo +
       "," +
@@ -230,7 +217,7 @@ export class CuentaComponent implements OnInit {
       return;
     }
     this.ngxService.startLoader("load-inver");
-    this.xAPI.funcion = "FID_ICuenta";
+    this.xAPI.funcion = environment.xApi.INSERTAR_CUENTA
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.Cuenta);
 
@@ -271,9 +258,6 @@ export class CuentaComponent implements OnInit {
     if (!this.active) {
       this.Limpiar();
       this.txtCuenta = ''
-      //this.contrato_search = 'none'
-      //this.GenerarSemillero()
-      // this.Listar()
     } else {
       this.active = !this.active;
     }
@@ -281,7 +265,7 @@ export class CuentaComponent implements OnInit {
 
   cargarContenido(): any {
     this.ELEMENT_DATA = [];
-    this.xAPI.funcion = "FID_CCuentas";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CUENTAS
     this.xAPI.parametros = "";
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -366,10 +350,10 @@ export class CuentaComponent implements OnInit {
       cancelButtonText: 'No',
       allowEscapeKey: true,
     }).then((result) => {
-       
-       if ( result.isConfirmed )  {
+      
+      if ( result.isConfirmed )  {
         this.ngxService.startLoader('loader-document')
-        this.xAPI.funcion = 'FID_DCuentaContable'
+        this.xAPI.funcion = environment.xApi.BORRAR_CUENTA
         this.xAPI.parametros = e.codigo
         this.apiService.Ejecutar(this.xAPI).subscribe(
           async data => {
@@ -386,8 +370,6 @@ export class CuentaComponent implements OnInit {
       }else {
         console.log("NO")
       }
-
     })
-
   }
 }

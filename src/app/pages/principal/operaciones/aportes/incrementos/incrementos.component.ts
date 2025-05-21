@@ -8,6 +8,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LAporteInicial, LIncremento } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-incrementos',
@@ -85,7 +86,7 @@ export class IncrementosComponent implements OnInit {
 
   UltimoCierre() {
 
-    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -110,15 +111,18 @@ export class IncrementosComponent implements OnInit {
 
   ConsultarContrato() {
     this.ngxService.startLoader('load-cont')
-    this.plan = this.util.zfill(this.plan, 4)
-
-    this.xAPI.funcion = "FID_CContrato"
+    // this.plan = this.util.zfill(this.plan, 4)
+    console.log(this.plan);
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATO
     this.xAPI.parametros = this.plan
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data);
+        
         if (data != null) {
           let Contrato = data[0]
+          console.log(Contrato);
           this.rif = Contrato.rif + '-' + Contrato.razonsocial
           this.fideicomiso = Contrato.plan
           this.idplan = parseInt(this.plan)
@@ -191,7 +195,7 @@ export class IncrementosComponent implements OnInit {
       haber: monto,
     }
 
-    this.xAPI.funcion = "FID_IComprobante"
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(Comprobante)
     cant++
@@ -201,7 +205,7 @@ export class IncrementosComponent implements OnInit {
       data => {
         console.log(data)
 
-        this.xAPI.funcion = "FID_IIncremento"
+        this.xAPI.funcion = environment.xApi.INSERTAR_INCREMENTO
         this.xAPI.parametros = `${data.msj},${monto},${fecha},${idplan}`,
           this.xAPI.valores = ''
         this.apiService.Ejecutar(this.xAPI).subscribe(
