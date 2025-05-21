@@ -6,6 +6,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { FID_IComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-procesooperaciones',
@@ -64,7 +65,7 @@ export class ProcesooperacionesComponent implements OnInit {
 
   consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CUltimoPreCierre"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_FECHA_PRECIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     // console.log('hola')
@@ -96,7 +97,7 @@ export class ProcesooperacionesComponent implements OnInit {
 
     let dia = parseInt(this.dias.toString())
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CalcularComision"
+    this.xAPI.funcion = environment.xApi.CALCULAR_COMISION
     this.xAPI.parametros = dia + ',360'
     this.xAPI.valores = ''
     this.visible = false
@@ -197,7 +198,7 @@ export class ProcesooperacionesComponent implements OnInit {
     console.log('e', e)
     let fecha = this.util.ConvertirFechaDB(this.fechai)
     cant++
-    this.xAPI.funcion = "FID_IComisionesAdministrativas"
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMISIONES_ADMINISTRATIVAS
     this.xAPI.parametros = `${dt.msj}, 360, ${e.plan}, ${fecha}, ${e.debe}, ${e.haber}`
     
     this.xAPI.valores = ''

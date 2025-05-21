@@ -5,6 +5,7 @@ import { NgxUiLoaderService } from "ngx-ui-loader";
 import { elementAt } from "rxjs";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { UtilService } from "src/app/services/util/util.service";
+import { environment } from "src/environments/environment";
 
 @Component({
   selector: "app-listados",
@@ -119,7 +120,7 @@ export class ListadosComponent implements OnInit {
   }
 
   consultarBalance() {
-    this.xAPI.funcion = "FID_CBalanceComprobacion";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
     this.xAPI.parametros = `${this.fecha}`
     // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'
     this.xAPI.valores = "";
@@ -330,7 +331,7 @@ export class ListadosComponent implements OnInit {
     // this.acum_saldo_inicial = parseFloat(saldo_inicial);
     // this.acum_saldo_actual = parseFloat(saldo_actual);
    
-    this.xAPI.funcion = "FID_CBalanceComprobacion";
+    this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
     // this.xAPI.parametros = "2023-08-01,2023-08-31,2023-07-31";
     this.xAPI.parametros = `${this.fdesde},${this.fhasta},${this.fecha_vienen}`
     // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'

@@ -6,6 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Maestro } from 'src/app/services/util/tabla.service';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-plancontable',
@@ -84,7 +85,7 @@ export class PlancontableComponent implements OnInit {
   cargarContenido(): any {
 
     this.ELEMENT_DATA = []
-    this.xAPI.funcion = "FID_CPlanContable"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PLAN_CONTABLE
     this.xAPI.parametros = this.API
     this.xAPI.valores = ""
     this.apiService.Ejecutar(this.xAPI).subscribe(

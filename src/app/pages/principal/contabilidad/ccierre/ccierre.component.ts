@@ -8,6 +8,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-ccierre',
@@ -85,10 +86,9 @@ export class CcierreComponent implements OnInit {
 
   consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
-    // console.log('hola')
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
 
@@ -124,7 +124,7 @@ export class CcierreComponent implements OnInit {
 
 
   ValidarPreCierre() {
-    this.xAPI.funcion = 'FID_CFechaMaxPreCierre'
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_PRECIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.ngxService.startLoader('load-precierre')
@@ -189,12 +189,11 @@ export class CcierreComponent implements OnInit {
     let plan = '1'
 
     this.ngxService.startLoader('load-precierre')
-    this.xAPI.funcion = "FID_ISaldosCierre"
+    this.xAPI.funcion = environment.xApi.INSERTAR_SALDOS_CIERRE
     this.xAPI.parametros = `${fopera},${usuario},${llave},${plan},${fultimo}`
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-
+      async data => {        
         this.apiService.Mensaje(
           "Proceso exitoso",
           "Se ha realizado el cierre para el dia: " + this.util.ConvertirFechaHumana(this.fechai),
@@ -216,7 +215,7 @@ export class CcierreComponent implements OnInit {
 
 
     this.ngxService.startLoader('load-precierre')
-    this.xAPI.funcion = "FID_DCierreSemestral"
+    this.xAPI.funcion = environment.xApi.BORRAR_CIERRE_SEMESTRAL
     this.xAPI.parametros = `2024-12-31`
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(

@@ -35,8 +35,16 @@ export class ImprimirService {
                 }
 
                 .membrete-div{
-                    margin-top: 20px;
-                    margin-bottom: 40px
+                    margin-top: 5px;
+                    margin-bottom: 5px
+                }
+
+                .mt-100{
+                    margin-top: 100px;
+                }
+
+                .flex-print{
+                    display: flex;
                 }
 
                 .mat-drawer-content {height: auto !important; }

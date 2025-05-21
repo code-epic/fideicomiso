@@ -8,6 +8,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -107,7 +108,7 @@ export class ProcesocontablesComponent implements OnInit {
 
   consultarUltimoPreCierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
 
@@ -152,7 +153,7 @@ export class ProcesocontablesComponent implements OnInit {
 
   consultarUltimoCierre(): any {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -216,7 +217,7 @@ export class ProcesocontablesComponent implements OnInit {
     let ffin = this.util.ConvertirFechaDB(this.fechaf)
     this.ELEMENT_DATA = []
     this.ngxService.startLoader('load-cont')
-    this.xAPI.funcion = "FID_CMovimientosComprobante"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_COMPROBANTE
     // this.xAPI.parametros = fini + ',' + ffin + ',' + this.estatus
     this.xAPI.valores = ''
     if(this.estatus == "S") fini = this.fechau
@@ -253,7 +254,7 @@ export class ProcesocontablesComponent implements OnInit {
     let fini = this.util.ConvertirFechaDB(this.fechai)
 
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_IMovimientosComprobantes"
+    this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIVIENTOS_COMPROBANTES
     if(this.estatus == "S") fini = this.fechau
     this.xAPI.parametros = fini + ',' + this.estatus    
     this.xAPI.valores = ''
@@ -299,7 +300,7 @@ export class ProcesocontablesComponent implements OnInit {
 
   consultarValoresSemestrales() {
     let fecha = '2024-12-31'
-    this.xAPI.funcion = 'FID_CMovimientosSemestrales'
+    this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
     this.xAPI.parametros = fecha
     this.xAPI.valores = ''
 
@@ -356,7 +357,7 @@ export class ProcesocontablesComponent implements OnInit {
 
   Acepar() {
     this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = "FID_IComprobante";
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
     this.xAPI.parametros = "";
     this.Comprobante.codigo = this.util.GenerarUnicId()
         
@@ -381,7 +382,7 @@ export class ProcesocontablesComponent implements OnInit {
       this.IDComprobante.fecha_operacion = e.fecha_operacion
       this.IDComprobante.cuenta = e.cuenta
 
-      this.xAPI.funcion = "FID_IDetalleComprobante";
+      this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE
       this.xAPI.parametros = "";
       this.xAPI.valores = JSON.stringify(this.IDComprobante);      
 
@@ -397,7 +398,7 @@ export class ProcesocontablesComponent implements OnInit {
    * Consultar la fecha del ultimo precierre realizado
    */
   ValidarPreCierre( ) {
-    this.xAPI.funcion = 'FID_CFechaMaxPreCierre'
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_PRECIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.ngxService.startLoader('load-precierre')
@@ -501,7 +502,7 @@ export class ProcesocontablesComponent implements OnInit {
   }
 
   ValidarPreCierreSemestral(x: boolean = true, ultc = null) {
-    this.xAPI.funcion = 'FID_CFechaMaxPreCierreSemestral'
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE_SEMESTRAL
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.ngxService.startLoader('load-precierre')

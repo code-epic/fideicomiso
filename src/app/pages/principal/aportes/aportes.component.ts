@@ -3,6 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Aportes } from 'src/app/services/banfanb/aportes.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-aportes',
@@ -77,7 +78,7 @@ export class AportesComponent implements OnInit {
 
 
   Listar() {
-    this.xAPI.funcion = "FID_CAportes"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_APORTES
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -145,7 +146,7 @@ export class AportesComponent implements OnInit {
 
 
   ConsultarAfiliado(){
-    this.xAPI.funcion = "FID_CAfiliado"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_AFILIADO
     this.xAPI.parametros = this.Aporte.cedula
     console.log(this.xAPI)
     
@@ -164,7 +165,7 @@ export class AportesComponent implements OnInit {
   }
 
   ConsultarContrato(){
-    this.xAPI.funcion = "FID_CContrato"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATO
     this.xAPI.parametros = this.Aporte.contrato
 
 

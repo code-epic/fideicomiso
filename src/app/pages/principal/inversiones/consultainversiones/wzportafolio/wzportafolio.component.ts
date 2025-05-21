@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Inversion, InversionPortafolio } from 'src/app/services/banfanb/inversiones.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-wzportafolio',
@@ -122,7 +123,7 @@ export class WzportafolioComponent implements OnInit {
   Commit() {
 
 
-    this.xAPI.funcion = 'FID_IInversionesPortafolio'
+    this.xAPI.funcion = environment.xApi.INSERTAR_INVERSIONES_PORTAFOLIO
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.InvPort)
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -141,7 +142,7 @@ export class WzportafolioComponent implements OnInit {
 
   Consultar() {
     console.info(this.Inversiones)
-    this.xAPI.funcion = 'FID_CInversionesPortafolio'
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES_PORTAFOLIO
     this.xAPI.parametros = this.Inversiones.identificador.toString()
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -167,7 +168,7 @@ export class WzportafolioComponent implements OnInit {
 
 
   ListarPortafolio() {
-    this.xAPI.funcion = "FID_CPortafolios"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIOS
     this.xAPI.parametros = this.portafolio
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -185,7 +186,7 @@ export class WzportafolioComponent implements OnInit {
   ConsultarMontoPortafolio(){
     let portf = this.portafolio.split('|')
    
-    this.xAPI.funcion = 'FID_CMontoPortafolio'
+    this.xAPI.funcion = environment.xApi.CONSULTAR_MONTO_PORTAFOLIO
     this.xAPI.parametros = portf[0]
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(

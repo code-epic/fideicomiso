@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Afiliado, Direccion } from 'src/app/services/banfanb/afiliado.service';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -87,7 +88,7 @@ export class AfiliadosComponent implements OnInit {
 
 
   Listar() {
-    this.xAPI.funcion = "FID_CAfiliados"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_AFILIADOS
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {

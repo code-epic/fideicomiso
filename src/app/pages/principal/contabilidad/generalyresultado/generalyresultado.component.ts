@@ -7,6 +7,7 @@ import { UtilService } from "src/app/services/util/util.service";
 import { ToastrService } from 'ngx-toastr';
 import { log } from 'console';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-generalyresultado',
@@ -76,7 +77,7 @@ export class GeneralyresultadoComponent implements OnInit {
 
   consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = "FID_CUltimoCierre"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     // console.log('hola')
@@ -114,12 +115,6 @@ export class GeneralyresultadoComponent implements OnInit {
 
     const fechaUltimoMasUnDia = new Date(fechaUltimo)
     fechaUltimoMasUnDia.setDate(fechaUltimo.getDate() + 1)
-    
-    if (fechaInicio > fechaUltimoMasUnDia) {
-      this.toasService.warning("La fecha del último cierre es menor a la fecha seleccionada", "Fideicomiso");
-      this.fechai = new Date(fechaUltimoMasUnDia)
-      console.log(this.fechai);
-    }
 
     let antes = new Date(this.fechai).setHours(-23)
     let despues = new Date(this.fechai).setHours(23)
@@ -196,7 +191,7 @@ export class GeneralyresultadoComponent implements OnInit {
 
   consultarBalance() {
 
-    this.xAPI.funcion = "FID_CBalanceFecha"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
     this.xAPI.parametros = `${this.fecha},${this.estatus}`
     // this.xAPI.parametros = '2024-01-02,2024-01-03,2024-01-01,%'
     this.xAPI.valores = "";

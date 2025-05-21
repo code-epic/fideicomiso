@@ -5,6 +5,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Afiliado, Direccion } from 'src/app/services/banfanb/afiliado.service';
 import { FormControl } from '@angular/forms';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-ejecutivos',
@@ -83,7 +84,7 @@ export class EjecutivosComponent implements OnInit {
   }
 
   Listar() {
-    this.xAPI.funcion = "FID_CEjecutivos"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_EJECUTIVOS
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -96,7 +97,7 @@ export class EjecutivosComponent implements OnInit {
     )
   }
   ListarPaises() {
-    this.xAPI.funcion = "ListarPaises"
+    this.xAPI.funcion = environment.xApi.LISTAR_PAISES
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -110,7 +111,7 @@ export class EjecutivosComponent implements OnInit {
   }
 
   ListarEstados() {
-    this.xAPI.funcion = "ListarEstados"
+    this.xAPI.funcion = environment.xApi.LISTAR_ESTADOS
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -124,7 +125,7 @@ export class EjecutivosComponent implements OnInit {
   }
 
   ListarCiudades() {
-    this.xAPI.funcion = "ListarCiudad"
+    this.xAPI.funcion = environment.xApi.LISTAR_CIUDAD
     this.xAPI.parametros = ''
 
 
@@ -139,8 +140,7 @@ export class EjecutivosComponent implements OnInit {
     )
   }
   Consultar() {
-
-    this.xAPI.funcion = "FID_CEjecutivo"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_EJECUTIVO
     this.xAPI.parametros = this.Ejecutivo.cedula
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
