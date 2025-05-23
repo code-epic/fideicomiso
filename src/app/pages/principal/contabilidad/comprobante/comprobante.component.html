@@ -143,12 +143,10 @@
                   </div>
 
                   <div class="row">
-
-
                     <div class="col-md-3">
                       <mat-form-field appearance="outline">
                         <mat-label>Fecha Valor</mat-label>
-                        <input matInput [matDatepicker]="picker" formControlName="fechaEjercicio" >
+                        <input matInput [matDatepicker]="picker" formControlName="fechaEjercicio" readonly>
                         <mat-datepicker #picker></mat-datepicker>
                         <mat-icon matSuffix (click)="picker.open()">event</mat-icon>
                       </mat-form-field>
@@ -181,7 +179,7 @@
                   <div class="row">
                     <div class="col-md-7">
                       <mat-form-field appearance="outline">
-                        <mat-label></mat-label>
+                        <mat-label>Cuenta</mat-label>
                         <input type="text" placeholder="Cuenta" aria-label="Cuentas" matInput [formControl]="myCuentas"
                           [matAutocomplete]="autox" [(ngModel)]="cuenta">
                         <mat-autocomplete autoActiveFirstOption #autox="matAutocomplete">

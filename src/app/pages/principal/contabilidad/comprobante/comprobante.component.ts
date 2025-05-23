@@ -189,6 +189,8 @@ export class ComprobanteComponent implements OnInit {
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data);
+        
         this.lst = data.Cuerpo;
       },
       (err) => {}
@@ -204,8 +206,8 @@ export class ComprobanteComponent implements OnInit {
       (data) => {
         if (data != null) {
           this.Contrato = data[0];
+          console.log(this.Contrato);
           // this.fechacreacion.setValue(this.Contrato.Saldos.fechainicio)
-
           this.getTipoFideicomiso();
         } else {
           let aux = this.Comprobante.plan;
