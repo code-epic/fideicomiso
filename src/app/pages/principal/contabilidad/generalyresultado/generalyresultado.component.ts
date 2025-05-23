@@ -117,7 +117,9 @@ export class GeneralyresultadoComponent implements OnInit {
 
     let antes = new Date(this.fechai).setHours(-23)
 
-    let sHoy = new Date(this.fechai).toISOString().substring(0, 10)
+    let fechaHoy = new Date(this.fechai);
+    fechaHoy.setDate(fechaHoy.getDate() - 1);
+    let sHoy = fechaHoy.toISOString().substring(0, 10);
     let sAntes = new Date(antes).toISOString().substring(0, 10)
 
     this.fecha = `${sHoy},${sAntes}`
@@ -188,11 +190,18 @@ export class GeneralyresultadoComponent implements OnInit {
 
   consultarBalance() {
 
+  // Asignar la fecha restada a this.fecha
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
+
     this.xAPI.parametros = `${this.fecha},${this.estatus}`
     // this.xAPI.parametros = '2024-01-02,2024-01-03,2024-01-01,%'
     this.xAPI.valores = "";
+    
     console.log(this.xAPI)
+
+    console.log(this.xAPI.parametros);
+    
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.printv = true
