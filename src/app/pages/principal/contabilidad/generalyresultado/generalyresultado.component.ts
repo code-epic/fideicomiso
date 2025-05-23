@@ -110,23 +110,20 @@ export class GeneralyresultadoComponent implements OnInit {
       return
     }
 
-    const fechaInicio = new Date(this.fechai)
     const fechaUltimo = new Date(this.fechaUltimoComparacion)
 
     const fechaUltimoMasUnDia = new Date(fechaUltimo)
     fechaUltimoMasUnDia.setDate(fechaUltimo.getDate() + 1)
 
     let antes = new Date(this.fechai).setHours(-23)
-    let despues = new Date(this.fechai).setHours(23)
 
     let sHoy = new Date(this.fechai).toISOString().substring(0, 10)
     let sAntes = new Date(antes).toISOString().substring(0, 10)
-    let sDesspues = new Date(despues).toISOString().substring(0, 10)
 
     this.fecha = `${sHoy},${sAntes}`
-    let fini = this.util.ConvertirFechaHumana(this.fechai)
-    this.fechaTexto = fini
-    this.iniciarIndex()
+    const fechaMenosUnDia = new Date(this.fechai);
+    fechaMenosUnDia.setDate(fechaMenosUnDia.getDate() - 1);
+    this.fechaTexto = this.util.ConvertirFechaHumana(fechaMenosUnDia);    this.iniciarIndex()
     this.lstBalance = []
     this.HTMLBalance = ''
     this.HTMLResultados = ''
