@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { LAporteInicial, LIncremento } from 'src/app/services/banfanb/contabilidad.service';
+import { LIncremento } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
 
@@ -38,7 +38,6 @@ export class IncrementosComponent implements OnInit {
   dataSource: any;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-
   public xAPI: IAPICore = {
     funcion: '',
     parametros: ''
@@ -51,16 +50,10 @@ export class IncrementosComponent implements OnInit {
   minDate: Date;
   maxDate: Date;
 
-
-
-
   constructor(private apiService: ApiService,
-    private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
     public formatter: NgbDateParserFormatter,) { }
-
-
 
   // Establecer el rango de fechas
   setDateRange(startDate: Date, endDate: Date) {
@@ -85,7 +78,6 @@ export class IncrementosComponent implements OnInit {
   }
 
   UltimoCierre() {
-
     this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
@@ -97,6 +89,8 @@ export class IncrementosComponent implements OnInit {
           this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
           this.minDate = new Date(this.fechaultimo)
           this.maxDate = new Date(2024, 12, 31)
+          console.log(this.fechaultimo);
+          
         }
         this.ngxService.stopLoader('load-cont')
       },
@@ -180,7 +174,7 @@ export class IncrementosComponent implements OnInit {
       this.close()
       return
     }
-    // console.log(this.ELEMENT_DATA)
+    console.log(this.ELEMENT_DATA)
     let monto = parseFloat(this.ELEMENT_DATA[cant].monto)
     let idplan = this.ELEMENT_DATA[cant].id
     let fecha = this.ELEMENT_DATA[cant].fecha
@@ -193,13 +187,13 @@ export class IncrementosComponent implements OnInit {
       fecha_ejercicio: fecha,
       debe: monto,
       haber: monto,
+      llave: 'M'
     }
-
+    
     this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(Comprobante)
     cant++
-    // console.log(this.xAPI)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
@@ -207,10 +201,13 @@ export class IncrementosComponent implements OnInit {
 
         this.xAPI.funcion = environment.xApi.INSERTAR_INCREMENTO
         this.xAPI.parametros = `${data.msj},${monto},${fecha},${idplan}`,
+        console.log("API", this.xAPI)
           this.xAPI.valores = ''
         this.apiService.Ejecutar(this.xAPI).subscribe(
           data => {
             this.insertData(cant)
+            console.log(data);
+            
           },
           (error) => {
             console.log(error)
