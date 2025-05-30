@@ -106,7 +106,7 @@ export class ProcesosComponent implements OnInit {
   }
 
   CalcularDiasInterese(fechai, fechaf): number {
-    let calculo = this.util.CalcuarDiasTranscurridos(fechai, fechaf) + 1;
+    const calculo = this.util.CalcuarDiasTranscurridos(fechai, fechaf) + 1;
 
     return calculo;
   }
@@ -116,9 +116,9 @@ export class ProcesosComponent implements OnInit {
       this._snackBar.open("Recuerde seleccionar un rango de fechas", "OK");
       return;
     }
-    let fini = this.util.ConvertirFechaDB(this.fechai);
-    let usuario = "";
-    let llave = "";
+    const fini = this.util.ConvertirFechaDB(this.fechai);
+    const usuario = "";
+    const llave = "";
 
     if (!this.recalcular) {
       this.ngxService.startLoader("load-cont");
@@ -130,6 +130,7 @@ export class ProcesosComponent implements OnInit {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         async (data) => {
           this.recalcular = true
+          this.blProcesar = false
           this.ListarInversiones();
         },
         (error) => {
@@ -247,12 +248,13 @@ export class ProcesosComponent implements OnInit {
           this.consultarUltimoComprobante();
           this.ListarVencimiento();
           this.Listarcompra();
+          this.blProcesar = false
         } else {
           this.recalcular = true
           this.blComprobante = true;
           this.ngxService.stopLoader("load-cont");
+          this.blProcesar = true
         }
-        this.blProcesar = true;
       },
       (error) => {
         console.error(error);
