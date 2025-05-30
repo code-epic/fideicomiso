@@ -13,6 +13,7 @@ import { PlanFideicomiso } from 'src/app/services/banfanb/contabilidad.service';
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { MatDialog } from "@angular/material/dialog";
 import { environment } from 'src/environments/environment';
+import { EstadocuentaComponent } from './estadocuenta/estadocuenta.component';
 
 @Component({
   selector: 'app-contratos',
@@ -399,8 +400,6 @@ export class ContratosComponent implements OnInit {
     this.selectedIndex = event.index
     if (!this.active) {
       this.Limpiar()
-      //this.contrato_search = 'none'
-      //this.GenerarSemillero()
       this.Contrato.numero = this.util.GenerarUnicId()
       this.Contrato.estatus = "2"
 
@@ -409,13 +408,13 @@ export class ContratosComponent implements OnInit {
       this.planFideicomiso.identificador = 0
     } else {
       this.active = !this.active
-
     }
 
   }
 
   editar(e: any) {
-    this.Contrato = e    
+    this.Contrato = e
+    console.log(this.Contrato)    
     this.selectedIndex = 1
     this.active = true
     this.fechainicio = NgbDate.from(this.formatter.parse(this.Contrato.Saldos.fechainicio))
@@ -851,8 +850,8 @@ export class ContratosComponent implements OnInit {
 
     
 
-    const dialogRef = this.dialog.open(this.estadocuenta, {
-      width: '100px',
+    const dialogRef = this.dialog.open(EstadocuentaComponent, {
+      // width: '100px',
       data: {},
     });
 
