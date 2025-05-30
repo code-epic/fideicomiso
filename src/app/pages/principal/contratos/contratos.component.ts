@@ -271,7 +271,6 @@ export class ContratosComponent implements OnInit {
     this.fecha = `${sAntes},${sHoy}`
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
     this.xAPI.parametros = `${this.fecha},${this.estatus}`
-    //console.log(this.xAPI.parametros)
     this.saldo_disponible = '0'
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -282,8 +281,6 @@ export class ContratosComponent implements OnInit {
         let cdd = 0
         let pdd = 0
         data.Cuerpo.forEach((e) => {
-          
-          console.log(e.codigo_padre)
           if (e.codigo_padre.indexOf("711") == 0 ) {
             sdd +=  parseFloat(e.saldo_inicial)
             
@@ -302,12 +299,6 @@ export class ContratosComponent implements OnInit {
         this.total_disponible = tdd.toFixed(2)
         this.capital_asignado = cdd.toFixed(2)
         this.saldo_patrimonio = pdd.toFixed(2)
-
-        console.log('this.saldo_disponible ', this.saldo_disponible)
-        console.log('this.total_disponible ', this.total_disponible)
-        console.log('this.capital_asignado ', this.capital_asignado)
-        console.log('this.saldo_patrimonio ', this.saldo_patrimonio)
-
 
         // console.log(sdd, tdd, cdd, pdd)
       },
@@ -423,11 +414,10 @@ export class ContratosComponent implements OnInit {
 
   }
 
-  editar(e) {
+  editar(e: any) {
     this.Contrato = e    
     this.selectedIndex = 1
     this.active = true
-    //this.contrato_search = ''
     this.fechainicio = NgbDate.from(this.formatter.parse(this.Contrato.Saldos.fechainicio))
 
 
@@ -437,8 +427,6 @@ export class ContratosComponent implements OnInit {
     this.saldo_inicio = this.Contrato.Saldos.saldoinicio.toString()
     this.planFideicomiso.identificador = parseInt(this.Contrato.numero)
     this.tabSaldos = true
-    // this.SaldoDisponible()
-    // this.CapitalAsignado()
 
     this.ConsultarSaldos()
 
@@ -449,18 +437,14 @@ export class ContratosComponent implements OnInit {
   getTipoFideicomiso() {
 
     let codigo = this.Contrato.plan
-    // console.log(codigo)
 
     this.lstTipoFid = []
     this.lstTipoFideicomiso.forEach(e => {
 
       if (e.key == codigo) {
         this.lstTipoFid = e.val
-
       }
     });
-
-    // console.log(this.lstTipoFid)
   }
 
   Listar() {
@@ -468,7 +452,6 @@ export class ContratosComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         this.lstContratos = data
       },
       (error) => {
@@ -703,11 +686,8 @@ export class ContratosComponent implements OnInit {
           this.Contrato.numero = this.util.zfill(numero, 4)
           this.Contrato.Saldos.fechainicio = this.planFideicomiso.fecha_apertura
           this.Contrato.Saldos.saldoinicio = this.planFideicomiso.monto_apertura
-
           this.AsientoContrato(numero, monto, this.planFideicomiso.fecha_apertura)
-
           this.GuardarContrato()
-
         }
       },
       (error) => {
@@ -729,7 +709,7 @@ export class ContratosComponent implements OnInit {
       "objeto": this.Contrato,
       "donde": `{\"numero\":\"${this.Contrato.numero}\"}`,
       "driver": "MDBFIDE",
-      "upsert": false
+      "upsert": true
     }
 
     this.apiService.ExecColeccion(obj).subscribe(
