@@ -381,6 +381,7 @@ export class ProcesocontablesComponent implements OnInit {
       this.IDComprobante.fecha_ejercicio = e.fecha_ejercicio
       this.IDComprobante.fecha_operacion = e.fecha_operacion
       this.IDComprobante.cuenta = e.cuenta
+      this.IDComprobante.plan = 1
 
       this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE
       this.xAPI.parametros = "";

@@ -97,6 +97,7 @@ export const environment = {
     INSERTAR_COMISIONES_ADMINISTRATIVAS: 'FID_IComisionesAdministrativas',
     INSERTAR_MOVIMIENTO_COMISION: 'FID_IMovComision',
     INSERTAR_MOVIMIENTOS_LOTE: 'FID_BashIPosicion',
+    BORRAR_MOVIMIENTOS_LOTE: 'FID_BashDPosicion',
     DISTRIBUIR_INTERESES: 'FID_BashIntereses',
     INSERTAR_INCREMENTO: 'FID_IIncremento'
   }, //total 69

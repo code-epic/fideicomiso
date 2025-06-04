@@ -7,6 +7,7 @@ import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { FID_IComprobante } from "src/app/services/banfanb/comprobante.service";
 import { UtilService } from "src/app/services/util/util.service";
 import { environment } from "src/environments/environment";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-procesos",
@@ -53,6 +54,7 @@ export class ProcesosComponent implements OnInit {
   };
 
   visible: boolean = false;
+  recalcular: boolean = false
 
   // public lstData = []
 
@@ -72,7 +74,7 @@ export class ProcesosComponent implements OnInit {
 
   consultarUltimoCierre() {
     this.ngxService.stopLoader("load-precierre");
-    this.xAPI.funcion = environment.xApi.CONSULTAR_FECHA_PRECIERRE
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
     this.xAPI.parametros = "";
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -104,7 +106,7 @@ export class ProcesosComponent implements OnInit {
   }
 
   CalcularDiasInterese(fechai, fechaf): number {
-    let calculo = this.util.CalcuarDiasTranscurridos(fechai, fechaf) + 1;
+    const calculo = this.util.CalcuarDiasTranscurridos(fechai, fechaf) + 1;
 
     return calculo;
   }
@@ -114,25 +116,60 @@ export class ProcesosComponent implements OnInit {
       this._snackBar.open("Recuerde seleccionar un rango de fechas", "OK");
       return;
     }
-    let fini = this.util.ConvertirFechaDB(this.fechai);
-    let usuario = "";
-    let llave = "";
+    const fini = this.util.ConvertirFechaDB(this.fechai);
+    const usuario = "";
+    const llave = "";
 
-    this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIENTOS_LOTE
-    this.xAPI.parametros = fini + ",I," + usuario + "," + llave;
+    if (!this.recalcular) {
+      this.ngxService.startLoader("load-cont");
+      this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIENTOS_LOTE
+      this.xAPI.parametros = fini + ",I," + usuario + "," + llave;
 
-    this.xAPI.valores = "";
+      this.xAPI.valores = "";
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (data) => {
-        this.ListarInversiones();
-      },
-      (error) => {
-        console.error(error);
-        this.ngxService.stopLoader("load-cont");
-      }
-    );
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        async (data) => {
+          this.recalcular = true
+          this.blProcesar = false
+          this.ListarInversiones();
+        },
+        (error) => {
+          console.error(error);
+          this.ngxService.stopLoader("load-cont");
+        }
+      );
+    } 
+    else {
+      Swal.fire({
+        title: "Informacion",
+        text: 'Ya ha insertado los movimientos',
+        icon: 'info',
+        showCancelButton: false,
+        confirmButtonColor: '#3085d6',
+        // cancelButtonColor: '#d33',
+        confirmButtonText: 'Salir',
+        allowEscapeKey: true,
+      }).then((result) => {
+        // const respuesta = result.isConfirmed
+        // if (respuesta) {
+        //   this.ngxService.startLoader("load-cont");
+        //   this.xAPI.funcion = environment.xApi.BORRAR_MOVIMIENTOS_LOTE
+        //   this.xAPI.parametros = fini;
+        //   this.xAPI.valores = "";
+        //   this.apiService.Ejecutar(this.xAPI).subscribe(
+        //     (data) => {
+        //       this.recalcular = false
+        //       this.CalculoPosicion();
+        //     },
+        //     (error) => {
+        //       console.error(error);
+        //       this.ngxService.stopLoader("load-cont");
+        //     }
+        //   );
+        // }
+      })
+      this.ngxService.stopLoader("load-cont");
+    }
   }
 
   CalcularInversion() {
@@ -207,13 +244,16 @@ export class ProcesosComponent implements OnInit {
             this.blComprobante = true;
           }
 
+          this.recalcular = false
           this.consultarUltimoComprobante();
           this.ListarVencimiento();
           this.Listarcompra();
+          this.blProcesar = false
         } else {
-          this.blProcesar = true;
+          this.recalcular = true
           this.blComprobante = true;
-          await this.ngxService.stopLoader("load-cont");
+          this.ngxService.stopLoader("load-cont");
+          this.blProcesar = true
         }
       },
       (error) => {
