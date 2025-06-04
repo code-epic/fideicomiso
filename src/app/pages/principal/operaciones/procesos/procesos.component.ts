@@ -120,7 +120,7 @@ export class ProcesosComponent implements OnInit {
     const usuario = "";
     const llave = "";
 
-    if (!this.recalcular) {
+    if (true) {
       this.ngxService.startLoader("load-cont");
       this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIENTOS_LOTE
       this.xAPI.parametros = fini + ",I," + usuario + "," + llave;
