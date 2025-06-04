@@ -547,6 +547,7 @@ export class ComprobanteComponent implements OnInit {
       this.IDComprobante.fecha_ejercicio = this.Comprobante.fecha_ejercicio
       this.IDComprobante.fecha_operacion = this.Comprobante.fecha_ejercicio
       this.IDComprobante.cuenta = this.getIDCuenta(e.cuenta);
+      this.IDComprobante.plan = Number(this.formComprobante.get('plan').value) 
       this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE
       this.xAPI.parametros = '';
       this.xAPI.valores = JSON.stringify(this.IDComprobante);      
