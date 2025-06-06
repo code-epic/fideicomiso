@@ -1,11 +1,45 @@
-<h1 mat-dialog-title>No Disponible</h1>
+<h1 mat-dialog-title>Estado de cuenta</h1>
 
-<mat-dialog-content>
-    <hr>
+<mat-divider></mat-divider>
+<mat-dialog-content class="py-4">
+    <div class="mat-elevation-z8">
+        <table mat-table [dataSource]="dataSource">
+
+            <!-- Position Column -->
+            <ng-container matColumnDef="fecha_operacion">
+                <th mat-header-cell *matHeaderCellDef> Fecha Operacion. </th>
+                <td mat-cell *matCellDef="let element"> {{element.fecha_operacion}} </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="debe">
+                <th mat-header-cell *matHeaderCellDef> Debe </th>
+                <td mat-cell *matCellDef="let element"> {{element.debe}} </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="haber">
+                <th mat-header-cell *matHeaderCellDef> Haber </th>
+                <td mat-cell *matCellDef="let element"> {{element.haber}} </td>
+            </ng-container>
+
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef> Cuenta </th>
+                <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
+            aria-label="Select page of periodic elements">
+        </mat-paginator>
+    </div>
 </mat-dialog-content>
+<mat-divider></mat-divider>
 
-<mat-dialog-actions>
-    <button mat-button color="warn" mat-dialog-close>Salir</button>
+<mat-dialog-actions align="end">
+    <button mat-stroked-button color="warn" mat-dialog-close>Salir</button>
 </mat-dialog-actions>
-
-

@@ -462,8 +462,8 @@ export class ProcesosComponent implements OnInit {
         )}`,
         fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
         fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
-        debe: parseInt(e.valor_nominal) + this.RendicionCupon(e),
-        haber: parseInt(e.valor_nominal) + this.RendicionCupon(e),
+        debe: parseFloat(e.valor_nominal) + this.RendicionCupon(e),
+        haber: parseFloat(e.valor_nominal) + this.RendicionCupon(e),
         llave: "M",
       };
 

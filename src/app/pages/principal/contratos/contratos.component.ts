@@ -162,21 +162,13 @@ export class ContratosComponent implements OnInit {
   ]
 
   public lstTipoFid = []
-
   public lstContratos = []
-
   public lstPaises = []
-
   public lstCiudades = []
-
   public lstEstados = []
 
-
-
   public selectedIndex = 0;
-
   public active: boolean = false
-
   public contrato_search: string = 'none'
 
   public xAPI: IAPICore = {
@@ -191,11 +183,8 @@ export class ContratosComponent implements OnInit {
   public fecharegistro: any
 
   public tabSaldos: boolean = false
-
   public tabEjecutivo: boolean = false
-
   public focus: boolean = false
-
   public buscar = ''
 
   myControl = new FormControl('');
@@ -846,13 +835,9 @@ export class ContratosComponent implements OnInit {
 
   openDialog(): void {
 
-    //this.xinver = JSON.stringify(e)
-
-    
-
     const dialogRef = this.dialog.open(EstadocuentaComponent, {
-      // width: '100px',
-      data: {},
+      data: {contrato: this.Contrato},
+      width: '80%'
     });
 
     dialogRef.afterClosed().subscribe(result => {
