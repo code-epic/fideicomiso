@@ -313,6 +313,8 @@ export class ComprobanteComponent implements OnInit {
       llave: 'M'
     };
 
+    this.Contrato.razonsocial = ''
+
     this.formComprobante.reset()
     this.dataSource = null
     this.formComprobante.get('fechaOperacion').setValue(this.Comprobante.fecha_operacion || this.fechacreacion.value)
