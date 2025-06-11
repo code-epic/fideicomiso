@@ -177,7 +177,25 @@ export class ComprobanteComponent implements OnInit {
       totalDebe: [this.Comprobante.debe, Validators.required],
       totalHaber: [this.Comprobante.haber, Validators.required],
     });
+
+    this.actualizarPlanConCeros();
+    this.ConsultarContrato()
+
+     // Suscribirse a los cambios de plan
+    this.formComprobante.get('plan').valueChanges.subscribe(val => {
+      if (val && Number(val) > 0 && val.toString().length < 4) {
+        this.actualizarPlanConCeros();
+      }
+    });
   }
+
+  private actualizarPlanConCeros() {
+  let plan = this.formComprobante.get('plan').value;
+  if (plan && Number(plan) > 0) {
+    const planConCeros = this.CompletarCeros(plan.toString());
+    this.formComprobante.get('plan').setValue(planConCeros, { emitEvent: false });
+  }
+}
 
   CompletarCeros(e : string ) : string{
     return this.util.zfill(e, 4)
@@ -187,13 +205,15 @@ export class ComprobanteComponent implements OnInit {
     this.xAPI.funcion = environment.xApi.CONSULTAR_COMPROBANTES
     this.xAPI.parametros = "";
     this.xAPI.valores = "";
+    this.ngxService.startLoader('load-cont');    
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        console.log(data);
-        
+      (data) => {    
         this.lst = data.Cuerpo;
+        this.ngxService.stopLoader('load-cont');    
       },
-      (err) => {}
+      (err) => {
+        this.ngxService.stopLoader('load-cont');    
+      }
     );
   }
 
@@ -308,7 +328,6 @@ export class ComprobanteComponent implements OnInit {
     this.xAPI.valores = {};
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         if (data != null) {
           let codigo = parseInt(data[0].codigo) + 1;
           this.Comprobante.codigo = this.util.zfill(codigo, 4);
