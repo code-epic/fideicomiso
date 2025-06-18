@@ -78,6 +78,7 @@ export class ProcesosComponent implements OnInit {
     this.ngxService.stopLoader("load-precierre");
     this.fechaultimo = await this.cierre.getUltimoCierre()
     this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);
+    this.fechaf = this.fechai
     this.ngxService.stopLoader("load-precierre");
   }
 
