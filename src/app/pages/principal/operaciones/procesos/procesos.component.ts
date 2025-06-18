@@ -26,7 +26,7 @@ export class ProcesosComponent implements OnInit {
   public lstVencimiento = [];
   public lstCompra = [];
   public bcuentat = false;
-  public dias: number = 0;
+  public dias: number = 1;
   public acum_debe = 0;
   public acum_haber = 0;
   public acum_debev = 0;
