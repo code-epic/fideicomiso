@@ -61,7 +61,7 @@ export class CierreService {
       this.apiService.Ejecutar(xAPI).subscribe({
         next: (data) => {
           if (data.Cuerpo && data.Cuerpo.length > 0) {
-            resolve(this.convertirfecha(data.Cuerpo[0].fecha));
+            resolve(this.convertirfecha(data.Cuerpo[0].fecha_cierre));
           } else {
             resolve('');
           }
