@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { ApiService } from 'src/app/services/apicore/api.service';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
-import { environment } from 'src/environments/environment';
 
 declare interface RouteInfo {
     path: string;
@@ -65,12 +64,13 @@ export class SidebarComponent implements OnInit {
       this.isCollapsed = true;
     });
 
+    this.cierre.actualizarCierres()
     this.getCierres()
   }
 
-  private async getCierres() {
-    this.ultimoPreCierre = await this.cierre.getUltimoPrecierre()
-    this.ultimoCierre = await this.cierre.getUltimoCierre()
+  getCierres() {
+    this.cierre.ultimoCierre$.subscribe(cierre => this.ultimoCierre = cierre);
+    this.cierre.ultimoPreCierre$.subscribe(preCierre => this.ultimoPreCierre = preCierre);
   }
 
   msj(pagina : string){

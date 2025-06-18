@@ -166,6 +166,7 @@ export class CcierreComponent implements OnInit {
           "Cierres"
         )
         this.consultarUltimoCierre()
+        this.cierre.actualizarCierres()
         this.ngxService.stopLoader('load-precierre')
 
       },

@@ -1,13 +1,29 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { ApiService, IAPICore } from '../apicore/api.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CierreService {
 
+  
+  private ultimoCierreSubject = new BehaviorSubject<string>('');
+  private ultimoPreCierreSubject = new BehaviorSubject<string>('');
+  
+  ultimoCierre$ = this.ultimoCierreSubject.asObservable();
+  ultimoPreCierre$ = this.ultimoPreCierreSubject.asObservable();
+  
   constructor(private apiService: ApiService) { }
+
+  async actualizarCierres() {
+    const preCierre = await this.getUltimoPrecierre();
+    const cierre = await this.getUltimoCierre();
+
+    this.ultimoPreCierreSubject.next(preCierre);
+    this.ultimoCierreSubject.next(cierre);
+  }
 
   getUltimoCierre(): Promise<string> {
     const xAPI: IAPICore = {

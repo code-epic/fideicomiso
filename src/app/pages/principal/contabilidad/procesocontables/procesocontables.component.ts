@@ -198,6 +198,7 @@ export class ProcesocontablesComponent implements OnInit {
         this.semestral = false;
         this.estatus = 'M';
         this.consultarUltimoCierre()
+        this.cierre.actualizarCierres()
         this.ngxService.stopLoader('load-precierre')
         this.lstMovimientos = []
         this.blista = false
