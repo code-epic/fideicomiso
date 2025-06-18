@@ -336,22 +336,42 @@ export class ProcesocontablesComponent implements OnInit {
       data => {
         if (data.Cuerpo != undefined ){
           console.log(data)
-          let ultimoPrecierre = data.Cuerpo[0].fecha_cierre
-          console.log('ultimoPrecierre', ultimoPrecierre)
-          ultimoPrecierre = this.util.ConvertirFechaDB(ultimoPrecierre)
-          let fechaAPrecerrar = this.util.ConvertirFechaDB(this.fechai)
+          let ultimoPrecierre = data.Cuerpo[0].fecha_cierre;
+          console.log('ultimoPrecierre', ultimoPrecierre);
 
-          let ultimoPrecierreDate = new Date(ultimoPrecierre).toISOString();
-          let fechaAPrecerrarDate = new Date(fechaAPrecerrar).toISOString();
-          
-          const fechaUltimoAux = new Date(this.fechaultimo.split('/').reverse().join('-'));
-          fechaUltimoAux.setDate(fechaUltimoAux.getDate() + 2); 
-          const fechaUltimoUTCAux = fechaUltimoAux.toISOString(); 
+          let d1: number, m1: number, y1: number;
+          if (ultimoPrecierre.includes('/')) {
+            // Formato DD/MM/YYYY
+            [d1, m1, y1] = ultimoPrecierre.split('/').map(Number);
+          } else if (ultimoPrecierre.includes('-')) {
+            // Formato YYYY-MM-DD
+            [y1, m1, d1] = ultimoPrecierre.split('-').map(Number);
+          } else {
+            throw new Error('Formato de fecha no soportado: ' + ultimoPrecierre);
+          }
+          let ultimoPrecierreDate = new Date(Date.UTC(y1, m1 - 1, d1)).toISOString();
+
+          let fechaAPrecerrar = this.util.ConvertirFechaDB(this.fechai);
+
+          let d2: number, m2: number, y2: number;
+          if (fechaAPrecerrar.includes('/')) {
+            [d2, m2, y2] = fechaAPrecerrar.split('/').map(Number);
+          } else if (fechaAPrecerrar.includes('-')) {
+            [y2, m2, d2] = fechaAPrecerrar.split('-').map(Number);
+          } else {
+            throw new Error('Formato de fecha no soportado: ' + fechaAPrecerrar);
+          }
+          let fechaAPrecerrarDate = new Date(Date.UTC(y2, m2 - 1, d2)).toISOString();
+
+          console.log(this.fechaultimo)
+          const [d3, m3, y3] = this.fechaultimo.split('/').map(Number);
+          const fechaUltimoAux = new Date(Date.UTC(y3, m3 - 1, d3));
+          fechaUltimoAux.setUTCDate(fechaUltimoAux.getUTCDate() + 2);
+          const fechaUltimoUTCAux = fechaUltimoAux.toISOString();
 
           console.log('fechaAPrecerrarDate', fechaAPrecerrarDate)
           console.log('ultimoPrecierreDate', ultimoPrecierreDate)
           console.log('fechaUltimoUTCAux', fechaUltimoUTCAux)
-          console.log('fechaUltimoAux', fechaUltimoAux)
 
           //Validar si el dia ya fue precerrado
           if (fechaAPrecerrarDate < ultimoPrecierreDate) {
@@ -373,8 +393,7 @@ export class ProcesocontablesComponent implements OnInit {
             )
             this.consultarUltimoCierre()
             this.ngxService.stopLoader('load-precierre')
-
-          }else if(fechaAPrecerrarDate == ultimoPrecierreDate){
+          } else if (fechaAPrecerrarDate == ultimoPrecierreDate) {
             Swal.fire({
               title: "Pendiente",
               text:  "Ya fue procesado el Precierre del día: " + this.util.ConvertirFechaHumana(this.fechai) + " Desea recalcular?",                  
@@ -390,10 +409,10 @@ export class ProcesocontablesComponent implements OnInit {
                 this.eliminarPrecierre(fechaAPrecerrarDate)
               }
             })
-          }else{
+          } else {
             if (fechaAPrecerrar == '2024-12-31' || fechaAPrecerrar == '2024-06-30' || fechaAPrecerrar == '2025-12-31' ) {            
               this.ValidarPreCierreSemestral()
-            }else{
+            } else {
               this.GenerarPrecierre()
             }
           }      
