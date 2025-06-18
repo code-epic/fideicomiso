@@ -50,7 +50,7 @@ export class ProcesocontablesComponent implements OnInit {
   public bcuentat = false
   public semestral = false
 
-  public dias: number = 0
+  public dias: number = 1
   public acum_debe = 0
   public acum_haber = 0
 
@@ -131,7 +131,7 @@ export class ProcesocontablesComponent implements OnInit {
   }
 
   CalcularDias(type: string, event: MatDatepickerInputEvent<Date>) {
-    this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1
+    this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 2
   }
 
   ConsultarComprobante() {
@@ -335,8 +335,10 @@ export class ProcesocontablesComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
         if (data.Cuerpo != undefined ){
-          
-          let ultimoPrecierre = data.Cuerpo[0].fecha
+          console.log(data)
+          let ultimoPrecierre = data.Cuerpo[0].fecha_cierre
+          console.log('ultimoPrecierre', ultimoPrecierre)
+          ultimoPrecierre = this.util.ConvertirFechaDB(ultimoPrecierre)
           let fechaAPrecerrar = this.util.ConvertirFechaDB(this.fechai)
 
           let ultimoPrecierreDate = new Date(ultimoPrecierre).toISOString();
@@ -345,6 +347,11 @@ export class ProcesocontablesComponent implements OnInit {
           const fechaUltimoAux = new Date(this.fechaultimo.split('/').reverse().join('-'));
           fechaUltimoAux.setDate(fechaUltimoAux.getDate() + 2); 
           const fechaUltimoUTCAux = fechaUltimoAux.toISOString(); 
+
+          console.log('fechaAPrecerrarDate', fechaAPrecerrarDate)
+          console.log('ultimoPrecierreDate', ultimoPrecierreDate)
+          console.log('fechaUltimoUTCAux', fechaUltimoUTCAux)
+          console.log('fechaUltimoAux', fechaUltimoAux)
 
           //Validar si el dia ya fue precerrado
           if (fechaAPrecerrarDate < ultimoPrecierreDate) {
