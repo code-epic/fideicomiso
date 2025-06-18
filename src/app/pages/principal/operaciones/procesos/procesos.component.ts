@@ -4,6 +4,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgbDateParserFormatter } from "@ng-bootstrap/ng-bootstrap";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
+import { CierreService } from "src/app/services/banfanb/cierre.service";
 import { FID_IComprobante } from "src/app/services/banfanb/comprobante.service";
 import { UtilService } from "src/app/services/util/util.service";
 import { environment } from "src/environments/environment";
@@ -63,7 +64,8 @@ export class ProcesosComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
-    public formatter: NgbDateParserFormatter
+    public formatter: NgbDateParserFormatter,
+    private cierre: CierreService
   ) { }
 
   ngOnInit(): void {
@@ -72,32 +74,11 @@ export class ProcesosComponent implements OnInit {
     this.consultarUltimoCierre();
   }
 
-  consultarUltimoCierre() {
+  async consultarUltimoCierre() {
     this.ngxService.stopLoader("load-precierre");
-    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
-    this.xAPI.parametros = "";
-    this.xAPI.valores = "";
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (data) => {
-        let ultc = data.Cuerpo;
-        if (ultc.length > 0) {
-          let fecha = ultc[0].fecha_cierre;
-          let d = fecha.split("-");
-          this.fechau = fecha;
-          this.fechaultimo = d[2] + "/" + d[1] + "/" + d[0];
-          let fechaCierre = new Date(`${d[0]}-${d[1]}-${d[2]}`);
-          fechaCierre.setDate(fechaCierre.getDate() + 2);
-          fechaCierre.setHours(0, 0, 0, 0);
-          this.fechai = fechaCierre;
-          this.fechaf = fechaCierre;
-          this.dias = 1;
-        }
-        this.ngxService.stopLoader("load-precierre");
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
+    this.fechaultimo = await this.cierre.getUltimoCierre()
+    this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);
+    this.ngxService.stopLoader("load-precierre");
   }
 
   CalcularDias(type: string, event: MatDatepickerInputEvent<Date>) {

@@ -1,16 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Component, OnInit } from '@angular/core';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banfanb/comprobante.service';
-import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-auxiliar',
@@ -44,7 +39,7 @@ export class AuxiliarComponent implements OnInit {
   estatus: string = 'M'
 
 
-  public lstIndex = [] //Cuentas totalizadores de Fideicomiso
+  public lstIndex = [] 
   public cuenta = ''
   public plan = ''
   lstData = []
@@ -55,13 +50,15 @@ export class AuxiliarComponent implements OnInit {
     private toastrService: ToastrService,
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
-    public formatter: NgbDateParserFormatter,) { }
+    public formatter: NgbDateParserFormatter,
+    private cierre: CierreService
+  ) { }
 
   ngOnInit(): void {
     this.semestral = false
     this.estatus = 'M'
     this.plan = '%'
-    this.consultarUltimoCierre()
+    this.consultarUltimoPreCierre()
     this.iniciarIndex()
   }
 
@@ -112,42 +109,13 @@ export class AuxiliarComponent implements OnInit {
   }
 
 
-  consultarUltimoCierre() {
-
-    this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_FECHA_PRECIERRE
-    this.xAPI.parametros = ''
-    this.xAPI.valores = ''
-    // console.log('hola')
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-
-        let ultc = data.Cuerpo
-        if (ultc.length > 0) {
-          let fecha = ultc[0].fecha_cierre;
-          let d = fecha.split('-');
-          this.fechau = fecha
-          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
-          let fechaCierre = new Date(`${d[0]}-${d[1]}-${d[2]}`);
-          fechaCierre.setDate(fechaCierre.getDate() + 2);
-          fechaCierre.setHours(0, 0, 0, 0);
-          this.fechai = fechaCierre;  
-          this.dias = 1
-        }
-        if ( this.fechaultimo == "30/06/2024" || this.fechaultimo == "31/12/2024"  ) {
-          this.semestral = true
-          this.estatus = 'S'
-        }
-
-        this.ngxService.stopLoader('load-precierre')
-
-      },
-      (error) => {
-        console.log(error)
-      }
-    )
+  async consultarUltimoPreCierre() {
+    this.fechaultimo = await this.cierre.getUltimoPrecierre()
+    this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);  
+    this.semestral = this.cierre.getSemestral(this.fechaultimo)
+    this.estatus = this.semestral ? 'S' : this.estatus
+    this.dias = 1
   }
-
 
   ConsultarDetalles(){
     let fecha = new Date(this.fechai).toISOString().substring(0, 10)
@@ -158,13 +126,11 @@ export class AuxiliarComponent implements OnInit {
       );
       return false
     }
-      
     
     this.ngxService.startLoader('load-precierre')
-    this.xAPI.funcion = "FID_CMayorAnalitico"
+    this.xAPI.funcion = environment.xApi.CONSULTAR_MAYOR_ANALITICO
     this.xAPI.parametros = `${fecha},${this.cuenta}`
     this.xAPI.valores = ''
-
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
@@ -174,7 +140,7 @@ export class AuxiliarComponent implements OnInit {
         this.ngxService.stopLoader('load-precierre')
       },
       error => {
-
+        console.error(error)
       }
     )
   }
@@ -182,6 +148,4 @@ export class AuxiliarComponent implements OnInit {
   getMoneda(numero: number): string {
     return this.util.ConvertirMoneda(numero);
   }
-
-
 }

@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { FID_IComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
@@ -50,51 +49,26 @@ export class ProcesooperacionesComponent implements OnInit {
   visible: boolean = false
 
   constructor(private apiService: ApiService,
-    private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
-    private toastrService: ToastrService,
+    private cierre: CierreService,
     private util: UtilService,
-    public formatter: NgbDateParserFormatter) { }
+    public formatter: NgbDateParserFormatter
+  ) { }
 
   ngOnInit(): void {
-    this.consultarUltimoCierre()
+    this.consultarUltimoPrecierre()
   }
 
-
-
-
-  consultarUltimoCierre() {
+  async consultarUltimoPrecierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_FECHA_PRECIERRE
-    this.xAPI.parametros = ''
-    this.xAPI.valores = ''
-    // console.log('hola')
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-
-        let ultc = data.Cuerpo
-        if (ultc.length > 0) {
-          let fecha = ultc[0].fecha_cierre;
-          let d = fecha.split('-');
-          this.fechau = fecha
-          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
-          let fechaCierre = new Date(`${d[0]}-${d[1]}-${d[2]}`);
-          fechaCierre.setDate(fechaCierre.getDate() + 2);
-          fechaCierre.setHours(0, 0, 0, 0);
-          this.fechai = fechaCierre;
-          this.fechaf = fechaCierre;
-          this.dias = 1
-        }
-        this.ngxService.stopLoader('load-precierre')
-      },
-      (error) => {
-        console.log(error)
-      }
-    )
+    this.fechaultimo = await this.cierre.getUltimoPrecierre()
+    this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);
+    this.fechaf = this.cierre.getSiguienteDia(this.fechaultimo);    
+    this.dias = 1
+    this.ngxService.stopLoader('load-precierre')
   }
 
   consultarComisiones() {
-
     let dia = parseInt(this.dias.toString())
     this.ngxService.stopLoader('load-precierre')
     this.xAPI.funcion = environment.xApi.CALCULAR_COMISION
@@ -115,14 +89,12 @@ export class ProcesooperacionesComponent implements OnInit {
           this.acum_haber += parseFloat(e.calculo_capital)
         })
         if (this.lstComisiones.length > 0) this.visible = true
-        
+
         let factual = new Date(this.fechau + ' 00:00:00')
         let fcalculo = new Date(this.fechai)
-
         
         if( factual.getTime() >= fcalculo.getTime() ) this.blComprobante = false
 
-      
         this.ngxService.stopLoader('load-precierre')
       },
       (error) => {
@@ -135,9 +107,6 @@ export class ProcesooperacionesComponent implements OnInit {
     this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1
   }
 
-
-
-
   getMoneda(numero: number): string {
     return this.util.ConvertirMoneda(numero);
   }
@@ -145,10 +114,6 @@ export class ProcesooperacionesComponent implements OnInit {
   getCodigo(id): string {
     return "CON-" + this.util.zfill(id, 4)
   }
-
-
-
-
 
   GenerarComprobante() {
     let fecha = this.util.ConvertirFechaDB(this.fechai)
@@ -204,8 +169,6 @@ export class ProcesooperacionesComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        // console.log(data)
-        // this.InsertData(dt, cant)
         this.visible = false
         this.lstComisiones = []
       },

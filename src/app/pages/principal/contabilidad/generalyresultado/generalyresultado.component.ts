@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgbDateParserFormatter } from "@ng-bootstrap/ng-bootstrap";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { UtilService } from "src/app/services/util/util.service";
 import { ToastrService } from 'ngx-toastr';
-import { log } from 'console';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { environment } from 'src/environments/environment';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 
 @Component({
   selector: 'app-generalyresultado',
@@ -61,48 +60,26 @@ export class GeneralyresultadoComponent implements OnInit {
 
   public lstIndex = [] //Cuentas totalizadores de Fideicomiso
 
-  constructor(private apiService: ApiService,
-    private _snackBar: MatSnackBar,
+  constructor(
+    private apiService: ApiService,
     private ngxService: NgxUiLoaderService,
     private toasService: ToastrService,
     private util: UtilService,
+    private _imprimir: ImprimirService,
+    private cierre: CierreService,
     public formatter: NgbDateParserFormatter,
-    private _imprimir: ImprimirService
   ) { }
 
   ngOnInit(): void {
-    
     this.consultarUltimoCierre()
   }
 
-  consultarUltimoCierre() {
+  async consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
-    this.xAPI.parametros = ''
-    this.xAPI.valores = ''
-    // console.log('hola')
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-
-        let ultc = data.Cuerpo
-        if (ultc.length > 0) {
-          let fecha = ultc[0].fecha_cierre;
-          let d = fecha.split('-')
-          let xf = new Date(fecha)
-          xf.setDate(xf.getDate() + 2)
-          this.fechai =  xf
-          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
-          this.fechaUltimoComparacion = d[1] + '/' + d[2] + '/' + d[0]
-        }
-        this.ngxService.stopLoader('load-precierre')
-
-      },
-      (error) => {
-        console.log(error)
-      }
-    )
+    this.fechaultimo = await this.cierre.getUltimoCierre()
+    this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);
+    this.ngxService.stopLoader('load-precierre')
   }
-
 
   ConsultarComprobante() {
     if (this.fechai == undefined) {
@@ -110,7 +87,7 @@ export class GeneralyresultadoComponent implements OnInit {
       return
     }
 
-    const fechaUltimo = new Date(this.fechaUltimoComparacion)
+    const fechaUltimo = new Date(this.fechaultimo)
 
     const fechaUltimoMasUnDia = new Date(fechaUltimo)
     fechaUltimoMasUnDia.setDate(fechaUltimo.getDate() + 1)
@@ -183,24 +160,12 @@ export class GeneralyresultadoComponent implements OnInit {
     ]
   }
 
-  validarCombo() {
-    let fini = this.util.ConvertirFechaHumana(this.fechai)
-    // console.log(fini)
-  }
-
   consultarBalance() {
-
   // Asignar la fecha restada a this.fecha
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
 
     this.xAPI.parametros = `${this.fecha},${this.estatus}`
-    // this.xAPI.parametros = '2024-01-02,2024-01-03,2024-01-01,%'
     this.xAPI.valores = "";
-    
-    console.log(this.xAPI)
-
-    console.log(this.xAPI.parametros);
-    
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
@@ -211,7 +176,6 @@ export class GeneralyresultadoComponent implements OnInit {
         }
         this.csvHead = data.Cabecera;
         this.csvBody = data.Cuerpo
-        console.log(data.Cuerpo)
         this.lstBalance = data.Cuerpo;
         this.HTMLBalance = `
           <table class="asientos" >
@@ -236,11 +200,6 @@ export class GeneralyresultadoComponent implements OnInit {
           }
         });
 
-
-        // this.lstIndex[this.posicion].debe = this.acumuladord;
-        // this.lstIndex[this.posicion].haber = this.acumuladorh;
-        // console.log(this.lstIndex)
-        // console.log(this.acum_saldo_actual, this.total_gastos);
         let result = this.acum_saldo_actual - this.total_gastos;
 
         this.HTMLBalance += ``;
@@ -304,10 +263,6 @@ export class GeneralyresultadoComponent implements OnInit {
         <tr>  
           <td  colspan="5" class="td-general">${this.getTitulosACuentasBalance(e)} </td>
         </tr>`
-        // console.log('imprimiendo valores ', this.acum_saldo_actual, this.calcularacero )
-        // if (this.acum_saldo_actual != 0) this.calcularacero = 1
-        
-     
 
       this.cambio = true;
       this.acumuladord = parseFloat(debe);
@@ -503,26 +458,25 @@ export class GeneralyresultadoComponent implements OnInit {
 
   PrintPage() {
 
-    var ventana = window.open("", "_blank");
-    var localtime = new Date().toLocaleString();
-    var contenido = document.getElementById('DivPrintPage').innerHTML
+    let ventana = window.open("", "_blank");
+    let contenido = document.getElementById('DivPrintPage').innerHTML
     ventana.document.write(contenido)
 
-    ventana.document.head.innerHTML = ` <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Gestion de Documentos</title>
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    
-    <style type="text/css">
-        @media print {
-            body {
-                  margin: 0px;
-                  font-family: Calibri;
-              }
-           
-        }
-    </style>
-     `;
+    ventana.document.head.innerHTML = ` 
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <title>Gestion de Documentos</title>
+      <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+      
+      <style type="text/css">
+          @media print {
+              body {
+                    margin: 0px;
+                    font-family: Calibri;
+                }
+          }
+      </style>
+    `;
     ventana.print()
     ventana.close()
   }

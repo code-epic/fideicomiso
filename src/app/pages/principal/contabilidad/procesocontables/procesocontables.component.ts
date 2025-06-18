@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -35,7 +36,7 @@ export class ProcesocontablesComponent implements OnInit {
   /**
    * Ultimo cierre
    */
-  public fechaUltimo = ''
+  public fechaultimo = ''
 
   /**
    * Fecha a Precerrar
@@ -93,110 +94,40 @@ export class ProcesocontablesComponent implements OnInit {
   public total_debe : number = 0
   public total_haber : number = 0
 
-  constructor(private apiService: ApiService,
+  constructor(
+    private apiService: ApiService,
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
-    public formatter: NgbDateParserFormatter,) { }
+    private cierre: CierreService,
+    public formatter: NgbDateParserFormatter,
+  ) { }
 
   ngOnInit(): void {
     this.semestral = false
     this.estatus = 'M'
-    // this.consultarUltimoCierre()
-    this.consultarUltimoPreCierre()
+    this.consultarUltimoCierre()
   }
 
-  consultarUltimoPreCierre() {
-    this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
-    this.xAPI.parametros = ''
-    this.xAPI.valores = ''
+  async consultarUltimoCierre() {
+    this.ngxService.startLoader('load-precierre')
+    this.fechaultimo = await this.cierre.getUltimoCierre()
+    this.semestral = this.cierre.getSemestral(this.fechaultimo)
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        let ultc = data.Cuerpo
-        if (ultc.length > 0) {
-          let fecha = ultc[0].fecha_cierre;
-          let d = fecha.split('-');
-          this.fechau = fecha
-          this.fechaUltimo = d[2] + '/' + d[1] + '/' + d[0];
-          let fechaCierre = new Date(`${d[0]}-${d[1]}-${d[2]}`);
-          fechaCierre.setDate(fechaCierre.getDate() + 2);
-          fechaCierre.setHours(0, 0, 0, 0);
-          this.fechai = fechaCierre;   
-          this.fechaf = fechaCierre;
-          this.dias = 1
-        }
-
-        if (this.fechaUltimo == "30/06/2024" || this.fechaUltimo == "31/12/2024" || this.fechaUltimo == "30/06/2025") {
-          
-          let fecha = ultc[0].fecha_cierre;
-          let d = fecha.split('-');
-          this.fechau = fecha
-          this.fechaUltimo = d[2] + '/' + d[1] + '/' + d[0];
-          let fechaCierre = new Date(`${d[0]}-${d[1]}-${d[2]}`);
-          fechaCierre.setDate(fechaCierre.getDate() + 1);
-          fechaCierre.setHours(0, 0, 0, 0);
-          this.fechai = fechaCierre;   
-          this.fechaf = fechaCierre;
-
-          this.ValidarPreCierreSemestral(false, ultc)
-        }
-
-        this.ngxService.stopLoader('load-precierre')
-      },
-      (error) => {
-        console.error(error)
+    if(this.semestral){
+      this.fechai = this.cierre.getSiguienteDia(this.fechaultimo, 1);
+      this.ValidarPreCierreSemestral(false)
+      if (this.yaProcesadoCierreSemestral) {
+        this.semestral = true;
+        this.estatus = 'S'
       }
-    )
-  }
-
-  consultarUltimoCierre(): any {
+    }else{
+      this.semestral = false
+      this.estatus = 'M'
+      this.fechai = this.cierre.getSiguienteDia(this.fechaultimo)
+    }
+    this.fechaf = this.fechai
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
-    this.xAPI.parametros = ''
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-
-        let ultc = data.Cuerpo
-        if (ultc.length > 0) {
-          let fecha = ultc[0].fecha_cierre;
-          this.fechauc = fecha
-          let d = fecha.split('-');
-          let fechaUltimo = d[2] + '/' + d[1] + '/' + d[0];
-          let fechaCierre = new Date(`${d[0]}-${d[1]}-${d[2]}`);
-          fechaCierre.setDate(fechaCierre.getDate() + 2);
-          fechaCierre.setHours(0, 0, 0, 0);          
-
-          if ( fechaUltimo == "30/06/2024" || fechaUltimo == "31/12/2024" || fechaUltimo == "30/06/2025" || fechaUltimo == "31/12/2025" ) {                                    
-            console.log('ya procesado');
-            if (this.yaProcesadoCierreSemestral) {
-              console.log("aqui");
-              this.semestral = true;
-              this.estatus = 'S'
-            }
-          }else{
-            if(!this.yaProcesadoCierreSemestral){
-              let fecha = ultc[0].fecha_cierre;
-              let d = fecha.split('-');
-              let aux = new Date(`${d[0]}-${d[1]}-${d[2]}`);
-              aux.setDate(aux.getDate() + 2);
-              aux.setHours(0, 0, 0, 0);
-              this.fechai = aux;   
-              this.fechaf = aux;
-            }
-            return false
-          }
-        }        
-        this.ngxService.stopLoader('load-precierre')
-
-      },
-      (error) => {
-        console.log(error)
-      }
-    )
-    return false
   }
 
   CalcularDias(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -204,7 +135,6 @@ export class ProcesocontablesComponent implements OnInit {
   }
 
   ConsultarComprobante() {
-
     if (this.fechai == undefined || this.fechaf == undefined) {
       this._snackBar.open('Recuerde seleccionar un rango de fechas', 'OK')
       return
@@ -214,16 +144,13 @@ export class ProcesocontablesComponent implements OnInit {
     this.total_haber = 0
 
     let fini = this.util.ConvertirFechaDB(this.fechai)
-    let ffin = this.util.ConvertirFechaDB(this.fechaf)
     this.ELEMENT_DATA = []
     this.ngxService.startLoader('load-cont')
     this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_COMPROBANTE
-    // this.xAPI.parametros = fini + ',' + ffin + ',' + this.estatus
     this.xAPI.valores = ''
     if(this.estatus == "S") fini = this.fechau
     this.xAPI.parametros = fini + ',' + this.estatus
 
-    //console.error(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.lstMovimientos = data.Cuerpo
@@ -270,7 +197,7 @@ export class ProcesocontablesComponent implements OnInit {
 
         this.semestral = false;
         this.estatus = 'M';
-        this.consultarUltimoPreCierre()
+        this.consultarUltimoCierre()
         this.ngxService.stopLoader('load-precierre')
         this.lstMovimientos = []
         this.blista = false
@@ -414,7 +341,7 @@ export class ProcesocontablesComponent implements OnInit {
           let ultimoPrecierreDate = new Date(ultimoPrecierre).toISOString();
           let fechaAPrecerrarDate = new Date(fechaAPrecerrar).toISOString();
           
-          const fechaUltimoAux = new Date(this.fechaUltimo.split('/').reverse().join('-'));
+          const fechaUltimoAux = new Date(this.fechaultimo.split('/').reverse().join('-'));
           fechaUltimoAux.setDate(fechaUltimoAux.getDate() + 2); 
           const fechaUltimoUTCAux = fechaUltimoAux.toISOString(); 
 
@@ -426,7 +353,7 @@ export class ProcesocontablesComponent implements OnInit {
               "error",
               "Cierre"
             )
-            this.consultarUltimoPreCierre()
+            this.consultarUltimoCierre()
             this.ngxService.stopLoader('load-precierre')
           }else if(fechaAPrecerrarDate >= fechaUltimoUTCAux){
           
@@ -436,7 +363,7 @@ export class ProcesocontablesComponent implements OnInit {
               "error",
               "Cierre"
             )
-            this.consultarUltimoPreCierre()
+            this.consultarUltimoCierre()
             this.ngxService.stopLoader('load-precierre')
 
           }else if(fechaAPrecerrarDate == ultimoPrecierreDate){
@@ -453,8 +380,6 @@ export class ProcesocontablesComponent implements OnInit {
             }).then((result) => {
               if (result.isConfirmed) {
                 this.eliminarPrecierre(fechaAPrecerrarDate)
-              }else{
-                console.log("CANCELADO");
               }
             })
           }else{
@@ -480,7 +405,6 @@ export class ProcesocontablesComponent implements OnInit {
     const mes = String(fecha.getUTCMonth() + 1).padStart(2, '0'); // Meses empiezan en 0
     const dia = String(fecha.getUTCDate()).padStart(2, '0');
     const fechaTransformada = `${año}-${mes}-${dia}`;
-    console.log(fechaTransformada); // Resultado: 2025-01-17
     
     let xApi: IAPICore = {
       funcion: 'FID_DPreCierre',
@@ -489,8 +413,6 @@ export class ProcesocontablesComponent implements OnInit {
 
     this.apiService.Ejecutar(xApi).subscribe(
       data => {
-        console.log("Eliminado correctamente");
-
         this.bauxiliar = false
         this.blista = false
         this.GenerarPrecierre()
@@ -512,10 +434,7 @@ export class ProcesocontablesComponent implements OnInit {
       data => {
         if (data.Cuerpo != undefined ){
           let fentrada = data.Cuerpo[0].fecha;
-          let finicio = this.util.ConvertirFechaDB(this.fechai);
-          console.log('fentrada', fentrada);
-          console.log('finicio', finicio);
-          
+          let finicio = this.util.ConvertirFechaDB(this.fechai);          
           
           if (fentrada == finicio){            
             if (x) {

@@ -15,6 +15,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { environment } from 'src/environments/environment';
 import { EstadocuentaComponent } from './estadocuenta/estadocuenta.component';
 import Swal from 'sweetalert2';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 
 @Component({
   selector: 'app-contratos',
@@ -219,7 +220,8 @@ export class ContratosComponent implements OnInit {
     private util: UtilService,
     public dialog: MatDialog,
     public formatter: NgbDateParserFormatter,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cierre: CierreService
   ) { }
 
   ngOnInit(): void {
@@ -301,24 +303,8 @@ export class ContratosComponent implements OnInit {
     });
   }
 
-  consultarUltimoCierre() {
-    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
-    this.xAPI.parametros = ''
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        let ultc = data.Cuerpo
-        if (ultc.length > 0) {
-          let fecha = ultc[0].fecha_cierre;
-          let d = fecha.split('-');
-          this.fechaultimo = d[0] + '-' + d[1] + '-' + d[2];
-          this.fechaUltimoComparacion = d;
-        }
-      },
-      (error) => {
-        console.error(error)
-      }
-    )
+  async consultarUltimoCierre() {
+    this.fechaultimo = await this.cierre.getUltimoCierre()
   }
 
   ConsultarSaldos(){

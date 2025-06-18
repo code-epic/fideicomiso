@@ -25,7 +25,7 @@
     <div class="col-md-2">
       <mat-form-field appearance="outline">
         <mat-label>Fecha valor</mat-label>
-        <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai" (blur)="validarCombo()">
+        <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai">
         <mat-datepicker #ypicker></mat-datepicker>
         <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
       </mat-form-field>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
@@ -34,28 +35,28 @@ export class ComprobacionComponent implements OnInit {
   public HTMLBalance = "";
   public HTMLComprobacion = "";
   public HTMLResultados = "";
-  public fecha : string = ''
-  public fdesde : string = '2023-12-01'
-  public fhasta : string = '2023-12-31'
-  public fecha_vienen : string = '2023-11-30'
+  public fecha: string = ''
+  public fdesde: string = '2023-12-01'
+  public fhasta: string = '2023-12-31'
+  public fecha_vienen: string = '2023-11-30'
   public plan = '%'
 
   printv: boolean = false
 
   public lstFecha = [
-    {id : 0, value: '2023-12-01,2023-12-31,2023-11-30', nombre: 'DICIEMBRE - 2023'},
-    {id : 1, value:  '2024-01-01,2024-01-31,2023-12-31', nombre: 'ENERO - 2024'},
-    {id : 2, value:  '2024-02-01,2024-02-28,2024-01-31', nombre: 'FEBRERO - 2024'},
-    {id : 3, value:  '2024-03-01,2024-03-31,2024-02-28', nombre: 'MARZO - 2024'},
-    {id : 4, value:  '2024-04-01,2024-04-30,2024-03-31', nombre: 'ABRIL - 2024'},
-    {id : 5, value:  '2024-05-01,2024-05-31,2024-04-30', nombre: 'MAYO - 2024'},
-    {id : 6, value:  '2024-06-01,2024-06-30,2024-05-31', nombre: 'JUNIO - 2024'},
-    {id : 7, value:  '2024-07-01,2024-07-31,2024-06-30', nombre: 'JULIO - 2024'},
-    {id : 9, value:  '2024-08-01,2024-08-31,2024-07-31', nombre: 'AGOSTO - 2024'},
-    {id : 10, value:  '2024-09-01,2024-09-30,2024-08-31', nombre: 'SEPTIEMBRE - 2024'},
-    {id : 11, value:  '2024-10-01,2024-10-31,2024-09-30', nombre: '0CTUBRE - 2024'},
-    {id : 12, value:  '2024-11-01,2024-11-30,2024-10-31', nombre: 'NOVIEMBRE - 2024'},
-    {id : 13, value:  '2024-12-01,2024-12-31,2024-11-30', nombre: 'DICIEMBRE - 2024'},
+    { id: 0, value: '2023-12-01,2023-12-31,2023-11-30', nombre: 'DICIEMBRE - 2023' },
+    { id: 1, value: '2024-01-01,2024-01-31,2023-12-31', nombre: 'ENERO - 2024' },
+    { id: 2, value: '2024-02-01,2024-02-28,2024-01-31', nombre: 'FEBRERO - 2024' },
+    { id: 3, value: '2024-03-01,2024-03-31,2024-02-28', nombre: 'MARZO - 2024' },
+    { id: 4, value: '2024-04-01,2024-04-30,2024-03-31', nombre: 'ABRIL - 2024' },
+    { id: 5, value: '2024-05-01,2024-05-31,2024-04-30', nombre: 'MAYO - 2024' },
+    { id: 6, value: '2024-06-01,2024-06-30,2024-05-31', nombre: 'JUNIO - 2024' },
+    { id: 7, value: '2024-07-01,2024-07-31,2024-06-30', nombre: 'JULIO - 2024' },
+    { id: 9, value: '2024-08-01,2024-08-31,2024-07-31', nombre: 'AGOSTO - 2024' },
+    { id: 10, value: '2024-09-01,2024-09-30,2024-08-31', nombre: 'SEPTIEMBRE - 2024' },
+    { id: 11, value: '2024-10-01,2024-10-31,2024-09-30', nombre: '0CTUBRE - 2024' },
+    { id: 12, value: '2024-11-01,2024-11-30,2024-10-31', nombre: 'NOVIEMBRE - 2024' },
+    { id: 13, value: '2024-12-01,2024-12-31,2024-11-30', nombre: 'DICIEMBRE - 2024' },
   ]
 
   public lstIndex = [
@@ -111,53 +112,27 @@ export class ComprobacionComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
     public formatter: NgbDateParserFormatter,
-    private _imprimir: ImprimirService
+    private _imprimir: ImprimirService,
+    private cierre: CierreService
   ) { }
 
   ngOnInit(): void {
     this.consultarUltimoCierre()
-    
+
   }
 
-  consultarUltimoCierre() {
+  async consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
-    this.xAPI.parametros = ''
-    this.xAPI.valores = ''
-    // console.log('hola')
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-
-        let ultc = data.Cuerpo
-        if (ultc.length > 0) {
-          let fecha = ultc[0].fecha_cierre;
-          let d = fecha.split('-');
-          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0];
-        }
-        this.ngxService.stopLoader('load-precierre')
-
-      },
-      (error) => {
-        console.log(error)
-      }
-    )
+    this.fechaultimo = await this.cierre.getUltimoCierre()
+    this.ngxService.stopLoader('load-precierre')
   }
-
-
-
-
-
 
   ConsultarComprobacion() {
     this.ngxService.startLoader('load-cont')
     console.log(this.mes)
-   
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
-    // this.xAPI.parametros = "2023-08-01,2023-08-31,2023-07-31";
     this.xAPI.parametros = `${this.lstFecha[this.mes].value},S`
-    // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'
     this.xAPI.valores = "";
-    console.log(this.xAPI)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
@@ -193,46 +168,29 @@ export class ComprobacionComponent implements OnInit {
         this.HTMLComprobacion += `
             <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
               <th >${this.lstIndex[this.posicion].nombre} </th>
-              <th class="text-right">${
-                this.getMoneda(this.acum_saldo_inicial) == "0"
-                  ? "-"
-                  : this.getMoneda(this.acum_saldo_inicial)
-              }</th>
-              <th class="text-right">${
-                this.getMoneda(this.acumuladord) == "0"
-                  ? "-"
-                  : this.getMoneda(this.acumuladord)
-              }</th>
-              <th class="text-right">${
-                this.getMoneda(this.acumuladorh) == "0"
-                  ? "-"
-                  : this.getMoneda(this.acumuladorh)
-              }</th>
-              <th class="text-right">${
-                this.getMoneda(this.acum_saldo_actual) == "0"
-                  ? "-"
-                  : this.getMoneda(this.acum_saldo_actual)
-              }</th>
+              <th class="text-right">${this.getMoneda(this.acum_saldo_inicial) == "0"
+            ? "-"
+            : this.getMoneda(this.acum_saldo_inicial)
+          }</th>
+              <th class="text-right">${this.getMoneda(this.acumuladord) == "0"
+            ? "-"
+            : this.getMoneda(this.acumuladord)
+          }</th>
+              <th class="text-right">${this.getMoneda(this.acumuladorh) == "0"
+            ? "-"
+            : this.getMoneda(this.acumuladorh)
+          }</th>
+              <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+            ? "-"
+            : this.getMoneda(this.acum_saldo_actual)
+          }</th>
             </tr>
             
           </tbody>
         </table>
           `;
-
-
-          // <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-          //     <td colspan="5"> &nbsp; </td>
-          //   </tr>
-          //   <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-          //     <th colspan=5 class="text-center total" > RESULTADO NETO </th>
-          //   </tr>
-          //   <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">  
-          //     <th colspan=5 class="text-center total"> 
-          //       Bs. ${this.getMoneda(result)}
-          //     </th>
-          //   </tr>
-          this.printv = true,
-        this.ngxService.stopLoader('load-cont')
+        this.printv = true,
+          this.ngxService.stopLoader('load-cont')
       },
       (error) => {
         console.log(error);
@@ -261,28 +219,23 @@ export class ComprobacionComponent implements OnInit {
       titulo = `
       <tr>  
           <td>${txt + ". " + e.descripcion.toUpperCase()}</td>
-          <td class="text-right">${
-            this.getMoneda(saldo_inicial) == "0"
-              ? "-"
-              : this.getMoneda(saldo_inicial)
-          }</td>
-          <td class="text-right">${
-            this.getMoneda(debe) == "0" ? "-" : this.getMoneda(debe)
-          }</td>
-          <td class="text-right">${
-            this.getMoneda(haber) == "0" ? "-" : this.getMoneda(haber)
-          }</td>
-          <td class="text-right">${
-            this.getMoneda(saldo_actual) == "0"
-              ? "-"
-              : this.getMoneda(saldo_actual)
-          }</td>
+          <td class="text-right">${this.getMoneda(saldo_inicial) == "0"
+          ? "-"
+          : this.getMoneda(saldo_inicial)
+        }</td>
+          <td class="text-right">${this.getMoneda(debe) == "0" ? "-" : this.getMoneda(debe)
+        }</td>
+          <td class="text-right">${this.getMoneda(haber) == "0" ? "-" : this.getMoneda(haber)
+        }</td>
+          <td class="text-right">${this.getMoneda(saldo_actual) == "0"
+          ? "-"
+          : this.getMoneda(saldo_actual)
+        }</td>
         </tr>`;
     } else {
       titulo = `
       <tr>  
-        <td colspan="5" style="background-color: #eeeee4;">${
-          e.codigo_padre + ". " + e.descripcion.toUpperCase()
+        <td colspan="5" style="background-color: #eeeee4;">${e.codigo_padre + ". " + e.descripcion.toUpperCase()
         }</td>
       </tr>`;
     }
@@ -309,26 +262,22 @@ export class ComprobacionComponent implements OnInit {
       this.HTMLComprobacion += `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th >${this.lstIndex[this.posicion].nombre} </th>
-          <th class="text-right">${
-            this.getMoneda(this.acum_saldo_inicial) == "0"
-              ? "-"
-              : this.getMoneda(this.acum_saldo_inicial)
-          }</th>
-          <th class="text-right">${
-            this.getMoneda(this.acumuladord) == "0"
-              ? "-"
-              : this.getMoneda(this.acumuladord)
-          }</th>
-          <th class="text-right">${
-            this.getMoneda(this.acumuladorh) == "0"
-              ? "-"
-              : this.getMoneda(this.acumuladorh)
-          }</th>
-          <th class="text-right">${
-            this.getMoneda(this.acum_saldo_actual) == "0"
-              ? "-"
-              : this.getMoneda(this.acum_saldo_actual)
-          }</th>
+          <th class="text-right">${this.getMoneda(this.acum_saldo_inicial) == "0"
+          ? "-"
+          : this.getMoneda(this.acum_saldo_inicial)
+        }</th>
+          <th class="text-right">${this.getMoneda(this.acumuladord) == "0"
+          ? "-"
+          : this.getMoneda(this.acumuladord)
+        }</th>
+          <th class="text-right">${this.getMoneda(this.acumuladorh) == "0"
+          ? "-"
+          : this.getMoneda(this.acumuladorh)
+        }</th>
+          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          ? "-"
+          : this.getMoneda(this.acum_saldo_actual)
+        }</th>
         </tr>
         <tr>  
           <td  colspan="5">${this.getTitulosACuentas(e)} </td>
@@ -349,7 +298,7 @@ export class ComprobacionComponent implements OnInit {
     return this.util.ConvertirMoneda(numero);
   }
 
-  imprimir(){
+  imprimir() {
     const p = document.getElementById("DivPrintPage").innerHTML;
     this._imprimir.createHtmlSectionForPrint(p);
   }
