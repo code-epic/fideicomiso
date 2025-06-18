@@ -46,7 +46,7 @@ export const environment = {
     // Contabilidad y comprobantes
     CONSULTAR_COMPROBANTES: 'FID_CComprobantes',
     INSERTAR_COMPROBANTE: 'FID_IComprobante',
-    EDITAR_COMPROBANTE: 'FID_EComprobante',
+    ELIMINAR_COMPROBANTE: 'FID_EComprobante',
     INSERTAR_DETALLE_COMPROBANTE: 'FID_IDetalleComprobante',
     CONSULTAR_MOVIMIENTOS_COMPROBANTE: 'FID_CMovimientosComprobante',
     INSERTAR_MOVIMIVIENTOS_COMPROBANTES: 'FID_IMovimientosComprobantes',

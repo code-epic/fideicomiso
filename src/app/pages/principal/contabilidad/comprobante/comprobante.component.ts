@@ -109,6 +109,8 @@ export class ComprobanteComponent implements OnInit {
     llave: 'M'
   };
 
+  private auxComprobante: string
+
   public IDComprobante: FID_IDetalleComprobante = {
     comprobante: 0,
     cuenta: 0,
@@ -258,8 +260,9 @@ export class ComprobanteComponent implements OnInit {
 
   Buscar(e) {}
 
-  editar(e, x = true) {
+  editar(e: any, x: boolean = true) {
     this.Comprobante = e
+    this.auxComprobante = e.id
     this.fechaejercicio =  new FormControl(new Date(e.fecha_ejercicio))
     this.ELEMENT_DATA = JSON.parse( e.definicion).map(ev => {
       ev.fecha = e.fecha_operacion
@@ -525,7 +528,7 @@ export class ComprobanteComponent implements OnInit {
       allowEscapeKey: true,
     }).then((result) => {
       if (result.isConfirmed) {
-        this.Acepar()
+        this.Aceptar()
       }
     })
 
@@ -539,7 +542,11 @@ export class ComprobanteComponent implements OnInit {
     this.Comprobante.fecha_ejercicio = this.util.ConvertirFechaDB(this.formComprobante.get('fechaEjercicio').value)
   }
 
-  Acepar(){
+  Aceptar(){
+    if(this.mostrarImprimir){
+      this.deleteData(this.auxComprobante)
+    }
+
     this.getComprobante();
     this.ngxService.startLoader('load-cont');
     this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
@@ -623,23 +630,27 @@ export class ComprobanteComponent implements OnInit {
 
   deleteData(id) {
     this.ngxService.startLoader('load-cont');
-    this.xAPI.funcion = environment.xApi.EDITAR_COMPROBANTE
+    this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTE
     this.xAPI.parametros = `${id}`
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        this.toastrService.success(
+        if(!this.mostrarImprimir){
+          this.toastrService.success(
           'Se ha eliminado comprobante con exito',
           `Fideicomiso`
         );
+        }
         this.ngxService.stopLoader('load-cont')
         this.ListarComprobantes()
       },
       err => {
-        this.toastrService.error(
+        if(!this.mostrarImprimir){
+          this.toastrService.error(
           'No se ha logrado eliminar el comprobante',
           `Fideicomiso`
         );
+        }
         this.ngxService.stopLoader('load-cont');
       }
     )
