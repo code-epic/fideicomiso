@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { ApiService } from 'src/app/services/apicore/api.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
-import { environment } from 'src/environments/environment';
 
 declare interface RouteInfo {
     path: string;
@@ -29,7 +29,8 @@ export class SidebarComponent implements OnInit {
     private router: Router, 
     private mesageService : MensajeService,
     private loginService: LoginService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private cierre: CierreService
   ) { }
 
   async ngOnInit() {
@@ -63,57 +64,13 @@ export class SidebarComponent implements OnInit {
       this.isCollapsed = true;
     });
 
-    this.consultarPreCierre()
-    this.consultarCierre()
+    this.cierre.actualizarCierres()
+    this.getCierres()
   }
 
-  consultarPreCierre() {
-    let xAPI: IAPICore = {
-      funcion: '',
-      parametros: '',
-      valores: ''
-    }
-
-    xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_PRECIERRE
-    xAPI.parametros = ''
-    xAPI.valores = ''
-
-    this.apiService.Ejecutar(xAPI).subscribe(
-      data => {
-        if (data.Cuerpo != undefined ){
-          this.ultimoPreCierre = data.Cuerpo[0].fecha          
-        }
-      },
-      err => {
-        console.error(err);
-      }
-    )
-  }
-
-  consultarCierre() {
-    let xAPI: IAPICore = {
-      funcion: '',
-      parametros: '',
-      valores: ''
-    }
-    xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
-    xAPI.parametros = ''
-    xAPI.valores = ''
-
-    this.apiService.Ejecutar(xAPI).subscribe(
-      async data => {
-
-        let ultc = data.Cuerpo
-        if (ultc.length > 0) {
-          let fecha = ultc[0].fecha_cierre;
-          let d = fecha.split('-');
-          this.ultimoCierre = d[0] + '-' + d[1] + '-' + d[2];          
-        }
-      },
-      (error) => {
-        console.log(error)
-      }
-    )
+  getCierres() {
+    this.cierre.ultimoCierre$.subscribe(cierre => this.ultimoCierre = cierre);
+    this.cierre.ultimoPreCierre$.subscribe(preCierre => this.ultimoPreCierre = preCierre);
   }
 
   msj(pagina : string){
