@@ -71,7 +71,7 @@
                         </div>
                       </div>
                     </mat-list>
-                    <mat-list *ngFor="let e of lst; let i=index "
+                    <mat-list *ngFor="let e of dataSourceLista.data | slice: getStartIndex() : getEndIndex()"
                       style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                       <div class="row">
                         <div class="col-md-2 texto-detalle auto-ajuste">
@@ -105,7 +105,18 @@
                     </mat-list>
                   </mat-selection-list>
                   <br><br>
-
+                  <div class="row">
+                    <div class="col-md-12">
+                      <mat-paginator [length]="totalRegistros" 
+                                     [pageSize]="pageSize" 
+                                     [pageSizeOptions]="[5, 10, 25, 100]"
+                                     (page)="cambiarPagina($event)"
+                                     showFirstLastButtons
+                                     aria-label="Seleccione página de comprobantes"
+                                     style="background: transparent;">
+                      </mat-paginator>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
