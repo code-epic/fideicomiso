@@ -46,6 +46,8 @@ export const environment = {
     INSERTAR_DETALLE_COMPROBANTE: 'FID_IDetalleComprobante',
     CONSULTAR_MOVIMIENTOS_COMPROBANTE: 'FID_CMovimientosComprobante',
     INSERTAR_MOVIMIVIENTOS_COMPROBANTES: 'FID_IMovimientosComprobantes',
+    PAGINAR_COMPROBANTES: 'FID_CComprobantesPaginado',
+    CONTAR_COMPROBANTES: 'FID_CCantidadComprobantes',
 
     // Cuentas contables
     CONSULTAR_CUENTAS: 'FID_CCuentas',

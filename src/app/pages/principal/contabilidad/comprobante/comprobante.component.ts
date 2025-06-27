@@ -31,7 +31,6 @@ export class ComprobanteComponent implements OnInit {
   public dataSourceLista = new MatTableDataSource<any>();
   public pageSize = 10;
   public pageIndex = 0;
-  public totalRegistros = 0;
 
   public ELEMENT_DATA: IComprobante[] = [];
   displayedColumns: string[] = [
@@ -90,6 +89,22 @@ export class ComprobanteComponent implements OnInit {
     },
     { key: "MIXTO", val: [{ key: "0", val: "JURIDICO" }] },
   ];
+
+  public lstMeses = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ].map((nombre, index) => ({
+    nombre: nombre,
+    valor: index + 1
+  }));
+
+  public anios: number[] = [
+    2024,
+    2025,
+    2026,
+  ]
+
+  
 
   public lstTipoFid = [];
 
@@ -152,6 +167,11 @@ export class ComprobanteComponent implements OnInit {
   public lstCuenta = [];
   public mostrarImprimir = false;
 
+  public mes: number = null
+  public anio: number = null
+
+  public total: number = null
+
   public cuenta: string = "";
   myCuentas = new FormControl("");
   Cuentas: string[] = [];
@@ -168,11 +188,39 @@ export class ComprobanteComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.mes = this.getMes()
+    this.anio = this.getAnio()
+
     //this.fechacreacion.setValue(this.Contrato.Saldos.fechacreacion)
     this.CargarFormulario();
     this.cargarContenido();
     this.GenerarSemillero();
-    this.ListarComprobantes();
+    this.cargarComprobantes()
+  }
+
+  cargarComprobantes(){
+    let xAPI = {
+      funcion: environment.xApi.CONTAR_COMPROBANTES,
+      parametros: `${this.mes}, ${this.anio}`
+    }
+
+     this.apiService.Ejecutar(xAPI).subscribe(
+      (data) => {
+        this.total = parseInt(data.Cuerpo[0].total)
+        this.ListarComprobantes();
+      },
+      (err) => {
+        console.error(err)
+      }
+    );
+  }
+
+  private getMes(): number{
+    return new Date().getMonth() + 1;
+  }
+
+  private getAnio(): number{
+     return new Date().getFullYear();
   }
 
   CargarFormulario() {
@@ -218,18 +266,16 @@ export class ComprobanteComponent implements OnInit {
   }
 
   ListarComprobantes() {
-    this.xAPI.funcion = environment.xApi.CONSULTAR_COMPROBANTES;
-    this.xAPI.parametros = "";
+    this.lst = []
+
+    this.xAPI.funcion = environment.xApi.PAGINAR_COMPROBANTES;
+    this.xAPI.parametros = `${this.mes}, ${this.anio}, ${this.pageIndex * 10}`;
     this.xAPI.valores = "";
+    console.log(this.xAPI)
     this.ngxService.startLoader("load-cont");
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.lst = data.Cuerpo;
-        this.dataSourceLista.data = this.lst;
-        this.totalRegistros = this.lst.length;
-        setTimeout(() => {
-          this.dataSourceLista.paginator = this.paginatorLista;
-        });
         this.ngxService.stopLoader("load-cont");
       },
       (err) => {
@@ -242,19 +288,7 @@ export class ComprobanteComponent implements OnInit {
   cambiarPagina(event: PageEvent) {
     this.pageSize = event.pageSize;
     this.pageIndex = event.pageIndex;
-  }
-
-  getStartIndex(): number {
-    return (
-      (this.paginatorLista?.pageIndex || 0) *
-      (this.paginatorLista?.pageSize || this.pageSize)
-    );
-  }
-
-  getEndIndex(): number {
-    return (
-      this.getStartIndex() + (this.paginatorLista?.pageSize || this.pageSize)
-    );
+    this.ListarComprobantes()
   }
 
   cargarDatos(datos: any[]) {
@@ -263,17 +297,6 @@ export class ComprobanteComponent implements OnInit {
       this.paginatorLista.firstPage();
     }
   }
-
-  // Añade esta función para obtener los datos paginados
-  // getDataForPage(
-  //   dataSource: MatTableDataSource<any>,
-  //   paginator: MatPaginator
-  // ): any[] {
-  //   if (!dataSource || !paginator) return [];
-  //   const startIndex = paginator.pageIndex * paginator.pageSize;
-  //   const endIndex = startIndex + paginator.pageSize;
-  //   return dataSource.data.slice(startIndex, endIndex);
-  // }
 
   // Modifica tu ngAfterViewInit si existe, o créalo
   ngAfterViewInit() {
