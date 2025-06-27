@@ -37,11 +37,7 @@ export class TablaComponent implements OnInit {
 
   }
 
-  ngOnInit(): void {
-    this.msj.contenido$.subscribe(e => {
-      console.log(e)
-    })
-  }
+  ngOnInit(): void { }
 
 
   async ngOnChanges() {
@@ -72,14 +68,12 @@ export class TablaComponent implements OnInit {
     this.xAPI.valores = JSON.stringify(contenido)
     // this.apiService.Ejecutar(this.xAPI).subscribe(
     //   (data) => {
-    //     console.log(data)
     //     this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'Data')
     //   },
     //   (err) => {
     //     console.error(err)
     //   }
     // )
-    console.log(this.API)
 
     this.nombre = ''
     this.observacion = ''

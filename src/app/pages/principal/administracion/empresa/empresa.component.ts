@@ -79,11 +79,10 @@ export class EmpresaComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         if (data != null && data.msj == undefined) this.lstEmpresa = data
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )
@@ -96,7 +95,7 @@ export class EmpresaComponent implements OnInit {
         this.lstPaises = data.Cuerpo
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -108,11 +107,10 @@ export class EmpresaComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        //console.log(data)
         this.lstEstados = data.Cuerpo
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -124,11 +122,10 @@ export class EmpresaComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        //console.log(data)
         this.lstCiudades = data
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -148,7 +145,7 @@ export class EmpresaComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )
@@ -200,16 +197,14 @@ export class EmpresaComponent implements OnInit {
       "driver": "MDBFIDE",
       "upsert": false
     }
-    console.log(obj)
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
-       
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
         this.ngxService.stopLoader('load-inver')
         this.Limpiar()
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }

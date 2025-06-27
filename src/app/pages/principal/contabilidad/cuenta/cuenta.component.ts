@@ -83,7 +83,6 @@ export class CuentaComponent implements OnInit {
     this.Cuenta = e;
     this.porta_insert = "";
     this.porta_search = "none";
-    console.log(e)
   }
 
   Consultar() {
@@ -108,7 +107,6 @@ export class CuentaComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data);
         if (data.Cuerpo != undefined) {
           if ( data.Cuerpo.length > 0) {
             this.Cuenta =  data.Cuerpo[0] ;
@@ -130,7 +128,7 @@ export class CuentaComponent implements OnInit {
 
       },
       (error) => {
-        console.log(error);
+        console.error(error);
         this.Limpiar();
       }
     );
@@ -223,7 +221,6 @@ export class CuentaComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data);
         this.apiService.Mensaje(
           "Proceso exitoso",
           "Felicitaciones",
@@ -235,7 +232,7 @@ export class CuentaComponent implements OnInit {
         this.txtCuenta = "";
       },
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
   }
@@ -336,9 +333,7 @@ export class CuentaComponent implements OnInit {
     }
     return nat;
   }
-  eliminar(e){
-    console.log(e)
-    
+  eliminar(e){    
     Swal.fire({
       title: `Va a eliminar`,
       text: e.descripcion.toUpperCase(),
@@ -368,7 +363,6 @@ export class CuentaComponent implements OnInit {
         )
       
       }else {
-        console.log("NO")
       }
     })
   }

@@ -54,9 +54,7 @@ export class FileComponent implements OnInit {
   }
 
 
-  async ngOnChanges(){
-    console.log(this.ACCION)
-  }
+  async ngOnChanges(){ }
 
 
 }

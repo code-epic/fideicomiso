@@ -135,7 +135,6 @@ export class AuxiliarComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
         this.blista = true
-        console.log(data)
         this.lstMovimientos = data.Cuerpo
         this.ngxService.stopLoader('load-precierre')
       },

@@ -64,11 +64,10 @@ export class PortafolioComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
 
       (data) => {
-        console.log(data)
         if (data != null && data.msj == undefined) this.lstPortafolio = data.Cuerpo
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )
@@ -90,7 +89,7 @@ export class PortafolioComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )
@@ -142,13 +141,12 @@ export class PortafolioComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
         this.ngxService.stopLoader('load-inver')
         this.Limpiar()
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }

@@ -42,20 +42,12 @@ export class PerfilComponent implements OnInit {
       width: '500px',
       data: {name: this.name, animal: this.animal},
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      this.animal = result;
-    });
   }
 
  
 
 
   ngOnInit(): void {
-
-    console.log(this.loginService.Usuario)
-
     this.nombrecompleto = this.loginService.Usuario.nombre
     this.nombre = this.loginService.Usuario.usuario
     this.perfil = this.loginService.Usuario.Perfil.descripcion

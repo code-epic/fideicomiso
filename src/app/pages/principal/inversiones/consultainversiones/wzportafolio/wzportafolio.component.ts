@@ -176,7 +176,7 @@ export class WzportafolioComponent implements OnInit {
         this.lstDataPortafolio = data.Cuerpo
       },
       (error) => {
-        console.log(error)
+        console.error(error)
 
       }
     )
@@ -191,7 +191,6 @@ export class WzportafolioComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {        
-        console.log(data)
         this.monto = data.Cuerpo .reduce((sum, e) => sum + parseFloat(e.monto), 0)
         this.monto_general = data.Cuerpo .reduce((sum, e) => sum + parseFloat(e.monto_general), 0)
       },

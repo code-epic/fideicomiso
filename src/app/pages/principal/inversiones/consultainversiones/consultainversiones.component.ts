@@ -153,7 +153,7 @@ export class ConsultainversionesComponent implements OnInit {
         );
       },
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
   }
@@ -167,11 +167,6 @@ export class ConsultainversionesComponent implements OnInit {
     const dialogRef = this.dialog.open(this.wzportafolio, {
       width: '850px',
       data: {},
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      // this.animal = result;
     });
   }
 
@@ -220,7 +215,7 @@ export class ConsultainversionesComponent implements OnInit {
         );
       },
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
   }
@@ -249,7 +244,7 @@ export class ConsultainversionesComponent implements OnInit {
         );
       },
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
   }
@@ -317,7 +312,7 @@ export class ConsultainversionesComponent implements OnInit {
           this.ngxService.stopLoader("load-inver");
       },
       (error) => {
-        console.log(error);
+        console.error(error);
         this.LimpiarInver();
         this.ngxService.stopLoader("load-inver");
       }
@@ -338,7 +333,7 @@ export class ConsultainversionesComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error);
+        console.error(error);
         this.LimpiarInver();
       }
     );
@@ -373,13 +368,11 @@ export class ConsultainversionesComponent implements OnInit {
       this.Inversiones.id_instrumento = -1; // Valor por defecto si no hay selección
     }
 
-    console.log(this.Inversiones);
 
     this.xAPI.funcion = this.Inversiones.identificador == 0 ? environment.xApi.INSERTAR_INVESION : environment.xApi.ACTUALIZAR_INVERSION
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Inversiones)
 
-    console.log(this.Inversiones)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         if (this.Inversiones.identificador > 0 ) {
@@ -391,7 +384,7 @@ export class ConsultainversionesComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }

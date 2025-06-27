@@ -85,7 +85,7 @@ export class AportesComponent implements OnInit {
         this.lstAportes = data
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )
@@ -107,7 +107,7 @@ export class AportesComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )
@@ -134,12 +134,11 @@ export class AportesComponent implements OnInit {
 
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
-        console.log(data)
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'aportes')
         this.ngxService.stopLoader('load-apor')
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -148,11 +147,9 @@ export class AportesComponent implements OnInit {
   ConsultarAfiliado(){
     this.xAPI.funcion = environment.xApi.CONSULTAR_AFILIADO
     this.xAPI.parametros = this.Aporte.cedula
-    console.log(this.xAPI)
     
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         if (data != null) {
           this.Aporte.nombre = data[0].pnombre
           this.Aporte.apellido = data[0].papellido
@@ -177,7 +174,7 @@ export class AportesComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )

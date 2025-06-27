@@ -53,11 +53,6 @@ export class ConfiguracionesComponent implements OnInit {
       width: '850px',
       data: {},
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      // this.animal = result;
-    });
   }
 
   seleccionNavegacion(e){

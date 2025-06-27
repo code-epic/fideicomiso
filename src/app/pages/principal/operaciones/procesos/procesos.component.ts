@@ -409,16 +409,14 @@ export class ProcesosComponent implements OnInit {
 
         if (this.lstVencimiento.length > 0) {
           this.GenerarComprobanteVencimiento()
+        }
+        if (this.lstCompra.length > 0) {
+          this.GenerarComprobanteCompra()
         } else {
-          if (this.lstCompra.length > 0) {
-            this.GenerarComprobanteCompra()
-          } else {
             this.ngxService.stopLoader("load-cont")
             this.visible = false;
             this.blProcesar = false;
             this.blComprobante = false;
-          }
-
         }
 
 
@@ -466,7 +464,6 @@ export class ProcesosComponent implements OnInit {
   }
 
   InsertDataVencimiento(dt: any, vencimiento: any) {
-    console.log('vencimiento', vencimiento);
     this.xAPI.funcion = environment.xApi.INSERTAR_VENCIMIENTO_INVERSIONES
     this.xAPI.parametros = dt.msj + "," + this.util.ConvertirFechaDB(this.fechai) + "," + vencimiento.codigo;
     this.xAPI.valores = "";
@@ -476,7 +473,6 @@ export class ProcesosComponent implements OnInit {
         this.ngxService.stopLoader("load-cont");
         this.visible = false;
 
-        if (this.lstCompra.length > 0) this.GenerarComprobanteCompra();
         this.visible = false;
         this.blProcesar = false;
         this.blComprobante = false;
@@ -491,7 +487,7 @@ export class ProcesosComponent implements OnInit {
   GenerarComprobanteCompra() {
     let fecha = this.util.ConvertirFechaDB(this.fechai);
 
-    this.lstCompra.map(e => {
+    this.lstCompra.map((e, i) => {
       let compra = {
         plan: 1,
         codigo: this.util.GenerarUnicId(),

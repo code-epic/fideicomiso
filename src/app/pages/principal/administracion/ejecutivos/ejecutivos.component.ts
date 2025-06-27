@@ -91,7 +91,7 @@ export class EjecutivosComponent implements OnInit {
         if (data != null && data.msj == undefined) this.lstEjecutivos = data
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )
@@ -101,11 +101,10 @@ export class EjecutivosComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         this.lstPaises = data.Cuerpo
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -115,11 +114,10 @@ export class EjecutivosComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         this.lstEstados = data.Cuerpo
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -131,11 +129,10 @@ export class EjecutivosComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         this.lstCiudades = data
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -145,7 +142,6 @@ export class EjecutivosComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         if (data != null && data.msj == undefined) {
           this.Ejecutivo = data[0]
         } else {
@@ -155,7 +151,7 @@ export class EjecutivosComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )
@@ -224,13 +220,12 @@ export class EjecutivosComponent implements OnInit {
 
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
-        console.log(data)
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
         this.ngxService.stopLoader('load-ejecutivo')
         this.Limpiar()
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }
