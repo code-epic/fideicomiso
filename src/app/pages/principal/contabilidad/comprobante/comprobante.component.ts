@@ -14,7 +14,7 @@ import {
 } from "src/app/services/banfanb/comprobante.service";
 import { Contrato } from "src/app/services/banfanb/contrato.service";
 import { MatTableDataSource } from "@angular/material/table";
-import { MatPaginator } from "@angular/material/paginator";
+import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 import { ToastrService } from "ngx-toastr";
 import { ComprobanteDialogComponent } from "./comprobante-dialog/comprobante-dialog.component";
@@ -27,6 +27,11 @@ import { environment } from "src/environments/environment";
   styleUrls: ["./comprobante.component.scss"],
 })
 export class ComprobanteComponent implements OnInit {
+  @ViewChild(MatPaginator) paginatorLista: MatPaginator;
+  public dataSourceLista = new MatTableDataSource<any>();
+  public pageSize = 10;
+  public pageIndex = 0;
+
   public ELEMENT_DATA: IComprobante[] = [];
   displayedColumns: string[] = [
     "cuenta",
@@ -34,12 +39,12 @@ export class ComprobanteComponent implements OnInit {
     "descripcion",
     "debe",
     "haber",
-    "accion"
+    "accion",
   ];
   dataSource: any;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  formComprobante: FormGroup
+  formComprobante: FormGroup;
 
   public Contrato: Contrato = {
     numero: "",
@@ -85,45 +90,61 @@ export class ComprobanteComponent implements OnInit {
     { key: "MIXTO", val: [{ key: "0", val: "JURIDICO" }] },
   ];
 
+  public lstMeses = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ].map((nombre, index) => ({
+    nombre: nombre,
+    valor: index + 1
+  }));
+
+  public anios: number[] = [
+    2024,
+    2025,
+    2026,
+  ]
+
+  
+
   public lstTipoFid = [];
 
   public lstContratos = [];
-  public razonsocial = '';
+  public razonsocial = "";
   public semillero: Semillero = {
     codigo: 0,
-    plan: '',
-    descripcion: '',
+    plan: "",
+    descripcion: "",
     fecha: new Date(),
-    autor: '',
+    autor: "",
   };
 
   public Comprobante: FID_IComprobante = {
     plan: 0,
-    codigo: '',
-    descripcion: '',
-    detalle: '',
-    fecha_operacion: '',
-    fecha_ejercicio: '',
+    codigo: "",
+    descripcion: "",
+    detalle: "",
+    fecha_operacion: "",
+    fecha_ejercicio: "",
     debe: 0,
     haber: 0,
-    llave: 'M'
+    llave: "M",
   };
 
-  private auxComprobante: string
+  private auxComprobante: string;
 
   public IDComprobante: FID_IDetalleComprobante = {
     comprobante: 0,
     cuenta: 0,
     debe: 0,
     haber: 0,
-    fecha_operacion: '',
-    fecha_ejercicio: '',
-    plan: 1
+    fecha_operacion: "",
+    fecha_ejercicio: "",
+    plan: 1,
   };
 
   public xAPI: IAPICore = {
-    funcion: '',
-    parametros: '',
+    funcion: "",
+    parametros: "",
   };
 
   public fechacreacion = new FormControl(new Date());
@@ -144,7 +165,12 @@ export class ComprobanteComponent implements OnInit {
   public saldo_debe: string = "0.00";
   public saldo_haber: string = "0.00";
   public lstCuenta = [];
-  public mostrarImprimir = false
+  public mostrarImprimir = false;
+
+  public mes: number = null
+  public anio: number = null
+
+  public total: number = null
 
   public cuenta: string = "";
   myCuentas = new FormControl("");
@@ -158,33 +184,67 @@ export class ComprobanteComponent implements OnInit {
     private toastrService: ToastrService,
     private util: UtilService,
     private dialog: MatDialog,
-    private _fb: FormBuilder,
+    private _fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.mes = this.getMes()
+    this.anio = this.getAnio()
+
     //this.fechacreacion.setValue(this.Contrato.Saldos.fechacreacion)
     this.CargarFormulario();
     this.cargarContenido();
     this.GenerarSemillero();
-    this.ListarComprobantes();
+    this.cargarComprobantes()
   }
 
-  CargarFormulario(){
+  cargarComprobantes(){
+    let xAPI = {
+      funcion: environment.xApi.CONTAR_COMPROBANTES,
+      parametros: `${this.mes}, ${this.anio}`
+    }
+
+     this.apiService.Ejecutar(xAPI).subscribe(
+      (data) => {
+        this.total = parseInt(data.Cuerpo[0].total)
+        this.ListarComprobantes();
+      },
+      (err) => {
+        console.error(err)
+      }
+    );
+  }
+
+  private getMes(): number{
+    return new Date().getMonth() + 1;
+  }
+
+  private getAnio(): number{
+     return new Date().getFullYear();
+  }
+
+  CargarFormulario() {
     this.formComprobante = this._fb.group({
       plan: [this.Comprobante.plan, Validators.required],
       codigo: [this.Comprobante.codigo, Validators.required],
       descripcion: [this.Comprobante.descripcion, Validators.required],
-      fechaOperacion: [this.Comprobante.fecha_operacion || this.fechacreacion.value, Validators.required],
-      fechaEjercicio: [this.Comprobante.fecha_ejercicio || this.fechaejercicio.value, Validators.required],
+      fechaOperacion: [
+        this.Comprobante.fecha_operacion || this.fechacreacion.value,
+        Validators.required,
+      ],
+      fechaEjercicio: [
+        this.Comprobante.fecha_ejercicio || this.fechaejercicio.value,
+        Validators.required,
+      ],
       totalDebe: [this.Comprobante.debe, Validators.required],
       totalHaber: [this.Comprobante.haber, Validators.required],
     });
 
     this.actualizarPlanConCeros();
-    this.ConsultarContrato()
+    this.ConsultarContrato();
 
-     // Suscribirse a los cambios de plan
-    this.formComprobante.get('plan').valueChanges.subscribe(val => {
+    // Suscribirse a los cambios de plan
+    this.formComprobante.get("plan").valueChanges.subscribe((val) => {
       if (val && Number(val) > 0 && val.toString().length < 4) {
         this.actualizarPlanConCeros();
       }
@@ -192,38 +252,62 @@ export class ComprobanteComponent implements OnInit {
   }
 
   private actualizarPlanConCeros() {
-  let plan = this.formComprobante.get('plan').value;
-  if (plan && Number(plan) > 0) {
-    const planConCeros = this.CompletarCeros(plan.toString());
-    this.formComprobante.get('plan').setValue(planConCeros, { emitEvent: false });
+    let plan = this.formComprobante.get("plan").value;
+    if (plan && Number(plan) > 0) {
+      const planConCeros = this.CompletarCeros(plan.toString());
+      this.formComprobante
+        .get("plan")
+        .setValue(planConCeros, { emitEvent: false });
+    }
   }
-}
 
-  CompletarCeros(e : string ) : string{
-    return this.util.zfill(e, 4)
+  CompletarCeros(e: string): string {
+    return this.util.zfill(e, 4);
   }
 
   ListarComprobantes() {
-    this.xAPI.funcion = environment.xApi.CONSULTAR_COMPROBANTES
-    this.xAPI.parametros = "";
+    this.lst = []
+
+    this.xAPI.funcion = environment.xApi.PAGINAR_COMPROBANTES;
+    this.xAPI.parametros = `${this.mes}, ${this.anio}, ${this.pageIndex * 10}`;
     this.xAPI.valores = "";
-    this.ngxService.startLoader('load-cont');    
+    console.log(this.xAPI)
+    this.ngxService.startLoader("load-cont");
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {    
+      (data) => {
         this.lst = data.Cuerpo;
-        this.ngxService.stopLoader('load-cont');    
+        this.ngxService.stopLoader("load-cont");
       },
       (err) => {
-        this.ngxService.stopLoader('load-cont');    
+        this.ngxService.stopLoader("load-cont");
       }
     );
+  }
+
+  // Añade este método para manejar cambios de página
+  cambiarPagina(event: PageEvent) {
+    this.pageSize = event.pageSize;
+    this.pageIndex = event.pageIndex;
+    this.ListarComprobantes()
+  }
+
+  cargarDatos(datos: any[]) {
+    this.dataSourceLista.data = datos;
+    if (this.paginatorLista) {
+      this.paginatorLista.firstPage();
+    }
+  }
+
+  // Modifica tu ngAfterViewInit si existe, o créalo
+  ngAfterViewInit() {
+    this.dataSourceLista.paginator = this.paginatorLista;
   }
 
   ConsultarComprobante() {}
 
   ConsultarContrato() {
-    this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATO
-    this.xAPI.parametros = (this.formComprobante.get('plan').value).toString()
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATO;
+    this.xAPI.parametros = this.formComprobante.get("plan").value.toString();
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data != null) {
@@ -261,32 +345,32 @@ export class ComprobanteComponent implements OnInit {
   Buscar(e) {}
 
   editar(e: any, x: boolean = true) {
-    this.Comprobante = e
-    this.auxComprobante = e.id
-    this.fechaejercicio =  new FormControl(new Date(e.fecha_ejercicio))
-    this.ELEMENT_DATA = JSON.parse( e.definicion).map(ev => {
-      ev.fecha = e.fecha_operacion
-      ev.codigo = ev.cuenta
-      ev.cuenta = ev.detalle
-      
-      return ev
+    this.Comprobante = e;
+    this.auxComprobante = e.id;
+    this.fechaejercicio = new FormControl(new Date(e.fecha_ejercicio));
+    this.ELEMENT_DATA = JSON.parse(e.definicion).map((ev) => {
+      ev.fecha = e.fecha_operacion;
+      ev.codigo = ev.cuenta;
+      ev.cuenta = ev.detalle;
+
+      return ev;
     });
     this.dataSource = new MatTableDataSource<IComprobante>(this.ELEMENT_DATA);
     this.dataSource.paginator = this.paginator;
     if (x) {
-      this.selectedIndex = 1
+      this.selectedIndex = 1;
       this.CargarFormulario();
-      this.mostrarImprimir = true
+      this.mostrarImprimir = true;
     }
-    this.active = true
-    this.TotalizarElement()
+    this.active = true;
+    this.TotalizarElement();
   }
 
   tabActive(event) {
     this.selectedIndex = event.index;
     if (!this.active) {
       this.Limpiar();
-      this.mostrarImprimir = false
+      this.mostrarImprimir = false;
       this.CargarFormulario();
       this.GenerarSemillero();
     } else {
@@ -295,10 +379,10 @@ export class ComprobanteComponent implements OnInit {
     }
   }
 
-  onSubmit(){
+  onSubmit() {
     if (this.formComprobante.valid) {
-      this.Guardar()
-    }else{
+      this.Guardar();
+    } else {
       this._snackBar.open("Por favor verifique los campos ", "ok");
     }
   }
@@ -306,21 +390,23 @@ export class ComprobanteComponent implements OnInit {
   Limpiar() {
     this.Comprobante = {
       plan: 0,
-      codigo: '',
-      descripcion: '',
-      detalle: '',
-      fecha_operacion: '',
-      fecha_ejercicio: '',
+      codigo: "",
+      descripcion: "",
+      detalle: "",
+      fecha_operacion: "",
+      fecha_ejercicio: "",
       debe: 0,
       haber: 0,
-      llave: 'M'
+      llave: "M",
     };
 
-    this.Contrato.razonsocial = ''
+    this.Contrato.razonsocial = "";
 
-    this.formComprobante.reset()
-    this.dataSource = null
-    this.formComprobante.get('fechaOperacion').setValue(this.Comprobante.fecha_operacion || this.fechacreacion.value)
+    this.formComprobante.reset();
+    this.dataSource = null;
+    this.formComprobante
+      .get("fechaOperacion")
+      .setValue(this.Comprobante.fecha_operacion || this.fechacreacion.value);
   }
 
   Consultar() {}
@@ -328,7 +414,7 @@ export class ComprobanteComponent implements OnInit {
   Seleccionar() {}
 
   GenerarSemillero() {
-    this.xAPI.funcion = environment.xApi.CONSULTAR_SEMILLERO_CONTABLE
+    this.xAPI.funcion = environment.xApi.CONSULTAR_SEMILLERO_CONTABLE;
     this.xAPI.parametros = "";
     this.xAPI.valores = {};
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -349,7 +435,7 @@ export class ComprobanteComponent implements OnInit {
 
   cargarContenido(): any {
     this.lstComprobante = [];
-    this.xAPI.funcion = environment.xApi.CONSULTAR_CUENTAS
+    this.xAPI.funcion = environment.xApi.CONSULTAR_CUENTAS;
     this.xAPI.parametros = "";
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -400,8 +486,11 @@ export class ComprobanteComponent implements OnInit {
   }
 
   addElement() {
-
-    if (this.debe <= 0 && this.haber <= 0 || this.debe == null || this.haber == null) {
+    if (
+      (this.debe <= 0 && this.haber <= 0) ||
+      this.debe == null ||
+      this.haber == null
+    ) {
       this._snackBar.open("Por favor verifique los campos ", "ok");
       return;
     }
@@ -410,29 +499,29 @@ export class ComprobanteComponent implements OnInit {
 
     if (!this.cuenta) {
       this._snackBar.open("Por favor seleccione una cuenta ", "ok");
-      return
+      return;
     }
-    
+
     let cta = this.cuenta.split("|");
-    let debe = parseFloat(this.debe.toString())
-    let haber = parseFloat(this.haber.toString())
+    let debe = parseFloat(this.debe.toString());
+    let haber = parseFloat(this.haber.toString());
 
     // Validar si debe y haber son números
     if (isNaN(debe) || isNaN(haber)) {
       this._snackBar.open("Por favor verifique los campos ", "ok");
       return;
     }
-    
+
     let detalle = {
       cuenta: cta[0].trim(),
       descripcion: cta[1].trim(),
       debe: parseFloat(debe.toFixed(2)),
       haber: parseFloat(haber.toFixed(2)),
       fecha: fecha.substr(0, 10),
-      referencia: '',
-      auxiliar: '',
-      cc: '',
-      tipo: '',
+      referencia: "",
+      auxiliar: "",
+      cc: "",
+      tipo: "",
       estatus: false,
     };
     // if ( this.IComprobante.plan == '' ) {
@@ -440,13 +529,13 @@ export class ComprobanteComponent implements OnInit {
     //   return
     // }
 
-    let sd = parseFloat(this.saldo_debe) + debe
-    let sh = parseFloat(this.saldo_haber) + haber
+    let sd = parseFloat(this.saldo_debe) + debe;
+    let sh = parseFloat(this.saldo_haber) + haber;
     this.saldo_debe = sd.toFixed(2);
     this.saldo_haber = sh.toFixed(2);
 
-    this.formComprobante.get('totalHaber').setValue(this.saldo_haber)
-    this.formComprobante.get('totalDebe').setValue(this.saldo_debe)
+    this.formComprobante.get("totalHaber").setValue(this.saldo_haber);
+    this.formComprobante.get("totalDebe").setValue(this.saldo_debe);
 
     this.ELEMENT_DATA.push(detalle);
 
@@ -458,15 +547,14 @@ export class ComprobanteComponent implements OnInit {
     this.haber = 0;
   }
 
-
   eliminar(e) {
-    let pos = 0
+    let pos = 0;
 
     for (let i = 0; i < this.ELEMENT_DATA.length; i++) {
       const ev = this.ELEMENT_DATA[i];
-      console.log(e.cuenta, ' ', ev.cuenta)
-      if (e.cuenta.trim() == ev.cuenta.trim()){
-        pos = i
+      console.log(e.cuenta, " ", ev.cuenta);
+      if (e.cuenta.trim() == ev.cuenta.trim()) {
+        pos = i;
       }
     }
 
@@ -474,11 +562,10 @@ export class ComprobanteComponent implements OnInit {
     this.dataSource = new MatTableDataSource<IComprobante>(this.ELEMENT_DATA);
     this.dataSource.paginator = this.paginator;
 
-    this.TotalizarElement()
-
+    this.TotalizarElement();
   }
 
-  TotalizarElement(){
+  TotalizarElement() {
     let debe = 0;
     let haber = 0;
     this.ELEMENT_DATA.map((e) => {
@@ -489,7 +576,6 @@ export class ComprobanteComponent implements OnInit {
     this.saldo_haber = haber.toFixed(2);
   }
 
-
   getComprobante() {
     let debe = 0;
     let haber = 0;
@@ -499,7 +585,7 @@ export class ComprobanteComponent implements OnInit {
     });
 
     this.Comprobante.detalle =
-      this.Contrato.rif + ' - ' + this.Contrato.razonsocial.toUpperCase();
+      this.Contrato.rif + " - " + this.Contrato.razonsocial.toUpperCase();
 
     this.Comprobante.debe = debe;
     this.Comprobante.haber = haber;
@@ -507,61 +593,68 @@ export class ComprobanteComponent implements OnInit {
   }
 
   async Guardar() {
-    this.convertirComprobante()        
-    
+    this.convertirComprobante();
+
     if (this.saldo_debe != this.saldo_haber) {
-      let saldo = parseFloat(this.saldo_debe) - parseFloat(this.saldo_haber)
-      let msj = 'Existe una diferencia de Bs. ' + (saldo * -1) 
-      if( parseFloat(this.saldo_debe) > parseFloat(this.saldo_haber) ) msj = 'Existe una diferencia de Bs. '  + saldo 
-      this.apiService.Mensaje(msj, 'Advertencia', 'warning', 'comprobante')
-      return
+      let saldo = parseFloat(this.saldo_debe) - parseFloat(this.saldo_haber);
+      let msj = "Existe una diferencia de Bs. " + saldo * -1;
+      if (parseFloat(this.saldo_debe) > parseFloat(this.saldo_haber))
+        msj = "Existe una diferencia de Bs. " + saldo;
+      this.apiService.Mensaje(msj, "Advertencia", "warning", "comprobante");
+      return;
     }
-    
+
     Swal.fire({
-      title: 'Esta seguro que desea realizar la operación',
+      title: "Esta seguro que desea realizar la operación",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Si',
-      cancelButtonText: 'No',
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si",
+      cancelButtonText: "No",
       allowEscapeKey: true,
     }).then((result) => {
       if (result.isConfirmed) {
-        this.Aceptar()
+        this.Aceptar();
       }
-    })
-
+    });
   }
 
-  convertirComprobante(){
-    this.Comprobante.plan = this.formComprobante.get('plan').value
-    this.Comprobante.codigo = this.formComprobante.get('codigo').value
-    this.Comprobante.descripcion = this.formComprobante.get('descripcion').value
-    this.Comprobante.fecha_operacion = this.util.ConvertirFechaDB(this.formComprobante.get('fechaEjercicio').value)
-    this.Comprobante.fecha_ejercicio = this.util.ConvertirFechaDB(this.formComprobante.get('fechaEjercicio').value)
+  convertirComprobante() {
+    this.Comprobante.plan = this.formComprobante.get("plan").value;
+    this.Comprobante.codigo = this.formComprobante.get("codigo").value;
+    this.Comprobante.descripcion =
+      this.formComprobante.get("descripcion").value;
+    this.Comprobante.fecha_operacion = this.util.ConvertirFechaDB(
+      this.formComprobante.get("fechaEjercicio").value
+    );
+    this.Comprobante.fecha_ejercicio = this.util.ConvertirFechaDB(
+      this.formComprobante.get("fechaEjercicio").value
+    );
   }
 
-  Aceptar(){
-    if(this.mostrarImprimir){
-      this.deleteData(this.auxComprobante)
+  Aceptar() {
+    if (this.mostrarImprimir) {
+      this.deleteData(this.auxComprobante);
     }
 
     this.getComprobante();
-    this.ngxService.startLoader('load-cont');
-    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
-    this.xAPI.parametros = '';
+    this.ngxService.startLoader("load-cont");
+    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE;
+    this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.Comprobante);
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         // console.log(data);
         await this.GuardarDetalle(data.msj);
-        this.ngxService.stopLoader('load-cont');
+        this.ngxService.stopLoader("load-cont");
         this.ELEMENT_DATA = [];
-        this.dataSource = new MatTableDataSource<IComprobante>(this.ELEMENT_DATA);
+        this.dataSource = new MatTableDataSource<IComprobante>(
+          this.ELEMENT_DATA
+        );
         this.dataSource.paginator = this.paginator;
-        this.Limpiar()
+        this.Limpiar();
       },
       (err) => {}
     );
@@ -572,17 +665,17 @@ export class ComprobanteComponent implements OnInit {
     await this.ELEMENT_DATA.map(async (e) => {
       this.IDComprobante.debe = e.debe;
       this.IDComprobante.haber = e.haber;
-      this.IDComprobante.fecha_ejercicio = this.Comprobante.fecha_ejercicio
-      this.IDComprobante.fecha_operacion = this.Comprobante.fecha_ejercicio
+      this.IDComprobante.fecha_ejercicio = this.Comprobante.fecha_ejercicio;
+      this.IDComprobante.fecha_operacion = this.Comprobante.fecha_ejercicio;
       this.IDComprobante.cuenta = this.getIDCuenta(e.cuenta);
-      this.IDComprobante.plan = Number(this.formComprobante.get('plan').value) 
-      this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE
-      this.xAPI.parametros = '';
-      this.xAPI.valores = JSON.stringify(this.IDComprobante);      
+      this.IDComprobante.plan = Number(this.formComprobante.get("plan").value);
+      this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE;
+      this.xAPI.parametros = "";
+      this.xAPI.valores = JSON.stringify(this.IDComprobante);
 
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log('detalle insertado ', data);
+          console.log("detalle insertado ", data);
         },
         (err) => {}
       );
@@ -601,71 +694,68 @@ export class ComprobanteComponent implements OnInit {
     return fd;
   }
 
-  getMoneda(e) : string {
+  getMoneda(e): string {
     return this.util.ConvertirMoneda(e.debe);
   }
-  
-  getFecha(f) : string {
-    return this.util.ConvertirFechaHumana(f) 
+
+  getFecha(f): string {
+    return this.util.ConvertirFechaHumana(f);
   }
 
-  eliminarComprobante(id, detalle){
-    
+  eliminarComprobante(id, detalle) {
     Swal.fire({
       title: `¿Estás seguro que desea eliminar? \n\n ${detalle} `,
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Si',
-      cancelButtonText: 'No',
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si",
+      cancelButtonText: "No",
       allowEscapeKey: true,
     }).then((result) => {
       if (result.isConfirmed) {
-        this.deleteData(id)
+        this.deleteData(id);
       }
-    })
-
-  }
-
-  deleteData(id) {
-    this.ngxService.startLoader('load-cont');
-    this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTE
-    this.xAPI.parametros = `${id}`
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-        if(!this.mostrarImprimir){
-          this.toastrService.success(
-          'Se ha eliminado comprobante con exito',
-          `Fideicomiso`
-        );
-        }
-        this.ngxService.stopLoader('load-cont')
-        this.ListarComprobantes()
-      },
-      err => {
-        if(!this.mostrarImprimir){
-          this.toastrService.error(
-          'No se ha logrado eliminar el comprobante',
-          `Fideicomiso`
-        );
-        }
-        this.ngxService.stopLoader('load-cont');
-      }
-    )
-  }
-
-  abrirDialogo(e: any = null){
-    if (e) {
-      this.editar(e, false)
-    }
-    this.dialog.open(ComprobanteDialogComponent, {
-      width: '60%',
-      data: {datos: this.ELEMENT_DATA}
     });
   }
 
+  deleteData(id) {
+    this.ngxService.startLoader("load-cont");
+    this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTE;
+    this.xAPI.parametros = `${id}`;
+    this.xAPI.valores = "";
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        if (!this.mostrarImprimir) {
+          this.toastrService.success(
+            "Se ha eliminado comprobante con exito",
+            `Fideicomiso`
+          );
+        }
+        this.ngxService.stopLoader("load-cont");
+        this.ListarComprobantes();
+      },
+      (err) => {
+        if (!this.mostrarImprimir) {
+          this.toastrService.error(
+            "No se ha logrado eliminar el comprobante",
+            `Fideicomiso`
+          );
+        }
+        this.ngxService.stopLoader("load-cont");
+      }
+    );
+  }
+
+  abrirDialogo(e: any = null) {
+    if (e) {
+      this.editar(e, false);
+    }
+    this.dialog.open(ComprobanteDialogComponent, {
+      width: "60%",
+      data: { datos: this.ELEMENT_DATA },
+    });
+  }
 }
 
 

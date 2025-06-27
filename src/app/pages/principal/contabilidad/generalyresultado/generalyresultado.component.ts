@@ -87,22 +87,17 @@ export class GeneralyresultadoComponent implements OnInit {
       return
     }
 
-    const fechaUltimo = new Date(this.fechaultimo)
-
-    const fechaUltimoMasUnDia = new Date(fechaUltimo)
-    fechaUltimoMasUnDia.setDate(fechaUltimo.getDate() + 1)
-
     let antes = new Date(this.fechai).setHours(-23)
 
     let fechaHoy = new Date(this.fechai);
-    fechaHoy.setDate(fechaHoy.getDate() - 1);
     let sHoy = fechaHoy.toISOString().substring(0, 10);
     let sAntes = new Date(antes).toISOString().substring(0, 10)
 
     this.fecha = `${sHoy},${sAntes}`
-    const fechaMenosUnDia = new Date(this.fechai);
-    fechaMenosUnDia.setDate(fechaMenosUnDia.getDate() - 1);
-    this.fechaTexto = this.util.ConvertirFechaHumana(fechaMenosUnDia);    this.iniciarIndex()
+
+    this.fechaTexto = this.util.ConvertirFechaHumana(this.fechai);    
+
+    this.iniciarIndex()
     this.lstBalance = []
     this.HTMLBalance = ''
     this.HTMLResultados = ''
@@ -166,7 +161,6 @@ export class GeneralyresultadoComponent implements OnInit {
 
     this.xAPI.parametros = `${this.fecha},${this.estatus}`
     this.xAPI.valores = "";
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.printv = true
@@ -225,12 +219,9 @@ export class GeneralyresultadoComponent implements OnInit {
             </tbody>
           </table>
           `;
-
-          // 
-        // this.ngxService.stopLoader('load-precierre')
       },
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
   }
@@ -240,7 +231,6 @@ export class GeneralyresultadoComponent implements OnInit {
     let haber = e.haber == null ? 0 : e.haber;
     let saldo_inicial = e.saldo_inicial == null ? 0 : e.saldo_inicial;
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
-    // console.log(e.codigo_padre, this.lstIndex[this.posicion], this.posicion)
     if (e.codigo_padre.substring(0, 2) == this.lstIndex[this.posicion].id) {
       this.acumuladord += parseFloat(debe);
       this.acumuladorh += parseFloat(haber);
@@ -275,7 +265,6 @@ export class GeneralyresultadoComponent implements OnInit {
 
   getDetalleResultados(e, tiempo) {
 
-    // console.log(e.codigo_padre, this.tiempo)
     let debe = e.debe == null ? 0 : e.debe;
     let haber = e.haber == null ? 0 : e.haber;
     let saldo_inicial = e.saldo_inicial == null ? 0 : e.saldo_inicial;
@@ -301,7 +290,6 @@ export class GeneralyresultadoComponent implements OnInit {
         </tr>
        
       `;
-      // console.log('imprimiendo valores ', this.acum_saldo_actual, this.calcularacero )
       if (this.acum_saldo_actual == 0) this.calcularacero = 1
       
       if (this.tiempo == 0) {
@@ -324,7 +312,6 @@ export class GeneralyresultadoComponent implements OnInit {
   }
 
   getTitulosACuentasBalance(e): string {
-    // console.log(e)
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
     let titulo = "";
     if (e.totalizadora == "0" || e.totalizadora == "3") {

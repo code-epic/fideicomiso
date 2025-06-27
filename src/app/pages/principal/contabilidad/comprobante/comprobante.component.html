@@ -21,34 +21,25 @@
 
                   <br>
                   <div class="row">
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-8 text-center">
+                      <mat-form-field appearance="outline">
+                        <mat-select [(ngModel)]="mes" (selectionChange)="cargarComprobantes()">
+                          <mat-option *ngFor="let mes of lstMeses" [value]="mes.valor">
+                            {{ mes.nombre }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
 
                     </div>
-                    <div class="col-md-6 text-center">
-
-
-                      <br>
-                      <form class="navbar-search">
-                        <div class="form-group" [ngClass]="{ 'focused': focus === true }">
-                          <div class="input-group input-group-alternative">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text"><i class="fa fa-search "></i></span>
-                            </div>
-                            <input class="form-control" placeholder="Buscar" type="text"
-                              [ngModelOptions]="{standalone: true}" [(ngModel)]="buscar" (focus)="focus = true"
-                              (blur)="focus = false" (keypress)="Buscar($event)">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text"><i class="fa fa-sliders"></i></span>
-                            </div>
-
-                          </div>
-                        </div>
-                      </form>
-
-                    </div>
-                    <div class="col-md-3">
-
-                    </div>
+                    <div class="col-md-4 text-center">
+                      <mat-form-field appearance="outline">
+                        <mat-select [(ngModel)]="anio" (selectionChange)="cargarComprobantes()">
+                          <mat-option *ngFor="let anio of anios" [value]="anio">
+                            {{ anio }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>  
                   </div>
 
                   <mat-selection-list>
@@ -71,7 +62,7 @@
                         </div>
                       </div>
                     </mat-list>
-                    <mat-list *ngFor="let e of lst; let i=index "
+                    <mat-list *ngFor="let e of lst" 
                       style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                       <div class="row">
                         <div class="col-md-2 texto-detalle auto-ajuste">
@@ -105,7 +96,17 @@
                     </mat-list>
                   </mat-selection-list>
                   <br><br>
-
+                  <div class="row">
+                    <div class="col-md-12">
+                      <mat-paginator [length]="total" 
+                                     [pageSize]="10" 
+                                     (page)="cambiarPagina($event)"
+                                     showFirstLastButtons
+                                     aria-label="Seleccione página de comprobantes"
+                                     style="background: transparent;">
+                      </mat-paginator>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
