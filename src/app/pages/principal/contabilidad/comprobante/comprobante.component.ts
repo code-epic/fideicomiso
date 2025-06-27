@@ -269,7 +269,7 @@ export class ComprobanteComponent implements OnInit {
     this.lst = []
 
     this.xAPI.funcion = environment.xApi.PAGINAR_COMPROBANTES;
-    this.xAPI.parametros = `${this.mes}, ${this.anio}, ${this.pageIndex * 10}`;
+    this.xAPI.parametros = `${this.mes}, ${this.anio}, ${this.pageIndex * 10}, ${this.pageSize}`;
     this.xAPI.valores = "";
     this.ngxService.startLoader("load-cont");
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -286,6 +286,7 @@ export class ComprobanteComponent implements OnInit {
   // Añade este método para manejar cambios de página
   cambiarPagina(event: PageEvent) {
     this.pageSize = event.pageSize;
+
     this.pageIndex = event.pageIndex;
     this.ListarComprobantes()
   }
