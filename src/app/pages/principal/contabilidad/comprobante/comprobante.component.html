@@ -98,12 +98,15 @@
                   <br><br>
                   <div class="row">
                     <div class="col-md-12">
-                      <mat-paginator [length]="total" 
-                                     [pageSize]="10" 
-                                     (page)="cambiarPagina($event)"
-                                     showFirstLastButtons
-                                     aria-label="Seleccione página de comprobantes"
-                                     style="background: transparent;">
+                      <mat-paginator 
+                        [length]="total" 
+                        [pageSize]="10" 
+                        [pageSizeOptions]="[10, 20, 30, 40, 50]"
+                        (page)="cambiarPagina($event)"
+                        showFirstLastButtons
+                        aria-label="Seleccione página de comprobantes"
+                        style="background: transparent;"
+                      >
                       </mat-paginator>
                     </div>
                   </div>
