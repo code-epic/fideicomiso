@@ -46,8 +46,6 @@ export class FileUploadComponent implements OnInit {
   }
 
 
-  async ngOnChanges(){
-    console.log(this.ACCION)
-  }
+  async ngOnChanges(){}
 
 }

@@ -112,7 +112,6 @@ export class ListadosComponent implements OnInit {
 
 
   ConsultarComprobante(){
-    // console.log(this.fecha)
     this.consultarBalance();
     this.generarBalanceComprobacion()
     this.lstBalance = []
@@ -124,11 +123,9 @@ export class ListadosComponent implements OnInit {
     this.xAPI.parametros = `${this.fecha}`
     // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'
     this.xAPI.valores = "";
-    console.log(this.xAPI.parametros)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
-        console.log(data);
         this.lstBalance = data.Cuerpo;
         this.HTMLBalance = `
           <table class="asientos" >
@@ -144,7 +141,6 @@ export class ListadosComponent implements OnInit {
         this.HTMLResultados += this.HTMLBalance;
         
         this.lstBalance.forEach((e) => {
-          // console.log(e.codigo_padre.indexOf("74"));
           if (
             e.codigo_padre.indexOf("74") == -1 &&
             e.codigo_padre.indexOf("75") == -1
@@ -155,13 +151,8 @@ export class ListadosComponent implements OnInit {
           }
         });
 
-        // this.lstBalance.forEach(e => {
-        //   this.getDetalle(e)
-        // });
-
         this.lstIndex[this.posicion].debe = this.acumuladord;
         this.lstIndex[this.posicion].haber = this.acumuladorh;
-        console.log(this.lstIndex);
         let result = this.lstIndex[4].haber - this.lstIndex[3].debe;
 
         this.HTMLBalance += ``;
@@ -191,7 +182,7 @@ export class ListadosComponent implements OnInit {
         // this.ngxService.stopLoader('load-precierre')
       },
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
   }
@@ -238,7 +229,6 @@ export class ListadosComponent implements OnInit {
 
   getDetalleResultados(e, tiempo) {
 
-    console.log(e.codigo_padre, this.tiempo)
     let debe = e.debe == null ? 0 : e.debe;
     let haber = e.haber == null ? 0 : e.haber;
     let saldo_inicial = e.saldo_inicial == null ? 0 : e.saldo_inicial;
@@ -354,7 +344,6 @@ export class ListadosComponent implements OnInit {
           </thead>
           <tbody>
           `;
-        // console.log(this.lstComprobacion)
         this.posicion = 0;
         this.acumuladord = 0
         this.acumuladorh = 0
@@ -366,7 +355,6 @@ export class ListadosComponent implements OnInit {
 
         this.lstIndex[this.posicion].debe = this.acumuladord;
         this.lstIndex[this.posicion].haber = this.acumuladorh;
-        console.log(this.lstIndex);
         let result = this.lstIndex[4].haber - this.lstIndex[3].debe;
 
         this.HTMLComprobacion += `
@@ -410,7 +398,7 @@ export class ListadosComponent implements OnInit {
         // this.ngxService.stopLoader('load-precierre')
       },
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
   }

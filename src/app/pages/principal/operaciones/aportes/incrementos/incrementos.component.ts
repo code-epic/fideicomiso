@@ -89,14 +89,13 @@ export class IncrementosComponent implements OnInit {
           this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
           this.minDate = new Date(this.fechaultimo)
           this.maxDate = new Date(2024, 12, 31)
-          console.log(this.fechaultimo);
           
         }
         this.ngxService.stopLoader('load-cont')
       },
       (error) => {
         this.ngxService.stopLoader('load-cont')
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -106,17 +105,14 @@ export class IncrementosComponent implements OnInit {
   ConsultarContrato() {
     this.ngxService.startLoader('load-cont')
     // this.plan = this.util.zfill(this.plan, 4)
-    console.log(this.plan);
     this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATO
     this.xAPI.parametros = this.plan
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data);
         
         if (data != null) {
           let Contrato = data[0]
-          console.log(Contrato);
           this.rif = Contrato.rif + '-' + Contrato.razonsocial
           this.fideicomiso = Contrato.plan
           this.idplan = parseInt(this.plan)
@@ -126,7 +122,7 @@ export class IncrementosComponent implements OnInit {
       },
       (error) => {
         this.ngxService.stopLoader('load-cont')
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -174,7 +170,6 @@ export class IncrementosComponent implements OnInit {
       this.close()
       return
     }
-    console.log(this.ELEMENT_DATA)
     let monto = parseFloat(this.ELEMENT_DATA[cant].monto)
     let idplan = this.ELEMENT_DATA[cant].id
     let fecha = this.ELEMENT_DATA[cant].fecha
@@ -197,27 +192,23 @@ export class IncrementosComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log(data)
 
         this.xAPI.funcion = environment.xApi.INSERTAR_INCREMENTO
         this.xAPI.parametros = `${data.msj},${monto},${fecha},${idplan}`,
-        console.log("API", this.xAPI)
           this.xAPI.valores = ''
         this.apiService.Ejecutar(this.xAPI).subscribe(
           data => {
-            this.insertData(cant)
-            console.log(data);
-            
+            this.insertData(cant)            
           },
           (error) => {
-            console.log(error)
+            console.error(error)
             this.ngxService.stopLoader('load-cont')
           }
         )
         // this.InsertData(cant)
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.ngxService.stopLoader('load-cont')
       }
     )

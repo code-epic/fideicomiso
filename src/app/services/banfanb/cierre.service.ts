@@ -43,7 +43,7 @@ export class CierreService {
           }
         },
         error: (error) => {
-          console.log(error);
+          console.error(error);
           reject(error);
         }
       });

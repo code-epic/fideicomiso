@@ -135,7 +135,6 @@ export class TablasComponent implements OnInit {
   editar(e) {
     this.porta_insert = "";
     this.porta_search = "none";
-    console.log(e);
   }
 
   Limpiar() {
@@ -177,7 +176,6 @@ export class TablasComponent implements OnInit {
       definicion: this.definicion,
     };
     this.ELEMENT_DATA_CUENTA.push(this.ILCuenta);
-    console.log(this.ILCuenta);
 
     this.dataSourceCuenta = new MatTableDataSource<ILConfiguracionCuenta>(
       this.ELEMENT_DATA_CUENTA
@@ -201,8 +199,6 @@ export class TablasComponent implements OnInit {
     this.ICuenta.cuenta = parseInt(
       this.ELEMENT_DATA_CUENTA[this.posicion].codigo
     );
-
-    // console.log(this.ICuenta);
 
     this.lstCuentas = [];
     this.xAPI.funcion = "FID_IConfiguracionCuenta";
@@ -293,7 +289,7 @@ export class TablasComponent implements OnInit {
         );
       },
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
   }
@@ -313,7 +309,6 @@ export class TablasComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data.Cuerpo != undefined) {
-          // console.log(data.Cuerpo)
           data.Cuerpo.forEach((e) => {
             this.ELEMENT_DATA.push({
               cuenta: e.cuenta,
@@ -325,8 +320,6 @@ export class TablasComponent implements OnInit {
               accion: this.getNaturaleza(e.accion),
             });
           });
-          // this.ELEMENT_DATA = data.Cuerpo;
-          //console.log(this.ELEMENT_DATA);
 
           this.dataSource = new MatTableDataSource<LConfiguracionCuenta>(
             this.ELEMENT_DATA

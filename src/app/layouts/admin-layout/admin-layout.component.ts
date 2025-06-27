@@ -18,7 +18,6 @@ export class AdminLayoutComponent implements OnInit {
     
     this.pagina = pagina[1].toUpperCase()
     this.msj.contenido$.subscribe( e => {
-      console.log(e)
       this.pagina = e == 'NPANEL'?'NEGOCIO':e
     })
   }

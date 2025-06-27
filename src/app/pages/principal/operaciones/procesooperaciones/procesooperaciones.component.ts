@@ -82,7 +82,6 @@ export class ProcesooperacionesComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.lstComisiones = data.Cuerpo
-        console.log(data);
         
         this.lstComisiones.map(e => {
           this.acum_debe += parseFloat(e.calculo_capital)
@@ -98,7 +97,7 @@ export class ProcesooperacionesComponent implements OnInit {
         this.ngxService.stopLoader('load-precierre')
       },
       (error) => {
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -117,7 +116,6 @@ export class ProcesooperacionesComponent implements OnInit {
 
   GenerarComprobante() {
     let fecha = this.util.ConvertirFechaDB(this.fechai)
-    console.log(this.lstComisiones);
 
     let xApi: IAPICore = {
       funcion: "FID_IComprobante",
@@ -145,7 +143,7 @@ export class ProcesooperacionesComponent implements OnInit {
           this.InsertData(data, this.lstComisiones.length, Comprobante)
         },
         (error) => {
-          console.log(error)
+          console.error(error)
           this.ngxService.stopLoader('load-cont')
         }
       )
@@ -160,7 +158,6 @@ export class ProcesooperacionesComponent implements OnInit {
   }
 
   InsertData(dt: any, cant: number, e: any) {
-    console.log('e', e)
     let fecha = this.util.ConvertirFechaDB(this.fechai)
     cant++
     this.xAPI.funcion = environment.xApi.INSERTAR_COMISIONES_ADMINISTRATIVAS
@@ -173,7 +170,7 @@ export class ProcesooperacionesComponent implements OnInit {
         this.lstComisiones = []
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.ngxService.stopLoader('load-cont')
       }
     )

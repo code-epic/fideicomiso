@@ -156,10 +156,8 @@ export class UtilService {
     let row = "#num" + delimitador;
 
     for (let index in headerList) {
-      // console.log(index, headerList);
       row += headerList[index] + delimitador;
     }
-    // console.log(row);
     row = row.slice(0, -1);
     str += row + "\r\n";
 

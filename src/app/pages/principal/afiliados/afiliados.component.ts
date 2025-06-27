@@ -95,7 +95,7 @@ export class AfiliadosComponent implements OnInit {
         this.lstAfiliados = data
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )
@@ -118,7 +118,7 @@ export class AfiliadosComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.Limpiar()
       }
     )
@@ -183,7 +183,6 @@ export class AfiliadosComponent implements OnInit {
 
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
-        console.log(data)
         this.Limpiar()
         this.ngxService.stopLoader('load-afi')
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'afiliado')
@@ -191,7 +190,7 @@ export class AfiliadosComponent implements OnInit {
 
       },
       (error) => {
-        console.log(error)
+        console.error(error)
 
       }
     )

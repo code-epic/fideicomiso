@@ -129,7 +129,6 @@ export class ComprobacionComponent implements OnInit {
 
   ConsultarComprobacion() {
     this.ngxService.startLoader('load-cont')
-    console.log(this.mes)
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
     this.xAPI.parametros = `${this.lstFecha[this.mes].value},S`
     this.xAPI.valores = "";
@@ -162,7 +161,6 @@ export class ComprobacionComponent implements OnInit {
 
         this.lstIndex[this.posicion].debe = this.acumuladord;
         this.lstIndex[this.posicion].haber = this.acumuladorh;
-        console.log(this.lstIndex);
         let result = this.lstIndex[4].haber - this.lstIndex[3].debe;
 
         this.HTMLComprobacion += `
@@ -193,7 +191,7 @@ export class ComprobacionComponent implements OnInit {
           this.ngxService.stopLoader('load-cont')
       },
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
   }

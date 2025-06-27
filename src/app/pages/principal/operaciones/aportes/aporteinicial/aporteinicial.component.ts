@@ -81,7 +81,6 @@ export class AporteinicialComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        // console.log(data)
         data.Cuerpo.map(e => {
           this.ELEMENT_DATA.push({
             id: e.id,
@@ -100,7 +99,7 @@ export class AporteinicialComponent implements OnInit {
         this.ngxService.stopLoader('load-cont')
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.ngxService.stopLoader('load-cont')
       }
     )
@@ -155,13 +154,13 @@ export class AporteinicialComponent implements OnInit {
             this.InsertData(cant)
           },
           (error) => {
-            console.log(error)
+            console.error(error)
             this.ngxService.stopLoader('load-cont')
           }
         )
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.ngxService.stopLoader('load-cont')
       }
     )

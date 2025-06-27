@@ -335,9 +335,7 @@ export class ProcesocontablesComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
         if (data.Cuerpo != undefined ){
-          console.log(data)
           let ultimoPrecierre = data.Cuerpo[0].fecha_cierre;
-          console.log('ultimoPrecierre', ultimoPrecierre);
 
           let d1: number, m1: number, y1: number;
           if (ultimoPrecierre.includes('/')) {
@@ -363,15 +361,10 @@ export class ProcesocontablesComponent implements OnInit {
           }
           let fechaAPrecerrarDate = new Date(Date.UTC(y2, m2 - 1, d2)).toISOString();
 
-          console.log(this.fechaultimo)
           const [d3, m3, y3] = this.fechaultimo.split('/').map(Number);
           const fechaUltimoAux = new Date(Date.UTC(y3, m3 - 1, d3));
           fechaUltimoAux.setUTCDate(fechaUltimoAux.getUTCDate() + 2);
           const fechaUltimoUTCAux = fechaUltimoAux.toISOString();
-
-          console.log('fechaAPrecerrarDate', fechaAPrecerrarDate)
-          console.log('ultimoPrecierreDate', ultimoPrecierreDate)
-          console.log('fechaUltimoUTCAux', fechaUltimoUTCAux)
 
           //Validar si el dia ya fue precerrado
           if (fechaAPrecerrarDate < ultimoPrecierreDate) {

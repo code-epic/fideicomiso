@@ -271,7 +271,6 @@ export class ComprobanteComponent implements OnInit {
     this.xAPI.funcion = environment.xApi.PAGINAR_COMPROBANTES;
     this.xAPI.parametros = `${this.mes}, ${this.anio}, ${this.pageIndex * 10}`;
     this.xAPI.valores = "";
-    console.log(this.xAPI)
     this.ngxService.startLoader("load-cont");
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -312,8 +311,6 @@ export class ComprobanteComponent implements OnInit {
       (data) => {
         if (data != null) {
           this.Contrato = data[0];
-          console.log(this.Contrato);
-          // this.fechacreacion.setValue(this.Contrato.Saldos.fechainicio)
           this.getTipoFideicomiso();
         } else {
           let aux = this.Comprobante.plan;
@@ -322,7 +319,7 @@ export class ComprobanteComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error);
+        console.error(error);
         this.Limpiar();
       }
     );
@@ -330,7 +327,6 @@ export class ComprobanteComponent implements OnInit {
 
   getTipoFideicomiso() {
     let codigo = this.Contrato.plan;
-    // console.log(codigo)
 
     this.lstTipoFid = [];
     this.lstTipoFideicomiso.forEach((e) => {
@@ -338,8 +334,6 @@ export class ComprobanteComponent implements OnInit {
         this.lstTipoFid = e.val;
       }
     });
-
-    // console.log(this.lstTipoFid)
   }
 
   Buscar(e) {}
@@ -427,7 +421,7 @@ export class ComprobanteComponent implements OnInit {
         }
       },
       (error) => {
-        console.log(error);
+        console.error(error);
         //this.Limpiar()
       }
     );
@@ -552,7 +546,6 @@ export class ComprobanteComponent implements OnInit {
 
     for (let i = 0; i < this.ELEMENT_DATA.length; i++) {
       const ev = this.ELEMENT_DATA[i];
-      console.log(e.cuenta, " ", ev.cuenta);
       if (e.cuenta.trim() == ev.cuenta.trim()) {
         pos = i;
       }
@@ -589,7 +582,6 @@ export class ComprobanteComponent implements OnInit {
 
     this.Comprobante.debe = debe;
     this.Comprobante.haber = haber;
-    console.log(this.Comprobante);
   }
 
   async Guardar() {
@@ -646,7 +638,6 @@ export class ComprobanteComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
-        // console.log(data);
         await this.GuardarDetalle(data.msj);
         this.ngxService.stopLoader("load-cont");
         this.ELEMENT_DATA = [];
@@ -675,7 +666,6 @@ export class ComprobanteComponent implements OnInit {
 
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log("detalle insertado ", data);
         },
         (err) => {}
       );

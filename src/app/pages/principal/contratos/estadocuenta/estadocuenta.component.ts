@@ -24,7 +24,6 @@ export class EstadocuentaComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: {contrato: Contrato},
     private _apiService: ApiService) {
       this.Contrato = data.contrato
-      console.log(this.Contrato)
   }
 
   ngOnInit(): void {
@@ -39,10 +38,8 @@ export class EstadocuentaComponent implements OnInit {
 
     this._apiService.Ejecutar(xAPI).subscribe({
       next: (data) =>{
-        console.log(data)
         this.dataSource = new MatTableDataSource<any>(data.Cuerpo)
         this.dataSource.paginator = this.paginator;
-        console.log(this.dataSource)
       },
       error: (err) => {
         console.error(err)

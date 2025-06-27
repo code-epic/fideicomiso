@@ -48,7 +48,6 @@ export class PlancontableComponent implements OnInit {
 
   ngOnInit(): void {
     this.msj.contenido$.subscribe(e => {
-      console.log(e)
     })
     this.cargarContenido()
   }
@@ -68,14 +67,12 @@ export class PlancontableComponent implements OnInit {
   //   this.xAPI.valores = JSON.stringify(contenido)
   //   // this.apiService.Ejecutar(this.xAPI).subscribe(
   //   //   (data) => {
-  //   //     console.log(data)
   //   //     this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'Data')
   //   //   },
   //   //   (err) => {
   //   //     console.error(err)
   //   //   }
   //   // )
-  //   console.log(this.API)
 
   //   this.nombre = ''
   //   this.observacion = ''

@@ -33,7 +33,6 @@ export class ConfigurarComponent implements OnInit {
     this.xAPI.parametros = "%"
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         this.lstMaestro = data.Cuerpo
       },
       (err) => {
@@ -44,7 +43,6 @@ export class ConfigurarComponent implements OnInit {
   }
 
   SeleccionarCambio(e){
-    console.log('testing', e, this.producto)
     //this.msj.contenido$.emit(this.producto)
   }
 
@@ -55,7 +53,6 @@ export class ConfigurarComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
       // this.animal = result;
     });
   }

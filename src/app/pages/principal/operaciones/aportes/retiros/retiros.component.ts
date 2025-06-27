@@ -84,7 +84,7 @@ export class RetirosComponent implements OnInit {
       },
       (error) => {
         this.ngxService.stopLoader('load-cont')
-        console.log(error)
+        console.error(error)
       }
     )
   }
@@ -136,7 +136,6 @@ export class RetirosComponent implements OnInit {
       this.close()
       return
     }
-    // console.log(this.ELEMENT_DATA)
     let monto = parseFloat(this.ELEMENT_DATA[cant].monto)
     let idplan = this.ELEMENT_DATA[cant].id
     let fecha = this.ELEMENT_DATA[cant].fecha
@@ -155,11 +154,9 @@ export class RetirosComponent implements OnInit {
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(Comprobante)
     cant++
-    // console.log(this.xAPI)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log(data)
 
         this.xAPI.funcion = environment.xApi.INSERTAR_RETIROS
         this.xAPI.parametros = `${data.msj},${monto},${fecha},${idplan}`, 
@@ -169,14 +166,14 @@ export class RetirosComponent implements OnInit {
             this.insertData(cant)
           },
           (error) => {
-            console.log(error)
+            console.error(error)
             this.ngxService.stopLoader('load-cont')
           }
         )
         // this.InsertData(cant)
       },
       (error) => {
-        console.log(error)
+        console.error(error)
         this.ngxService.stopLoader('load-cont')
       }
     )
