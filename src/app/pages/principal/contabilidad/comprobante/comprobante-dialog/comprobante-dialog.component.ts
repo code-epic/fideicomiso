@@ -27,7 +27,6 @@ export class ComprobanteDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.fechaComprobante = this._util.ConvertirFechaHumana(this.xData[0].fecha)
-    console.log(this.fechaComprobante)
     this.totalDebeHaber();
     this.totalDebe = Number(this.totalDebe).toFixed(2);
     this.totalHaber = Number(this.totalHaber).toFixed(2);
