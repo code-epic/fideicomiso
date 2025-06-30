@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Vista Previa</h1>
+<h1 mat-dialog-title class="text-center">Vista Previa</h1>
 <div mat-dialog-content>
     <div id="contenido">
 
@@ -18,7 +18,7 @@
         <div style="display: flex; align-items: center; justify-content: center;">
             <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
                 <p align="center" style="font-weight: bold;font-size: 13px;">
-                    COMPROBANTE CONTABLE
+                    COMPROBANTE CONTABLE AL {{fechaComprobante}}
                 </p>
             </div>
         </div>
@@ -27,7 +27,6 @@
             <thead>
                 <tr>
                     <th>CUENTA</th>
-                    <th>FECHA</th>
                     <th>DESCRIPCION</th>
                     <th>DEBE</th>
                     <th>HABER</th>
@@ -36,13 +35,12 @@
             <tbody>
                 <tr *ngFor="let e of xData">
                     <td>{{ e.cuenta }}</td>
-                    <td>{{ e.fecha }}</td>
                     <td>{{ e.descripcion }}</td>
                     <td>{{ e.debe }}</td>
                     <td>{{ e.haber }}</td>
                 </tr>
                 <tr>
-                    <td colspan="3">
+                    <td colspan="2">
                         <b>TOTAL</b>
                     </td>
                     <td>{{ totalDebe }}</td>

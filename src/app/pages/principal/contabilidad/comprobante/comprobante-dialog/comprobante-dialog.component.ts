@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { log } from 'console';
 import { DialogData } from 'src/app/pages/generico/perfil/perfil.component';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
+import { UtilService } from 'src/app/services/util/util.service';
 
 @Component({
   selector: 'app-comprobante-dialog',
@@ -14,15 +15,18 @@ export class ComprobanteDialogComponent implements OnInit {
   xData: any
   totalDebe: any = 0;
   totalHaber: any = 0;
+  fechaComprobante: string
 
   constructor(public dialogRef: MatDialogRef<ComprobanteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private _imprimir: ImprimirService
+    private _imprimir: ImprimirService,
+    private _util: UtilService
   ) {
       this.xData = data.datos;
     }
 
   ngOnInit(): void {
+    this.fechaComprobante = this._util.ConvertirFechaHumana(this.xData[0].fecha)
     this.totalDebeHaber();
     this.totalDebe = Number(this.totalDebe).toFixed(2);
     this.totalHaber = Number(this.totalHaber).toFixed(2);

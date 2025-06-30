@@ -16,30 +16,44 @@
               <div class="row" style="margin:0px; padding: 0px;">
 
                 <div class="col-md-12">
-
-
-
                   <br>
                   <div class="row">
-                    <div class="col-md-8 text-center">
+
+                    <div class="col-md-6 col-lg-6 col-xl-8 text-center">
                       <mat-form-field appearance="outline">
+                        <mat-label>Buscar</mat-label>
+                        <input matInput placeholder="Buscar..." [(ngModel)]="buscar" (ngModelChange)="filtrarLista()" />
+                        <mat-icon matSuffix>search</mat-icon>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3 col-xl-2 text-center">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Mes</mat-label>
                         <mat-select [(ngModel)]="mes" (selectionChange)="cargarComprobantes()">
                           <mat-option *ngFor="let mes of lstMeses" [value]="mes.valor">
-                            {{ mes.nombre }}
+                            {{ mes.valor }} - {{ mes.nombre }}
                           </mat-option>
                         </mat-select>
                       </mat-form-field>
-
                     </div>
-                    <div class="col-md-4 text-center">
+
+                    <div class="col-md-6 col-lg-3 col-xl-2 text-center">
                       <mat-form-field appearance="outline">
+                        <mat-label>Año</mat-label>
                         <mat-select [(ngModel)]="anio" (selectionChange)="cargarComprobantes()">
                           <mat-option *ngFor="let anio of anios" [value]="anio">
                             {{ anio }}
                           </mat-option>
                         </mat-select>
                       </mat-form-field>
-                    </div>  
+                    </div>
+
+                      <div class="col-1 d-none">
+                        <button mat-icon-button color="primary" class="mt-1">
+                          <mat-icon>settings</mat-icon>
+                        </button> 
+                      </div>
                   </div>
 
                   <mat-selection-list>

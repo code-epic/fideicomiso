@@ -177,6 +177,8 @@ export class ComprobanteComponent implements OnInit {
   Cuentas: string[] = [];
   filteredCuentas: Observable<string[]>;
 
+  public lstOriginal = []; // Lista original sin filtrar
+
   constructor(
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
@@ -266,20 +268,32 @@ export class ComprobanteComponent implements OnInit {
   }
 
   ListarComprobantes() {
-    this.lst = []
-
+    this.lst = [];
     this.xAPI.funcion = environment.xApi.PAGINAR_COMPROBANTES;
     this.xAPI.parametros = `${this.mes}, ${this.anio}, ${this.pageIndex * 10}, ${this.pageSize}`;
     this.xAPI.valores = "";
     this.ngxService.startLoader("load-cont");
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lst = data.Cuerpo;
+        this.lstOriginal = data.Cuerpo; // Guarda la lista original
+        this.lst = [...this.lstOriginal]; // Inicialmente muestra todo
         this.ngxService.stopLoader("load-cont");
+        this.filtrarLista(); // Aplica filtro si hay texto
       },
       (err) => {
         this.ngxService.stopLoader("load-cont");
       }
+    );
+  }
+
+  filtrarLista() {
+    const texto = (this.buscar || '').toLowerCase();
+    if (!texto) {
+      this.lst = [...this.lstOriginal];
+      return;
+    }
+    this.lst = this.lstOriginal.filter(e =>
+      (e.descripcion || '').toLowerCase().includes(texto)
     );
   }
 
