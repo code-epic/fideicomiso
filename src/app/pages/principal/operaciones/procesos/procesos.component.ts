@@ -16,31 +16,34 @@ import Swal from "sweetalert2";
   styleUrls: ["./procesos.component.scss"],
 })
 export class ProcesosComponent implements OnInit {
-  public fechau: any;
-  public fechaultimo = "";
-  public fechai: any;
-  public fechaf: any;
-  public fecha_al: string = "";
+  fechau: any;
+  fechaultimo: string = "";
+  fechai: any;
+  fechaf: any;
+  fecha_al: string = "";
 
-  public lstAsientos = [];
-  public lstVencimiento = [];
-  public lstCompra = [];
-  public bcuentat = false;
-  public dias: number = 1;
-  public acum_debe = 0;
-  public acum_haber = 0;
-  public acum_debev = 0;
-  public acum_debec = 0;
-  public acum_haberv = 0;
-  public blComprobante = false;
-  public blProcesar = false;
+  lstAsientos: any[] = [];
+  lstVencimiento: any[] = [];
+  lstCompra = [];
+  dias: number = 1;
 
-  public xAPI: IAPICore = {
-    funcion: "",
-    parametros: "",
-  };
+  // devengo
+  acum_debe: number = 0;
+  acum_haber: number = 0;
 
-  events: string[] = [];
+  // Compra
+  acum_debec: number = 0;
+
+  // Vencimiento
+  acum_debev: number = 0;
+
+  existenMovimientos: boolean
+
+  xAPI: IAPICore = {
+    funcion: '',
+    parametros: '',
+    valores: ''
+  }
 
   public Comprobante: FID_IComprobante = {
     plan: 0,
@@ -54,10 +57,8 @@ export class ProcesosComponent implements OnInit {
     llave: "",
   };
 
-  visible: boolean = false;
-  recalcular: boolean = false
-
-  // public lstData = []
+  mostrarGenerarComprobante: boolean = false;
+  mostrarComprobantes: boolean = false
 
   constructor(
     private apiService: ApiService,
@@ -69,27 +70,42 @@ export class ProcesosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.lstVencimiento = [];
-    this.lstCompra = [];
     this.consultarUltimoCierre();
   }
 
   async consultarUltimoCierre() {
-    this.ngxService.stopLoader("load-precierre");
+    this.ngxService.startLoader("load-precierre");
     this.fechaultimo = await this.cierre.getUltimoCierre()
     this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);
     this.fechaf = this.fechai
+    this.consultarUltimoCalculo(this.fechai)
     this.ngxService.stopLoader("load-precierre");
   }
 
+  consultarUltimoCalculo(f: any){
+    const fecha = this.util.ConvertirFechaDB(f)
+    const xApi: IAPICore = {
+      funcion: environment.xApi.ULTIMO_COMPROBANTE,
+      parametros: fecha,
+      valores: "",
+    }
+
+    this.apiService.Ejecutar(xApi).subscribe({
+      next: (data) => {
+        this.existenMovimientos = data.Cuerpo.length > 0
+      },
+      error: (error) => {
+        console.error(error)
+      }
+    })
+  }
+
   CalcularDias(type: string, event: MatDatepickerInputEvent<Date>) {
-    this.dias =
-      this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1;
+    this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1;
   }
 
   CalcularDiasInterese(fechai, fechaf): number {
     const calculo = this.util.CalcuarDiasTranscurridos(fechai, fechaf) + 1;
-
     return calculo;
   }
 
@@ -102,58 +118,83 @@ export class ProcesosComponent implements OnInit {
     const usuario = "";
     const llave = "";
 
-    if (true) {
-      this.ngxService.startLoader("load-cont");
-      this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIENTOS_LOTE
-      this.xAPI.parametros = fini + ",I," + usuario + "," + llave;
-
-      this.xAPI.valores = "";
-
-      this.apiService.Ejecutar(this.xAPI).subscribe(
-        async (data) => {
-          this.recalcular = true
-          this.blProcesar = false
-          this.ListarInversiones();
-        },
-        (error) => {
-          console.error(error);
-          this.ngxService.stopLoader("load-cont");
-        }
-      );
+    if (!this.existenMovimientos) {
+      this.existenMovimientos = true
+      this.insertarMovimientos(fini, usuario, llave)
     } 
     else {
       Swal.fire({
-        title: "Informacion",
-        text: 'Ya ha insertado los movimientos',
-        icon: 'info',
-        showCancelButton: false,
+        title: "¡Ya ha insertado los movimientos!",
+        text: '¿Desea Recalcular?',
+        icon: 'question',
+        showCancelButton: true,
         confirmButtonColor: '#3085d6',
-        // cancelButtonColor: '#d33',
-        confirmButtonText: 'Salir',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si',
+        cancelButtonText: 'No',
         allowEscapeKey: true,
       }).then((result) => {
-        // const respuesta = result.isConfirmed
-        // if (respuesta) {
-        //   this.ngxService.startLoader("load-cont");
-        //   this.xAPI.funcion = environment.xApi.BORRAR_MOVIMIENTOS_LOTE
-        //   this.xAPI.parametros = fini;
-        //   this.xAPI.valores = "";
-        //   this.apiService.Ejecutar(this.xAPI).subscribe(
-        //     (data) => {
-        //       this.recalcular = false
-        //       this.CalculoPosicion();
-        //     },
-        //     (error) => {
-        //       console.error(error);
-        //       this.ngxService.stopLoader("load-cont");
-        //     }
-        //   );
-        // }
+        if (result.isConfirmed) {
+          this.eliminarMovimientos(fini)
+        }
       })
       this.ngxService.stopLoader("load-cont");
     }
   }
 
+  private insertarMovimientos(fini: string, usuario: string, llave: string){
+    this.ngxService.startLoader("load-cont");
+    this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIENTOS_LOTE
+    this.xAPI.parametros = fini + ",I," + usuario + "," + llave;
+
+    this.xAPI.valores = "";
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async (data) => {
+        this.mostrarGenerarComprobante = true
+        this.ListarInversiones();
+      },
+      (error) => {
+        console.error(error);
+        this.ngxService.stopLoader("load-cont");
+      }
+    );
+  }
+
+  private eliminarMovimientos(fecha: string){
+    this.ngxService.startLoader("load-cont");
+    this.xAPI.funcion = environment.xApi.BORRAR_MOVIMIENTOS_LOTE
+    this.xAPI.parametros = fecha;
+    this.xAPI.valores = "";
+    this.apiService.Ejecutar(this.xAPI).subscribe({
+      next: (data) => {
+        this.eliminarComprobantes(fecha)
+      },
+      error: (error) => {
+        console.error(error);
+        this.ngxService.stopLoader("load-cont");
+      }
+    });
+  }
+
+  private eliminarComprobantes(fecha: string){
+    this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTES_INVERSIONES
+    this.xAPI.parametros = fecha;
+    this.xAPI.valores = "";
+    this.apiService.Ejecutar(this.xAPI).subscribe({
+      next: (data) => {
+        this.existenMovimientos = false
+        this.CalculoPosicion()
+        this.ngxService.stopLoader("load-cont");
+      },
+      error: (error) => {
+        console.error(error);
+        this.ngxService.stopLoader("load-cont");
+      }
+    });
+  }
+
+  // NO se esta usando
   CalcularInversion() {
     if (this.fechai == undefined || this.fechaf == undefined) {
       this._snackBar.open("Recuerde seleccionar un rango de fechas", "OK");
@@ -172,7 +213,7 @@ export class ProcesosComponent implements OnInit {
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
-        this.visible = false;
+        this.mostrarComprobantes = false;
         await this.ngxService.stopLoader("load-cont");
       },
       (error) => {
@@ -198,79 +239,28 @@ export class ProcesosComponent implements OnInit {
     this.lstAsientos = [];
     this.acum_debe = 0;
     this.acum_haber = 0;
-    this.visible = false;
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         this.lstAsientos = data.Cuerpo;
+
         if (this.lstAsientos.length > 0) {
+          this.mostrarComprobantes = true
           data.Cuerpo.forEach((e) => {
             this.acum_debe += parseFloat(e.interes_acumulado);
             this.acum_haber += parseFloat(e.interes_acumulado);
           });
 
-          this.visible = true;
-
-          let factual = new Date(this.fechau + " 00:00:00");
-          let fcalculo = new Date(this.fechai);
-
-          const partes = this.fechaultimo.split('/'); // Divide la fecha en [día, mes, año]
-          const dia = parseInt(partes[0], 10); // Día
-          const mes = parseInt(partes[1], 10) - 1; // Mes (resta 1 porque los meses en Date comienzan en 0)
-          const anio = parseInt(partes[2], 10); // Año
-
-          const fechaConvertida = new Date(anio, mes, dia); // Crea un objeto Date
-
-
-          if (factual.getTime() > fcalculo.getTime() && fechaConvertida.getTime() < fcalculo.getTime()) {
-            this.blProcesar = true;
-            this.blComprobante = true;
-          }
-
-          this.recalcular = false
-          this.consultarUltimoComprobante();
           this.ListarVencimiento();
           this.Listarcompra();
-          this.blProcesar = false
-        } else {
-          this.recalcular = true
-          this.blComprobante = true;
+        }else{
+          this.mostrarComprobantes = false
+          this.CalculoPosicion()
           this.ngxService.stopLoader("load-cont");
-          this.blProcesar = true
         }
       },
       (error) => {
         console.error(error);
         this.ngxService.stopLoader("load-cont");
-      }
-    );
-  }
-
-  consultarUltimoComprobante() {
-    let xApiAux: IAPICore = {
-      funcion: "FID_CUltimoComprobante",
-      parametros: "",
-      valores: "",
-    };
-    let fechaiAux = ''
-
-    if (this.fechai) {
-      const fecha = new Date(this.fechai);
-      fecha.setDate(fecha.getDate() - 1);
-      const anio = fecha.getFullYear();
-      const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-      const dia = String(fecha.getDate()).padStart(2, '0');
-      fechaiAux = `${anio}-${mes}-${dia}`;
-    }
-
-    this.apiService.Ejecutar(xApiAux).subscribe(
-      (data) => {
-        let ultc = data.Cuerpo[0].ultimaFechaComprobante;
-        if (ultc == fechaiAux) {
-          this.blComprobante = true
-        }
-      },
-      (error) => {
-        console.error(error);
       }
     );
   }
@@ -286,7 +276,7 @@ export class ProcesosComponent implements OnInit {
     this.xAPI.valores = "";
     this.acum_debev = 0;
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (data) => {
+      (data) => {
         this.lstVencimiento = data.Cuerpo;
 
         this.lstVencimiento.map((e) => {
@@ -294,7 +284,7 @@ export class ProcesosComponent implements OnInit {
           this.acum_debev += parseFloat(e.valor_nominal)
         });
 
-        await this.ngxService.stopLoader("load-cont");
+        this.ngxService.stopLoader("load-cont");
       },
       (error) => {
         console.error(error);
@@ -314,18 +304,14 @@ export class ProcesosComponent implements OnInit {
     this.xAPI.valores = "";
     this.acum_debev = 0;
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (data) => {
+      (data) => {
         this.lstCompra = data.Cuerpo;
-
-        if (this.lstCompra.length > 0) {
-          this.visible = true;
-        }
 
         this.lstCompra.map(e => {
           this.acum_debec += e.valor_nominal * 1;
         });
 
-        await this.ngxService.stopLoader("load-cont");
+        this.ngxService.stopLoader("load-cont");
       },
       (error) => {
         console.error(error);
@@ -388,6 +374,14 @@ export class ProcesosComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.InsertData(data, this.lstAsientos.length);
+        this.mostrarComprobantes = false
+        this.mostrarGenerarComprobante = false
+        this.existenMovimientos = true
+        Swal.fire({
+          title: "Comprobantes generados correctamente",
+          confirmButtonColor: '#3085d6',
+          icon: 'success'
+        })
       },
       (error) => {
         console.error(error);
@@ -399,26 +393,19 @@ export class ProcesosComponent implements OnInit {
   InsertData(dt, cant: number) {
     cant++;
     this.xAPI.funcion = environment.xApi.INSERTAR_DEVENGO_INVERIONES
-    this.xAPI.parametros =
-      dt.msj + "," + this.util.ConvertirFechaDB(this.fechai);
+    this.xAPI.parametros = dt.msj + "," + this.util.ConvertirFechaDB(this.fechai);
     this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-
-
         if (this.lstVencimiento.length > 0) {
           this.GenerarComprobanteVencimiento()
         }
         if (this.lstCompra.length > 0) {
           this.GenerarComprobanteCompra()
         } else {
-            this.ngxService.stopLoader("load-cont")
-            this.visible = false;
-            this.blProcesar = false;
-            this.blComprobante = false;
+          this.ngxService.stopLoader("load-cont")
         }
-
 
       },
       (error) => {
@@ -437,9 +424,11 @@ export class ProcesosComponent implements OnInit {
         descripcion: `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(
           fecha
         )}`,
+
         detalle: `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(
           fecha
         )}`,
+        
         fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
         fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
         debe: parseFloat(e.valor_nominal) + this.RendicionCupon(e),
@@ -471,11 +460,6 @@ export class ProcesosComponent implements OnInit {
       (data) => {
         this.lstVencimiento = [];
         this.ngxService.stopLoader("load-cont");
-        this.visible = false;
-
-        this.visible = false;
-        this.blProcesar = false;
-        this.blComprobante = false;
       },
       (error) => {
         console.error(error);
@@ -526,9 +510,6 @@ export class ProcesosComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.lstCompra = [];
-        this.visible = false;
-        this.blProcesar = false;
-        this.blComprobante = false;
         this.ngxService.stopLoader("load-cont");
       },
       (error) => {

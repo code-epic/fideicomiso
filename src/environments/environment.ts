@@ -47,11 +47,13 @@ export const environment = {
     CONSULTAR_COMPROBANTES: 'FID_CComprobantes',
     INSERTAR_COMPROBANTE: 'FID_IComprobante',
     ELIMINAR_COMPROBANTE: 'FID_EComprobante',
+    ELIMINAR_COMPROBANTES_INVERSIONES: 'FID_EComprobantesInversiones',
     INSERTAR_DETALLE_COMPROBANTE: 'FID_IDetalleComprobante',
     CONSULTAR_MOVIMIENTOS_COMPROBANTE: 'FID_CMovimientosComprobante',
     INSERTAR_MOVIMIVIENTOS_COMPROBANTES: 'FID_IMovimientosComprobantes',
     PAGINAR_COMPROBANTES: 'FID_CComprobantesPaginado',
     CONTAR_COMPROBANTES: 'FID_CCantidadComprobantes',
+    ULTIMO_COMPROBANTE: 'FID_CUltimoComprobante',
 
     // Cuentas contables
     CONSULTAR_CUENTAS: 'FID_CCuentas',
