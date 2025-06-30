@@ -48,6 +48,8 @@ export const environment = {
     INSERTAR_MOVIMIVIENTOS_COMPROBANTES: 'FID_IMovimientosComprobantes',
     PAGINAR_COMPROBANTES: 'FID_CComprobantesPaginado',
     CONTAR_COMPROBANTES: 'FID_CCantidadComprobantes',
+    ULTIMO_COMPROBANTE: 'FID_CUltimoComprobante',
+    ELIMINAR_COMPROBANTES_INVERSIONES: 'FID_EComprobantesInversiones',
 
     // Cuentas contables
     CONSULTAR_CUENTAS: 'FID_CCuentas',

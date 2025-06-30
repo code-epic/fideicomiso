@@ -275,10 +275,10 @@ export class ComprobanteComponent implements OnInit {
     this.ngxService.startLoader("load-cont");
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstOriginal = data.Cuerpo; // Guarda la lista original
-        this.lst = [...this.lstOriginal]; // Inicialmente muestra todo
+        this.lstOriginal = data.Cuerpo;
+        this.lst = [...this.lstOriginal];
         this.ngxService.stopLoader("load-cont");
-        this.filtrarLista(); // Aplica filtro si hay texto
+        this.filtrarLista();
       },
       (err) => {
         this.ngxService.stopLoader("load-cont");

@@ -92,7 +92,7 @@
                           Bs. {{ getMoneda(e) }}
                         </div>
                         <div class="col-md-1 text-right d-flex flex-column justify-content-center align-items-end">
-                          <button mat-icon-button aria-label="ELiminar"
+                          <button mat-icon-button aria-label="Eliminar"
                             (click)="eliminarComprobante(e.id, e.descripcion )" matTooltip="Eliminar">
                             <mat-icon class="texto-gray">delete</mat-icon>
                           </button>
@@ -269,7 +269,7 @@
                           <ng-container matColumnDef="accion">
                             <th mat-header-cell *matHeaderCellDef> ACCION </th>
                             <td mat-cell *matCellDef="let e">
-                              <button mat-icon-button aria-label="Editar" (click)="eliminar(e)">
+                              <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e)">
                                 <mat-icon class="text-gray">delete</mat-icon>
                               </button>
 
