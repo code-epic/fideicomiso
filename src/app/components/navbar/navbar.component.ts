@@ -43,15 +43,14 @@ export class NavbarComponent implements OnInit {
   }
 
   cerrar(){
-    
     Swal.fire({
-      title: 'Esta seguro?',
-      text: "de salir del sistema!",
-      icon: 'warning',
+      title: '¿Desea salir del sistema?',
+      icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Si, desconectarme!'
+      confirmButtonText: 'Si',
+      cancelButtonText: 'No'
     }).then((result) => {
       if (result.isConfirmed) {
         sessionStorage.clear()
