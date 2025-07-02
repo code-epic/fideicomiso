@@ -57,16 +57,16 @@ export class LoginService {
     
   }
   getLogin(user: string, clave : string) : Observable<IToken>{
-    var usuario = {
+    const usuario = {
       "nombre" : user,
       "clave" : clave,
     }
-    var url = this.URL + 'wusuario/login'
+    const url = this.URL + 'wusuario/login'
     return this.http.post<IToken>(url, usuario )
   }
   
   makeUser(user: IUsuario): Observable<any>{    
-    var url = this.URL + 'identicacion'   
+    const url = this.URL + 'identicacion'   
     return this.http.post<any>( url, user )
   }
 
@@ -77,13 +77,11 @@ export class LoginService {
   }
 
   protected getUserDecrypt() : any {    
-    var e = sessionStorage.getItem("token");
-    var s = e.split(".");
+    const e = sessionStorage.getItem("token");
+    const s = e.split(".");
     
-    //var str = Buffer.from(s[1], 'base64').toString();
-    var str = atob( s[1] );
+    const str = atob( s[1] );
     this.Token = JSON.parse(str)
-    // console.info(this.Token)
     this.Usuario = this.Token.Usuario
     return JSON.parse(str);
   }
@@ -91,7 +89,7 @@ export class LoginService {
   //ObenterAplicacion 
   protected obenterAplicacion(){
     
-    var Aplicacion = this.Token.Usuario.Aplicacion
+    const Aplicacion = this.Token.Usuario.Aplicacion
     Aplicacion.forEach(e => {
       if(e.id == this.Id ){
         this.Aplicacion = e;
@@ -104,16 +102,16 @@ export class LoginService {
   }
 
   obtenerPrivilegiosMenu(idUrl : string) : any {
-    var App = this.Aplicacion
-    var Menu: any
+    const App = this.Aplicacion
+    let Menu: any
     App.Rol.Menu.forEach(e => {if (e.url == idUrl) Menu = e});
     return Menu
     
   }
 
   obtenerSubMenu(idUrl : string) : any{   
-    var App = this.Aplicacion
-    var SubMenu = [] 
+    const App = this.Aplicacion
+    let SubMenu = [] 
     App.Rol.Menu.forEach(e => {if (e.url == idUrl) SubMenu = e.SubMenu});
     return SubMenu
   }
