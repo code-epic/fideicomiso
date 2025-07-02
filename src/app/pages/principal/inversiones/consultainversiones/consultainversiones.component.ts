@@ -10,6 +10,7 @@ import { UtilService } from "src/app/services/util/util.service";
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 import { MatDialog } from "@angular/material/dialog";
 import { environment } from "src/environments/environment";
+import { WzportafolioComponent } from "./wzportafolio/wzportafolio.component";
 
 @Component({
   selector: 'app-consultainversiones',
@@ -18,13 +19,7 @@ import { environment } from "src/environments/environment";
 })
 export class ConsultainversionesComponent implements OnInit {
 
-
-
-  @ViewChild('wzportafolio', { static: true }) wzportafolio: TemplateRef<any>;
-
   @ViewChild('filex', { static: true }) filex: TemplateRef<any>;
-
-
 
   public Inversiones: Inversion = {
     identificador: 0,
@@ -160,17 +155,13 @@ export class ConsultainversionesComponent implements OnInit {
 
 
 
-  openDialog(e): void {
-
-    this.xinver = JSON.stringify(e)
-
-    const dialogRef = this.dialog.open(this.wzportafolio, {
+  abrirDialogoPortafolio(inversion: any): void {
+    this.dialog.open(WzportafolioComponent, {
       width: '850px',
-      data: {},
+      height: 'auto',
+      data: inversion
     });
   }
-
-  
 
   getZFill(numero : any) : string{
 

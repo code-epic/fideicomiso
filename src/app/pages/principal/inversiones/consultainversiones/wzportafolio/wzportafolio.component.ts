@@ -1,18 +1,15 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Inversion, InversionPortafolio } from 'src/app/services/banfanb/inversiones.service';
-import { MensajeService } from 'src/app/services/util/mensaje.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-wzportafolio',
   templateUrl: './wzportafolio.component.html',
-  styleUrls: ['./wzportafolio.component.css']
+  styleUrls: ['./wzportafolio.component.scss']
 })
 export class WzportafolioComponent implements OnInit {
-
-
-
   public InvPort: InversionPortafolio = {
     id_inversion: 0,
     id_portafolio: 0,
@@ -26,11 +23,10 @@ export class WzportafolioComponent implements OnInit {
     funcion: '',
     parametros: ''
   }
-  @Input() xinver: string
 
   public portafolio 
 
-  public porcentaje : any
+  public porcentaje : any = 0
 
   public monto = 0
   public monto_general = 0
@@ -82,23 +78,31 @@ export class WzportafolioComponent implements OnInit {
 
   public titulo = 'DETALLES DE LA INVERSION POR PORTAFOLIO'
 
-  constructor(private apiService: ApiService, private msj: MensajeService) {
-
+  constructor(
+    private apiService: ApiService, 
+    @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit(): void {
-    this.ListarPortafolio()
-
-  }
-
-
-  ngOnChanges() {
-    this.Inversiones = JSON.parse(this.xinver)
+    this.Inversiones = this.data
     this.Consultar()
-
-
-
+    this.ListarPortafolio()
   }
+  
+
+  private ListarPortafolio() {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIOS
+    this.xAPI.parametros = this.portafolio
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstDataPortafolio = data.Cuerpo
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  } 
 
   getStatus(status): string {
     return status == '1' ? 'ACTIVO' : 'INACTIVO'
@@ -117,31 +121,26 @@ export class WzportafolioComponent implements OnInit {
     this.lstInversiones.push(iPor)
 
     this.blSave = this.total == 100 ? true : false
-   
   }
 
   Commit() {
-
-
     this.xAPI.funcion = environment.xApi.INSERTAR_INVERSIONES_PORTAFOLIO
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.InvPort)
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
+    this.apiService.Ejecutar(this.xAPI).subscribe({
+      next: (data) => {
         this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
         this.Consultar()
         this.Limpiar()
       },
-      error => {
-        console.error(error)
-
+      error: (err) => {
+        console.error(err)
       }
-    )
+  })
 
   }
 
   Consultar() {
-    console.info(this.Inversiones)
     this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES_PORTAFOLIO
     this.xAPI.parametros = this.Inversiones.identificador.toString()
     this.xAPI.valores = ''
@@ -160,48 +159,27 @@ export class WzportafolioComponent implements OnInit {
     )
   }
 
-  Limpiar() {
+  private Limpiar() {
     this.porcentaje = 0.00
     this.portafolio = 1
-
   }
 
 
-  ListarPortafolio() {
-    this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIOS
-    this.xAPI.parametros = this.portafolio
-
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.lstDataPortafolio = data.Cuerpo
-      },
-      (error) => {
-        console.error(error)
-
-      }
-    )
-
-  } 
-
   ConsultarMontoPortafolio(){
-    let portf = this.portafolio.split('|')
-   
+    const portf = this.portafolio.split('|')
+    console.log(portf)
     this.xAPI.funcion = environment.xApi.CONSULTAR_MONTO_PORTAFOLIO
     this.xAPI.parametros = portf[0]
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {        
-        this.monto = data.Cuerpo .reduce((sum, e) => sum + parseFloat(e.monto), 0)
-        this.monto_general = data.Cuerpo .reduce((sum, e) => sum + parseFloat(e.monto_general), 0)
+        this.monto = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto), 0)
+        this.monto_general = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto_general), 0)
       },
       error => {
         console.error(error)
 
       }
     )
-  }
-  
-  Close(){
-
   }
 }

@@ -1,17 +1,14 @@
-<h3>{{titulo}}</h3>
-<hr>
+<h2 mat-dialog-title>{{titulo}}</h2>
 
+<mat-dialog-content>
 
-
-
-
-<div class="container">
+    <hr style="margin-top: 0;">
 
     <div class="row">
         <div class="col-md-12">
             <p>
-               SALDO DISPONIBLE DEL PORTAFOLIO: <b>{{monto}}</b> Bs.<br>
-               VALOR NOMINAL DE LA INVERSION: <b>{{Inversiones.valor_nominal}}</b> Bs.
+                SALDO DISPONIBLE DEL PORTAFOLIO: <b>{{monto}}</b> Bs.<br>
+                VALOR NOMINAL DE LA INVERSION: <b>{{Inversiones.valor_nominal}}</b> Bs.
             </p>
         </div>
     </div>
@@ -19,44 +16,37 @@
     <div class="row">
         <div class="col-md-5">
             <mat-form-field appearance="outline">
-                <mat-label>Portafiloio</mat-label>
+                <mat-label>Portafolio</mat-label>
 
-                <mat-select placeholder="Portafiloio"
-                    [ngModelOptions]="{standalone: true}"
-                    [(ngModel)]="portafolio"
-                    (selectionChange)="ConsultarMontoPortafolio()"
-                    value="{{portafolio}}">
-                    <mat-option *ngFor="let e of lstDataPortafolio" 
-                    value="{{e.id + '|' + e.descripcion}}">{{e.descripcion | uppercase}}</mat-option>
+                <mat-select placeholder="Portafolio" [ngModelOptions]="{standalone: true}" [(ngModel)]="portafolio"
+                    (selectionChange)="ConsultarMontoPortafolio()" value="{{portafolio}}">
+                    <mat-option *ngFor="let e of lstDataPortafolio"
+                        value="{{e.id + '|' + e.descripcion}}">{{e.descripcion | uppercase}}</mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
         <div class="col-md-3">
             <mat-form-field appearance="outline">
                 <mat-label>Saldo para invertir</mat-label>
-                <input matInput placeholder="Saldo para invertir"
-                    [ngModelOptions]="{standalone: true}"
+                <input matInput placeholder="Saldo para invertir" [ngModelOptions]="{standalone: true}"
                     [(ngModel)]="monto_general" currencyMask
-                    [options]="{ prefix: 'Bs. ', thousands: '.', decimal: ',' }"
-                    value="{{monto_general}}">
+                    [options]="{ prefix: 'Bs. ', thousands: '.', decimal: ',' }" value="{{monto_general}}">
             </mat-form-field>
         </div>
         <div class="col-md-2">
             <mat-form-field appearance="outline">
                 <mat-label>Porcentaje</mat-label>
-                <input matInput placeholder="Porcentaje"
-                    [ngModelOptions]="{standalone: true}"
-                    [(ngModel)]="porcentaje"
+                <input matInput placeholder="Porcentaje" [ngModelOptions]="{standalone: true}" [(ngModel)]="porcentaje"
                     value="{{porcentaje}}">
             </mat-form-field>
         </div>
         <div class="col-md-2 text-right">
             <div class="asistente-button-container">
-      
-                <button mat-button color="primary" (click)="Agregar()"> 
-                  <mat-icon>add</mat-icon> Agregar
+
+                <button mat-flat-button color="primary" (click)="Agregar()">
+                    <mat-icon>add</mat-icon> Agregar
                 </button>
-              </div>
+            </div>
         </div>
 
 
@@ -76,7 +66,7 @@
                             {{ e.descripcion | uppercase }}
                         </div>
                         <div class="col-md-2 texto-lista">
-                             {{ e.porcentaje }} %.
+                            {{ e.porcentaje }} %.
                         </div>
 
                         <div class="col-md-2 texto-detalle">
@@ -108,25 +98,25 @@
 
                     <div class="col-md-2 texto-lista">
                         {{ total }} %.
-                   </div>
+                    </div>
 
                 </div>
 
             </mat-list>
         </div>
 
-        <div class="col-md-12 text-right">
-            <hr>
-            <div >
-                <button mat-flat-button color="primary" (click)="Commit()" *ngIf="blSave"> 
-                    <mat-icon>save</mat-icon>&nbsp;&nbsp;Guardar
-                  </button>
-                  &nbsp;&nbsp;
-                <button mat-flat-button color="warn" (click)="Close()"> 
-                  <mat-icon>cancel</mat-icon>&nbsp;&nbsp;Cancelar
-                </button>
-              </div>
-        </div>
-        
     </div>
-</div>
+    <hr style="margin-bottom: 0;">
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-flat-button color="primary" (click)="Commit()" *ngIf="blSave">
+        <mat-icon>save</mat-icon>&nbsp;&nbsp;Guardar
+    </button>
+
+    &nbsp;&nbsp;
+
+    <button mat-flat-button color="warn" mat-dialog-close>
+        <mat-icon>cancel</mat-icon>&nbsp;&nbsp;Cancelar
+    </button>
+</mat-dialog-actions>

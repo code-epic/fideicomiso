@@ -62,10 +62,10 @@
                                                 </div>
                                                 <div class="col-md-2 text-right">
 
-                                                    <button mat-icon-button aria-label="Editar" (click)="editar(e)">
+                                                    <button mat-icon-button aria-label="Editar" matTooltip="Editar" (click)="editar(e)">
                                                         <mat-icon class="texto-gray">edit</mat-icon>
                                                     </button>
-                                                    <button mat-icon-button aria-label="Editar" (click)="openDialog(e)">
+                                                    <button mat-icon-button aria-label="Portafolio" matTooltip="Portafolio" (click)="abrirDialogoPortafolio(e)">
                                                         <mat-icon class="texto-gray">folder</mat-icon>
                                                     </button>
 
@@ -407,8 +407,3 @@
 </div>
 
 <br><br><br>
-
-
-<ng-template  #wzportafolio let-modal >
-    <app-wzportafolio xinver="{{xinver}}"></app-wzportafolio>
-</ng-template>
