@@ -89,7 +89,7 @@ export class CierreService {
   }
 
   getSemestral(fecha: string): boolean {
-    const [anio, mes, dia] = fecha.split('/');
+    const [dia, mes, anio] = fecha.split('/');
     return (mes === '06' && dia === '30') || (mes === '12' && dia === '31');
   }
 
