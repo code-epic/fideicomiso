@@ -104,7 +104,7 @@ export const environment = {
     BORRAR_MOVIMIENTOS_LOTE: 'FID_BashDPosicion',
     DISTRIBUIR_INTERESES: 'FID_BashIntereses',
     INSERTAR_INCREMENTO: 'FID_IIncremento'
-  }, //total 69
+  }, 
 
   functions: {
     

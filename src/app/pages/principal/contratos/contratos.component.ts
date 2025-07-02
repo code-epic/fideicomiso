@@ -14,7 +14,6 @@ import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { MatDialog } from "@angular/material/dialog";
 import { environment } from 'src/environments/environment';
 import { EstadocuentaComponent } from './estadocuenta/estadocuenta.component';
-import Swal from 'sweetalert2';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
 
 @Component({
@@ -202,15 +201,7 @@ export class ContratosComponent implements OnInit {
   public lstDataPortafolio = []
 
   public saldo_inicio = ''
-  private total_disponible = ''
-  private saldo_disponible = ''
-  private capital_asignado = ''
-  private saldo_patrimonio = ''
   private fechaultimo = ''
-  private fechaUltimoComparacion = ''
-  private fecha: string = ''
-  private fdesde: string = '2023-12-01'
-  private fhasta: string = '2023-12-31'
   private estatus: string = '%'
 
   constructor(
@@ -308,15 +299,15 @@ export class ContratosComponent implements OnInit {
   }
 
   ConsultarSaldos(){
-    let antes = new Date(this.fechaUltimoComparacion).setHours(+23)
+    const antes = new Date(this.util.ConvertirFechaDB(this.fechaultimo))
 
-    let sHoy = this.fechaultimo
-    let sAntes = new Date(antes).toISOString().substring(0, 10)
+    const sHoy = this.util.ConvertirFechaDB(this.fechaultimo)
+    const sAntes = new Date(antes).toISOString().substring(0, 10)
 
-    this.fecha = `${sAntes},${sHoy}`
+    const fecha = `${sAntes},${sHoy}`
+
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
-    this.xAPI.parametros = `${this.fecha},${this.estatus}`
-    this.saldo_disponible = '0'
+    this.xAPI.parametros = `${fecha},${this.estatus}`
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       

@@ -31,17 +31,17 @@ export class UtilService {
   }
 
   Semillero(id: string): string {
-    var f = new Date();
-    var anio = f.getFullYear().toString().substring(2, 4);
-    var mes = this.zfill((f.getMonth() + 1).toString(), 2);
-    var dia = this.zfill(f.getDate().toString(), 2);
+    const f = new Date();
+    const anio = f.getFullYear().toString().substring(2, 4);
+    const mes = this.zfill((f.getMonth() + 1).toString(), 2);
+    const dia = this.zfill(f.getDate().toString(), 2);
     return anio + mes + dia + "-" + this.zfill(id, 5);
   }
 
   public zfill(number, width) {
-    var numberOutput = Math.abs(number); /* Valor absoluto del número */
-    var length = number.toString().length; /* Largo del número */
-    var zero = "0"; /* String de cero */
+    const numberOutput = Math.abs(number); /* Valor absoluto del número */
+    const length = number.toString().length; /* Largo del número */
+    const zero = "0"; /* String de cero */
 
     if (width <= length) {
       if (number < 0) {
@@ -80,9 +80,9 @@ export class UtilService {
   //Retorna Fecha Formato: DD/MM/AAAA
   ConvertirFechaHumana(f) {
     if (f == undefined ) return "1900-01-01"
-    var ISODate = new Date(f).toISOString();
-    var fe = ISODate.substr(0, 10);
-    var fa = fe.split("-");
+      const ISODate = new Date(f).toISOString();
+      const fe = ISODate.substr(0, 10);
+      const fa = fe.split("-");
     if (fa[0] != "0001") {
       return fa[2] + "/" + fa[1] + "/" + fa[0];
     } else {
@@ -98,14 +98,14 @@ export class UtilService {
     if (typeof f != "object") {
       faux = "1900-01-01";
       if (f != undefined && f != "") {
-        var fx = f.split("/");
+        const fx = f.split("/");
         faux = fx[2] + "-" + fx[1] + "-" + fx[0];
       }
       return faux;
     } else {
-      var ISODate = new Date(f).toISOString();
-      var fe = ISODate.substr(0, 10);
-      var fa = fe.split("-");
+      const ISODate = new Date(f).toISOString();
+      const fe = ISODate.substr(0, 10);
+      const fa = fe.split("-");
       if (fa[0] != "0001") {
         return fa[0] + "-" + fa[1] + "-" + fa[2];
       } else {
@@ -116,9 +116,9 @@ export class UtilService {
 
   //AAAA-MM-DD
   CalcuarDiasTranscurridos(fechai, fechaf): number {
-    var fechaInicio = new Date(fechai).getTime();
-    var fechaFin = new Date(fechaf).getTime();
-    var diff = fechaFin - fechaInicio;
+    const fechaInicio = new Date(fechai).getTime();
+    const fechaFin = new Date(fechaf).getTime();
+    const diff = fechaFin - fechaInicio;
     return diff / (1000 * 60 * 60 * 24);
   }
 
