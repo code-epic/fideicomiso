@@ -85,10 +85,29 @@ export class WzportafolioComponent implements OnInit {
 
   ngOnInit(): void {
     this.Inversiones = this.data
+    console.log(this.Inversiones)
     this.Consultar()
     this.ListarPortafolio()
   }
   
+  Consultar() {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES_PORTAFOLIO
+    this.xAPI.parametros = this.Inversiones.identificador.toString()
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        console.log(data)
+        this.lstInversiones = data.Cuerpo
+        if( this.lstInversiones!= undefined ) 
+          this.total =  this.lstInversiones.reduce((sum, e) => sum + parseFloat(e.porcentaje), 0)
+        this.Limpiar()
+      },
+      error => {
+        console.error(error)
+
+      }
+    )
+  }
 
   private ListarPortafolio() {
     this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIOS
@@ -96,6 +115,7 @@ export class WzportafolioComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log("CONSULTAR PORTAFOLIOS", data)
         this.lstDataPortafolio = data.Cuerpo
       },
       (error) => {
@@ -109,18 +129,18 @@ export class WzportafolioComponent implements OnInit {
   }
 
   Agregar() {
-    let portf = this.portafolio.split('|')
-    let iPor = {
-      'id_inversion' : this.Inversiones.identificador,
-      'id_portafolio' : parseInt( portf[0]),
-      'descripcion' : portf[1],
-      'porcentaje' : parseFloat(this.porcentaje),
-      'estatus' : 1
+    const portf = this.portafolio.split('|')
+    const iPor = {
+      id_inversion : this.Inversiones.identificador,
+      id_portafolio : parseInt( portf[0]),
+      descripcion : portf[1],
+      porcentaje : parseFloat(this.porcentaje),
+      estatus : 1
     }
     this.total += parseFloat(this.porcentaje)
     this.lstInversiones.push(iPor)
 
-    this.blSave = this.total == 100 ? true : false
+    this.blSave = this.total == 100
   }
 
   Commit() {
@@ -140,25 +160,6 @@ export class WzportafolioComponent implements OnInit {
 
   }
 
-  Consultar() {
-    this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES_PORTAFOLIO
-    this.xAPI.parametros = this.Inversiones.identificador.toString()
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-
-        this.lstInversiones = data.Cuerpo
-        if( this.lstInversiones!= undefined ) 
-          this.total =  this.lstInversiones.reduce((sum, e) => sum + parseFloat(e.porcentaje), 0)
-        this.Limpiar()
-      },
-      error => {
-        console.error(error)
-
-      }
-    )
-  }
-
   private Limpiar() {
     this.porcentaje = 0.00
     this.portafolio = 1
@@ -173,6 +174,7 @@ export class WzportafolioComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {        
+        console.log(data)
         this.monto = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto), 0)
         this.monto_general = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto_general), 0)
       },
