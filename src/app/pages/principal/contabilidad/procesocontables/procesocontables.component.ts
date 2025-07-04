@@ -31,8 +31,6 @@ export class ProcesocontablesComponent implements OnInit {
   dataSource: any;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  public fechau: any
-
   /**
    * Ultimo cierre
    */
@@ -148,7 +146,7 @@ export class ProcesocontablesComponent implements OnInit {
     this.ngxService.startLoader('load-cont')
     this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_COMPROBANTE
     this.xAPI.valores = ''
-    if(this.estatus == "S") fini = this.fechau
+    if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.parametros = fini + ',' + this.estatus
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -182,7 +180,7 @@ export class ProcesocontablesComponent implements OnInit {
 
     this.ngxService.stopLoader('load-precierre')
     this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIVIENTOS_COMPROBANTES
-    if(this.estatus == "S") fini = this.fechau
+    if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.parametros = fini + ',' + this.estatus    
     this.xAPI.valores = ''
     
@@ -227,7 +225,7 @@ export class ProcesocontablesComponent implements OnInit {
   }
 
   consultarValoresSemestrales() {
-    let fecha = '2024-12-31'
+    let fecha = '2025-06-30'
     this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
     this.xAPI.parametros = fecha
     this.xAPI.valores = ''
