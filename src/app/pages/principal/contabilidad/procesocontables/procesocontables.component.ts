@@ -102,8 +102,6 @@ export class ProcesocontablesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.semestral = false
-    this.estatus = 'M'
     this.consultarUltimoCierre()
   }
 
@@ -111,20 +109,11 @@ export class ProcesocontablesComponent implements OnInit {
     this.ngxService.startLoader('load-precierre')
     this.fechaultimo = await this.cierre.getUltimoCierre()
     this.semestral = this.cierre.getSemestral(this.fechaultimo)
-
-    if(this.semestral){
-      this.fechai = this.cierre.getSiguienteDia(this.fechaultimo, 1);
-      this.ValidarPreCierreSemestral(false)
-      if (this.yaProcesadoCierreSemestral) {
-        this.semestral = true;
-        this.estatus = 'S'
-      }
-    }else{
-      this.semestral = false
-      this.estatus = 'M'
-      this.fechai = this.cierre.getSiguienteDia(this.fechaultimo)
-    }
+    this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);
     this.fechaf = this.fechai
+
+    this.estatus = this.semestral ? 'S' : 'M'
+
     this.ngxService.stopLoader('load-precierre')
   }
 
@@ -442,7 +431,7 @@ export class ProcesocontablesComponent implements OnInit {
     
   }
 
-  ValidarPreCierreSemestral(x: boolean = true, ultc = null) {
+  ValidarPreCierreSemestral() {
     this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE_SEMESTRAL
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
@@ -455,25 +444,15 @@ export class ProcesocontablesComponent implements OnInit {
           let finicio = this.util.ConvertirFechaDB(this.fechai);          
           
           if (fentrada == finicio){            
-            if (x) {
-              this.apiService.Mensaje(
-                "Pendiente",
-                "Ya fue procesado el Precierre Semestral: " + this.util.ConvertirFechaHumana(this.fechai),
-                "error",
-                "Cierre"
-              )
-              this.ngxService.stopLoader('load-precierre')
-            }else{
-              this.yaProcesadoCierreSemestral = false
-              this.consultarUltimoCierre()       
-            }
+            this.apiService.Mensaje(
+              "Pendiente",
+              "Ya fue procesado el Precierre Semestral: " + this.util.ConvertirFechaHumana(this.fechai),
+              "error",
+              "Cierre"
+            )
+            this.ngxService.stopLoader('load-precierre')
           }else{
-            if (x) {
-              this.GenerarPrecierre()
-            }else{
-              this.yaProcesadoCierreSemestral = true       
-              this.consultarUltimoCierre()       
-            }
+            this.GenerarPrecierre()
           }      
         }
       },
