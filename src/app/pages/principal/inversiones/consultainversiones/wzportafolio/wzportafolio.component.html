@@ -8,7 +8,7 @@
         <div class="col-md-12">
             <p>
                 SALDO DISPONIBLE DEL PORTAFOLIO: <b>{{monto}}</b> Bs.<br>
-                VALOR NOMINAL DE LA INVERSION: <b>{{Inversiones.valor_nominal}}</b> Bs.
+                VALOR NOMINAL DE LA INVERSION: <b>{{valor_inversion | number:'1.2-2'}}</b> Bs.
             </p>
         </div>
     </div>
@@ -28,27 +28,41 @@
         <div class="col-md-3">
             <mat-form-field appearance="outline">
                 <mat-label>Saldo para invertir</mat-label>
-                <input matInput placeholder="Saldo para invertir" [ngModelOptions]="{standalone: true}"
-                    [(ngModel)]="monto_general" currencyMask
-                    [options]="{ prefix: 'Bs. ', thousands: '.', decimal: ',' }" value="{{monto_general}}">
+                <span matPrefix>Bs</span>
+                <input matInput
+                    placeholder="Saldo para invertir"
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="monto_general"
+                    value="{{monto_general}}"
+                    (input)="onMontoChange()"
+                    [readonly]="bloquearMonto">
             </mat-form-field>
         </div>
         <div class="col-md-2">
             <mat-form-field appearance="outline">
                 <mat-label>Porcentaje</mat-label>
-                <input matInput placeholder="Porcentaje" [ngModelOptions]="{standalone: true}" [(ngModel)]="porcentaje"
-                    value="{{porcentaje}}">
+                <input matInput
+                    placeholder="Porcentaje"
+                    [ngModelOptions]="{standalone: true}" 
+                    [(ngModel)]="porcentaje"
+                    value="{{porcentaje}}"
+                    (keypress)="soloNumeros($event)"
+                    (input)="onPorcentajeChange()"
+                    [readonly]="bloquearPorcentaje">
             </mat-form-field>
         </div>
-        <div class="col-md-2 text-right">
+        <div class="col-md-2">
             <div class="asistente-button-container">
 
-                <button mat-flat-button color="primary" (click)="Agregar()">
-                    <mat-icon>add</mat-icon> Agregar
+                <button mat-mini-fab color="primary" [disabled]="habilitar()" (click)="Agregar()" [matTooltip]="editando ? 'Editar' : 'Agregar'">
+                    <mat-icon>{{editando ? 'edit' : 'add'}}</mat-icon>
+                </button>
+                &nbsp; &nbsp;
+                <button mat-mini-fab color="warn" (click)="limpiarCampos()" matTooltip="Limpiar campos">
+                    <mat-icon>clear</mat-icon>
                 </button>
             </div>
         </div>
-
 
     </div>
 
@@ -75,7 +89,7 @@
 
                         <div class="col-md-1 text-right">
 
-                            <button mat-icon-button aria-label="Editar" (click)="editar(e)">
+                            <button mat-icon-button aria-label="Editar" matTooltip="Editar" (click)="editar(e, i)">
                                 <mat-icon class="texto-gray">edit</mat-icon>
                             </button>
 
@@ -111,7 +125,7 @@
 
 <mat-dialog-actions align="end">
     <button mat-flat-button color="primary" (click)="Commit()" *ngIf="blSave">
-        <mat-icon>save</mat-icon>&nbsp;&nbsp;Guardar
+        <mat-icon>{{editado ? 'edit' : 'save'}}</mat-icon>&nbsp;{{editado ? 'Editar' : 'Guardar'}}
     </button>
 
     &nbsp;&nbsp;
