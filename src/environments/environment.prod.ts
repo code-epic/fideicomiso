@@ -89,6 +89,7 @@ export const environment = {
     INSERTAR_MOVIMIENTOS_INVERSION: 'FID_IMovInversion',
     INSERTAR_INVERSIONES_PORTAFOLIO: 'FID_IInversionesPortafolio',
     CONSULTAR_INVERSIONES_PORTAFOLIO: 'FID_CInversionesPortafolio',
+    BORRAR_INVERSIONES_PORTAFOLIO: 'FID_DInversionesPortafolio',
 
     // Capital y comisiones
     CONSULTAR_CAPITAL_ASIGNADO: 'FID_CCapitalAsignado',

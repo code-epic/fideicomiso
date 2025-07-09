@@ -85,11 +85,12 @@ textarea {
     justify-content: center;
     width: 30px;
     padding-top: 10px;
-  }
-  
-  .asistente-button-container {
+}
 
+.asistente-button-container {
+    width: 100%;
+    display: flex;
     justify-content: center;
-    width: 30px;
-    padding-top: 13px;
-  }
+    padding-top: 9px;
+    gap: 5px;
+}
