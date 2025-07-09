@@ -157,7 +157,7 @@ export class ConsultainversionesComponent implements OnInit {
 
   abrirDialogoPortafolio(inversion: any): void {
     this.dialog.open(WzportafolioComponent, {
-      width: '850px',
+      width: '900px',
       height: 'auto',
       data: inversion
     });

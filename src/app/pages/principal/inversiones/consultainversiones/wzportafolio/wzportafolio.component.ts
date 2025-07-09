@@ -184,12 +184,7 @@ export class WzportafolioComponent implements OnInit {
       this.total += parseFloat(this.porcentaje)
       this.blSave = this.total == 100
 
-      console.log(this.valor_inversion)
       this.valor_inversion -= Number(this.monto_general)
-
-      console.log(this.valor_inversion)
-      console.log(this.monto_general)
-
       this.Limpiar()
 
     if(this.editando){
@@ -257,7 +252,7 @@ export class WzportafolioComponent implements OnInit {
   private Limpiar() {
     this.porcentaje = 0.00
     this.monto_general = 0
-    this.portafolio = '1'
+    this.portafolio = null
   }
 
 
@@ -267,7 +262,8 @@ export class WzportafolioComponent implements OnInit {
     this.xAPI.parametros = portf[0]
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe({
-      next: (data) => {        
+      next: (data) => { 
+        console.log(data)       
         this.monto = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto), 0)
         this.monto_general = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto_general), 0)
       },
@@ -282,7 +278,6 @@ export class WzportafolioComponent implements OnInit {
 
   onPorcentajeChange() {
     if (this.editandoMonto) return; // Evita bucle
-    console.log(this.porcentaje)
     this.editandoPorcentaje = true;
     const valor = Number(this.Inversiones.valor_nominal);
     if (this.porcentaje !== null && this.porcentaje !== undefined && this.porcentaje !== '') {
