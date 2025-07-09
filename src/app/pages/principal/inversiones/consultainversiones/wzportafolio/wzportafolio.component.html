@@ -28,7 +28,7 @@
         <div class="col-md-3">
             <mat-form-field appearance="outline">
                 <mat-label>Saldo para invertir</mat-label>
-                <span matPrefix>Bs</span>
+                <span matPrefix>Bs &nbsp;</span>
                 <input matInput
                     placeholder="Saldo para invertir"
                     [ngModelOptions]="{standalone: true}"
@@ -41,6 +41,7 @@
         <div class="col-md-2">
             <mat-form-field appearance="outline">
                 <mat-label>Porcentaje</mat-label>
+                <span matSuffix>&nbsp; %</span>
                 <input matInput
                     placeholder="Porcentaje"
                     [ngModelOptions]="{standalone: true}" 

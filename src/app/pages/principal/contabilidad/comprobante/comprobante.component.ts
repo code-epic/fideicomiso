@@ -20,6 +20,7 @@ import { ToastrService } from "ngx-toastr";
 import { ComprobanteDialogComponent } from "./comprobante-dialog/comprobante-dialog.component";
 import { MatDialog } from "@angular/material/dialog";
 import { environment } from "src/environments/environment";
+import { CierreService } from "src/app/services/banfanb/cierre.service";
 
 @Component({
   selector: "app-comprobante",
@@ -31,6 +32,7 @@ export class ComprobanteComponent implements OnInit {
   public dataSourceLista = new MatTableDataSource<any>();
   public pageSize = 10;
   public pageIndex = 0;
+  public fechaUltimo: string = ''
 
   public ELEMENT_DATA: IComprobante[] = [];
   displayedColumns: string[] = [
@@ -186,10 +188,11 @@ export class ComprobanteComponent implements OnInit {
     private toastrService: ToastrService,
     private util: UtilService,
     private dialog: MatDialog,
-    private _fb: FormBuilder
+    private _fb: FormBuilder,
+    private _cierre: CierreService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.mes = this.getMes()
     this.anio = this.getAnio()
 
@@ -198,6 +201,7 @@ export class ComprobanteComponent implements OnInit {
     this.cargarContenido();
     this.GenerarSemillero();
     this.cargarComprobantes()
+    this.fechaUltimo = await this._cierre.getUltimoCierre()
   }
 
   cargarComprobantes(){
@@ -707,9 +711,21 @@ export class ComprobanteComponent implements OnInit {
     return this.util.ConvertirFechaHumana(f);
   }
 
-  eliminarComprobante(id, detalle) {
-    Swal.fire({
-      title: `¿Estás seguro que desea eliminar? \n\n ${detalle} `,
+  eliminarComprobante(e: any) {
+    const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo)
+
+    // Si la fecha de cierre es mayor que la fecha de operación del comprobante, no se puede eliminar
+    if (new Date(fechaCierre) > new Date(e.fecha_operacion)) {
+      Swal.fire({
+        title: "No se puede eliminar este comprobante",
+        text: "Este comprobante pertenece a un periodo cerrado",
+        icon: "error",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Aceptar",
+      });
+    }else{
+      Swal.fire({
+      title: `¿Estás seguro que desea eliminar este comprobante? \n\n ${e.descripcion.toUpperCase()} `,
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -719,9 +735,10 @@ export class ComprobanteComponent implements OnInit {
       allowEscapeKey: true,
     }).then((result) => {
       if (result.isConfirmed) {
-        this.deleteData(id);
+        this.deleteData(e.id);
       }
     });
+    }
   }
 
   deleteData(id) {
