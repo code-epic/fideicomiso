@@ -101,7 +101,6 @@ export class WzportafolioComponent implements OnInit {
     this.ListarPortafolio()
   }
 
-  
   Consultar() {
     this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES_PORTAFOLIO
     this.xAPI.parametros = this.Inversiones.identificador.toString()
@@ -261,11 +260,16 @@ export class WzportafolioComponent implements OnInit {
     this.xAPI.funcion = environment.xApi.CONSULTAR_MONTO_PORTAFOLIO
     this.xAPI.parametros = portf[0]
     this.xAPI.valores = ''
+
     this.apiService.Ejecutar(this.xAPI).subscribe({
       next: (data) => { 
-        console.log(data)       
-        this.monto = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto), 0)
-        this.monto_general = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto_general), 0)
+        let suma = 0
+        data.Cuerpo.forEach((e:any) => {
+          suma += Number(e.valor_porcentual)
+        })
+        console.log(suma)
+        // this.monto = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto), 0)
+        // this.monto_general = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto_general), 0)
       },
       error: (error) => {
         console.error(error)
