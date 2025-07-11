@@ -358,6 +358,21 @@ export class ComprobanteComponent implements OnInit {
   Buscar(e) {}
 
   editar(e: any, x: boolean = true) {
+
+    const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo)
+
+    // Si la fecha de cierre es mayor que la fecha de operación del comprobante, no se puede eliminar
+    if (new Date(fechaCierre) > new Date(e.fecha_operacion)) {
+      Swal.fire({
+        title: "No se puede editar este comprobante",
+        text: "Este comprobante pertenece a un periodo cerrado",
+        icon: "error",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Aceptar",
+      });
+      return
+    }
+
     this.Comprobante = e;
     this.auxComprobante = e.id;
     this.fechaejercicio = new FormControl(new Date(e.fecha_ejercicio));
