@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-mayoranalitico',
   templateUrl: './mayoranalitico.component.html',
-  styleUrls: ['./mayoranalitico.component.css']
+  styleUrls: ['./mayoranalitico.component.scss']
 })
 export class MayoranaliticoComponent implements OnInit {
 

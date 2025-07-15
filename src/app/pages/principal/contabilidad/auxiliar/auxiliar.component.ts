@@ -131,7 +131,6 @@ export class AuxiliarComponent implements OnInit {
     this.xAPI.funcion = environment.xApi.CONSULTAR_MAYOR_ANALITICO
     this.xAPI.parametros = `${fecha},${this.cuenta}`
     this.xAPI.valores = ''
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
         this.blista = true
