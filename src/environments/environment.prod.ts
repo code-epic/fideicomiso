@@ -58,6 +58,7 @@ export const environment = {
     BORRAR_CUENTA: 'FID_DCuentaContable',
     CONSULTAR_PLAN_CONTABLE: 'FID_CPlanContable',
     CONSULTAR_ESTADO_CUENTA: 'FID_CEstadoCuenta',
+    CONSULTAR_SALDO_ESPECIFICO: 'FID_CSaldoCuenta',
 
     // Reportes contables
     CONSULTAR_BALANCE_COMPROBACION: 'FID_CBalanceComprobacion',

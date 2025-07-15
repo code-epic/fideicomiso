@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { Inversion, InversionPortafolio } from 'src/app/services/banfanb/inversiones.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
@@ -91,6 +92,7 @@ export class WzportafolioComponent implements OnInit {
   constructor(
     private apiService: ApiService, 
     private _util: UtilService,
+    private _cierre: CierreService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
@@ -254,8 +256,44 @@ export class WzportafolioComponent implements OnInit {
     this.portafolio = null
   }
 
+  async ConsultarMontoPortafolio(){
 
-  ConsultarMontoPortafolio(){
+    let fechaCierre = await this._cierre.getUltimoCierre()
+    fechaCierre = this._util.ConvertirFechaDB(fechaCierre)
+    const portf = this.portafolio.split('|')
+    
+    const cuenta = this.getCuentaPortafolio(portf[0])
+    
+    if(cuenta){
+      this.xAPI.funcion = environment.xApi.CONSULTAR_SALDO_ESPECIFICO
+      this.xAPI.valores = ''
+      this.xAPI.parametros = `${fechaCierre}, ${cuenta}`
+
+      this.apiService.Ejecutar(this.xAPI).subscribe({
+        next: (data) => { 
+          const monto = parseFloat(data.Cuerpo[0].saldo)
+          console.log(monto)
+          this.ConsultarMontoInvertido(monto)
+        },
+        error: (error) => {
+          console.error(error)
+        }
+      })
+    }
+  }
+
+  private getCuentaPortafolio(id: string): string | null{
+    switch(id){
+      case '1':
+        return '18'
+      case '2':
+        return '19'
+      default: 
+        return null
+    }
+  }
+
+  ConsultarMontoInvertido(monto: number){
     const portf = this.portafolio.split('|')
     this.xAPI.funcion = environment.xApi.CONSULTAR_MONTO_PORTAFOLIO
     this.xAPI.parametros = portf[0]
@@ -265,10 +303,11 @@ export class WzportafolioComponent implements OnInit {
       next: (data) => { 
         let suma = 0
         data.Cuerpo.forEach((e:any) => {
-          suma += Number(e.valor_porcentual)
+          suma += parseFloat(e.valor_porcentual)
         })
-        console.log(suma)
-        // this.monto = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto), 0)
+        // console.log(suma)
+        this.monto = monto - suma
+        // console.log(`${monto} - ${suma} = ${this.monto.toFixed(2)}`)
         // this.monto_general = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto_general), 0)
       },
       error: (error) => {
