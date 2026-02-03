@@ -180,7 +180,7 @@ export class CcierreComponent implements OnInit {
   CrearSemestral(llave) {
     this.ngxService.startLoader('load-precierre')
     this.xAPI.funcion = environment.xApi.BORRAR_CIERRE_SEMESTRAL
-    this.xAPI.parametros = `2024-12-31`
+    this.xAPI.parametros = `2025-12-31`
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
