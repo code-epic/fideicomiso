@@ -137,9 +137,10 @@ export class ProcesocontablesComponent implements OnInit {
     this.xAPI.valores = ''
     if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.parametros = fini + ',' + this.estatus
-
+    console.log(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
+        console.log('ARTE ... ', data)
         this.lstMovimientos = data.Cuerpo
         this.lstMovimientos.map(e => {
           this.total_debe += parseFloat(e.debe)
@@ -172,9 +173,11 @@ export class ProcesocontablesComponent implements OnInit {
     if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.parametros = fini + ',' + this.estatus    
     this.xAPI.valores = ''
-    
+
+    console.log('GenerarPrecierre ... ', this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
+        console.log('GenerarPrecierre ... ', data)
         this.apiService.Mensaje(
           "Proceso exitoso",
           "Se ha realizado el Precierre",
@@ -363,6 +366,7 @@ export class ProcesocontablesComponent implements OnInit {
 
           if (fechaAPrecerrar == '2024-12-31' || fechaAPrecerrar == '2024-06-30' || fechaAPrecerrar == '2025-12-31' ) {            
               this.ValidarPreCierreSemestral()
+               console.log('ValidarPreCierre precierre semestral ... ', this.xAPI)
               return;
           }
 
@@ -449,9 +453,10 @@ export class ProcesocontablesComponent implements OnInit {
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.ngxService.startLoader('load-precierre')
-
+    console.log('ValidarPreCierreSemestral ... ', this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
+        console.log('ValidarPreCierreSemestral ... ', data)
         if (data.Cuerpo != undefined ){
           let fentrada = data.Cuerpo[0].fecha;
           let finicio = this.util.ConvertirFechaDB(this.fechai);          
@@ -465,6 +470,7 @@ export class ProcesocontablesComponent implements OnInit {
             )
             this.ngxService.stopLoader('load-precierre')
           }else{
+            console.log('ValidarPreCierreSemestral GenerarPrecierre semestral ... ')
             this.GenerarPrecierre()
           }      
         }
