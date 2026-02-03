@@ -202,7 +202,7 @@ export class ProcesocontablesComponent implements OnInit {
   }
 
   //Recorrer cada plan y realizar cierres individuales **pendientes
-  registrarComprobante(fecha) {
+  iniciarComprobante(fecha) {
     this.Comprobante.descripcion = 'CIERRE SEMESTRAL ASIENTO ' + fecha
     this.Comprobante.detalle = 'CIERRE SEMESTRAL ASIENTO ' + fecha
     this.Comprobante.plan = 1
@@ -214,15 +214,23 @@ export class ProcesocontablesComponent implements OnInit {
   }
 
   consultarValoresSemestrales() {
-    let fecha = '2025-06-30'
+     if (this.fechai == undefined || this.fechaf == undefined) {
+      this._snackBar.open('Recuerde seleccionar un rango de fechas', 'OK')
+      return
+    }
+
+
+    let fini = this.util.ConvertirFechaDB(this.fechai)
+    let fecha = fini
     this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
     this.xAPI.parametros = fecha
     this.xAPI.valores = ''
 
-    this.registrarComprobante(fecha)
+    this.iniciarComprobante(fecha)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
+        console.log(data)
         let debe = 0
         let haber = 0
         data.Cuerpo.forEach(e => {
