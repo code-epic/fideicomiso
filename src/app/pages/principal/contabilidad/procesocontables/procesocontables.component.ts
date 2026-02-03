@@ -361,6 +361,11 @@ export class ProcesocontablesComponent implements OnInit {
           fechaUltimoAux.setUTCDate(fechaUltimoAux.getUTCDate() + 2);
           const fechaUltimoUTCAux = fechaUltimoAux.toISOString();
 
+          if (fechaAPrecerrar == '2024-12-31' || fechaAPrecerrar == '2024-06-30' || fechaAPrecerrar == '2025-12-31' ) {            
+              this.ValidarPreCierreSemestral()
+              return;
+          }
+
           //Validar si el dia ya fue precerrado
           if (fechaAPrecerrarDate < ultimoPrecierreDate) {
             this.apiService.Mensaje(
