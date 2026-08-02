@@ -155,7 +155,6 @@ export class TablasComponent implements OnInit {
     this.dataSourceCuenta = new MatTableDataSource<ILConfiguracionCuenta>(
       this.ELEMENT_DATA_CUENTA
     );
-    this.dataSourceCuenta.paginator = this.paginator;
   }
 
 
@@ -180,7 +179,6 @@ export class TablasComponent implements OnInit {
     this.dataSourceCuenta = new MatTableDataSource<ILConfiguracionCuenta>(
       this.ELEMENT_DATA_CUENTA
     );
-    this.dataSourceCuenta.paginator = this.paginator;
     this.cuenta = "";
     this.myCuentas.setValue("");
     this.txtInstrumento = true;
