@@ -34,6 +34,10 @@ export class SidebarComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+
+    this.cierre.actualizarCierres()
+    this.getCierres()
+
     if (ROUTES.length == 0){
       await this.loginService.Iniciar()
       var App = this.loginService.Aplicacion
@@ -63,9 +67,6 @@ export class SidebarComponent implements OnInit {
     this.router.events.subscribe((event) => {
       this.isCollapsed = true;
     });
-
-    this.cierre.actualizarCierres()
-    this.getCierres()
   }
 
   getCierres() {

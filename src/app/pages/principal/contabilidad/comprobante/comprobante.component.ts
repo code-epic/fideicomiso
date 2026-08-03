@@ -108,9 +108,9 @@ export class ComprobanteComponent implements OnInit {
 
   
 
-  public lstTipoFid = [];
+  public lstTipoFid: any[] = [];
 
-  public lstContratos = [];
+  public lstContratos: any[] = [];
   public razonsocial = "";
   public semillero: Semillero = {
     codigo: 0,
@@ -152,9 +152,9 @@ export class ComprobanteComponent implements OnInit {
   public fechacreacion = new FormControl(new Date());
   public fechaejercicio = new FormControl(new Date());
 
-  public lstComprobante = [];
+  public lstComprobante: any[] = [];
 
-  public lst = [];
+  public lst: any[] = [];
 
   public porta_search = false;
   public porta_insert = true;
@@ -166,7 +166,7 @@ export class ComprobanteComponent implements OnInit {
   public haber: number = 0.0;
   public saldo_debe: string = "0.00";
   public saldo_haber: string = "0.00";
-  public lstCuenta = [];
+  public lstCuenta: any[] = [];
   public mostrarImprimir = false;
 
   public mes: number = null
@@ -179,7 +179,7 @@ export class ComprobanteComponent implements OnInit {
   Cuentas: string[] = [];
   filteredCuentas: Observable<string[]>;
 
-  public lstOriginal = []; // Lista original sin filtrar
+  public lstOriginal: any[] = []; // Lista original sin filtrar
 
   constructor(
     private apiService: ApiService,
@@ -328,7 +328,7 @@ export class ComprobanteComponent implements OnInit {
     this.xAPI.parametros = this.formComprobante.get("plan").value.toString();
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if (data != null) {
+        if (data != null && data.length > 0) {
           this.Contrato = data[0];
           this.getTipoFideicomiso();
         } else {
@@ -345,7 +345,7 @@ export class ComprobanteComponent implements OnInit {
   }
 
   getTipoFideicomiso() {
-    let codigo = this.Contrato.plan;
+    let codigo = this.Contrato?.plan || "";
 
     this.lstTipoFid = [];
     this.lstTipoFideicomiso.forEach((e) => {
@@ -415,6 +415,32 @@ export class ComprobanteComponent implements OnInit {
     }
   }
 
+  inicializarContrato() {
+    this.Contrato = {
+      numero: "",
+      rif: "",
+      razonsocial: "",
+      plan: "",
+      estatus: "2",
+      tipo: "",
+      empresa: "",
+      fideicomiso: "",
+      reporte: "",
+      codigo: "",
+      plananterior: "",
+      grupoanterior: "",
+      segmento: "",
+      subsegmento: "",
+      oficinatutora: "",
+      fecha: new Date(),
+      clasificacion: "1",
+      Direccion: undefined,
+      Ejecutivo: undefined,
+      Politicas: undefined,
+      Saldos: undefined,
+    };
+  }
+
   Limpiar() {
     this.Comprobante = {
       plan: 0,
@@ -428,7 +454,7 @@ export class ComprobanteComponent implements OnInit {
       llave: "M",
     };
 
-    this.Contrato.razonsocial = "";
+    this.inicializarContrato();
 
     this.formComprobante.reset();
     this.dataSource = null;
@@ -447,7 +473,7 @@ export class ComprobanteComponent implements OnInit {
     this.xAPI.valores = {};
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if (data != null) {
+        if (data != null && data.length > 0) {
           let codigo = parseInt(data[0].codigo) + 1;
           this.Comprobante.codigo = this.util.zfill(codigo, 4);
         } else {
@@ -611,8 +637,9 @@ export class ComprobanteComponent implements OnInit {
       haber += parseFloat(e.haber.toString());
     });
 
-    this.Comprobante.detalle =
-      this.Contrato.rif + " - " + this.Contrato.razonsocial.toUpperCase();
+    const rif = this.Contrato?.rif || "";
+    const razonSocial = this.Contrato?.razonsocial?.toUpperCase() || "";
+    this.Comprobante.detalle = `${rif} - ${razonSocial}`;
 
     this.Comprobante.debe = debe;
     this.Comprobante.haber = haber;
