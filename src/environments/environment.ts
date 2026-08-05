@@ -11,6 +11,7 @@ export const environment = {
 
   xApi: {
     // Operaciones básicas de consulta
+    CONSULTAR_PLANES: 'ConsultarDatos',
     CONSULTAR_ULTIMO_CIERRE: 'FID_CUltimoCierre',
     CONSULTAR_ULTIMO_PRECIERRE: 'FID_CUltimoPreCierre',
     CONSULTAR_ULTIMO_CIERRE_SEMESTRAL: 'FID_CFechaMaxPreCierreSemestral',

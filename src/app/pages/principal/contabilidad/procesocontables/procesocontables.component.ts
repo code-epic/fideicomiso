@@ -204,11 +204,11 @@ export class ProcesocontablesComponent implements OnInit {
     return this.util.ConvertirMoneda( monto );
   }
 
-  //Recorrer cada plan y realizar cierres individuales **pendientes
-  iniciarComprobante(fecha) {
+  //Recorrer cada plan y realizar cierres individuales
+  iniciarComprobante(fecha, plan) {
     this.Comprobante.descripcion = 'CIERRE SEMESTRAL ASIENTO ' + fecha
     this.Comprobante.detalle = 'CIERRE SEMESTRAL ASIENTO ' + fecha
-    this.Comprobante.plan = 1
+    this.Comprobante.plan = plan
     this.Comprobante.fecha_ejercicio = this.util.FechaActual()
     this.Comprobante.fecha_operacion = fecha
     this.Comprobante.debe = 0.00
@@ -222,17 +222,52 @@ export class ProcesocontablesComponent implements OnInit {
       return
     }
 
-
     let fini = this.util.ConvertirFechaDB(this.fechai)
     let fecha = fini
-    this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
-    this.xAPI.parametros = fecha
+    this.ngxService.startLoader('load-precierre')
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PLANES
+    this.xAPI.parametros = ''
     this.xAPI.valores = ''
 
-    this.iniciarComprobante(fecha)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+        const planes = data.Cuerpo.map((p: any) => p.id)
+        const confirmado = await Swal.fire({
+          title: 'Esta seguro que desea realizar la operación de cierre semestral',
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Si',
+          cancelButtonText: 'No',
+          allowEscapeKey: true,
+        })
+
+        if (confirmado.isConfirmed) {
+          await this.procesarCierreSemestral(fecha, planes, 0)
+        }
+        this.ngxService.stopLoader('load-precierre')
+      },
+      error => {
+        console.error(error)
+        this.ngxService.stopLoader('load-precierre')
+      }
+    )
+  }
+
+  async procesarCierreSemestral(fecha: string, planes: number[], idx: number) {
+    if (idx >= planes.length) return
+
+    const plan = planes[idx]
+    this.lstData = []
+    this.iniciarComprobante(fecha, plan)
+
+    this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
+    this.xAPI.parametros = `${fecha},${plan}`
+    this.xAPI.valores = ''
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
+      async data => {
         console.log(data)
         let debe = 0
         let haber = 0
@@ -262,41 +297,34 @@ export class ProcesocontablesComponent implements OnInit {
         this.lstData.push(dcx)
         this.Comprobante.debe = debe
         this.Comprobante.haber = debe
-        Swal.fire({
-          title: 'Esta seguro que desea realizar la operación de cierre semestral',
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Si',
-          cancelButtonText: 'No',
-          allowEscapeKey: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.Acepar()
-          }
-        })
+        await this.Acepar()
+        await this.procesarCierreSemestral(fecha, planes, idx + 1)
       },
       error => { }
     )
   }
 
-  Acepar() {
-    this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
-    this.xAPI.parametros = "";
-    this.Comprobante.codigo = this.util.GenerarUnicId()
-        
-    this.xAPI.valores = JSON.stringify(this.Comprobante);
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (data) => {
-        
-        await this.GuardarDetalle(data.msj);
-        this.ngxService.stopLoader("load-cont");
-        this.lstData = [];
-      },
-      (err) => { }
-    );
+  Acepar(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      this.ngxService.startLoader("load-cont");
+      this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
+      this.xAPI.parametros = "";
+      this.Comprobante.codigo = this.util.GenerarUnicId()
+          
+      this.xAPI.valores = JSON.stringify(this.Comprobante);
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        async (data) => {
+          
+          await this.GuardarDetalle(data.msj);
+          this.ngxService.stopLoader("load-cont");
+          this.lstData = [];
+          resolve();
+        },
+        (err) => {
+          resolve();
+        }
+      );
+    })
   }
 
   async GuardarDetalle(comprobante: number) {
@@ -307,7 +335,7 @@ export class ProcesocontablesComponent implements OnInit {
       this.IDComprobante.fecha_ejercicio = e.fecha_ejercicio
       this.IDComprobante.fecha_operacion = e.fecha_operacion
       this.IDComprobante.cuenta = e.cuenta
-      this.IDComprobante.plan = 1
+      this.IDComprobante.plan = this.Comprobante.plan
 
       this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE
       this.xAPI.parametros = "";
@@ -364,7 +392,7 @@ export class ProcesocontablesComponent implements OnInit {
           fechaUltimoAux.setUTCDate(fechaUltimoAux.getUTCDate() + 2);
           const fechaUltimoUTCAux = fechaUltimoAux.toISOString();
 
-          if (fechaAPrecerrar == '2024-12-31' || fechaAPrecerrar == '2024-06-30' || fechaAPrecerrar == '2025-12-31' ) {            
+          if (this.cierre.getSemestral(this.util.ConvertirFechaHumana(fechaAPrecerrar))) {            
               this.ValidarPreCierreSemestral()
                console.log('ValidarPreCierre precierre semestral ... ', this.xAPI)
               return;
@@ -407,7 +435,7 @@ export class ProcesocontablesComponent implements OnInit {
               }
             })
           } else {
-            if (fechaAPrecerrar == '2024-12-31' || fechaAPrecerrar == '2024-06-30' || fechaAPrecerrar == '2025-12-31' ) {            
+            if (this.cierre.getSemestral(this.util.ConvertirFechaHumana(fechaAPrecerrar))) {            
               this.ValidarPreCierreSemestral()
             } else {
               this.GenerarPrecierre()
