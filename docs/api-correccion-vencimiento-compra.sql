@@ -1,0 +1,136 @@
+-- Corrección de APIs FID_IVencimientoInversiones y FID_ICompraInversiones
+-- BD destino: MongoDB apicore (driver MYDBFID), colección apicore, campo query.
+-- Fecha: 03/08/2026
+-- Motivo:
+--   1) El SQL ignoraba el parámetro $2 (codigo de la inversión) y filtraba solo
+--      por fecha ($1), por lo que al vencer/comprar 2+ inversiones el mismo día
+--      cada comprobante repetía el detalle de TODAS (duplicados, asientos
+--      desbalanceados y mezcla de configuraciones de instrumentos).
+--   2) Usaba LEFT JOIN: cuando el instrumento no tenía configuración, insertaba
+--      una línea basura (cuenta NULL, debe/haber 0).
+--   3) FID_IVencimientoInversiones ponía rendimiento_vencimiento en todas las
+--      líneas en lugar de valor_nominal (cuentas de capital 712) y
+--      rendimiento (cuentas de rendimiento 714), con el total en caja (711).
+
+-- =====================================================================
+-- 1) FID_IVencimientoInversiones (QUERY ANTIGUO - ROTO)
+-- =====================================================================
+-- INSERT INTO fideicomiso.detalle_comprobante
+-- (id_comprobante, cuenta, debe, haber, fecha_operacion, fecha_ejercicio, fecha_creacion, plan)
+-- SELECT
+-- 	$0,
+-- 	dinamica.idc AS cuenta,
+-- 	IF(dinamica.aumenta='DEBE', rendimiento_vencimiento , 0.00) AS debe,
+-- 	IF(dinamica.aumenta='HABER', rendimiento_vencimiento, 0.00) AS haber,
+-- 	fecha_vencimiento as operacion,
+-- 	fecha_vencimiento as ejercicio,
+-- 	current_timestamp() as creacion,
+-- 	1
+-- FROM
+-- 	inversiones pi
+-- LEFT JOIN (
+-- 	SELECT idc, ope, acc,
+-- 		CASE WHEN aumenta = 'DEBE' THEN IF(acc='D', 'HABER', 'DEBE') ELSE 'HABER' END AS aumenta,
+-- 		idi
+-- 	FROM cuenta_configuracion cc
+-- 	JOIN cuenta c ON cc.idc = c.id
+-- 	WHERE ope = 1 AND tip = 'V') AS dinamica ON
+-- 	dinamica.ope = 1 AND idi=pi.id_instrumento
+-- WHERE pi.fecha_vencimiento = '$1'
+
+-- =====================================================================
+-- 2) FID_IVencimientoInversiones (QUERY NUEVO - CORREGIDO)
+-- =====================================================================
+-- INSERT INTO fideicomiso.detalle_comprobante
+-- (id_comprobante, cuenta, debe, haber, fecha_operacion, fecha_ejercicio, fecha_creacion, plan)
+-- SELECT
+-- 	$0,
+-- 	d.idc AS cuenta,
+-- 	IF(d.aumenta = 'DEBE', IF(d.codigo_padre = '714' OR am.tipo = 'R', pi.rendimiento_vencimiento, pi.valor_nominal), 0.00) AS debe,
+-- 	IF(d.aumenta = 'HABER', IF(d.codigo_padre = '714' OR am.tipo = 'R', pi.rendimiento_vencimiento, pi.valor_nominal), 0.00) AS haber,
+-- 	pi.fecha_vencimiento AS operacion,
+-- 	pi.fecha_vencimiento AS ejercicio,
+-- 	current_timestamp() AS creacion,
+-- 	1
+-- FROM inversiones pi
+-- JOIN (
+-- 	SELECT cc.idc, cc.idi,
+-- 		CASE WHEN c.aumenta = 'DEBE' THEN IF(cc.acc='D', 'HABER', 'DEBE') ELSE 'HABER' END AS aumenta,
+-- 		c.codigo_padre
+-- 	FROM cuenta_configuracion cc
+-- 	JOIN cuenta c ON cc.idc = c.id
+-- 	WHERE cc.ope = 1 AND cc.tip = 'V'
+-- ) d ON d.idi = pi.id_instrumento
+-- JOIN (
+-- 	SELECT '712' AS codigo_padre, 'V' AS tipo
+-- 	UNION ALL SELECT '714', 'R'
+-- 	UNION ALL SELECT '711', 'V'
+-- 	UNION ALL SELECT '711', 'R'
+-- ) am ON am.codigo_padre = d.codigo_padre
+-- WHERE pi.id = '$2'
+
+-- =====================================================================
+-- 3) FID_ICompraInversiones (QUERY ANTIGUO - ROTO)
+-- =====================================================================
+-- INSERT INTO fideicomiso.detalle_comprobante
+-- (id_comprobante, cuenta, debe, haber, fecha_operacion, fecha_ejercicio, fecha_creacion, plan)
+-- SELECT
+-- 	$0,
+-- 	dinamica.idc AS cuenta,
+-- 	IF(dinamica.aumenta='DEBE', costo_adquisicion , 0.00) AS debe,
+-- 	IF(dinamica.aumenta='HABER', costo_adquisicion, 0.00) AS haber,
+-- 	fecha_compra as operacion,
+-- 	fecha_compra as ejercicio,
+-- 	current_timestamp() as creacion,
+-- 	1
+-- FROM
+-- 	inversiones pi
+-- LEFT JOIN (
+-- 	SELECT idc, ope, acc,
+-- 		CASE WHEN aumenta = 'DEBE' THEN IF(acc='D', 'HABER', 'DEBE') ELSE 'HABER' END AS aumenta,
+-- 		idi
+-- 	FROM cuenta_configuracion cc
+-- 	JOIN cuenta c ON cc.idc = c.id
+-- 	WHERE ope = 1 AND tip = 'C') AS dinamica ON
+-- 	dinamica.ope = 1 AND idi=pi.id_instrumento
+-- WHERE pi.fecha_compra = '$1'
+
+-- =====================================================================
+-- 4) FID_ICompraInversiones (QUERY NUEVO - CORREGIDO)
+-- =====================================================================
+-- INSERT INTO fideicomiso.detalle_comprobante
+-- (id_comprobante, cuenta, debe, haber, fecha_operacion, fecha_ejercicio, fecha_creacion, plan)
+-- SELECT
+-- 	$0,
+-- 	dinamica.idc AS cuenta,
+-- 	IF(dinamica.aumenta='DEBE', pi.costo_adquisicion, 0.00) AS debe,
+-- 	IF(dinamica.aumenta='HABER', pi.costo_adquisicion, 0.00) AS haber,
+-- 	pi.fecha_compra AS operacion,
+-- 	pi.fecha_compra AS ejercicio,
+-- 	current_timestamp() AS creacion,
+-- 	1
+-- FROM
+-- 	inversiones pi
+-- JOIN (
+-- 	SELECT cc.idc, cc.acc,
+-- 		CASE WHEN c.aumenta = 'DEBE' THEN IF(cc.acc='D', 'HABER', 'DEBE') ELSE 'HABER' END AS aumenta,
+-- 		cc.idi
+-- 	FROM cuenta_configuracion cc
+-- 	JOIN cuenta c ON cc.idc = c.id
+-- 	WHERE cc.ope = 1 AND cc.tip = 'C'
+-- ) dinamica ON dinamica.idi = pi.id_instrumento
+-- WHERE pi.id = '$2'
+
+-- =====================================================================
+-- 5) Configuración faltante: compra de instrumento 25 (CERTIFICADO DE
+--    MICROCREDITO). Sin esta configuración, FID_ICompraInversiones no
+--    genera líneas (o generaba una línea NULL con LEFT JOIN).
+--    INSERT INTO cuenta_configuracion (idc, idi, tip, acc, ope) VALUES
+--        (3, 25, 'C', 'D', 1),   -- caja: HABER
+--        (6, 25, 'C', 'A', 1);   -- deposito microcredito: DEBE
+-- =====================================================================
+
+-- =====================================================================
+-- 6) Reparación de datos del 13/05/2026 (comprobantes 4183-4186)
+--    Ejecutado contra BD MySQL fideicomiso (ver bitácora de ejecución).
+-- =====================================================================

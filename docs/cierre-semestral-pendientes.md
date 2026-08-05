@@ -55,7 +55,7 @@ Estado: **NO listo**. El flujo semestral no se activaría para 2026-06-30.
 
 1. [x] Definir la fecha objetivo del cierre semestral (2026-06-30).
 2. [x] Actualizar las fechas hardcodeadas en `procesocontables.component.ts` y `ccierre.component.ts`.
-3. [ ] Activar `FID_IComprobante` y `FID_IDetalleComprobante` en `apicore` (`estatus: true`).
+3. [x] Activar `FID_IComprobante` y `FID_IDetalleComprobante` en `apicore` (`estatus: true`).
 4. [ ] Corregir el menú/ruta para que "Cierre Contable" apunte a `CcierreComponent`.
 5. [x] Verificar que existan movimientos y precierres hasta el 2026-06-30.
 6. [x] Revisar y commitear el trabajo multi-plan en curso.
@@ -63,7 +63,20 @@ Estado: **NO listo**. El flujo semestral no se activaría para 2026-06-30.
 
 ## Actualización 2026-08-05
 
-Ejecutados los puntos 1, 2, 5 y 6 del checklist (3 y 4 quedan fuera de alcance).
+Ejecutados los puntos 1, 2, 3, 5 y 6 del checklist (el 4 queda fuera de alcance).
+
+### Punto 3 — APIs del cierre activadas
+
+Actualizadas en `apicore` (MongoDB local, colección `apicore`):
+
+| Funcion | Cambio |
+|---------|--------|
+| `FID_IComprobante` | `estatus: false` → `true` |
+| `FID_IDetalleComprobante` | `estatus: false` → `true` |
+| `FID_IMovimientosComprobantes` | `metodo: CONSULTAR` → `INSERTAR` (consistencia: ejecuta INSERT) |
+
+Esto desbloquea `Acepar()` / `GuardarDetalle()` para insertar el asiento del
+cierre semestral.
 
 ### Punto 2 — detección dinámica de fechas semestrales
 

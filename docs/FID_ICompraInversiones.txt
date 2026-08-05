@@ -1,0 +1,22 @@
+INSERT INTO fideicomiso.detalle_comprobante
+(id_comprobante, cuenta, debe, haber, fecha_operacion, fecha_ejercicio, fecha_creacion, plan)
+SELECT
+	$0,
+	dinamica.idc AS cuenta,
+	IF(dinamica.aumenta='DEBE', pi.costo_adquisicion, 0.00) AS debe,
+	IF(dinamica.aumenta='HABER', pi.costo_adquisicion, 0.00) AS haber,
+	pi.fecha_compra AS operacion,
+	pi.fecha_compra AS ejercicio,
+	current_timestamp() AS creacion,
+	1
+FROM
+	inversiones pi
+JOIN (
+	SELECT cc.idc, cc.acc,
+		CASE WHEN c.aumenta = 'DEBE' THEN IF(cc.acc='D', 'HABER', 'DEBE') ELSE 'HABER' END AS aumenta,
+		cc.idi
+	FROM cuenta_configuracion cc
+	JOIN cuenta c ON cc.idc = c.id
+	WHERE cc.ope = 1 AND cc.tip = 'C'
+) dinamica ON dinamica.idi = pi.id_instrumento
+WHERE pi.id = '$2'
