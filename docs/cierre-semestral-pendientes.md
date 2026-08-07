@@ -45,11 +45,13 @@ Estado: **NO listo**. El flujo semestral no se activaría para 2026-06-30.
 - Sin esos datos, `FID_CUltimoPrecierre` devolverá una fecha anterior y
   `ValidarPreCierre` bloqueará con "Tiene pendiente el cierre del anterior".
 
-## 5. Trabajo sin commitear (soporte multi-plan)
+## 5. Soporte multi-plan (diferido)
 
-- `ccierre.component.ts`, `procesocontables.component.ts` y `environment.ts` / `environment.prod.ts`
-  tienen cambios sin commit para soportar múltiples planes.
-- Revisar, completar y commitear antes de aplicar las correcciones anteriores.
+- Se desarrolló soporte para múltiples planes (`ccierre.component.ts`,
+  `procesocontables.component.ts` y `environment.ts` / `environment.prod.ts`).
+- **Decisión 2026-08-07**: se revirtió; el cierre semestral vuelve a usar el
+  plan fijo `1`. Implementar el soporte multi-plan real queda como tarea
+  pendiente (ver Actualización 2026-08-07).
 
 ## Checklist para dejar listo el sistema
 
@@ -58,8 +60,9 @@ Estado: **NO listo**. El flujo semestral no se activaría para 2026-06-30.
 3. [x] Activar `FID_IComprobante` y `FID_IDetalleComprobante` en `apicore` (`estatus: true`).
 4. [ ] Corregir el menú/ruta para que "Cierre Contable" apunte a `CcierreComponent`.
 5. [x] Verificar que existan movimientos y precierres hasta el 2026-06-30.
-6. [x] Revisar y commitear el trabajo multi-plan en curso.
+6. [x] Revertir el soporte multi-plan (queda como tarea pendiente; cierre a plan fijo `1`).
 7. [ ] Probar el flujo completo en un ambiente de pruebas antes de producción.
+8. [ ] Implementar soporte multi-plan (diferido por decisión del usuario).
 
 ## Actualización 2026-08-05
 
@@ -106,17 +109,26 @@ completar esos precierres diarios. Además, el asiento del cierre semestral
 (`Acepar` → `FID_IComprobante`, `GuardarDetalle` → `FID_IDetalleComprobante`)
 no podrá completarse mientras esas APIs estén `estatus: false` (punto 3).
 
-### Punto 6 — trabajo multi-plan
+### Punto 6 — trabajo multi-plan (REVERTIDO)
 
-Revisado y completo:
-- `ccierre.component.ts` `CrearSaldos`: recorre todos los planes vía
-  `ConsultarDatos` (`SELECT * FROM plan_fideicomiso`) y ejecuta
-  `FID_ISaldosCierre` por cada uno de forma secuencial.
-- `procesocontables.component.ts`: `ValidarPreCierreSemestral` →
-  `procesarCierreSemestral` recursivo por plan; `Acepar`/`GuardarDetalle` usan
-  el plan real (antes fijo `1`); `FID_CMovimientosSemestrales` recibe
-  `fecha,plan` (la API soporta `$0` y `$1`).
-- `environment.ts` / `environment.prod.ts`: agregado `CONSULTAR_PLANES`.
+Por decisión del usuario se elimina el soporte multi-plan (no se agrega);
+queda como tarea pendiente. Ver Actualización 2026-08-07.
 
-Commiteado junto con el build de producción de `dist/`. `data/01AGO2026.sql`
-(dump de 97MB) quedó excluido vía `.gitignore` (`/data`).
+## Actualización 2026-08-07
+
+### Punto 6 — soporte multi-plan revertido
+
+Por decisión del usuario se elimina el soporte multi-plan; queda como tarea
+pendiente (checklist ítem 8). Revertido a plan fijo `1`:
+
+- `ccierre.component.ts` `CrearSaldos`: vuelve al plan fijo `1` (llamada directa
+  a `FID_ISaldosCierre`, sin `ConsultarDatos` ni recorrido de planes).
+- `procesocontables.component.ts`: `iniciarComprobante(fecha)` a plan `1`,
+  `consultarValoresSemestrales` en un solo plan (sin `procesarCierreSemestral`);
+  `GuardarDetalle` escribe plan `1`.
+- `environment.ts` / `environment.prod.ts`: eliminado `CONSULTAR_PLANES`.
+
+Se mantiene la detección dinámica de fechas semestrales (`getSemestral`,
+`CrearSemestral` con fecha derivada de `fechaultimo`). Compilado de `dist/`
+actualizado. `data/01AGO2026.sql` (dump de 97MB) sigue excluido vía `.gitignore`
+(`/data`).

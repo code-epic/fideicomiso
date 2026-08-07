@@ -151,27 +151,14 @@ export class CcierreComponent implements OnInit {
       fultimo = f.toISOString().split('T')[0]
     }
     let usuario = 'Administrador'
+    let plan = '1'
 
     this.ngxService.startLoader('load-precierre')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_PLANES
-    this.xAPI.parametros = ''
+    this.xAPI.funcion = environment.xApi.INSERTAR_SALDOS_CIERRE
+    this.xAPI.parametros = `${fopera},${usuario},${llave},${plan},${fultimo}`
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        const planes = data.Cuerpo.map((p: any) => p.id)
-
-        for (const plan of planes) {
-          await new Promise<void>((resolve, reject) => {
-            this.xAPI.funcion = environment.xApi.INSERTAR_SALDOS_CIERRE
-            this.xAPI.parametros = `${fopera},${usuario},${llave},${plan},${fultimo}`
-            this.xAPI.valores = ''
-            this.apiService.Ejecutar(this.xAPI).subscribe(
-              () => resolve(),
-              (error) => reject(error)
-            )
-          })
-        }
-
         this.apiService.Mensaje(
           "Proceso exitoso",
           "Se ha realizado el cierre para el dia: " + this.util.ConvertirFechaHumana(this.fechai),
