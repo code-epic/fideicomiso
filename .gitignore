@@ -12,6 +12,7 @@ package-lock.json
 
 # dumps y datos temporales
 /data
+/docs
 
 # IDEs and editors
 /.angular
