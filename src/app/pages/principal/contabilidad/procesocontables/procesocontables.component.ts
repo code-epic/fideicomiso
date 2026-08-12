@@ -225,7 +225,7 @@ export class ProcesocontablesComponent implements OnInit {
     this.lstData = []
     let fecha = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
-    this.xAPI.parametros = fecha
+    this.xAPI.parametros = fecha + ',1'
     this.xAPI.valores = ''
 
     this.iniciarComprobante(fecha)
