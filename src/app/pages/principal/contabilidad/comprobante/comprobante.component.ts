@@ -624,6 +624,11 @@ export class ComprobanteComponent implements OnInit {
     });
     this.saldo_debe = debe.toFixed(2);
     this.saldo_haber = haber.toFixed(2);
+
+    if (this.formComprobante) {
+      this.formComprobante.get("totalDebe").setValue(this.saldo_debe);
+      this.formComprobante.get("totalHaber").setValue(this.saldo_haber);
+    }
   }
 
   getComprobante() {
