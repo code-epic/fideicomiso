@@ -222,8 +222,7 @@ export class ProcesocontablesComponent implements OnInit {
       return
     }
 
-    let fini = this.util.ConvertirFechaDB(this.fechai)
-    let fecha = fini
+    let fecha = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
     this.xAPI.parametros = fecha
     this.xAPI.valores = ''

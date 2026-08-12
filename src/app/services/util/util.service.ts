@@ -98,6 +98,9 @@ export class UtilService {
     if (typeof f != "object") {
       faux = "1900-01-01";
       if (f != undefined && f != "") {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(f)) {
+          return f;
+        }
         const fx = f.split("/");
         faux = fx[2] + "-" + fx[1] + "-" + fx[0];
       }
