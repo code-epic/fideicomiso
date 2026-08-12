@@ -378,9 +378,6 @@ export class ComprobanteComponent implements OnInit {
     this.fechaejercicio = new FormControl(new Date(e.fecha_ejercicio));
     this.ELEMENT_DATA = JSON.parse(e.definicion).map((ev) => {
       ev.fecha = e.fecha_operacion;
-      ev.codigo = ev.cuenta;
-      ev.cuenta = ev.detalle;
-
       return ev;
     });
     this.dataSource = new MatTableDataSource<IComprobante>(this.ELEMENT_DATA);
