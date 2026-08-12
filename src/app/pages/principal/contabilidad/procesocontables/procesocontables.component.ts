@@ -222,6 +222,7 @@ export class ProcesocontablesComponent implements OnInit {
       return
     }
 
+    this.lstData = []
     let fecha = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
     this.xAPI.parametros = fecha
@@ -259,7 +260,7 @@ export class ProcesocontablesComponent implements OnInit {
         }
         this.lstData.push(dcx)
         this.Comprobante.debe = debe
-        this.Comprobante.haber = debe
+        this.Comprobante.haber = haber
         Swal.fire({
           title: 'Esta seguro que desea realizar la operación de cierre semestral',
           icon: "question",
