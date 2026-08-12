@@ -53,6 +53,7 @@ export class ProcesocontablesComponent implements OnInit {
   public acum_haber = 0
 
   public yaProcesadoCierreSemestral = false
+  public procesando = false
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -222,6 +223,7 @@ export class ProcesocontablesComponent implements OnInit {
       return
     }
 
+    this.procesando = true
     this.lstData = []
     let fecha = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
@@ -260,7 +262,7 @@ export class ProcesocontablesComponent implements OnInit {
         }
         this.lstData.push(dcx)
         this.Comprobante.debe = debe
-        this.Comprobante.haber = haber
+        this.Comprobante.haber = debe
         Swal.fire({
           title: 'Esta seguro que desea realizar la operación de cierre semestral',
           icon: "question",
@@ -272,11 +274,17 @@ export class ProcesocontablesComponent implements OnInit {
           allowEscapeKey: true,
         }).then((result) => {
           if (result.isConfirmed) {
-            this.Acepar()
+            this.Acepar().then(() => {
+              this.procesando = false
+            })
+          } else {
+            this.procesando = false
           }
         })
       },
-      error => { }
+      error => {
+        this.procesando = false
+      }
     )
   }
 

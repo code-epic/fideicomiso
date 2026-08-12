@@ -60,7 +60,7 @@
     <div class="row">
 
       <div class="col-md-6 ">
-        <button *ngIf="semestral" mat-flat-button color="warn" (click)="consultarValoresSemestrales()" style="height: 50px;">
+        <button *ngIf="semestral" mat-flat-button color="warn" (click)="consultarValoresSemestrales()" [disabled]="procesando" style="height: 50px;">
           <mat-icon>print</mat-icon>&nbsp;Generar comprobante semestral
         </button>
       </div>
