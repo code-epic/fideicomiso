@@ -603,7 +603,7 @@ export class ComprobanteComponent implements OnInit {
 
     for (let i = 0; i < this.ELEMENT_DATA.length; i++) {
       const ev = this.ELEMENT_DATA[i];
-      if (e.cuenta.trim() == ev.cuenta.trim()) {
+      if (String(e.cuenta).trim() == String(ev.cuenta).trim()) {
         pos = i;
       }
     }
