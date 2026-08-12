@@ -111,6 +111,31 @@ textarea {
   padding: 0px;
 }
 
+.texto-resultados {
+  font-size: 12.5px;
+  color: #525f7f;
+  font-weight: 500;
+}
+
+.mat-tab-group .row > [class*="col-"] {
+  min-width: 0;
+}
+
+.mat-selection-list .row {
+  min-width: 0;
+}
+
+.example-large-box {
+  overflow-x: hidden;
+}
+
+.resaltado {
+  background: rgba(255, 214, 0, 0.35);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
 .example-small-box {
   height: 100px;
   width: 100px;

@@ -1,7 +1,7 @@
-import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { Observable } from "rxjs";
-import { map, startWith } from "rxjs/operators";
+import { Observable, Subject } from "rxjs";
+import { debounceTime, map, startWith } from "rxjs/operators";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
@@ -17,9 +17,11 @@ import { WzportafolioComponent } from "./wzportafolio/wzportafolio.component";
   templateUrl: './consultainversiones.component.html',
   styleUrls: ['./consultainversiones.component.scss']
 })
-export class ConsultainversionesComponent implements OnInit {
+export class ConsultainversionesComponent implements OnInit, OnDestroy {
 
   @ViewChild('filex', { static: true }) filex: TemplateRef<any>;
+
+  private buscar$ = new Subject<void>();
 
   public Inversiones: Inversion = {
     identificador: 0,
@@ -56,9 +58,15 @@ export class ConsultainversionesComponent implements OnInit {
   };
 
   public lstInversiones = [];
+  public lstInversionesFiltro = [];
   public lstInstrumento = [];
   public lstEmisor = [];
   public lstCustodia = [];
+  public buscar: string = "";
+  public focus: boolean = false;
+  public filtroInstrumento: string = "";
+  public fecha_desde: Date | NgbDate | null = null;
+  public fecha_hasta: Date | NgbDate | null = null;
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -116,10 +124,73 @@ export class ConsultainversionesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.buscar$.pipe(debounceTime(300)).subscribe(() => this.BuscarInversion());
     this.ListarCustodia();
     this.ListarEmisor();
     this.ListarInstrumento();
     this.ListarInver();
+  }
+
+  ngOnDestroy(): void {
+    this.buscar$.complete();
+  }
+
+  onBuscarKey(e: KeyboardEvent) {
+    const k = e.key;
+    if (['Shift', 'Control', 'Alt', 'Meta', 'Tab', 'CapsLock'].includes(k) || k.startsWith('Arrow')) {
+      return;
+    }
+    this.buscar$.next();
+  }
+
+  soloNumerico(event: KeyboardEvent, enteros: boolean = false): boolean {
+    const permitidas = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'F5'];
+    if (permitidas.includes(event.key)) return true;
+    if (event.ctrlKey || event.metaKey) return true;
+    if (event.key === '-' || event.key === '+' || event.key === 'e' || event.key === 'E') {
+      event.preventDefault();
+      return false;
+    }
+    if (enteros && event.key === '.') {
+      event.preventDefault();
+      return false;
+    }
+    if (event.key.length === 1 && !/^[0-9]$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  soloCodigo(event: KeyboardEvent): boolean {
+    const permitidas = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'F5'];
+    if (permitidas.includes(event.key)) return true;
+    if (event.ctrlKey || event.metaKey) return true;
+    if (event.key.length === 1 && !/^[A-Za-z0-9.\- ]$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  soloFecha(event: KeyboardEvent): boolean {
+    const permitidas = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'F5'];
+    if (permitidas.includes(event.key)) return true;
+    if (event.ctrlKey || event.metaKey) return true;
+    if (event.key.length === 1 && !/^[0-9/]$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  trackByIdentificador(index: number, e: any): number {
+    return e ? e.identificador : index;
+  }
+
+  get resultados(): string {
+    if (!this.lstInversiones.length) return '';
+    return `Mostrando ${this.lstInversionesFiltro.length} de ${this.lstInversiones.length} inversiones`;
   }
 
   tabActive(event) {
@@ -294,13 +365,16 @@ export class ConsultainversionesComponent implements OnInit {
   ListarInver() {
     this.ngxService.startLoader("load-inver");
     this.lstInversiones = [];
-    this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES
+    this.lstInversionesFiltro = [];
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES;
     this.xAPI.parametros = '';
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if (data != null && data.msj == undefined)
+        if (data != null && data.msj == undefined) {
           this.lstInversiones = data.Cuerpo;
-          this.ngxService.stopLoader("load-inver");
+          this.BuscarInversion();
+        }
+        this.ngxService.stopLoader("load-inver");
       },
       (error) => {
         console.error(error);
@@ -308,6 +382,94 @@ export class ConsultainversionesComponent implements OnInit {
         this.ngxService.stopLoader("load-inver");
       }
     );
+  }
+
+  getFechaStr(f: any): string {
+    if (!f) return '';
+    if (f instanceof Date) {
+      const y = f.getFullYear();
+      const m = (f.getMonth() + 1).toString().padStart(2, '0');
+      const d = f.getDate().toString().padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    if (typeof f === 'object' && f.year) {
+      return this.formatter.format(f);
+    }
+    if (typeof f === 'string') {
+      return f.substring(0, 10);
+    }
+    return '';
+  }
+
+  BuscarInversion() {
+    let resultado = [...this.lstInversiones];
+
+    // 1. Filtro por Instrumento
+    if (this.filtroInstrumento && this.filtroInstrumento.trim() !== '') {
+      const instSelected = this.filtroInstrumento.toLowerCase().trim();
+      const parts = instSelected.split(' - ');
+      const codePart = parts[0] ? parts[0].trim() : '';
+      const namePart = parts[1] ? parts[1].trim() : instSelected;
+
+      resultado = resultado.filter((e) => {
+        const instName = (e.instrumento || '').toLowerCase();
+        const instId = (e.id_instrumento || '').toString();
+        return (
+          instName.includes(namePart) ||
+          instId === codePart ||
+          instSelected.includes(instName)
+        );
+      });
+    }
+
+    // 2. Filtro por Búsqueda (ISIN, Monto o Nº)
+    if (this.buscar && this.buscar.trim() !== '') {
+      const val = this.buscar.toLowerCase().trim();
+      resultado = resultado.filter((e) => {
+        const num = this.getZFill(e.identificador || 0).toLowerCase();
+        const isin = (e.codigo_isin || '').toString().toLowerCase();
+        const valorNominal = (e.valor_nominal || '').toString().toLowerCase();
+
+        return (
+          num.includes(val) ||
+          isin.includes(val) ||
+          valorNominal.includes(val)
+        );
+      });
+    }
+
+    // 3. Filtro por Rango de Fechas (Fecha Emisión)
+    const fDesdeStr = this.getFechaStr(this.fecha_desde);
+    const fHastaStr = this.getFechaStr(this.fecha_hasta);
+
+    if (fDesdeStr) {
+      resultado = resultado.filter((e) => {
+        const fEmision = (e.fecha_emision || '').substring(0, 10);
+        return fEmision >= fDesdeStr;
+      });
+    }
+
+    if (fHastaStr) {
+      resultado = resultado.filter((e) => {
+        const fEmision = (e.fecha_emision || '').substring(0, 10);
+        return fEmision <= fHastaStr;
+      });
+    }
+
+    this.lstInversionesFiltro = resultado;
+  }
+
+  limpiarBusquedaText() {
+    this.buscar = '';
+    this.BuscarInversion();
+  }
+
+  limpiarFiltros() {
+    this.buscar = '';
+    this.filtroInstrumento = '';
+    this.fecha_desde = null;
+    this.fecha_hasta = null;
+    this.lstInversionesFiltro = [...this.lstInversiones];
   }
 
   ConsultarInver() {
@@ -336,9 +498,63 @@ export class ConsultainversionesComponent implements OnInit {
     this.inver_search = '';
   }
 
+  private obtenerFechaEfectiva(fechaNgb: any, fechaFija: any): any {
+    return fechaNgb && typeof fechaNgb === 'object' && fechaNgb.year ? fechaNgb : fechaFija;
+  }
+
+  private normalizarFechaISO(f: any): string {
+    if (!f) return '';
+    if (f.year) {
+      return `${f.year}-${String(f.month).padStart(2, '0')}-${String(f.day).padStart(2, '0')}`;
+    }
+    if (typeof f === 'string') {
+      return f.substring(0, 10);
+    }
+    if (f instanceof Date) {
+      const y = f.getFullYear();
+      const m = String(f.getMonth() + 1).padStart(2, '0');
+      const d = String(f.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    return '';
+  }
+
+  private compararFechasISO(a: any, b: any): number {
+    const fa = this.normalizarFechaISO(a);
+    const fb = this.normalizarFechaISO(b);
+    if (!fa || !fb) return 0;
+    return fa < fb ? -1 : fa > fb ? 1 : 0;
+  }
+
   GuardarInversiones() {
-    if (this.Inversiones.codigo_isin == "") {
-      this._snackBar.open("Debe verificar todos los campos...", "Ok");
+    if (!this.Inversiones.codigo_isin || String(this.Inversiones.codigo_isin).trim() === "") {
+      this._snackBar.open("Debe indicar el código del instrumento.", "Ok");
+      return;
+    }
+    if (!this.Inversiones.instrumento || String(this.Inversiones.instrumento).trim() === "") {
+      this._snackBar.open("Debe indicar el instrumento.", "Ok");
+      return;
+    }
+    if (this.Inversiones.valor_nominal === null || this.Inversiones.valor_nominal === undefined || this.Inversiones.valor_nominal <= 0) {
+      this._snackBar.open("El valor nominal debe ser mayor que cero.", "Ok");
+      return;
+    }
+    if (this.Inversiones.precio_compra === null || this.Inversiones.precio_compra === undefined || this.Inversiones.precio_compra < 0) {
+      this._snackBar.open("Debe indicar un precio de compra válido (mayor o igual a cero).", "Ok");
+      return;
+    }
+    if (this.Inversiones.base_calculo === null || this.Inversiones.base_calculo === undefined || this.Inversiones.base_calculo <= 0) {
+      this._snackBar.open("La base de cálculo debe ser mayor que cero.", "Ok");
+      return;
+    }
+    if (this.Inversiones.tasa_cupon !== null && this.Inversiones.tasa_cupon !== undefined && this.Inversiones.tasa_cupon < 0) {
+      this._snackBar.open("La tasa de cupón no puede ser negativa.", "Ok");
+      return;
+    }
+    const fechaEmision = this.obtenerFechaEfectiva(this.fecha_emi, this.Inversiones.fecha_emision);
+    const fechaVencimiento = this.obtenerFechaEfectiva(this.fecha_ven, this.Inversiones.fecha_vencimiento);
+    if (fechaEmision && fechaVencimiento && this.compararFechasISO(fechaVencimiento, fechaEmision) < 0) {
+      this._snackBar.open("La fecha de vencimiento no puede ser anterior a la de emisión.", "Ok");
       return;
     }
     this.ngxService.startLoader("load-inver");

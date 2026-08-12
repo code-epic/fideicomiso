@@ -66,6 +66,7 @@ import {MatRippleModule} from '@angular/material/core';
 import { TablasComponent } from 'src/app/pages/principal/contabilidad/tablas/tablas.component';
 import { ConfiguracionesComponent } from 'src/app/pages/principal/administracion/configuraciones/configuraciones.component';
 import { ConsultainversionesComponent } from 'src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component';
+import { ResaltarPipe } from 'src/app/pages/principal/inversiones/consultainversiones/resaltar.pipe';
 import { SaldosinversionesComponent } from 'src/app/pages/principal/inversiones/saldosinversiones/saldosinversiones.component';
 import { ProcesosinversionesComponent } from 'src/app/pages/principal/inversiones/procesosinversiones/procesosinversiones.component';
 import { ConciliacionesinversionesComponent } from 'src/app/pages/principal/inversiones/conciliacionesinversiones/conciliacionesinversiones.component';
@@ -165,6 +166,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     TablasComponent,
     ConfiguracionesComponent,
     ConsultainversionesComponent,
+    ResaltarPipe,
     SaldosinversionesComponent,
     ProcesosinversionesComponent,
     ConciliacionesinversionesComponent,
