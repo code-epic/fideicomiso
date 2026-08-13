@@ -227,17 +227,24 @@ export class ProcesocontablesComponent implements OnInit {
     let fecha = this.util.ConvertirFechaDB(this.fechaultimo)
     
     // Verificar si ya existe comprobante semestral para esta fecha
-    this.xAPI.funcion = environment.xApi.CONSULTAR_COMPROBANTE_SEMESTRAL
-    this.xAPI.parametros = fecha
+    this.xAPI.funcion = environment.xApi.CONSULTAR_COMPROBANTES
+    this.xAPI.parametros = ''
     this.xAPI.valores = ''
     
     this.apiService.Ejecutar(this.xAPI).subscribe({
       next: (data) => {
-        if (data.Cuerpo && data.Cuerpo.length > 0) {
+        // Buscar comprobante semestral existente para esta fecha
+        let comprobanteExistente = null
+        if (data.Cuerpo) {
+          comprobanteExistente = data.Cuerpo.find((c: any) => 
+            c.llave === 'S' && c.fecha_operacion === fecha
+          )
+        }
+        
+        if (comprobanteExistente) {
           // Eliminar comprobante existente antes de crear el nuevo
-          let idExistente = data.Cuerpo[0].id
           this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTE
-          this.xAPI.parametros = idExistente
+          this.xAPI.parametros = comprobanteExistente.id
           this.xAPI.valores = ''
           this.apiService.Ejecutar(this.xAPI).subscribe({
             next: () => {
