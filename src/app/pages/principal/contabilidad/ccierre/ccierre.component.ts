@@ -177,7 +177,20 @@ export class CcierreComponent implements OnInit {
 
   CrearSemestral(llave) {
     this.ngxService.startLoader('load-precierre')
-    this.CrearSaldos(llave)
+    let d = this.fechaultimo.split('/')
+    let fultimo = d[2] + '-' + d[1] + '-' + d[0]
+    this.xAPI.funcion = environment.xApi.BORRAR_CIERRE_SEMESTRAL
+    this.xAPI.parametros = fultimo
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+        this.CrearSaldos(llave)
+        this.ngxService.stopLoader('load-precierre')
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
   }
 
 
