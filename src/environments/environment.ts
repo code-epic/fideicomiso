@@ -45,6 +45,7 @@ export const environment = {
 
     // Contabilidad y comprobantes
     CONSULTAR_COMPROBANTES: 'FID_CComprobantes',
+    CONSULTAR_COMPROBANTE_SEMESTRAL: 'FID_CComprobanteSemestral',
     INSERTAR_COMPROBANTE: 'FID_IComprobante',
     ELIMINAR_COMPROBANTE: 'FID_EComprobante',
     ELIMINAR_COMPROBANTES_INVERSIONES: 'FID_EComprobantesInversiones',
