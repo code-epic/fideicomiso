@@ -510,7 +510,7 @@ export class ProcesocontablesComponent implements OnInit {
       data => {
         console.log('ValidarPreCierreSemestral ... ', data)
         if (data.Cuerpo != undefined ){
-          let fentrada = data.Cuerpo[0].fecha;
+          let fentrada = data.Cuerpo[0].fecha.substring(0, 10);
           let finicio = this.util.ConvertirFechaDB(this.fechai);          
           
           if (fentrada == finicio){            
