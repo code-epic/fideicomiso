@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "NODE_OPTIONS=\"--max-http-header-size=100000\" ng serve --host 0.0.0.0 --port 4203 --proxy-config ./src/proxy.conf.json --prod=false ",
-    "build": "ng build",
+    "build": "ng build --configuration production --base-href=\".\"",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
