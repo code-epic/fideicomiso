@@ -144,11 +144,9 @@ export class CcierreComponent implements OnInit {
     d = dt.split('T')
     let fopera = d[0]
     if (llave == 'S') {
-      fopera = fultimo
-      let f = new Date(fultimo);
-      f.setDate(f.getDate());
-      f.setHours(0, 0, 0, 0);
-      fultimo = f.toISOString().split('T')[0]
+      let f = new Date(fopera);
+      f.setDate(f.getDate() - 1);
+      fopera = f.toISOString().split('T')[0]
     }
     let usuario = 'Administrador'
     let plan = '1'
