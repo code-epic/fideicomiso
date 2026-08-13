@@ -4,67 +4,9 @@
 
 ---
 
-## 1. ARCHIVOS MODIFICADOS
+## 1. STORED PROCEDURES A MODIFICAR/CREAR EN SERVIDOR BANFANB
 
-### 1.1 Consulta de Inversiones (consultainversiones)
-| Archivo | Cambio |
-|---------|--------|
-| `src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component.ts` | Filtros avanzados, debounce, validaciones |
-| `src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component.html` | Panel de filtros, pipe resaltado |
-| `src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component.scss` | Estilos para resultados y resaltado |
-| `src/app/pages/principal/inversiones/consultainversiones/resaltar.pipe.ts` | **NUEVO** - Pipe para resaltar texto |
-
-### 1.2 Cierre Semestral (ccierre)
-| Archivo | Cambio |
-|---------|--------|
-| `src/app/pages/principal/contabilidad/ccierre/ccierre.component.ts` | Corregir fecha fopera, no eliminar cierre diario |
-
-### 1.3 Proceso Contables (procesocontables)
-| Archivo | Cambio |
-|---------|--------|
-| `src/app/pages/principal/contabilidad/procesocontables/procesocontables.component.ts` | Múltiples fixes de cierre semestral |
-
-### 1.4 Comprobante
-| Archivo | Cambio |
-|---------|--------|
-| `src/app/pages/principal/contabilidad/comprobante/comprobante.component.ts` | Fix carga de detalle al editar |
-| `src/app/pages/principal/contabilidad/comprobante/comprobante.component.html` | Deshabilitar edición de fechas |
-
-### 1.5 Utilidades
-| Archivo | Cambio |
-|---------|--------|
-| `src/app/services/util/util.service.ts` | Fix ConvertirFechaDB para formato YYYY-MM-DD |
-
-### 1.6 Environment
-| Archivo | Cambio |
-|---------|--------|
-| `src/environments/environment.ts` | Agregado CONSULTAR_COMPROBANTE_SEMESTRAL |
-| `src/environments/environment.prod.ts` | Agregado CONSULTAR_COMPROBANTE_SEMESTRAL |
-
-### 1.7 Módulo
-| Archivo | Cambio |
-|---------|--------|
-| `src/app/layouts/admin-layout/admin-layout.module.ts` | Import y declaración de ResaltarPipe |
-
----
-
-## 2. APIs MODIFICADAS
-
-### 2.1 APIs Nuevas
-| API | Función | Descripción |
-|-----|---------|-------------|
-| `CONSULTAR_COMPROBANTE_SEMESTRAL` | `FID_CComprobanteSemestral` | Buscar comprobante semestral existente por fecha |
-
-### 2.2 APIs Existentes con Cambios de Parámetros
-| API | Función | Cambio |
-|-----|---------|--------|
-| `CONSULTAR_MOVIMIENTOS_SEMESTRALES` | `FID_CMovimientosSemestrales` | Ahora recibe 2 parámetros: `fecha,1` |
-
----
-
-## 3. STORED PROCEDURES REQUERIDOS
-
-### 3.1 FID_CComprobanteSemestral (NUEVO)
+### 1.1 FID_CComprobanteSemestral (NUEVO)
 ```sql
 CREATE PROCEDURE FID_CComprobanteSemestral(IN p_fecha DATE)
 BEGIN
@@ -76,14 +18,13 @@ BEGIN
 END
 ```
 
-### 3.2 FID_DCierreSemestral (PROBLEMA IDENTIFICADO)
-**Problema:** Este stored procedure elimina TODOS los saldos para una fecha, no solo los semestrales.
+### 1.2 FID_DCierreSemestral (PROBLEMA IDENTIFICADO)
+**Problema actual:** Elimina TODOS los saldos de una fecha, no solo los semestrales.
 
-**Solución temporal:** Se eliminó la llamada a este stored procedure en el código Angular.
-
-**Solución permanente (requiere modificar en servidor):**
+**Corrección recomendada:**
 ```sql
--- Modificar para que solo elimine saldos con llave='S'
+DROP PROCEDURE IF EXISTS FID_DCierreSemestral;
+
 CREATE PROCEDURE FID_DCierreSemestral(IN p_fecha DATE)
 BEGIN
     DELETE FROM fideicomiso.saldos 
@@ -91,57 +32,210 @@ BEGIN
 END
 ```
 
+### 1.3 FID_CMovimientosSemestrales (VERIFICAR PARÁMETROS)
+**Nota:** Ahora recibe 2 parámetros: `fecha,1`
+
+Verificar que el stored procedure acepte el segundo parámetro. Si no lo acepta, modificar:
+```sql
+DROP PROCEDURE IF EXISTS FID_CMovimientosSemestrales;
+
+CREATE PROCEDURE FID_CMovimientosSemestrales(IN p_fecha DATE, IN p_plan INT)
+BEGIN
+    -- Aquí va la lógica existente del stored procedure
+    -- Asegurarse de usar p_plan en lugar de valor hardcodeado
+    SELECT 
+        c.id AS id_cuenta,
+        c.descripcion,
+        c.disminuye,
+        CASE 
+            WHEN c.disminuye = 'DEBE' THEN s.saldo
+            ELSE 0
+        END AS saldo
+    FROM fideicomiso.saldos s
+    JOIN fideicomiso.cuenta c ON s.id_cuenta = c.id
+    WHERE s.fecha_cierre = p_fecha
+      AND s.llave = 'S'
+      AND c.totalizadora = 0
+      AND s.saldo != 0
+    ORDER BY c.disminuye, c.id;
+END
+```
+
 ---
 
-## 4. CAMBIOS EN LÓGICA DE NEGOCIO
+## 2. ARCHIVOS MODIFICADOS EN ANGULAR
 
-### 4.1 Cierre Semestral
-**ANTES:**
-1. `FID_DCierreSemestral` eliminaba TODOS los saldos de la fecha
-2. `FID_ISaldosCierzal` creaba nuevos saldos
-3. Resultado: Se perdía el cierre diario
+### 2.1 Consulta de Inversiones
+| Archivo | Descripción |
+|---------|-------------|
+| `src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component.ts` | Filtros avanzados, debounce, validaciones |
+| `src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component.html` | Panel de filtros, pipe resaltado |
+| `src/app/pages/principal/inversiones/consultainversiones/consultainversiones.component.scss` | Estilos para resultados |
+| `src/app/pages/principal/inversiones/consultainversiones/resaltar.pipe.ts` | **NUEVO** - Pipe para resaltar texto |
 
-**DESPUÉS:**
-1. `FID_ISaldosCierzal` crea saldos semestrales sin eliminar el diario
-2. Resultado: Se mantienen ambos cierres
+### 2.2 Cierre Semestral
+| Archivo | Descripción |
+|---------|-------------|
+| `src/app/pages/principal/contabilidad/ccierre/ccierre.component.ts` | Corregir fecha fopera para cierre semestral |
 
-### 4.2 Fecha del Cierre Semestral
-**ANTES:**
+### 2.3 Proceso Contables
+| Archivo | Descripción |
+|---------|-------------|
+| `src/app/pages/principal/contabilidad/procesocontables/procesocontables.component.ts` | Fixes de cierre semestral |
+
+### 2.4 Comprobante
+| Archivo | Descripción |
+|---------|-------------|
+| `src/app/pages/principal/contabilidad/comprobante/comprobante.component.ts` | Fix carga de detalle al editar |
+| `src/app/pages/principal/contabilidad/comprobante/comprobante.component.html` | Deshabilitar edición de fechas |
+
+### 2.5 Utilidades
+| Archivo | Descripción |
+|---------|-------------|
+| `src/app/services/util/util.service.ts` | Fix ConvertirFechaDB para formato YYYY-MM-DD |
+
+### 2.6 Environment
+| Archivo | Descripción |
+|---------|-------------|
+| `src/environments/environment.ts` | Agregado CONSULTAR_COMPROBANTE_SEMESTRAL |
+| `src/environments/environment.prod.ts` | Agregado CONSULTAR_COMPROBANTE_SEMESTRAL |
+
+### 2.7 Módulo
+| Archivo | Descripción |
+|---------|-------------|
+| `src/app/layouts/admin-layout/admin-layout.module.ts` | Import y declaración de ResaltarPipe |
+
+---
+
+## 3. APIs A MODIFICAR/CREAR
+
+### 3.1 Nueva API
+| Nombre | Stored Procedure | Parámetros | Descripción |
+|--------|------------------|------------|-------------|
+| `CONSULTAR_COMPROBANTE_SEMESTRAL` | `FID_CComprobanteSemestral` | `fecha DATE` | Buscar comprobante semestral existente |
+
+### 3.2 API Existentes
+| Nombre | Stored Procedure | Cambio |
+|--------|------------------|--------|
+| `CONSULTAR_MOVIMIENTOS_SEMESTRALES` | `FID_CMovimientosSemestrales` | Ahora recibe 2 parámetros: `fecha,plan` |
+
+---
+
+## 4. CAMBIOS EN LÓGICA
+
+### 4.1 ConvertirFechaDB (util.service.ts)
+**Problema:** No manejaba formato YYYY-MM-DD
+**Solución:** Agregada detección de formato YYYY-MM-DD
+
 ```typescript
-fopera = fultimo  // "2026-06-29" (incorrecto)
+// ANTES
+ConvertirFechaDB(f: any): string {
+    if (typeof f != "object") {
+        const fx = f.split("/");  // Fallaba con YYYY-MM-DD
+        ...
+    }
+}
+
+// DESPUÉS
+ConvertirFechaDB(f: any): string {
+    if (typeof f != "object") {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(f)) {
+            return f;  // Ya está en formato correcto
+        }
+        const fx = f.split("/");
+        ...
+    }
+}
 ```
 
-**DESPUÉS:**
+### 4.2 Fecha Cierre Semestral (ccierre.component.ts)
+**Problema:** `fopera` se establecía como la fecha del último cierre diario
+**Solución:** Calcular `fopera` restando 1 día a `fechai`
+
 ```typescript
-let f = new Date(fopera);
-f.setDate(f.getDate() - 1);
-fopera = f.toISOString().split('T')[0]  // "2026-06-30" (correcto)
+// ANTES
+if (llave == 'S') {
+    fopera = fultimo  // "2026-06-29"
+}
+
+// DESPUÉS
+if (llave == 'S') {
+    let f = new Date(fopera);
+    f.setDate(f.getDate() - 1);
+    fopera = f.toISOString().split('T')[0]  // "2026-06-30"
+}
 ```
 
-### 4.3 Generación de Comprobante Semestral
-**ANTES:**
-- Se creaban múltiples comprobantes duplicados
-- `Comprobante.haber` no reflejaba el total real
-
-**DESPUÉS:**
-- Se verifica si ya existe comprobante y se elimina antes de crear uno nuevo
+### 4.3 Comprobante Semestral (procesocontables.component.ts)
+**Cambios:**
 - `Comprobante.haber = debe` (total después del asiento de balanceo)
-- Botón deshabilitado durante procesamiento
+- `lstData = []` al inicio para evitar acumulación
+- Verificar comprobante existente antes de crear nuevo
+- Botón deshabilitado durante procesamiento (`procesando`)
 
-### 4.4 ConvertirFechaDB
-**ANTES:**
-- Solo manejaba formato DD/MM/YYYY
-- Fallaba con formato YYYY-MM-DD
+### 4.4 Carga de Detalle al Editar (comprobante.component.ts)
+**Problema:** `ev.cuenta = ev.detalle` (campo inexistente)
+**Solución:** Eliminar swap innecesario de campos
 
-**DESPUÉS:**
-- Detecta formato YYYY-MM-DD y retorna directamente
-- Continúa manejando DD/MM/YYYY
+```typescript
+// ANTES
+this.ELEMENT_DATA = JSON.parse(e.definicion).map((ev) => {
+    ev.fecha = e.fecha_operacion;
+    ev.codigo = ev.cuenta;
+    ev.cuenta = ev.detalle;  // BUG: campo inexistente
+    return ev;
+});
+
+// DESPUÉS
+this.ELEMENT_DATA = JSON.parse(e.definicion).map((ev) => {
+    ev.fecha = e.fecha_operacion;
+    return ev;
+});
+```
 
 ---
 
-## 5. COMMITRES REALIZADOS
+## 5. SQL DE LIMPIEZA (Ejecutar en servidor Banfanb)
+
+### 5.1 Eliminar comprobantes semestrales duplicados (2026-06-30)
+```sql
+-- Primero eliminar detalle
+DELETE FROM fideicomiso.detalle_comprobante 
+WHERE id_comprobante IN (
+    SELECT id FROM fideicomiso.comprobante 
+    WHERE llave = 'S' AND fecha_operacion = '2026-06-30' 
+    AND id NOT IN (
+        SELECT MAX(id) FROM fideicomiso.comprobante 
+        WHERE llave = 'S' AND fecha_operacion = '2026-06-30'
+    )
+);
+
+-- Luego eliminar comprobantes
+DELETE FROM fideicomiso.comprobante 
+WHERE llave = 'S' AND fecha_operacion = '2026-06-30' 
+AND id NOT IN (
+    SELECT MAX(id) FROM fideicomiso.comprobante 
+    WHERE llave = 'S' AND fecha_operacion = '2026-06-30'
+);
+```
+
+### 5.2 Eliminar saldos duplicados
+```sql
+DELETE s1 FROM fideicomiso.saldos s1
+INNER JOIN fideicomiso.saldos s2
+WHERE s1.fecha_cierre = s2.fecha_cierre
+  AND s1.llave = s2.llave
+  AND s1.id_cuenta = s2.id_cuenta
+  AND s1.id > s2.id;
+```
+
+---
+
+## 6. COMMITS REALIZADOS
 
 ```
+0417bae Revert "fix(ccierre): no eliminar cierre diario al hacer cierre semestral"
+223f1ab Reapply "docs: agregar archivo de migracion con APIs modificadas"
 7a89918 fix(ccierre): no eliminar cierre diario al hacer cierre semestral
 2be1ff5 fix(ccierre): corregir fecha fopera en cierre semestral
 c0db35b fix(cierre-semestral): normalizar fecha en ValidarPreCierreSemestral
@@ -159,49 +253,18 @@ ee3ac7c fix(comprobante): convertir cuenta a string antes de trim en eliminar
 
 ---
 
-## 6. SQL DE LIMPIEZA (Ejecutar en servidor Banfanb)
+## 7. INSTRUCCIONES DE MIGRACIÓN
 
-### 6.1 Eliminar comprobantes semestrales duplicados
-```sql
--- Eliminar detalle de comprobantes duplicados
-DELETE FROM fideicomiso.detalle_comprobante 
-WHERE id_comprobante IN (
-    SELECT id FROM fideicomiso.comprobante 
-    WHERE llave = 'S' AND fecha_operacion = '2026-06-30' 
-    AND id NOT IN (
-        SELECT MAX(id) FROM fideicomiso.comprobante 
-        WHERE llave = 'S' AND fecha_operacion = '2026-06-30'
-    )
-);
+1. **Ejecutar SQL en servidor Banfanb:**
+   - Crear/modificar stored procedures (sección 1)
+   - Ejecutar SQL de limpieza (sección 5)
 
--- Eliminar comprobantes duplicados
-DELETE FROM fideicomiso.comprobante 
-WHERE llave = 'S' AND fecha_operacion = '2026-06-30' 
-AND id NOT IN (
-    SELECT MAX(id) FROM fideicomiso.comprobante 
-    WHERE llave = 'S' AND fecha_operacion = '2026-06-30'
-);
-```
+2. **Copiar archivos Angular modificados** (sección 2)
 
-### 6.2 Eliminar saldos duplicados
-```sql
--- Eliminar saldos duplicados manteniendo solo el primero por fecha, llave y cuenta
-DELETE s1 FROM fideicomiso.saldos s1
-INNER JOIN fideicomiso.saldos s2
-WHERE s1.fecha_cierre = s2.fecha_cierre
-  AND s1.llave = s2.llave
-  AND s1.id_cuenta = s2.id_cuenta
-  AND s1.id > s2.id;
-```
+3. **Compilar:** `npm run build:prod`
 
----
-
-## 7. NOTAS PARA MIGRACIÓN
-
-1. **Servidor de Banfanb:** Crear o modificar stored procedures según la sección 3
-2. **Ejecutar SQL de limpieza:** Sección 6
-3. **Compilar Angular:** `npm run build:prod`
 4. **Probar flujo completo:**
+   - Consulta de inversiones con filtros
    - Cierre diario
    - Cierre semestral
    - Generación de comprobante semestral
