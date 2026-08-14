@@ -143,11 +143,17 @@ export class CcierreComponent implements OnInit {
 
     d = dt.split('T')
     let fopera = d[0]
+
     if (llave == 'S') {
       let f = new Date(fopera);
       f.setDate(f.getDate() - 1);
       fopera = f.toISOString().split('T')[0]
+
+      let fo = new Date(fultimo);
+      fo.setDate(f.getDate() - 1);
+      fultimo = fo.toISOString().split('T')[0]
     }
+
     let usuario = 'Administrador'
     let plan = '1'
 
@@ -155,6 +161,7 @@ export class CcierreComponent implements OnInit {
     this.xAPI.funcion = environment.xApi.INSERTAR_SALDOS_CIERRE
     this.xAPI.parametros = `${fopera},${usuario},${llave},${plan},${fultimo}`
     this.xAPI.valores = ''
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.apiService.Mensaje(
