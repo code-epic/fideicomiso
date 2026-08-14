@@ -164,9 +164,9 @@
                     <div class="col-md-3">
                       <mat-form-field appearance="outline">
                         <mat-label>Fecha Valor</mat-label>
-                        <input matInput [matDatepicker]="picker" formControlName="fechaEjercicio" readonly>
+                        <input matInput [matDatepicker]="picker" formControlName="fechaEjercicio">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                         <mat-datepicker #picker></mat-datepicker>
-                        <mat-icon matSuffix>event</mat-icon>
                       </mat-form-field>
                       <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
 
@@ -296,9 +296,9 @@
                     <div class="col-md-3">
                       <mat-form-field appearance="outline">
                         <mat-label>Fecha Creacion</mat-label>
-                        <input matInput [matDatepicker]="xpicker" formControlName="fechaOperacion" readonly>
+                        <input matInput [matDatepicker]="xpicker" formControlName="fechaOperacion">
+                        <mat-datepicker-toggle matSuffix [for]="xpicker"></mat-datepicker-toggle>
                         <mat-datepicker #xpicker></mat-datepicker>
-                        <mat-icon matSuffix>event</mat-icon>
                       </mat-form-field>
                       <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
 

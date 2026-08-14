@@ -229,17 +229,29 @@ export class ComprobanteComponent implements OnInit {
      return new Date().getFullYear();
   }
 
+  parseFecha(f: any): Date {
+    if (!f) return new Date();
+    if (f instanceof Date) return f;
+    if (typeof f === "string") {
+      const parts = f.split(" ")[0].split("-");
+      if (parts.length === 3) {
+        return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      }
+    }
+    return new Date(f);
+  }
+
   CargarFormulario() {
     this.formComprobante = this._fb.group({
       plan: [this.Comprobante.plan, Validators.required],
       codigo: [this.Comprobante.codigo, Validators.required],
       descripcion: [this.Comprobante.descripcion, Validators.required],
       fechaOperacion: [
-        this.Comprobante.fecha_operacion || this.fechacreacion.value,
+        this.parseFecha(this.Comprobante.fecha_operacion || this.fechacreacion.value),
         Validators.required,
       ],
       fechaEjercicio: [
-        this.Comprobante.fecha_ejercicio || this.fechaejercicio.value,
+        this.parseFecha(this.Comprobante.fecha_ejercicio || this.fechaejercicio.value),
         Validators.required,
       ],
       totalDebe: [this.Comprobante.debe, Validators.required],
@@ -375,7 +387,8 @@ export class ComprobanteComponent implements OnInit {
 
     this.Comprobante = e;
     this.auxComprobante = e.id;
-    this.fechaejercicio = new FormControl(new Date(e.fecha_ejercicio));
+    this.fechaejercicio = new FormControl(this.parseFecha(e.fecha_ejercicio));
+    this.fechacreacion = new FormControl(this.parseFecha(e.fecha_operacion));
     this.ELEMENT_DATA = JSON.parse(e.definicion).map((ev) => {
       ev.fecha = e.fecha_operacion;
       return ev;
@@ -455,9 +468,18 @@ export class ComprobanteComponent implements OnInit {
 
     this.formComprobante.reset();
     this.dataSource = null;
-    this.formComprobante
-      .get("fechaOperacion")
-      .setValue(this.Comprobante.fecha_operacion || this.fechacreacion.value);
+    this.fechacreacion.setValue(new Date());
+    this.fechaejercicio.setValue(new Date());
+    if (this.formComprobante && this.formComprobante.get("fechaOperacion")) {
+      this.formComprobante
+        .get("fechaOperacion")
+        .setValue(this.fechacreacion.value);
+    }
+    if (this.formComprobante && this.formComprobante.get("fechaEjercicio")) {
+      this.formComprobante
+        .get("fechaEjercicio")
+        .setValue(this.fechaejercicio.value);
+    }
   }
 
   Consultar() {}
@@ -546,7 +568,8 @@ export class ComprobanteComponent implements OnInit {
       return;
     }
 
-    let fecha = new Date(this.fechaejercicio.value).toISOString();
+    const fechaVal = this.formComprobante.get("fechaEjercicio")?.value || this.fechaejercicio.value;
+    let fecha = this.util.ConvertirFechaDB(fechaVal);
 
     if (!this.cuenta) {
       this._snackBar.open("Por favor seleccione una cuenta ", "ok");
@@ -681,7 +704,7 @@ export class ComprobanteComponent implements OnInit {
     this.Comprobante.descripcion =
       this.formComprobante.get("descripcion").value;
     this.Comprobante.fecha_operacion = this.util.ConvertirFechaDB(
-      this.formComprobante.get("fechaEjercicio").value
+      this.formComprobante.get("fechaOperacion").value
     );
     this.Comprobante.fecha_ejercicio = this.util.ConvertirFechaDB(
       this.formComprobante.get("fechaEjercicio").value
