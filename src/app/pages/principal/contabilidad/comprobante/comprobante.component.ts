@@ -723,6 +723,7 @@ export class ComprobanteComponent implements OnInit {
         fecha_ejercicio: this.Comprobante.fecha_ejercicio,
         plan: plan,
       };
+
       this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE;
       this.xAPI.parametros = "";
       this.xAPI.valores = JSON.stringify(detalle);
@@ -731,7 +732,19 @@ export class ComprobanteComponent implements OnInit {
     await Promise.all(promises);
   }
 
-  getIDCuenta(cuenta: string): number {
+  getIDCuenta(cuenta: any): number {
+    // Si ya es un número válido, retornarlo directamente
+    if (typeof cuenta === 'number' && cuenta > 0) {
+      return cuenta;
+    }
+
+    // Si es un string numérico, parsearlo
+    if (typeof cuenta === 'string' && !isNaN(Number(cuenta))) {
+      const num = Number(cuenta);
+      if (num > 0) return num;
+    }
+
+    // Buscar por código de cuenta (formato "1.01.01.01...")
     const found = this.lstCuenta.find((e) => e.cuenta == cuenta);
     return found ? found.id : 0;
   }
@@ -769,7 +782,7 @@ export class ComprobanteComponent implements OnInit {
   deleteData(id) {
     this.ngxService.startLoader("load-cont");
     this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTE;
-    this.xAPI.parametros = `${id}`;
+    this.xAPI.parametros = id;
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -778,9 +791,9 @@ export class ComprobanteComponent implements OnInit {
             "Se ha eliminado comprobante con exito",
             `Fideicomiso`
           );
+            this.ListarComprobantes();
+            this.ngxService.stopLoader("load-cont");
         }
-        this.ngxService.stopLoader("load-cont");
-        this.ListarComprobantes();
       },
       (err) => {
         if (!this.mostrarImprimir) {
