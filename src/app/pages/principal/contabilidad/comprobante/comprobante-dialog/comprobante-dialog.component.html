@@ -34,7 +34,7 @@
             </thead>
             <tbody>
                 <tr *ngFor="let e of xData">
-                    <td>{{ e.cuenta }}</td>
+                    <td>{{ e.detalle || e.cuenta }}</td>
                     <td>{{ e.descripcion }}</td>
                     <td>{{ e.debe }}</td>
                     <td>{{ e.haber }}</td>

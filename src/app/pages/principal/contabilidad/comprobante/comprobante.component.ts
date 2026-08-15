@@ -149,7 +149,6 @@ export class ComprobanteComponent implements OnInit {
     parametros: "",
   };
 
-  public fechacreacion = new FormControl(new Date());
   public fechaejercicio = new FormControl(new Date());
 
   public lstComprobante: any[] = [];
@@ -246,12 +245,8 @@ export class ComprobanteComponent implements OnInit {
       plan: [this.Comprobante.plan, Validators.required],
       codigo: [this.Comprobante.codigo, Validators.required],
       descripcion: [this.Comprobante.descripcion, Validators.required],
-      fechaOperacion: [
-        this.parseFecha(this.Comprobante.fecha_operacion || this.fechacreacion.value),
-        Validators.required,
-      ],
       fechaEjercicio: [
-        this.parseFecha(this.Comprobante.fecha_ejercicio || this.fechaejercicio.value),
+        this.parseFecha(this.Comprobante.fecha_operacion || this.fechaejercicio.value),
         Validators.required,
       ],
       totalDebe: [this.Comprobante.debe, Validators.required],
@@ -370,25 +365,9 @@ export class ComprobanteComponent implements OnInit {
   Buscar(e) {}
 
   editar(e: any, x: boolean = true) {
-
-    const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo)
-
-    // Si la fecha de cierre es mayor que la fecha de operación del comprobante, no se puede eliminar
-    if (new Date(fechaCierre) > new Date(e.fecha_operacion) && x) {
-      Swal.fire({
-        title: "No se puede editar este comprobante",
-        text: "Este comprobante pertenece a un periodo cerrado",
-        icon: "error",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "Aceptar",
-      });
-      return
-    }
-
     this.Comprobante = e;
     this.auxComprobante = e.id;
-    this.fechaejercicio = new FormControl(this.parseFecha(e.fecha_ejercicio));
-    this.fechacreacion = new FormControl(this.parseFecha(e.fecha_operacion));
+    this.fechaejercicio = new FormControl(this.parseFecha(e.fecha_operacion));
     this.ELEMENT_DATA = JSON.parse(e.definicion).map((ev) => {
       ev.fecha = e.fecha_operacion;
       return ev;
@@ -468,13 +447,7 @@ export class ComprobanteComponent implements OnInit {
 
     this.formComprobante.reset();
     this.dataSource = null;
-    this.fechacreacion.setValue(new Date());
     this.fechaejercicio.setValue(new Date());
-    if (this.formComprobante && this.formComprobante.get("fechaOperacion")) {
-      this.formComprobante
-        .get("fechaOperacion")
-        .setValue(this.fechacreacion.value);
-    }
     if (this.formComprobante && this.formComprobante.get("fechaEjercicio")) {
       this.formComprobante
         .get("fechaEjercicio")
@@ -589,6 +562,7 @@ export class ComprobanteComponent implements OnInit {
     let detalle = {
       cuenta: cta[0].trim(),
       descripcion: cta[1].trim(),
+      detalle: cta[0].trim(),
       debe: parseFloat(debe.toFixed(2)),
       haber: parseFloat(haber.toFixed(2)),
       fecha: fecha.substr(0, 10),
@@ -704,7 +678,7 @@ export class ComprobanteComponent implements OnInit {
     this.Comprobante.descripcion =
       this.formComprobante.get("descripcion").value;
     this.Comprobante.fecha_operacion = this.util.ConvertirFechaDB(
-      this.formComprobante.get("fechaOperacion").value
+      this.formComprobante.get("fechaEjercicio").value
     );
     this.Comprobante.fecha_ejercicio = this.util.ConvertirFechaDB(
       this.formComprobante.get("fechaEjercicio").value
@@ -738,36 +712,28 @@ export class ComprobanteComponent implements OnInit {
   }
 
   async GuardarDetalle(comprobante: number) {
-    this.IDComprobante.comprobante = comprobante;
-    await this.ELEMENT_DATA.map(async (e) => {
-      this.IDComprobante.debe = e.debe;
-      this.IDComprobante.haber = e.haber;
-      this.IDComprobante.fecha_ejercicio = this.Comprobante.fecha_ejercicio;
-      this.IDComprobante.fecha_operacion = this.Comprobante.fecha_ejercicio;
-      this.IDComprobante.cuenta = this.getIDCuenta(e.cuenta);
-      this.IDComprobante.plan = Number(this.formComprobante.get("plan").value);
+    const plan = Number(this.formComprobante.get("plan").value);
+    const promises = this.ELEMENT_DATA.map((e) => {
+      const detalle: FID_IDetalleComprobante = {
+        comprobante: comprobante,
+        cuenta: this.getIDCuenta(e.cuenta),
+        debe: e.debe,
+        haber: e.haber,
+        fecha_operacion: this.Comprobante.fecha_operacion,
+        fecha_ejercicio: this.Comprobante.fecha_ejercicio,
+        plan: plan,
+      };
       this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE;
       this.xAPI.parametros = "";
-      this.xAPI.valores = JSON.stringify(this.IDComprobante);
-
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-        },
-        (err) => {}
-      );
+      this.xAPI.valores = JSON.stringify(detalle);
+      return this.apiService.Ejecutar(this.xAPI).toPromise();
     });
+    await Promise.all(promises);
   }
 
   getIDCuenta(cuenta: string): number {
-    let fd = 0;
-    this.lstCuenta.forEach((e) => {
-      if (e.cuenta == cuenta) {
-        fd = e.id;
-        return;
-      }
-    });
-
-    return fd;
+    const found = this.lstCuenta.find((e) => e.cuenta == cuenta);
+    return found ? found.id : 0;
   }
 
   getMoneda(e): string {
@@ -778,20 +744,13 @@ export class ComprobanteComponent implements OnInit {
     return this.util.ConvertirFechaHumana(f);
   }
 
-  eliminarComprobante(e: any) {
-    const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo)
+  esPeriodoCerrado(e: any): boolean {
+    const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
+    return new Date(fechaCierre) >= new Date(e.fecha_operacion);
+  }
 
-    // Si la fecha de cierre es mayor que la fecha de operación del comprobante, no se puede eliminar
-    if (new Date(fechaCierre) > new Date(e.fecha_operacion)) {
-      Swal.fire({
-        title: "No se puede eliminar este comprobante",
-        text: "Este comprobante pertenece a un periodo cerrado",
-        icon: "error",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "Aceptar",
-      });
-    }else{
-      Swal.fire({
+  eliminarComprobante(e: any) {
+    Swal.fire({
       title: `¿Estás seguro que desea eliminar este comprobante? \n\n ${e.descripcion.toUpperCase()} `,
       icon: "question",
       showCancelButton: true,
@@ -805,7 +764,6 @@ export class ComprobanteComponent implements OnInit {
         this.deleteData(e.id);
       }
     });
-    }
   }
 
   deleteData(id) {
@@ -837,9 +795,6 @@ export class ComprobanteComponent implements OnInit {
   }
 
   abrirDialogo(e: any = null) {
-    if (e) {
-      this.editar(e, false);
-    }
     this.dialog.open(ComprobanteDialogComponent, {
       width: "60%",
       data: { datos: this.ELEMENT_DATA },
