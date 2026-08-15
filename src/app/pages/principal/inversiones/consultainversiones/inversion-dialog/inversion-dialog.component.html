@@ -1,0 +1,153 @@
+<h1 mat-dialog-title class="text-center" style="font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; color: #1E293B;">
+    Vista Previa
+</h1>
+<div mat-dialog-content style="padding: 0;">
+    <div id="contenido" style="font-family: 'IBM Plex Sans', sans-serif; color: #0F172A; background: #fff; padding: 30px 40px; max-width: 800px; margin: 0 auto;">
+
+        <!-- Membrete -->
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; border-bottom: 3px solid #1E293B; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <img src="./assets/img/brand/logo.png" alt="Logo" style="height: 50px;">
+                <div>
+                    <p style="margin: 0; font-size: 14px; font-weight: 700; color: #1E293B; letter-spacing: 0.5px;">
+                        BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA
+                    </p>
+                    <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: 500; color: #64748B; letter-spacing: 1px; text-transform: uppercase;">
+                        Dirección de Fideicomiso
+                    </p>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <p style="margin: 0; font-size: 10px; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px;">Fecha de impresión</p>
+                <p style="margin: 2px 0 0 0; font-size: 12px; font-weight: 600; color: #334155;">{{ getFechaHoy() }}</p>
+            </div>
+        </div>
+
+        <!-- Título -->
+        <div style="text-align: center; margin-bottom: 28px;">
+            <p style="margin: 0; font-size: 11px; font-weight: 500; color: #2563EB; text-transform: uppercase; letter-spacing: 2px;">
+                Ficha de Inversión
+            </p>
+            <p style="margin: 4px 0 0 0; font-size: 20px; font-weight: 700; color: #1E293B;">
+                N° {{ inv.numero || getZFill(inv.identificador) }}
+            </p>
+        </div>
+
+        <!-- Datos Generales -->
+        <div style="margin-bottom: 20px;">
+            <div style="background: #1E293B; color: #fff; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border-radius: 4px 4px 0 0;">
+                Datos Generales
+            </div>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #E4E5E7; border-top: none;">
+                <tbody>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; width: 35%; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Instrumento</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ inv.instrumento | uppercase }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Código ISIN</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ inv.codigo_isin }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Emisor</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ inv.emisor | uppercase }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Custodia</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ inv.custodio | uppercase }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC;">País</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A;">{{ inv.pais | uppercase }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Fechas -->
+        <div style="margin-bottom: 20px;">
+            <div style="background: #1E293B; color: #fff; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border-radius: 4px 4px 0 0;">
+                Fechas
+            </div>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #E4E5E7; border-top: none;">
+                <tbody>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; width: 35%; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Fecha Emisión</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ getFecha(inv.fecha_emision) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Fecha Compra</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ getFecha(inv.fecha_compra) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC;">Fecha Vencimiento</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A;">{{ getFecha(inv.fecha_vencimiento) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Monto e Inversión -->
+        <div style="margin-bottom: 20px;">
+            <div style="background: #1E293B; color: #fff; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border-radius: 4px 4px 0 0;">
+                Monto e Inversión
+            </div>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #E4E5E7; border-top: none;">
+                <tbody>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; width: 35%; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Valor Nominal</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ getMoneda(inv.valor_nominal) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Precio de Compra</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ inv.precio_compra }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC;">Costo de Adquisición</td>
+                        <td style="padding: 10px 16px; font-size: 13px; font-weight: 700; color: #1E293B;">{{ getMoneda(inv.costo_adquisicion) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Rendimiento -->
+        <div style="margin-bottom: 20px;">
+            <div style="background: #1E293B; color: #fff; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border-radius: 4px 4px 0 0;">
+                Rendimiento
+            </div>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #E4E5E7; border-top: none;">
+                <tbody>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; width: 35%; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Tasa Cupón</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ inv.tasa_cupon }}%</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Base de Cálculo</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ inv.base_calculo }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Plazo al Vencimiento</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ inv.plazo_vencimiento }} días</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E4E5E7;">Interés Diario</td>
+                        <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ getMoneda(inv.interes_diario) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #64748B; background: #F8FAFC;">Rendimiento al Vencimiento</td>
+                        <td style="padding: 10px 16px; font-size: 13px; font-weight: 700; color: #1E293B;">{{ getMoneda(inv.rendimiento_vencimiento) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+<div mat-dialog-actions align="end" style="padding: 8px 16px;">
+    <button mat-raised-button color="primary" (click)="imprimir()" style="font-family: 'IBM Plex Sans', sans-serif;">
+        <mat-icon style="font-size: 18px; height: 18px; width: 18px; margin-right: 4px;">print</mat-icon> Imprimir
+    </button>
+    <button mat-raised-button color="warn" mat-dialog-close style="font-family: 'IBM Plex Sans', sans-serif;">
+        <mat-icon style="font-size: 18px; height: 18px; width: 18px; margin-right: 4px;">close</mat-icon> Cerrar
+    </button>
+</div>
