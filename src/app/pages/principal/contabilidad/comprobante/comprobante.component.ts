@@ -746,7 +746,7 @@ export class ComprobanteComponent implements OnInit {
 
   esPeriodoCerrado(e: any): boolean {
     const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
-    return new Date(fechaCierre) >= new Date(e.fecha_operacion);
+    return new Date(fechaCierre) > new Date(e.fecha_operacion);
   }
 
   eliminarComprobante(e: any) {
@@ -795,6 +795,9 @@ export class ComprobanteComponent implements OnInit {
   }
 
   abrirDialogo(e: any = null) {
+    if (e) {
+      this.editar(e, false);
+    }
     this.dialog.open(ComprobanteDialogComponent, {
       width: "60%",
       data: { datos: this.ELEMENT_DATA },
