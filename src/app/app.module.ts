@@ -44,6 +44,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
 import { CurrencyMaskModule } from 'ng2-currency-mask';
 import { ComprobanteDialogComponent } from './pages/principal/contabilidad/comprobante/comprobante-dialog/comprobante-dialog.component';
+import { InversionDialogComponent } from './pages/principal/inversiones/consultainversiones/inversion-dialog/inversion-dialog.component';
 
 @NgModule({
   imports: [
@@ -93,6 +94,7 @@ import { ComprobanteDialogComponent } from './pages/principal/contabilidad/compr
     AdminLayoutComponent,
     AuthLayoutComponent,
     ComprobanteDialogComponent,
+    InversionDialogComponent,
   ],
   providers:  [
     {

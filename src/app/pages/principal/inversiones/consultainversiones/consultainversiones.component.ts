@@ -12,6 +12,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { environment } from "src/environments/environment";
 import { WzportafolioComponent } from "./wzportafolio/wzportafolio.component";
 import { CierreService } from "src/app/services/banfanb/cierre.service";
+import { InversionDialogComponent } from "./inversion-dialog/inversion-dialog.component";
 
 @Component({
   selector: 'app-consultainversiones',
@@ -239,19 +240,30 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     });
   }
 
+  imprimirInversion(inversion: any): void {
+    this.dialog.open(InversionDialogComponent, {
+      width: '60%',
+      data: { inversion }
+    });
+  }
+
   getZFill(numero : any) : string{
 
     return this.util.zfill(numero , 4) 
   }
 
   editar(e) {
-    this.Inversiones = e
+    this.Inversiones = { ...e }
     this.selectedIndex = 1
     this.active = true
     this.tipo_moneda = this.Inversiones.tipo_moneda.toString()
     this.estatus = this.Inversiones.estatus.toString()
     this.tipo_inversion = this.Inversiones.tipo_inversion.toString()
-    this.Inversiones.numero =  this.getZFill( this.Inversiones.identificador )
+    this.Inversiones.numero = '';
+
+    this.myInstrumento.setValue(e.instrumento || '');
+    this.myEmisor.setValue(e.emisor || '');
+    this.myCustodia.setValue(e.custodio || '');
 
     this.fecha_emision = NgbDate.from(this.formatter.parse(e.fecha_emision))
     this.fecha_compra = NgbDate.from(this.formatter.parse(e.fecha_compra))
@@ -545,7 +557,7 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     return fa < fb ? -1 : fa > fb ? 1 : 0;
   }
 
-  GuardarInversiones() {
+  async GuardarInversiones() {
     if (!this.Inversiones.codigo_isin || String(this.Inversiones.codigo_isin).trim() === "") {
       this._snackBar.open("Debe indicar el código del instrumento.", "Ok");
       return;
@@ -576,6 +588,9 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
       this._snackBar.open("La fecha de vencimiento no puede ser anterior a la de emisión.", "Ok");
       return;
     }
+
+    const esEdicion = this.Inversiones.identificador > 0;
+
     this.ngxService.startLoader("load-inver");
 
     this.Inversiones.tipo_moneda = parseInt(this.tipo_moneda)
@@ -591,23 +606,20 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
       const idInstrumento = parseInt(instrumentoSeleccionado.split(" - ")[0]);
       this.Inversiones.id_instrumento = isNaN(idInstrumento) ? -1 : idInstrumento;
     } else {
-      this.Inversiones.id_instrumento = -1; // Valor por defecto si no hay selección
+      this.Inversiones.id_instrumento = -1;
     }
 
+    if (esEdicion) {
+      await this.EliminarInversion(this.Inversiones.identificador);
+    }
 
-    this.xAPI.funcion = this.Inversiones.identificador == 0 ? environment.xApi.INSERTAR_INVESION : environment.xApi.ACTUALIZAR_INVERSION
+    this.xAPI.funcion = environment.xApi.INSERTAR_INVESION;
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Inversiones)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        if (this.Inversiones.identificador > 0 ) {
-          await this.AsientoInversion(this.Inversiones)
-        }else {
-          this.LimpiarInver()
-          this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
-          this.ngxService.stopLoader('load-inver')
-        }
+        await this.AsientoInversion(this.Inversiones)
       },
       (error) => {
         console.error(error)
@@ -733,6 +745,20 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
         this._snackBar.open("No se ha generado el movimiento 711...", "Error");
       }
     );
+  }
+
+  EliminarMovimientos(inversionId: number): Promise<any> {
+    this.xAPI.funcion = environment.xApi.ELIMINAR_MOVIMIENTOS_INVERSION;
+    this.xAPI.parametros = inversionId.toString();
+    this.xAPI.valores = '';
+    return this.apiService.Ejecutar(this.xAPI).toPromise();
+  }
+
+  EliminarInversion(id: number): Promise<any> {
+    this.xAPI.funcion = environment.xApi.ELIMINAR_INVERSION;
+    this.xAPI.parametros = id.toString();
+    this.xAPI.valores = '';
+    return this.apiService.Ejecutar(this.xAPI).toPromise();
   }
 
   folder(){
