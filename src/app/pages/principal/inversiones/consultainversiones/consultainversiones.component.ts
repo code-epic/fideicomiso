@@ -610,6 +610,8 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     }
 
     if (esEdicion) {
+      const fechaInversion = this.Inversiones.fecha_emision.substring(0, 10);
+      await this.eliminarComprobantesPorFecha(fechaInversion);
       await this.EliminarInversion(this.Inversiones.identificador);
     }
 
@@ -757,6 +759,20 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
   EliminarInversion(id: number): Promise<any> {
     this.xAPI.funcion = environment.xApi.ELIMINAR_INVERSION;
     this.xAPI.parametros = id.toString();
+    this.xAPI.valores = '';
+    return this.apiService.Ejecutar(this.xAPI).toPromise();
+  }
+
+  eliminarMovimientosPorFecha(fecha: string): Promise<any> {
+    this.xAPI.funcion = environment.xApi.BORRAR_MOVIMIENTOS_LOTE;
+    this.xAPI.parametros = fecha;
+    this.xAPI.valores = '';
+    return this.apiService.Ejecutar(this.xAPI).toPromise();
+  }
+
+  eliminarComprobantesPorFecha(fecha: string): Promise<any> {
+    this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTES_INVERSIONES;
+    this.xAPI.parametros = fecha;
     this.xAPI.valores = '';
     return this.apiService.Ejecutar(this.xAPI).toPromise();
   }
