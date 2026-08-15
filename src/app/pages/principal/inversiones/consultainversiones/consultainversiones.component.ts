@@ -21,6 +21,7 @@ import { CierreService } from "src/app/services/banfanb/cierre.service";
 export class ConsultainversionesComponent implements OnInit, OnDestroy {
 
   @ViewChild('filex', { static: true }) filex: TemplateRef<any>;
+  @ViewChild('dateRange') dateRange: any;
 
   private buscar$ = new Subject<void>();
 
@@ -484,6 +485,9 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     this.filtroInstrumento = '';
     this.fecha_desde = null;
     this.fecha_hasta = null;
+    if (this.dateRange && this.dateRange._model) {
+      this.dateRange._model.reset();
+    }
     this.lstInversionesFiltro = [...this.lstInversiones];
   }
 
