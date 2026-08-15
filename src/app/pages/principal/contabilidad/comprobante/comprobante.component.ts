@@ -375,11 +375,11 @@ export class ComprobanteComponent implements OnInit {
     this.dataSource = new MatTableDataSource<IComprobante>(this.ELEMENT_DATA);
     this.dataSource.paginator = this.paginator;
     if (x) {
+      this.active = true;
       this.selectedIndex = 1;
       this.CargarFormulario();
       this.mostrarImprimir = true;
     }
-    this.active = true;
     this.TotalizarElement();
   }
 
@@ -759,7 +759,7 @@ export class ComprobanteComponent implements OnInit {
 
   esPeriodoCerrado(e: any): boolean {
     const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
-    return new Date(fechaCierre) > new Date(e.fecha_operacion);
+    return new Date(fechaCierre) >= new Date(e.fecha_operacion);
   }
 
   eliminarComprobante(e: any) {
