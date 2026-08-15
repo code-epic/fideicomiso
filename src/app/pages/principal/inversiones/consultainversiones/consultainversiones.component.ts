@@ -11,6 +11,7 @@ import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 import { MatDialog } from "@angular/material/dialog";
 import { environment } from "src/environments/environment";
 import { WzportafolioComponent } from "./wzportafolio/wzportafolio.component";
+import { CierreService } from "src/app/services/banfanb/cierre.service";
 
 @Component({
   selector: 'app-consultainversiones',
@@ -112,6 +113,7 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
   public fecha_compra : NgbDate | null
   public fecha_vencimiento : NgbDate | null
   public xinver : string = ''
+  public fechaUltimo: string = ''
 
 
   constructor(
@@ -121,14 +123,16 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
     public formatter: NgbDateParserFormatter,
+    private _cierre: CierreService,
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.buscar$.pipe(debounceTime(300)).subscribe(() => this.BuscarInversion());
     this.ListarCustodia();
     this.ListarEmisor();
     this.ListarInstrumento();
     this.ListarInver();
+    this.fechaUltimo = await this._cierre.getUltimoCierre();
   }
 
   ngOnDestroy(): void {
@@ -393,74 +397,85 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
       return `${y}-${m}-${d}`;
     }
     if (typeof f === 'object' && f.year) {
-      return this.formatter.format(f);
+      return `${f.year}-${String(f.month).padStart(2, '0')}-${String(f.day).padStart(2, '0')}`;
     }
     if (typeof f === 'string') {
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(f)) {
+        const [d, m, y] = f.split('/');
+        return `${y}-${m}-${d}`;
+      }
       return f.substring(0, 10);
     }
     return '';
   }
 
   BuscarInversion() {
-    let resultado = [...this.lstInversiones];
+    setTimeout(() => {
+      let resultado = [...this.lstInversiones];
 
-    // 1. Filtro por Instrumento
-    if (this.filtroInstrumento && this.filtroInstrumento.trim() !== '') {
-      const instSelected = this.filtroInstrumento.toLowerCase().trim();
-      const parts = instSelected.split(' - ');
-      const codePart = parts[0] ? parts[0].trim() : '';
-      const namePart = parts[1] ? parts[1].trim() : instSelected;
+      // 1. Filtro por Instrumento
+      if (this.filtroInstrumento && this.filtroInstrumento.trim() !== '') {
+        const instSelected = this.filtroInstrumento.toLowerCase().trim();
+        const parts = instSelected.split(' - ');
+        const codePart = parts[0] ? parts[0].trim() : '';
+        const namePart = parts[1] ? parts[1].trim() : instSelected;
 
-      resultado = resultado.filter((e) => {
-        const instName = (e.instrumento || '').toLowerCase();
-        const instId = (e.id_instrumento || '').toString();
-        return (
-          instName.includes(namePart) ||
-          instId === codePart ||
-          instSelected.includes(instName)
-        );
-      });
-    }
+        resultado = resultado.filter((e) => {
+          const instName = (e.instrumento || '').toLowerCase();
+          const instId = (e.id_instrumento || '').toString();
+          return (
+            instName.includes(namePart) ||
+            instId === codePart ||
+            instSelected.includes(instName)
+          );
+        });
+      }
 
-    // 2. Filtro por Búsqueda (ISIN, Monto o Nº)
-    if (this.buscar && this.buscar.trim() !== '') {
-      const val = this.buscar.toLowerCase().trim();
-      resultado = resultado.filter((e) => {
-        const num = this.getZFill(e.identificador || 0).toLowerCase();
-        const isin = (e.codigo_isin || '').toString().toLowerCase();
-        const valorNominal = (e.valor_nominal || '').toString().toLowerCase();
+      // 2. Filtro por Búsqueda (ISIN, Monto o Nº)
+      if (this.buscar && this.buscar.trim() !== '') {
+        const val = this.buscar.toLowerCase().trim();
+        resultado = resultado.filter((e) => {
+          const num = this.getZFill(e.identificador || 0).toLowerCase();
+          const isin = (e.codigo_isin || '').toString().toLowerCase();
+          const valorNominal = (e.valor_nominal || '').toString().toLowerCase();
 
-        return (
-          num.includes(val) ||
-          isin.includes(val) ||
-          valorNominal.includes(val)
-        );
-      });
-    }
+          return (
+            num.includes(val) ||
+            isin.includes(val) ||
+            valorNominal.includes(val)
+          );
+        });
+      }
 
-    // 3. Filtro por Rango de Fechas (Fecha Emisión)
-    const fDesdeStr = this.getFechaStr(this.fecha_desde);
-    const fHastaStr = this.getFechaStr(this.fecha_hasta);
+      // 3. Filtro por Rango de Fechas (Fecha Emisión)
+      const fDesdeStr = this.getFechaStr(this.fecha_desde);
+      const fHastaStr = this.getFechaStr(this.fecha_hasta);
 
-    if (fDesdeStr) {
-      resultado = resultado.filter((e) => {
-        const fEmision = (e.fecha_emision || '').substring(0, 10);
-        return fEmision >= fDesdeStr;
-      });
-    }
+      if (fDesdeStr || fHastaStr) {
+        resultado = resultado.filter((e) => {
+          const fEmision = this.getFechaStr(e.fecha_emision);
+          if (!fEmision) return false;
+          if (fDesdeStr && fEmision < fDesdeStr) return false;
+          if (fHastaStr && fEmision > fHastaStr) return false;
+          return true;
+        });
+      }
 
-    if (fHastaStr) {
-      resultado = resultado.filter((e) => {
-        const fEmision = (e.fecha_emision || '').substring(0, 10);
-        return fEmision <= fHastaStr;
-      });
-    }
-
-    this.lstInversionesFiltro = resultado;
+      this.lstInversionesFiltro = resultado;
+    }, 0);
   }
 
   limpiarBusquedaText() {
     this.buscar = '';
+    this.BuscarInversion();
+  }
+
+  onFechaCambio(tipo: string, event: any) {
+    if (tipo === 'desde') {
+      this.fecha_desde = event.value;
+    } else {
+      this.fecha_hasta = event.value;
+    }
     this.BuscarInversion();
   }
 
@@ -726,6 +741,13 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
 
   getFecha(f) : string {
     return this.util.ConvertirFechaHumana(f) 
+  }
+
+  esPeriodoCerrado(e: any): boolean {
+    if (!this.fechaUltimo) return false;
+    const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
+    const fechaCompra = (e.fecha_compra || '').substring(0, 10);
+    return new Date(fechaCierre) > new Date(fechaCompra);
   }
 
 

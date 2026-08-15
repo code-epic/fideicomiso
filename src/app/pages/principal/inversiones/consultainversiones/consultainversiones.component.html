@@ -41,8 +41,8 @@
                                     <mat-form-field appearance="outline" style="width: 100%;">
                                         <mat-label>Rango de Fecha (Emisión)</mat-label>
                                         <mat-date-range-input [rangePicker]="pickerRango">
-                                            <input matStartDate placeholder="Desde" mask="d0/M0/0000" (keydown)="soloFecha($event)" [(ngModel)]="fecha_desde" (dateChange)="BuscarInversion()">
-                                            <input matEndDate placeholder="Hasta" mask="d0/M0/0000" (keydown)="soloFecha($event)" [(ngModel)]="fecha_hasta" (dateChange)="BuscarInversion()">
+                                            <input matStartDate placeholder="Desde" mask="d0/M0/0000" (keydown)="soloFecha($event)" [(ngModel)]="fecha_desde" (dateChange)="onFechaCambio('desde', $event)">
+                                            <input matEndDate placeholder="Hasta" mask="d0/M0/0000" (keydown)="soloFecha($event)" [(ngModel)]="fecha_hasta" (dateChange)="onFechaCambio('hasta', $event)">
                                         </mat-date-range-input>
                                         <mat-datepicker-toggle matSuffix [for]="pickerRango"></mat-datepicker-toggle>
                                         <mat-date-range-picker #pickerRango></mat-date-range-picker>
@@ -113,7 +113,7 @@
                                                 </div>
                                                 <div class="col-md-2 text-right">
 
-                                                    <button mat-icon-button aria-label="Editar" matTooltip="Editar" (click)="editar(e)">
+                                                    <button *ngIf="!esPeriodoCerrado(e)" mat-icon-button aria-label="Editar" matTooltip="Editar" (click)="editar(e)">
                                                         <mat-icon class="texto-gray">edit</mat-icon>
                                                     </button>
                                                     <button mat-icon-button aria-label="Portafolio" matTooltip="Portafolio" (click)="abrirDialogoPortafolio(e)">
