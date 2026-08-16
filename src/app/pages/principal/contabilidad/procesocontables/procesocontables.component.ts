@@ -416,7 +416,15 @@ export class ProcesocontablesComponent implements OnInit {
           fechaUltimoAux.setUTCDate(fechaUltimoAux.getUTCDate() + 2);
           const fechaUltimoUTCAux = fechaUltimoAux.toISOString();
 
-          if (this.cierre.getSemestral(this.util.ConvertirFechaHumana(fechaAPrecerrar))) {            
+          console.log('ultimoPrecierreDate', ultimoPrecierreDate);
+          console.log('fechaAPrecerrarDate', fechaAPrecerrarDate);
+          console.log('fechaUltimoUTCAux', fechaUltimoUTCAux);
+          console.log('fechaAPrecerrarDate < ultimoPrecierreDate', fechaAPrecerrarDate < ultimoPrecierreDate);
+          console.log('fechaAPrecerrarDate >= fechaUltimoUTCAux', fechaAPrecerrarDate >= fechaUltimoUTCAux);
+          console.log('fechaAPrecerrarDate == ultimoPrecierreDate', fechaAPrecerrarDate == ultimoPrecierreDate);
+          
+
+          if (this.cierre.getSemestral(this.util.ConvertirFechaHumana(fechaAPrecerrar)) && this.estatus == 'S') {            
               this.ValidarPreCierreSemestral()
                console.log('ValidarPreCierre precierre semestral ... ', this.xAPI)
               return;
