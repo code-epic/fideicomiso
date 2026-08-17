@@ -14,6 +14,7 @@ export class ComprobanteDialogComponent implements OnInit {
   totalDebe: any = 0;
   totalHaber: any = 0;
   fechaComprobante: string
+  descripcionComprobante: string
 
   constructor(public dialogRef: MatDialogRef<ComprobanteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -21,6 +22,7 @@ export class ComprobanteDialogComponent implements OnInit {
     private _util: UtilService
   ) {
       this.xData = data.datos;
+      this.descripcionComprobante = data.descripcion || '';
     }
 
   ngOnInit(): void {

@@ -18,131 +18,34 @@ export class ImprimirService {
         if (i === 0) {
             printWindow.document.head.innerHTML = ` 
             <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-            <style  type="text/css">
+            <style type="text/css">
+            @page { 
+                size: letter portrait;
+                margin: 15mm 20mm;
+                ${xsize}
+            }
             @media print {
-                @page { 
-                    ${xsize} 
-                
-                }
-                body{ width: 1200px, padding: 2rem}
-                div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Roboto"; font-size:x-small }
-                section { 
-                    page-break-before: always; 
-                }
-
-                .membrete{
-                    font-size: 13px;
-                }
-
-                .membrete-div{
-                    margin-top: 5px;
-                    margin-bottom: 5px
-                }
-
-                .mt-100{
-                    margin-top: 100px;
-                }
-
-                .flex-print{
-                    display: flex;
-                }
-
-                .mat-drawer-content {height: auto !important; }
-                .mat-drawer-container {overflow: inherit !important; }
-                .logo { margin-right: 10px; }
-                .logo img { max-height: 50px; }
-                .cabecera { font-weight: bold; }
-                .nombre { font-size:9px; }
-                table {
-                    border-collapse: collapse; width: 100%;         
-                    th,
-                    td {
-                        padding: .25em .5em;
-                        font-size: 12px
-                        text-align: left;
-
-                        &:nth-child(2) {
-                            text-align: left;
-                        }
-                    }
-
-                    th {
-                        background-color:rgb(228, 228, 228);
-                        color: #252525;
-                        text-align: center;
-                        font-size: 13px;
-                    }
-
-                    tr {
-                        border-bottom: #b9aeae;
-                    }
-
-                    tr:nth-child(odd) {
-                        background-color: #f1f1f1;
-                    }
-
-                    tr:nth-child(even) {
-                        background-color: #fff;
-                    }
-                }
-                th, td { 
-                    border: 1px solid #ddd;  padding: 8px 16px; text-align: center; 
-                }
+                body { padding: 0; margin: 0; }
+                div, table, thead, tbody, tfoot, tr, th, td, p { font-family: "Roboto", sans-serif; }
+                section { page-break-before: always; }
             }
-            
-            section { 
-                page-break-before: always; 
+
+            body { 
+                font-family: "Roboto", sans-serif;
+                font-size: 14px;
+                line-height: 1.5;
+                color: #333;
+                margin: 0;
+                padding: 15mm 20mm;
             }
-            .mat-drawer-content {height: auto !important; }
-            .mat-drawer-container {overflow: inherit !important; }
-            .logo { margin-right: 10px; }
-            .logo img { max-height: 50px; }
-            .cabecera {font-weight: bold; }
-            .nombre { font-size:8px; }
-            table {
-                border-collapse: collapse; width: 100%;
-                font-family: sans-serif;
 
-                th,
-                td {
-                    padding: .25em .5em;
-                    text-align: left;
-                    font-size: 12px;
-
-                    &:nth-child(2) {
-                        text-align: left;
-                    }
-                }
-
-                th {
-                    background-color: #F5F5F0;
-                    color: #252525;
-                    font-size: 13px;
-                }
-
-                tr {
-                    border-bottom: #b9aeae;
-                }
-
-                tr:nth-child(odd) {
-                    background-color: #f1f1f1;
-                }
-
-                tr:nth-child(even) {
-                    background-color: #fff;
-                }
-            }
-            th, td { 
-                border: 1px solid #ddd; padding: 8px 16px; text-align: center; 
-            }
-            
-            body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:Calibri; font-size:11px }
+            h1 { font-size: 18px; font-weight: 500; margin: 0; padding: 12px 24px; background-color: #fafafa; border-bottom: 1px solid #e0e0e0; }
             </style>`
         } else {
 
             printWindow.document.head.innerHTML = ` 
             <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-            <style  type="text/css">
+            <style type="text/css">
                 @media print {
                     @page { 
                         size: landscape; 

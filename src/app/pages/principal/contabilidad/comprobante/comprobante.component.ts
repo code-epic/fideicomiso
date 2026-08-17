@@ -825,7 +825,7 @@ export class ComprobanteComponent implements OnInit {
     }
     this.dialog.open(ComprobanteDialogComponent, {
       width: "60%",
-      data: { datos: this.ELEMENT_DATA },
+      data: { datos: this.ELEMENT_DATA, descripcion: e?.descripcion || '' },
     });
   }
 }
