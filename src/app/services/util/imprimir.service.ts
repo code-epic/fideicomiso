@@ -14,7 +14,7 @@ export class ImprimirService {
         if (i === 0) {
             headContent = ` 
             <base href="${window.location.origin}/">
-            <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
             <style type="text/css">
             @page { 
                 size: letter portrait;
@@ -22,17 +22,17 @@ export class ImprimirService {
             }
             @media print {
                 body { padding: 0 !important; margin: 0 !important; }
-                div, table, thead, tbody, tfoot, tr, th, td, p { font-family: "Roboto", sans-serif; }
-                table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
-                tr { page-break-inside: auto; }
-                th, td { padding: 6px 8px; line-height: 1.8; }
+                div, table, thead, tbody, tfoot, tr, th, td, p { font-family: 'IBM Plex Sans', sans-serif; }
+                table { width: 100%; border-collapse: collapse; }
+                tr { page-break-inside: avoid; }
+                th, td { padding: 10px 16px; }
             }
 
             body { 
-                font-family: "Roboto", sans-serif;
+                font-family: 'IBM Plex Sans', sans-serif;
                 font-size: 13px;
                 line-height: 1.5;
-                color: #333;
+                color: #0F172A;
                 margin: 0;
                 padding: 0;
             }
@@ -43,8 +43,7 @@ export class ImprimirService {
             }
 
             th, td { 
-                padding: 6px 8px; 
-                line-height: 1.8; 
+                padding: 10px 16px; 
             }
             </style>`;
         } else {

@@ -196,7 +196,7 @@ export class GeneralyresultadoComponent implements OnInit {
 
         let result = this.acum_saldo_actual - this.total_gastos;
 
-        this.HTMLBalance += `</tbody></table>`;
+        this.HTMLBalance += ``;
         this.HTMLResultados += `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
         <th >${this.lstIndex[this.posicion].nombre} </th>
@@ -245,7 +245,7 @@ export class GeneralyresultadoComponent implements OnInit {
       this.HTMLBalance += `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th class="th-general">${this.lstIndex[this.posicion].nombre} </th>
-          <th class="text-right th-general">${this.getMoneda(this.acum_saldo_actual) == "0"
+          <th class="text-right class="th-general">${this.getMoneda(this.acum_saldo_actual) == "0"
           ? ""
           : this.getMoneda(this.acum_saldo_actual) 
         }</th>
@@ -490,9 +490,26 @@ export class GeneralyresultadoComponent implements OnInit {
       .replace(/<th class='text-right'>/g, '<th style="padding: 6px 8px; line-height: 1.8; width: 20%; text-align: right;">')
       .replace(/<th class="text-right">/g, '<th style="padding: 6px 8px; line-height: 1.8; width: 20%; text-align: right;">')
       .replace(/<th class="th-general">/g, '<th style="padding: 6px 8px; line-height: 1.8; width: 80%; text-align: left; font-weight: 600;">')
-      .replace(/<th class="text-right class="th-general">/g, '<th style="padding: 6px 8px; line-height: 1.8; width: 20%; text-align: right; font-weight: 600;">');
+      .replace(/<th class="text-right class="th-general">/g, '<th style="padding: 6px 8px; line-height: 1.8; width: 20%; text-align: right; font-weight: 600;">')
+      .replace(/<th class="text-right th-general">/g, '<th style="padding: 6px 8px; line-height: 1.8; width: 20%; text-align: right; font-weight: 600;">');
 
     const resultadosHTML = this.HTMLResultados
+      .replace(/<thead>[\s\S]*?<\/thead>/g, '') // Quitar cabecera de la tabla de resultados para la impresión
+      .replace(/<th >TOTAL DE INGRESOS/g, '<th style="padding: 6px 8px; line-height: 1.8; text-align: left;">TOTAL DE INGRESOS')
+      .replace(/<tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">\s*?<td colspan="5"> &nbsp; <\/td>\s*?<\/tr>/g, `
+        <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">
+          <td colspan="5"> &nbsp; </td>
+        </tr>
+        <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">
+          <td colspan="5"> &nbsp; </td>
+        </tr>
+        <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">
+          <td colspan="5"> &nbsp; </td>
+        </tr>
+        <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #f3f3ea54; height: 35px;">
+          <td colspan="5"> &nbsp; </td>
+        </tr>
+      `)
       .replace(/<table class="asientos">/g, '<table style="width: 100%; border-collapse: collapse; margin-top: 4px;">')
       .replace(/<td style="background-color: #eeeee4;">/g, '<td style="padding: 6px 8px; line-height: 1.8; width: 80%; text-align: left; background-color: #eeeee4;">')
       .replace(/<td >/g, '<td style="padding: 6px 8px; line-height: 1.8; width: 80%; text-align: left;">')
@@ -518,18 +535,12 @@ export class GeneralyresultadoComponent implements OnInit {
           <p style="font-weight: 700; font-size: 13px; margin: 2px 0;">ESTADO DE SITUACION FINANCIERA AL - ${fecha}</p>
         </div>
         ${balanceHTML}
-      </div>
-
-      <div style="page-break-before: always; height: 0;"></div>
-
-      <div style="font-family: 'Roboto', sans-serif; font-size: 13px; color: #333; padding: 0; margin: 0;">
-        <div style="text-align: center;">
-          <p style="font-weight: 700; font-size: 13px; margin: 2px 0;">ESTADO DE SITUACION FINANCIERA - AL ${fecha}</p>
-        </div>
-
         ${resultadosHTML}
 
-        <div style="margin-top: 75px; display: flex; flex-direction: column; align-items: center;">
+      </div>
+
+      <div style="font-family: 'Roboto', sans-serif; font-size: 13px; color: #333; padding: 0; margin: 0;">
+        <div style="margin-top: 115px; display: flex; flex-direction: column; align-items: center;">
           <hr style="width: 40%; border: none; border-top: 1px solid #333; margin-bottom: 0.5rem;">
           <p style="font-weight: 600; font-size: 13px; margin: 0;">FIRMA AUTORIZADA</p>
         </div>
