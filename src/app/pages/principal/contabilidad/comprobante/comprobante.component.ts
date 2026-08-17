@@ -206,7 +206,7 @@ export class ComprobanteComponent implements OnInit {
   cargarComprobantes(){
     let xAPI = {
       funcion: environment.xApi.CONTAR_COMPROBANTES,
-      parametros: `${this.mes}, ${this.anio}`
+      parametros: `${this.getFechaInicio()}, ${this.getFechaFin()}`
     }
 
      this.apiService.Ejecutar(xAPI).subscribe(
@@ -226,6 +226,18 @@ export class ComprobanteComponent implements OnInit {
 
   private getAnio(): number{
      return new Date().getFullYear();
+  }
+
+  private getFechaInicio(): string {
+    const mesStr = this.mes.toString().padStart(2, '0');
+    return `${this.anio}-${mesStr}-01`;
+  }
+
+  private getFechaFin(): string {
+    const mesSiguiente = this.mes === 12 ? 1 : this.mes + 1;
+    const anioSiguiente = this.mes === 12 ? this.anio + 1 : this.anio;
+    const mesStr = mesSiguiente.toString().padStart(2, '0');
+    return `${anioSiguiente}-${mesStr}-01`;
   }
 
   parseFecha(f: any): Date {
@@ -281,7 +293,7 @@ export class ComprobanteComponent implements OnInit {
   ListarComprobantes() {
     this.lst = [];
     this.xAPI.funcion = environment.xApi.PAGINAR_COMPROBANTES;
-    this.xAPI.parametros = `${this.mes}, ${this.anio}, ${this.pageIndex * 10}, ${this.pageSize}`;
+    this.xAPI.parametros = `${this.getFechaInicio()}, ${this.getFechaFin()}, ${this.pageIndex * 10}, ${this.pageSize}`;
     this.xAPI.valores = "";
     this.ngxService.startLoader("load-cont");
     this.apiService.Ejecutar(this.xAPI).subscribe(
