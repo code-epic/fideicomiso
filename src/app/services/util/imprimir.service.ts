@@ -23,8 +23,8 @@ export class ImprimirService {
             @media print {
                 body { padding: 0 !important; margin: 0 !important; }
                 div, table, thead, tbody, tfoot, tr, th, td, p { font-family: 'IBM Plex Sans', sans-serif; }
-                table { width: 100%; border-collapse: collapse; }
-                tr { page-break-inside: avoid; }
+                table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+                tr { page-break-inside: auto; }
                 th, td { padding: 10px 16px; }
             }
 

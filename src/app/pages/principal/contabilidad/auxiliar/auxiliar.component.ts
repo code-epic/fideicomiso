@@ -128,7 +128,7 @@ export class AuxiliarComponent implements OnInit {
     }
     
     this.ngxService.startLoader('load-precierre')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_MAYOR_ANALITICO
+    this.xAPI.funcion = environment.xApi.CONSULTAR_AUXILIAR
     this.xAPI.parametros = `${fecha},${this.cuenta}`
     this.xAPI.valores = ''
 

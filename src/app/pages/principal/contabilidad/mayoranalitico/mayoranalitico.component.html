@@ -4,53 +4,177 @@
   <div class="row">
     <div class="col-md-2">
       <mat-form-field appearance="outline">
-        <mat-label>Ultimo Cierre</mat-label>
-        <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
-          [(ngModel)]="fechaultimo" disabled="disabled">
-        <mat-icon matSuffix>event</mat-icon>
-      </mat-form-field>
-    </div>
-    
-    <div class="col-md-3">
-      <mat-form-field appearance="outline">
-        <mat-label>Plan</mat-label>
-        <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}">
-          <mat-option value='%'>TODOS</mat-option>
-          <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
-        </mat-select>
-  
+        <mat-label>Fecha Inicio</mat-label>
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="fechaInicio">
+        <mat-datepicker #startPicker></mat-datepicker>
+        <mat-icon matSuffix (click)="startPicker.open()">event</mat-icon>
       </mat-form-field>
     </div>
 
     <div class="col-md-2">
       <mat-form-field appearance="outline">
-        <mat-label>Fecha valor</mat-label>
-        <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai" (blur)="validarCombo()">
-        <mat-datepicker #ypicker></mat-datepicker>
-        <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
-      </mat-form-field>
-  
-    </div>
-    <div class="col-md-3">
-      <mat-form-field appearance="outline">
-        <mat-label>Frecuencia</mat-label>
-        <mat-select placeholder="Frecuencia" [(ngModel)]="estatus" value="{{estatus}}">
-          <mat-option value='%'>MENSUAL</mat-option>
-          <!-- <mat-option value='S'>CIERRE SEMESTRAL</mat-option> -->
-          <mat-option value='M' *ngIf="bAntes">ANTES DEL CIERRE SEMESTRAL</mat-option>
-          <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
-        </mat-select>
-  
+        <mat-label>Fecha Fin</mat-label>
+        <input matInput [matDatepicker]="endPicker" [(ngModel)]="fechaFin">
+        <mat-datepicker #endPicker></mat-datepicker>
+        <mat-icon matSuffix (click)="endPicker.open()">event</mat-icon>
       </mat-form-field>
     </div>
-  
-    <div class="col-md-2 text-left">
-      <button mat-flat-button color="primary"  style="margin-top: 5px; height: 50px;">
-        <mat-icon>verified</mat-icon>&nbsp;Procesar reporte
+
+    <div class="col-md-5">
+      <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>Cuenta Contable</mat-label>
+        <input matInput [formControl]="cuentaControl" [matAutocomplete]="auto" placeholder="Todas las cuentas">
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCuentaSelected($event)">
+          <mat-option *ngFor="let c of filteredCuentas" [value]="c.codigo">
+            {{ c.codigo }} - {{ c.descripcion }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-3 text-left">
+      <button mat-flat-button color="primary" (click)="ConsultarMayor()" style="margin-top: 5px; height: 50px;">
+        <mat-icon>search</mat-icon>&nbsp;Consultar
       </button>
     </div>
-  
-  
   </div>
 </div>
 
+<div *ngIf="cuentaSeleccionada" style="margin: 0 16px 8px; padding: 8px 16px; background: #F1F5F9; border-radius: 4px; border-left: 3px solid #2563EB;">
+  <span style="font-weight: 600; color: #1E293B; font-size: 13px;">{{ cuentaSeleccionada }}</span>
+  <span style="color: #64748B; margin-left: 8px; font-size: 13px;">{{ cuentaDescripcionSeleccionada }}</span>
+</div>
+
+<div *ngIf="mostrarResultados" id="DivPrintPage">
+
+  <div style="font-family: 'IBM Plex Sans', sans-serif; color: #0F172A; padding: 20px 30px;">
+
+    <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; border-bottom: 3px solid #1E293B; margin-bottom: 24px;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <img src="./assets/img/brand/logo.png" alt="Logo" style="height: 50px;">
+        <div>
+          <p style="margin: 0; font-size: 14px; font-weight: 700; color: #1E293B; letter-spacing: 0.5px;">
+            BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA
+          </p>
+          <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: 500; color: #64748B; letter-spacing: 1px; text-transform: uppercase;">
+            Dirección de Fideicomiso
+          </p>
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <p style="margin: 0; font-size: 10px; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px;">Fecha de impresión</p>
+        <p style="margin: 2px 0 0 0; font-size: 12px; font-weight: 600; color: #334155;">{{ getFechaHoy() }}</p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 28px;">
+      <p style="margin: 0; font-size: 11px; font-weight: 500; color: #2563EB; text-transform: uppercase; letter-spacing: 2px;">
+        Mayor Analítico
+      </p>
+      <p style="margin: 4px 0 0 0; font-size: 18px; font-weight: 700; color: #1E293B;">
+        {{ fechaInicio | date:'dd/MM/yyyy' }} - {{ fechaFin | date:'dd/MM/yyyy' }}
+      </p>
+      <p *ngIf="cuentaSeleccionada" style="margin: 4px 0 0 0; font-size: 13px; color: #64748B;">
+        Cuenta: {{ cuentaSeleccionada }}
+      </p>
+    </div>
+
+    <div *ngFor="let cuenta of cuentasConMovimientos" style="margin-bottom: 24px; page-break-inside: avoid;">
+      <div style="background: #1E293B; color: #fff; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border-radius: 4px 4px 0 0;">
+        {{ cuenta.codigo_cuenta }} - {{ cuenta.nombre_cuenta }}
+      </div>
+      <table style="width: 100%; border-collapse: collapse; border: 1px solid #E4E5E7; border-top: none;">
+        <thead>
+          <tr style="background: #F8FAFC;">
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Fecha</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Comprobante</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Descripción</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7;">Debe</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7;">Haber</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7;">Saldo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #F1F5F9;">
+            <td colspan="3" style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; border-bottom: 1px solid #E4E5E7;">SALDO INICIAL</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
+            <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ cuenta.saldo_inicial | number:'1.2-2' }}</td>
+          </tr>
+          <tr *ngFor="let mov of cuenta.movimientos; let odd = odd" [style.background]="odd ? '#fff' : '#F8FAFC'">
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ mov.fecha_operacion | date:'dd/MM/yyyy' }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ mov.id_comprobante }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ mov.descripcion_comprobante }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ mov.debe > 0 ? (mov.debe | number:'1.2-2') : '' }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ mov.haber > 0 ? (mov.haber | number:'1.2-2') : '' }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ mov.saldo_corrido | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+          <tfoot>
+          <tr style="background: #F1F5F9; font-weight: 700;">
+            <td colspan="3" style="padding: 10px 16px; font-size: 12px; color: #1E293B; border-top: 2px solid #1E293B;">TOTALES</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">{{ cuenta.total_debe | number:'1.2-2' }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">{{ cuenta.total_haber | number:'1.2-2' }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">{{ cuenta.saldo_final | number:'1.2-2' }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <table style="width: 100%; border-collapse: collapse; border: 1px solid #E4E5E7; border-radius: 4px;">
+        <thead>
+          <tr style="background: #1E293B;">
+            <th colspan="6" style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #fff; text-align: center; letter-spacing: 1px; text-transform: uppercase;">TOTALES GENERALES</th>
+          </tr>
+          <tr style="background: #F8FAFC;">
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7; width: 30%;">Concepto</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7; width: 14%;">Saldo Inicial</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7; width: 14%;">Debe</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7; width: 14%;">Haber</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7; width: 14%;">Saldo Final</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7; width: 14%;">Diferencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; border-bottom: 1px solid #E4E5E7;">Saldo Inicial</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ totalGeneralSaldoInicial | number:'1.2-2' }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; border-bottom: 1px solid #E4E5E7;">Total Período</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ totalGeneralDebe | number:'1.2-2' }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ totalGeneralHaber | number:'1.2-2' }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
+            <td style="padding: 10px 16px; font-size: 12px; font-weight: 700; color: #1E293B; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ totalGeneralDebe - totalGeneralHaber | number:'1.2-2' }}</td>
+          </tr>
+          <tr style="background: #F1F5F9; font-weight: 700;">
+            <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; border-top: 2px solid #1E293B;">Saldo Final</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;"></td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;"></td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;"></td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">{{ totalGeneralSaldoFinal | number:'1.2-2' }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 75px; display: flex; flex-direction: column; align-items: center;">
+      <hr style="width: 40%; border: none; border-top: 1px solid #94A3B8; margin-bottom: 8px;">
+      <p style="font-size: 11px; font-weight: 600; color: #64748B; margin: 0; letter-spacing: 1px; text-transform: uppercase;">FIRMA AUTORIZADA</p>
+    </div>
+
+  </div>
+</div>
+
+<div *ngIf="mostrarResultados" style="margin-top: 16px; text-align: right;">
+  <button mat-flat-button color="warn" (click)="imprimir()" style="height: 50px;">
+    <mat-icon>print</mat-icon>&nbsp;Imprimir reporte
+  </button>
+</div>

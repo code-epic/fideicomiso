@@ -64,6 +64,7 @@ export const environment = {
     CONSULTAR_BALANCE_COMPROBACION: 'FID_CBalanceComprobacion',
     CONSULTAR_BALANCE_FECHA: 'FID_CBalanceFecha',
     CONSULTAR_MAYOR_ANALITICO: 'FID_CMayorAnalitico',
+    CONSULTAR_AUXILIAR: 'FID_CAuxiliar',
     CONSULTAR_SEMILLERO_CONTABLE: 'FID_CSemilleroContable',
     CONSULTAR_SEMILLERO: 'FID_CSemillero',
 
