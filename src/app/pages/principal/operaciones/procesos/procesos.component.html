@@ -51,7 +51,7 @@
 
     <div class="row py-2">
       <div class="col-md-12 text-right">
-        <button mat-flat-button color="accent" (click)="ListarInversiones()" style="height: 50px;">
+        <button mat-flat-button color="accent" (click)="Consultar()" style="height: 50px;">
           <mat-icon>search</mat-icon>&nbsp;Consultar
         </button>
         &nbsp;&nbsp;
@@ -66,8 +66,8 @@
     </div>
 
 
-    <mat-tab-group *ngIf="mostrarComprobantes" mat-stretch-tabs style="padding:4px;">
-      <mat-tab>
+    <mat-tab-group *ngIf="mostrarComprobantes || mostrarVencimientos || mostrarCompras" mat-stretch-tabs style="padding:4px;">
+      <mat-tab *ngIf="mostrarComprobantes">
         <ng-template mat-tab-label>
           &nbsp;POSICION FINANCIERA
         </ng-template>
@@ -164,9 +164,8 @@
 
 
       </mat-tab>
-      <mat-tab>
+      <mat-tab *ngIf="mostrarVencimientos">
         <ng-template mat-tab-label>
-          <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
           &nbsp;VENCIMIENTO
         </ng-template>
 
@@ -254,9 +253,8 @@
 
         <br>
       </mat-tab>
-      <mat-tab>
+      <mat-tab *ngIf="mostrarCompras">
         <ng-template mat-tab-label>
-          <!-- <mat-icon class="example-tab-icon">tips_and_updates</mat-icon> -->
           &nbsp;COMPRAS
         </ng-template>
         <div class="example-large-box mat-elevation-z4">
@@ -338,7 +336,7 @@
 
     <div class="row" *ngIf="mostrarGenerarComprobante" >
       <div class="col-md-12 text-right">
-        <button mat-flat-button color="accent" (click)="GenerarComprobante()" style="height: 50px;">
+        <button mat-flat-button color="accent" [disabled]="generandoComprobante" (click)="GenerarComprobante()" style="height: 50px;">
           Generar comprobante
         </button>
       </div>

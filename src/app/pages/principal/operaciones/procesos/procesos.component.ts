@@ -3,6 +3,7 @@ import { MatDatepickerInputEvent } from "@angular/material/datepicker";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgbDateParserFormatter } from "@ng-bootstrap/ng-bootstrap";
 import { NgxUiLoaderService } from "ngx-ui-loader";
+import { firstValueFrom } from "rxjs";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { CierreService } from "src/app/services/banfanb/cierre.service";
 import { FID_IComprobante } from "src/app/services/banfanb/comprobante.service";
@@ -37,13 +38,15 @@ export class ProcesosComponent implements OnInit {
   // Vencimiento
   acum_debev: number = 0;
 
-  existenMovimientos: boolean
+  existenMovimientos: boolean;
+  mostrarVencimientos: boolean = false;
+  mostrarCompras: boolean = false;
 
   xAPI: IAPICore = {
     funcion: '',
     parametros: '',
     valores: ''
-  }
+  };
 
   public Comprobante: FID_IComprobante = {
     plan: 0,
@@ -58,7 +61,9 @@ export class ProcesosComponent implements OnInit {
   };
 
   mostrarGenerarComprobante: boolean = false;
-  mostrarComprobantes: boolean = false
+  mostrarComprobantes: boolean = false;
+  generandoComprobante: boolean = false;
+  esConsulta: boolean = false;
 
   constructor(
     private apiService: ApiService,
@@ -75,29 +80,29 @@ export class ProcesosComponent implements OnInit {
 
   async consultarUltimoCierre() {
     this.ngxService.startLoader("load-precierre");
-    this.fechaultimo = await this.cierre.getUltimoCierre()
+    this.fechaultimo = await this.cierre.getUltimoCierre();
     this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);
-    this.fechaf = this.fechai
-    this.consultarUltimoCalculo(this.fechai)
+    this.fechaf = this.fechai;
+    this.consultarUltimoCalculo(this.fechai);
     this.ngxService.stopLoader("load-precierre");
   }
 
-  consultarUltimoCalculo(f: any){
-    const fecha = this.util.ConvertirFechaDB(f)
+  consultarUltimoCalculo(f: any) {
+    const fecha = this.util.ConvertirFechaDB(f);
     const xApi: IAPICore = {
-      funcion: environment.xApi.ULTIMO_COMPROBANTE,
-      parametros: fecha,
+      funcion: environment.xApi.CONSULTAR_POSICIONES_INVERSIONES,
+      parametros: fecha + "," + fecha,
       valores: "",
-    }
+    };
 
     this.apiService.Ejecutar(xApi).subscribe({
       next: (data) => {
-        this.existenMovimientos = data.Cuerpo.length > 0
+        this.existenMovimientos = data.Cuerpo && data.Cuerpo.length > 0;
       },
       error: (error) => {
-        console.error(error)
+        console.error(error);
       }
-    })
+    });
   }
 
   CalcularDias(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -109,20 +114,30 @@ export class ProcesosComponent implements OnInit {
     return calculo;
   }
 
+  Consultar() {
+    if (this.fechai == undefined || this.fechaf == undefined) {
+      this._snackBar.open("Recuerde seleccionar un rango de fechas", "OK");
+      return;
+    }
+    this.esConsulta = true;
+    this.limpiarPantalla();
+    this.ListarInversiones();
+  }
+
   CalculoPosicion() {
     if (this.fechai == undefined || this.fechaf == undefined) {
       this._snackBar.open("Recuerde seleccionar un rango de fechas", "OK");
       return;
     }
+    this.esConsulta = false;
     const fini = this.util.ConvertirFechaDB(this.fechai);
     const usuario = "";
     const llave = "";
 
     if (!this.existenMovimientos) {
-      this.existenMovimientos = true
-      this.insertarMovimientos(fini, usuario, llave)
-    } 
-    else {
+      this.limpiarPantalla();
+      this.insertarMovimientos(fini, usuario, llave);
+    } else {
       Swal.fire({
         title: "¡Ya ha insertado los movimientos!",
         text: '¿Desea Recalcular?',
@@ -135,23 +150,24 @@ export class ProcesosComponent implements OnInit {
         allowEscapeKey: true,
       }).then((result) => {
         if (result.isConfirmed) {
-          this.eliminarMovimientos(fini)
+          this.limpiarPantalla();
+          this.eliminarMovimientos(fini);
         }
-      })
+      });
       this.ngxService.stopLoader("load-cont");
     }
   }
 
-  private insertarMovimientos(fini: string, usuario: string, llave: string){
+  private insertarMovimientos(fini: string, usuario: string, llave: string) {
     this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIENTOS_LOTE
-    this.xAPI.parametros = fini + ",I," + usuario + "," + llave;
+    const api: IAPICore = {
+      funcion: environment.xApi.INSERTAR_MOVIMIENTOS_LOTE,
+      parametros: fini + ",I," + usuario + "," + llave,
+      valores: ""
+    };
 
-    this.xAPI.valores = "";
-
-    this.apiService.Ejecutar(this.xAPI).subscribe(
+    this.apiService.Ejecutar(api).subscribe(
       async (data) => {
-        this.mostrarGenerarComprobante = true
         this.ListarInversiones();
       },
       (error) => {
@@ -161,14 +177,16 @@ export class ProcesosComponent implements OnInit {
     );
   }
 
-  private eliminarMovimientos(fecha: string){
+  private eliminarMovimientos(fecha: string) {
     this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = environment.xApi.BORRAR_MOVIMIENTOS_LOTE
-    this.xAPI.parametros = fecha;
-    this.xAPI.valores = "";
-    this.apiService.Ejecutar(this.xAPI).subscribe({
+    const api: IAPICore = {
+      funcion: environment.xApi.BORRAR_MOVIMIENTOS_LOTE,
+      parametros: fecha,
+      valores: ""
+    };
+    this.apiService.Ejecutar(api).subscribe({
       next: (data) => {
-        this.eliminarComprobantes(fecha)
+        this.eliminarComprobantes(fecha);
       },
       error: (error) => {
         console.error(error);
@@ -177,15 +195,20 @@ export class ProcesosComponent implements OnInit {
     });
   }
 
-  private eliminarComprobantes(fecha: string){
-    this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTES_INVERSIONES
-    this.xAPI.parametros = fecha;
-    this.xAPI.valores = "";
-    this.apiService.Ejecutar(this.xAPI).subscribe({
+  private eliminarComprobantes(fecha: string) {
+    const api: IAPICore = {
+      funcion: environment.xApi.ELIMINAR_COMPROBANTES_INVERSIONES,
+      parametros: fecha,
+      valores: ""
+    };
+    this.apiService.Ejecutar(api).subscribe({
       next: (data) => {
-        this.existenMovimientos = false
-        this.CalculoPosicion()
+        this.existenMovimientos = false;
         this.ngxService.stopLoader("load-cont");
+        this._snackBar.open("Movimientos eliminados. Procesando de nuevo...", "OK");
+        const usuario = "";
+        const llave = "";
+        this.insertarMovimientos(fecha, usuario, llave);
       },
       error: (error) => {
         console.error(error);
@@ -207,11 +230,12 @@ export class ProcesosComponent implements OnInit {
     let llave = "";
 
     this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = environment.xApi.DISTRIBUIR_INTERESES
-    this.xAPI.parametros =
-      fope + "," + fini + "," + ffin + "," + usuario + "," + llave;
-    this.xAPI.valores = "";
-    this.apiService.Ejecutar(this.xAPI).subscribe(
+    const api: IAPICore = {
+      funcion: environment.xApi.DISTRIBUIR_INTERESES,
+      parametros: fope + "," + fini + "," + ffin + "," + usuario + "," + llave,
+      valores: ""
+    };
+    this.apiService.Ejecutar(api).subscribe(
       async (data) => {
         this.mostrarComprobantes = false;
         await this.ngxService.stopLoader("load-cont");
@@ -233,30 +257,28 @@ export class ProcesosComponent implements OnInit {
 
     this.fecha_al = fini;
     this.ngxService.startLoader("load-cont");
-    this.xAPI.funcion = environment.xApi.CONSULTAR_POSICIONES_INVERSIONES
-    this.xAPI.parametros = fini + "," + ffin;
-    this.xAPI.valores = "";
+    const api: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_POSICIONES_INVERSIONES,
+      parametros: fini + "," + ffin,
+      valores: ""
+    };
     this.lstAsientos = [];
     this.acum_debe = 0;
     this.acum_haber = 0;
-    this.apiService.Ejecutar(this.xAPI).subscribe(
+    this.apiService.Ejecutar(api).subscribe(
       async (data) => {
-        this.lstAsientos = data.Cuerpo;
+        this.lstAsientos = data.Cuerpo || [];
 
         if (this.lstAsientos.length > 0) {
-          this.mostrarComprobantes = true
-          data.Cuerpo.forEach((e) => {
+          this.mostrarComprobantes = true;
+          this.lstAsientos.forEach((e) => {
             this.acum_debe += parseFloat(e.interes_acumulado);
             this.acum_haber += parseFloat(e.interes_acumulado);
           });
-
-          this.ListarVencimiento();
-          this.Listarcompra();
-        }else{
-          this.mostrarComprobantes = false
-          this.CalculoPosicion()
-          this.ngxService.stopLoader("load-cont");
+        } else {
+          this.mostrarComprobantes = false;
         }
+        this.ListarVencimiento();
       },
       (error) => {
         console.error(error);
@@ -271,20 +293,26 @@ export class ProcesosComponent implements OnInit {
     let ffin = this.util.ConvertirFechaDB(this.fechaf);
 
     this.fecha_al = fini;
-    this.xAPI.funcion = environment.xApi.CONSULTAR_VENCIMIENTO_INVERSIONES
-    this.xAPI.parametros = fini + "," + ffin;
-    this.xAPI.valores = "";
+    const api: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_VENCIMIENTO_INVERSIONES,
+      parametros: fini + "," + ffin,
+      valores: ""
+    };
     this.acum_debev = 0;
-    this.apiService.Ejecutar(this.xAPI).subscribe(
+    this.apiService.Ejecutar(api).subscribe(
       (data) => {
-        this.lstVencimiento = data.Cuerpo;
+        this.lstVencimiento = data.Cuerpo || [];
 
-        this.lstVencimiento.map((e) => {
-          this.acum_debev += this.RendicionCupon(e);
-          this.acum_debev += parseFloat(e.valor_nominal)
-        });
-
-        this.ngxService.stopLoader("load-cont");
+        if (this.lstVencimiento.length > 0) {
+          this.mostrarVencimientos = true;
+          this.lstVencimiento.forEach((e) => {
+            this.acum_debev += this.RendicionCupon(e);
+            this.acum_debev += parseFloat(e.valor_nominal);
+          });
+        } else {
+          this.mostrarVencimientos = false;
+        }
+        this.Listarcompra();
       },
       (error) => {
         console.error(error);
@@ -299,17 +327,36 @@ export class ProcesosComponent implements OnInit {
     let ffin = this.util.ConvertirFechaDB(this.fechaf);
 
     this.fecha_al = fini;
-    this.xAPI.funcion = environment.xApi.CONSULTAR_COMPRA_INVERSIONES
-    this.xAPI.parametros = fini + "," + ffin;
-    this.xAPI.valores = "";
-    this.acum_debev = 0;
-    this.apiService.Ejecutar(this.xAPI).subscribe(
+    const api: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_COMPRA_INVERSIONES,
+      parametros: fini + "," + ffin,
+      valores: ""
+    };
+    this.acum_debec = 0;
+    this.apiService.Ejecutar(api).subscribe(
       (data) => {
-        this.lstCompra = data.Cuerpo;
+        this.lstCompra = data.Cuerpo || [];
 
-        this.lstCompra.map(e => {
-          this.acum_debec += e.valor_nominal * 1;
-        });
+        if (this.lstCompra.length > 0) {
+          this.mostrarCompras = true;
+          this.lstCompra.forEach(e => {
+            this.acum_debec += e.valor_nominal * 1;
+          });
+        } else {
+          this.mostrarCompras = false;
+        }
+
+        this.existenMovimientos = (this.lstAsientos.length > 0 || this.lstVencimiento.length > 0 || this.lstCompra.length > 0);
+
+        if (!this.mostrarComprobantes && !this.mostrarVencimientos && !this.mostrarCompras) {
+          this._snackBar.open("No hay devengos, vencimientos ni compras para procesar", "OK");
+        }
+
+        if (!this.esConsulta && this.existenMovimientos) {
+          this.mostrarGenerarComprobante = true;
+        } else {
+          this.mostrarGenerarComprobante = false;
+        }
 
         this.ngxService.stopLoader("load-cont");
       },
@@ -348,175 +395,163 @@ export class ProcesosComponent implements OnInit {
   }
 
   GenerarComprobante() {
+    if (this.generandoComprobante) return;
+    this.generandoComprobante = true;
+    this.mostrarGenerarComprobante = false;
+
     let fecha = this.util.ConvertirFechaDB(this.fechai);
-
-    this.Comprobante = {
-      plan: 1,
-      codigo: this.util.GenerarUnicId(),
-      descripcion: `DEVENGO DE INVERSIONES ${this.util.ConvertirFechaHumana(
-        fecha
-      )}`,
-      detalle: `DEVENGO DE INVERSIONES ${this.util.ConvertirFechaHumana(
-        fecha
-      )}`,
-      fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
-      fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
-      debe: this.acum_debe,
-      haber: this.acum_haber,
-      llave: "M",
-    };
-
-    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
-    this.xAPI.parametros = "";
-    this.xAPI.valores = JSON.stringify(this.Comprobante);
     this.ngxService.startLoader("load-cont");
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.InsertData(data, this.lstAsientos.length);
-        this.mostrarComprobantes = false
-        this.mostrarGenerarComprobante = false
-        this.existenMovimientos = true
-        Swal.fire({
-          title: "Comprobantes generados correctamente",
-          confirmButtonColor: '#3085d6',
-          icon: 'success'
-        })
+    // Eliminar comprobantes existentes previamente para esta fecha
+    const apiDel: IAPICore = {
+      funcion: environment.xApi.ELIMINAR_COMPROBANTES_INVERSIONES,
+      parametros: fecha,
+      valores: ""
+    };
+
+    this.apiService.Ejecutar(apiDel).subscribe({
+      next: (data) => {
+        this.ejecutarGeneracionComprobantes(fecha);
       },
-      (error) => {
+      error: (error) => {
         console.error(error);
+        this.generandoComprobante = false;
         this.ngxService.stopLoader("load-cont");
+        this._snackBar.open("Error al limpiar comprobantes existentes", "OK");
       }
-    );
-  }
-
-  InsertData(dt, cant: number) {
-    cant++;
-    this.xAPI.funcion = environment.xApi.INSERTAR_DEVENGO_INVERIONES
-    this.xAPI.parametros = dt.msj + "," + this.util.ConvertirFechaDB(this.fechai);
-    this.xAPI.valores = "";
-
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        if (this.lstVencimiento.length > 0) {
-          this.GenerarComprobanteVencimiento()
-        }
-        if (this.lstCompra.length > 0) {
-          this.GenerarComprobanteCompra()
-        } else {
-          this.ngxService.stopLoader("load-cont")
-        }
-
-      },
-      (error) => {
-        console.error(error);
-        this.ngxService.stopLoader("load-cont");
-      }
-    );
-  }
-
-  GenerarComprobanteVencimiento() {
-    let fecha = this.util.ConvertirFechaDB(this.fechai);
-    this.lstVencimiento.forEach(e => {
-      let vencimiento = {
-        plan: 1,
-        codigo: this.util.GenerarUnicId(),
-        descripcion: `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(
-          fecha
-        )}`,
-
-        detalle: `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(
-          fecha
-        )}`,
-        
-        fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
-        fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
-        debe: parseFloat(e.valor_nominal) + this.RendicionCupon(e),
-        haber: parseFloat(e.valor_nominal) + this.RendicionCupon(e),
-        llave: "M",
-      };
-
-      this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
-      this.xAPI.parametros = "";
-      this.xAPI.valores = JSON.stringify(vencimiento);
-
-      this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.InsertDataVencimiento(data, e);
-        },
-        (error) => {
-          console.error(error);
-          this.ngxService.stopLoader("load-cont");
-        }
-      );
-    })
-  }
-
-  InsertDataVencimiento(dt: any, vencimiento: any) {
-    this.xAPI.funcion = environment.xApi.INSERTAR_VENCIMIENTO_INVERSIONES
-    this.xAPI.parametros = dt.msj + "," + this.util.ConvertirFechaDB(this.fechai) + "," + vencimiento.codigo;
-    this.xAPI.valores = "";
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.lstVencimiento = [];
-        this.ngxService.stopLoader("load-cont");
-      },
-      (error) => {
-        console.error(error);
-        this.ngxService.stopLoader("load-cont");
-      }
-    );
-  }
-
-  GenerarComprobanteCompra() {
-    let fecha = this.util.ConvertirFechaDB(this.fechai);
-
-    this.lstCompra.map((e, i) => {
-      let compra = {
-        plan: 1,
-        codigo: this.util.GenerarUnicId(),
-        descripcion: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(
-          fecha
-        )}`,
-        detalle: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
-        fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
-        fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
-        debe: e.valor_nominal,
-        haber: e.valor_nominal,
-        llave: "M",
-      };
-
-      this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
-      this.xAPI.parametros = "";
-      this.xAPI.valores = JSON.stringify(compra);
-
-      this.apiService.Ejecutar(this.xAPI).subscribe(
-        (xd) => {
-          this.InsertDataCompra(xd, e.codigo)
-        },
-        (error) => {
-          console.error(error);
-          this.ngxService.stopLoader("load-cont");
-        }
-      );
     });
   }
 
-  InsertDataCompra(dt: any, codigo: any) {
-    this.xAPI.funcion = environment.xApi.INSERTAR_COMPRA_INVERSIONES
-    this.xAPI.parametros = dt.msj + "," + this.util.ConvertirFechaDB(this.fechai) + "," + codigo;
-    this.xAPI.valores = "";
+  async ejecutarGeneracionComprobantes(fecha: string) {
+    try {
+      // 1. Comprobante Devengo
+      if (this.lstAsientos.length > 0) {
+        const comprobanteDevengo: FID_IComprobante = {
+          plan: 1,
+          codigo: this.util.GenerarUnicId(),
+          descripcion: `DEVENGO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+          detalle: `DEVENGO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+          fecha_operacion: fecha,
+          fecha_ejercicio: fecha,
+          debe: this.acum_debe,
+          haber: this.acum_haber,
+          llave: "M",
+        };
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.lstCompra = [];
-        this.ngxService.stopLoader("load-cont");
-      },
-      (error) => {
-        console.error(error);
-        this.ngxService.stopLoader("load-cont");
+        const apiDev: IAPICore = {
+          funcion: environment.xApi.INSERTAR_COMPROBANTE,
+          parametros: "",
+          valores: JSON.stringify(comprobanteDevengo)
+        };
+
+        const resDev = await firstValueFrom(this.apiService.Ejecutar(apiDev));
+        if (resDev && resDev.msj) {
+          const apiDevData: IAPICore = {
+            funcion: environment.xApi.INSERTAR_DEVENGO_INVERIONES,
+            parametros: resDev.msj + "," + fecha,
+            valores: ""
+          };
+          await firstValueFrom(this.apiService.Ejecutar(apiDevData));
+        }
       }
-    );
+
+      // 2. Comprobantes Vencimiento
+      if (this.lstVencimiento.length > 0) {
+        for (const e of this.lstVencimiento) {
+          const monto = parseFloat(e.valor_nominal) + this.RendicionCupon(e);
+          const vencimiento = {
+            plan: 1,
+            codigo: this.util.GenerarUnicId(),
+            descripcion: `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+            detalle: `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+            fecha_operacion: fecha,
+            fecha_ejercicio: fecha,
+            debe: monto,
+            haber: monto,
+            llave: "M",
+          };
+
+          const apiVenc: IAPICore = {
+            funcion: environment.xApi.INSERTAR_COMPROBANTE,
+            parametros: "",
+            valores: JSON.stringify(vencimiento)
+          };
+
+          const resVenc = await firstValueFrom(this.apiService.Ejecutar(apiVenc));
+          if (resVenc && resVenc.msj) {
+            const apiVencData: IAPICore = {
+              funcion: environment.xApi.INSERTAR_VENCIMIENTO_INVERSIONES,
+              parametros: resVenc.msj + "," + fecha + "," + e.codigo,
+              valores: ""
+            };
+            await firstValueFrom(this.apiService.Ejecutar(apiVencData));
+          }
+        }
+      }
+
+      // 3. Comprobantes Compra
+      if (this.lstCompra.length > 0) {
+        for (const e of this.lstCompra) {
+          const compra = {
+            plan: 1,
+            codigo: this.util.GenerarUnicId(),
+            descripcion: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+            detalle: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+            fecha_operacion: fecha,
+            fecha_ejercicio: fecha,
+            debe: e.valor_nominal,
+            haber: e.valor_nominal,
+            llave: "M",
+          };
+
+          const apiComp: IAPICore = {
+            funcion: environment.xApi.INSERTAR_COMPROBANTE,
+            parametros: "",
+            valores: JSON.stringify(compra)
+          };
+
+          const resComp = await firstValueFrom(this.apiService.Ejecutar(apiComp));
+          if (resComp && resComp.msj) {
+            const apiCompData: IAPICore = {
+              funcion: environment.xApi.INSERTAR_COMPRA_INVERSIONES,
+              parametros: resComp.msj + "," + fecha + "," + e.codigo,
+              valores: ""
+            };
+            await firstValueFrom(this.apiService.Ejecutar(apiCompData));
+          }
+        }
+      }
+
+      this.ngxService.stopLoader("load-cont");
+      this.existenMovimientos = true;
+      this.limpiarPantalla();
+      this.generandoComprobante = false;
+
+      Swal.fire({
+        title: "Comprobantes generados correctamente",
+        confirmButtonColor: '#3085d6',
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error(error);
+      this.ngxService.stopLoader("load-cont");
+      this.generandoComprobante = false;
+      this._snackBar.open("Error al generar comprobantes", "OK");
+    }
+  }
+
+  limpiarPantalla() {
+    this.mostrarComprobantes = false;
+    this.mostrarVencimientos = false;
+    this.mostrarCompras = false;
+    this.mostrarGenerarComprobante = false;
+    this.lstAsientos = [];
+    this.lstVencimiento = [];
+    this.lstCompra = [];
+    this.acum_debe = 0;
+    this.acum_haber = 0;
+    this.acum_debev = 0;
+    this.acum_debec = 0;
   }
 
   getMoneda(numero: number): string {
