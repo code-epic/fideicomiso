@@ -57,6 +57,7 @@ export class GeneralyresultadoComponent implements OnInit {
   public total_gastos  : number = 0
 
   public plan : string = '%'
+  public tipoVista: string = 'TODAS'
 
   public lstIndex = [] //Cuentas totalizadores de Fideicomiso
 
@@ -313,6 +314,9 @@ export class GeneralyresultadoComponent implements OnInit {
     let saldo_actual = e.saldo_actual == null ? 0 : e.saldo_actual;
     let titulo = "";
     if (e.totalizadora == "0" || e.totalizadora == "3") {
+      if (this.tipoVista === 'MADRES') {
+        return "";
+      }
       let txt =
         "&nbsp;&nbsp;&nbsp;" +
         e.codigo_padre +
@@ -333,10 +337,16 @@ export class GeneralyresultadoComponent implements OnInit {
         }</td>
         </tr>`;
     } else {
+      let montoMadre = "";
+      if (this.tipoVista === 'MADRES') {
+        montoMadre = `<td class="text-right" style="background-color: #eeeee4; font-weight: bold;">${
+          this.getMoneda(saldo_actual) == "0" ? "-" : this.getMoneda(saldo_actual)
+        }</td>`;
+      }
       titulo = `
       <tr>  
-        <td colspan="5" style="background-color: #eeeee4;">${e.codigo_padre + ". " + e.descripcion.toUpperCase()
-        }</td>
+        <td ${this.tipoVista === 'MADRES' ? '' : 'colspan="5"'} style="background-color: #eeeee4; font-weight: bold;">${e.codigo_padre + ". " + e.descripcion.toUpperCase()}</td>
+        ${montoMadre}
       </tr>`;
     }
     return titulo;

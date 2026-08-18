@@ -41,8 +41,8 @@
                                     <mat-form-field appearance="outline" style="width: 100%;">
                                         <mat-label>Rango de Fecha (Emisión)</mat-label>
                                         <mat-date-range-input #dateRange [rangePicker]="pickerRango">
-                                            <input matStartDate placeholder="Desde" mask="d0/M0/0000" (keydown)="soloFecha($event)" [(ngModel)]="fecha_desde" (dateChange)="onFechaCambio('desde', $event)">
-                                            <input matEndDate placeholder="Hasta" mask="d0/M0/0000" (keydown)="soloFecha($event)" [(ngModel)]="fecha_hasta" (dateChange)="onFechaCambio('hasta', $event)">
+                                            <input #inputDesde matStartDate placeholder="Desde" mask="d0/M0/0000" (keydown)="soloFecha($event)" [(ngModel)]="fecha_desde" (dateChange)="onFechaCambio('desde', $event)">
+                                            <input #inputHasta matEndDate placeholder="Hasta" mask="d0/M0/0000" (keydown)="soloFecha($event)" [(ngModel)]="fecha_hasta" (dateChange)="onFechaCambio('hasta', $event)">
                                         </mat-date-range-input>
                                         <mat-datepicker-toggle matSuffix [for]="pickerRango"></mat-datepicker-toggle>
                                         <mat-date-range-picker #pickerRango></mat-date-range-picker>

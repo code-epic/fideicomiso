@@ -11,7 +11,7 @@
       </mat-form-field>
     </div>
 
-    <div class="col-md-3">
+    <div class="col-md-2">
       <mat-form-field appearance="outline">
         <mat-label>Plan</mat-label>
         <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}">
@@ -30,7 +30,7 @@
       </mat-form-field>
 
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
       <mat-form-field appearance="outline">
         <mat-label>Frecuencia</mat-label>
         <mat-select placeholder="Frecuencia" [(ngModel)]="estatus" value="{{estatus}}">
@@ -43,9 +43,19 @@
       </mat-form-field>
     </div>
 
+    <div class="col-md-2">
+      <mat-form-field appearance="outline">
+        <mat-label>Estructura</mat-label>
+        <mat-select placeholder="Estructura" [(ngModel)]="tipoVista" (selectionChange)="ConsultarComprobante()">
+          <mat-option value="TODAS">TODAS LAS CUENTAS</mat-option>
+          <mat-option value="MADRES">SOLO CUENTAS MADRES</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
     <div class="col-md-2 text-left">
-      <button mat-flat-button color="primary" (click)="ConsultarComprobante()" style="margin-top: 5px; height: 50px;">
-        <mat-icon>verified</mat-icon>&nbsp;Procesar reporte
+      <button mat-flat-button color="primary" (click)="ConsultarComprobante()" style="margin-top: 5px; height: 50px; width: 100%;">
+        <mat-icon>verified</mat-icon>&nbsp;Procesar
       </button>
     </div>
 
@@ -59,8 +69,8 @@
     <div style="width: 33%;">
       <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 2.75rem;">
     </div>
-    <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
-      <p class="membrete">
+    <div style="flex-grow: 1; text-align: center;">
+      <p class="membrete" style="text-align: center;">
         BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
         DIRECCION DE FIDEICOMISO<br>
         ESTADO DE SITUACION FINANCIERA AL - {{fechaTexto}}
@@ -74,8 +84,8 @@
     <div style="width: 33%;">
       <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 2.75rem;">
     </div>
-    <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
-      <p class="membrete">
+    <div style="flex-grow: 1; text-align: center;">
+      <p class="membrete" style="text-align: center;">
         BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
         DIRECCION DE FIDEICOMISO<br>
         ESTADO DE SITUACION FINANCIERA - AL {{fechaTexto}}

@@ -23,6 +23,8 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
 
   @ViewChild('filex', { static: true }) filex: TemplateRef<any>;
   @ViewChild('dateRange') dateRange: any;
+  @ViewChild('inputDesde') inputDesde: any;
+  @ViewChild('inputHasta') inputHasta: any;
 
   private buscar$ = new Subject<void>();
 
@@ -157,9 +159,30 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
       event.preventDefault();
       return false;
     }
-    if (enteros && event.key === '.') {
-      event.preventDefault();
-      return false;
+    if (enteros) {
+      if (event.key === '.' || event.key === ',') {
+        event.preventDefault();
+        return false;
+      }
+    } else {
+      if (event.key === '.' || event.key === ',') {
+        const input = event.target as HTMLInputElement;
+        const val = input ? (input.value || '') : '';
+        if (val.includes('.') || val.includes(',')) {
+          event.preventDefault();
+          return false;
+        }
+        if (event.key === ',' && input && input.type === 'number') {
+          event.preventDefault();
+          const start = input.selectionStart ?? val.length;
+          const end = input.selectionEnd ?? val.length;
+          const newVal = val.substring(0, start) + '.' + val.substring(end);
+          input.value = newVal;
+          input.dispatchEvent(new Event('input'));
+          return false;
+        }
+        return true;
+      }
     }
     if (event.key.length === 1 && !/^[0-9]$/.test(event.key)) {
       event.preventDefault();
@@ -404,6 +427,7 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
   getFechaStr(f: any): string {
     if (!f) return '';
     if (f instanceof Date) {
+      if (isNaN(f.getTime())) return '';
       const y = f.getFullYear();
       const m = (f.getMonth() + 1).toString().padStart(2, '0');
       const d = f.getDate().toString().padStart(2, '0');
@@ -413,68 +437,77 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
       return `${f.year}-${String(f.month).padStart(2, '0')}-${String(f.day).padStart(2, '0')}`;
     }
     if (typeof f === 'string') {
-      if (/^\d{2}\/\d{2}\/\d{4}$/.test(f)) {
-        const [d, m, y] = f.split('/');
+      const str = f.trim();
+      if (!str) return '';
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+        const [d, m, y] = str.split('/');
         return `${y}-${m}-${d}`;
       }
-      return f.substring(0, 10);
+      if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+        return str.substring(0, 10);
+      }
+      return '';
     }
     return '';
   }
 
+  ejecutarFiltro() {
+    let resultado = [...this.lstInversiones];
+
+    // 1. Filtro por Instrumento
+    if (this.filtroInstrumento && this.filtroInstrumento.trim() !== '') {
+      const instSelected = this.filtroInstrumento.toLowerCase().trim();
+      const parts = instSelected.split(' - ');
+      const codePart = parts[0] ? parts[0].trim() : '';
+      const namePart = parts[1] ? parts[1].trim() : instSelected;
+
+      resultado = resultado.filter((e) => {
+        const instName = (e.instrumento || '').toLowerCase();
+        const instId = (e.id_instrumento || '').toString();
+        return (
+          instName.includes(namePart) ||
+          instId === codePart ||
+          instSelected.includes(instName)
+        );
+      });
+    }
+
+    // 2. Filtro por Búsqueda (ISIN, Monto o Nº)
+    if (this.buscar && this.buscar.trim() !== '') {
+      const val = this.buscar.toLowerCase().trim();
+      resultado = resultado.filter((e) => {
+        const num = this.getZFill(e.identificador || 0).toLowerCase();
+        const isin = (e.codigo_isin || '').toString().toLowerCase();
+        const valorNominal = (e.valor_nominal || '').toString().toLowerCase();
+
+        return (
+          num.includes(val) ||
+          isin.includes(val) ||
+          valorNominal.includes(val)
+        );
+      });
+    }
+
+    // 3. Filtro por Rango de Fechas (Fecha Emisión)
+    const fDesdeStr = this.getFechaStr(this.fecha_desde);
+    const fHastaStr = this.getFechaStr(this.fecha_hasta);
+
+    if (fDesdeStr || fHastaStr) {
+      resultado = resultado.filter((e) => {
+        const fEmision = this.getFechaStr(e.fecha_emision);
+        if (!fEmision) return false;
+        if (fDesdeStr && fEmision < fDesdeStr) return false;
+        if (fHastaStr && fEmision > fHastaStr) return false;
+        return true;
+      });
+    }
+
+    this.lstInversionesFiltro = resultado;
+  }
+
   BuscarInversion() {
     setTimeout(() => {
-      let resultado = [...this.lstInversiones];
-
-      // 1. Filtro por Instrumento
-      if (this.filtroInstrumento && this.filtroInstrumento.trim() !== '') {
-        const instSelected = this.filtroInstrumento.toLowerCase().trim();
-        const parts = instSelected.split(' - ');
-        const codePart = parts[0] ? parts[0].trim() : '';
-        const namePart = parts[1] ? parts[1].trim() : instSelected;
-
-        resultado = resultado.filter((e) => {
-          const instName = (e.instrumento || '').toLowerCase();
-          const instId = (e.id_instrumento || '').toString();
-          return (
-            instName.includes(namePart) ||
-            instId === codePart ||
-            instSelected.includes(instName)
-          );
-        });
-      }
-
-      // 2. Filtro por Búsqueda (ISIN, Monto o Nº)
-      if (this.buscar && this.buscar.trim() !== '') {
-        const val = this.buscar.toLowerCase().trim();
-        resultado = resultado.filter((e) => {
-          const num = this.getZFill(e.identificador || 0).toLowerCase();
-          const isin = (e.codigo_isin || '').toString().toLowerCase();
-          const valorNominal = (e.valor_nominal || '').toString().toLowerCase();
-
-          return (
-            num.includes(val) ||
-            isin.includes(val) ||
-            valorNominal.includes(val)
-          );
-        });
-      }
-
-      // 3. Filtro por Rango de Fechas (Fecha Emisión)
-      const fDesdeStr = this.getFechaStr(this.fecha_desde);
-      const fHastaStr = this.getFechaStr(this.fecha_hasta);
-
-      if (fDesdeStr || fHastaStr) {
-        resultado = resultado.filter((e) => {
-          const fEmision = this.getFechaStr(e.fecha_emision);
-          if (!fEmision) return false;
-          if (fDesdeStr && fEmision < fDesdeStr) return false;
-          if (fHastaStr && fEmision > fHastaStr) return false;
-          return true;
-        });
-      }
-
-      this.lstInversionesFiltro = resultado;
+      this.ejecutarFiltro();
     }, 0);
   }
 
@@ -497,10 +530,16 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     this.filtroInstrumento = '';
     this.fecha_desde = null;
     this.fecha_hasta = null;
-    if (this.dateRange && this.dateRange._model) {
-      this.dateRange._model.reset();
-    }
+    try {
+      if (this.inputDesde && this.inputDesde.nativeElement) {
+        this.inputDesde.nativeElement.value = '';
+      }
+      if (this.inputHasta && this.inputHasta.nativeElement) {
+        this.inputHasta.nativeElement.value = '';
+      }
+    } catch (e) {}
     this.lstInversionesFiltro = [...this.lstInversiones];
+    this.ejecutarFiltro();
   }
 
   ConsultarInver() {
