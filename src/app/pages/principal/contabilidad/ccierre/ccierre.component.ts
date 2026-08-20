@@ -10,6 +10,7 @@ import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banf
 import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-ccierre',
@@ -114,7 +115,7 @@ export class CcierreComponent implements OnInit {
       let fechaultimoDate = new Date(this.util.ConvertirFechaDB(this.fechaultimo)).toISOString();
 
       if (fechaultimoDate < finicioDate) {
-        this.CrearSaldos()
+        this.ValidarCierreCompleto(finicio)
       } else {
         this.apiService.Mensaje(
           "Pendiente",
@@ -134,6 +135,42 @@ export class CcierreComponent implements OnInit {
       this.consultarUltimoCierre()
       this.ngxService.stopLoader('load-precierre')
     }
+  }
+
+  ValidarCierreCompleto(fecha: string) {
+    this.xAPI.funcion = environment.xApi.VALIDAR_CIERRE
+    this.xAPI.parametros = fecha
+    this.xAPI.valores = ''
+
+    this.apiService.Ejecutar(this.xAPI).subscribe({
+      next: (data) => {
+        const resultados = data.Cuerpo;
+        const faltantes = resultados.filter(r => r.estado === 'FALTANTE');
+
+        if (faltantes.length > 0) {
+          this.ngxService.stopLoader('load-precierre');
+          let listaHTML = '<ul style="text-align: left; margin: 10px 0; padding-left: 20px;">';
+          faltantes.forEach(f => {
+            listaHTML += `<li style="margin: 5px 0;"><strong>${f.tipo}</strong>: Faltan ${f.esperado - f.existe} de ${f.esperado}</li>`;
+          });
+          listaHTML += '</ul>';
+
+          Swal.fire({
+            title: 'Comprobantes incompletos',
+            html: `No se puede cerrar el día porque faltan comprobantes:${listaHTML}`,
+            icon: 'warning',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Entendido'
+          });
+        } else {
+          this.CrearSaldos()
+        }
+      },
+      error: (error) => {
+        console.error(error);
+        this.ngxService.stopLoader('load-precierre');
+      }
+    })
   }
 
   CrearSaldos(llave = 'M') {
