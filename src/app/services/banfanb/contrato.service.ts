@@ -42,6 +42,7 @@ export interface Ejecutivo {
 export interface Contrato {
   numero: string;
   clasificacion: string;
+  tiporif?: string;
   rif: string;
   razonsocial: string;
   plan: string;

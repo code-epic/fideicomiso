@@ -105,15 +105,27 @@
                                                 </mat-form-field>
                                             </div>
 
+                                            <div class="col-md-1">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Tipo</mat-label>
+                                                    <mat-select placeholder="Tipo" formControlName="tiporif">
+                                                        <mat-option value="J-">J</mat-option>
+                                                        <mat-option value="V-">V</mat-option>
+                                                        <mat-option value="G-">G</mat-option>
+                                                        <mat-option value="E-">E</mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+
                                             <div class="col-md-2">
                                                 <mat-form-field appearance="outline">
-                                                    <mat-label>Rif</mat-label>
-                                                    <input matInput placeholder="Rif" (blur)="ConsultarEmpresa()"
+                                                    <mat-label>Rif / Identificación</mat-label>
+                                                    <input matInput placeholder="Número" (blur)="ConsultarEmpresa()"
                                                         formControlName="rif">
                                                 </mat-form-field>
                                             </div>
 
-                                            <div class="col-md-5">
+                                            <div class="col-md-4">
                                                 <mat-form-field appearance="outline">
                                                     <mat-label>Empresa / Fideicomitente</mat-label>
                                                     <input matInput placeholder="Empresa / Afiliado"

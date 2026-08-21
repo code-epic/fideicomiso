@@ -79,6 +79,7 @@ export class ContratosComponent implements OnInit {
 
   public Contrato: Contrato = {
     numero: '',
+    tiporif: 'J-',
     rif: '',
     razonsocial: '',
     plan: '',
@@ -230,6 +231,7 @@ export class ContratosComponent implements OnInit {
     this.contratoForm = this.fb.group({
       // Datos principales
       numero: [{value: '', disabled: true}, Validators.required],
+      tiporif: ['J-'],
       rif: ['', Validators.required],
       razonsocial: ['', Validators.required],
       estatus: ['', Validators.required],
@@ -542,14 +544,26 @@ export class ContratosComponent implements OnInit {
   }
 
   ConsultarEmpresa() {
+    let rifBusqueda = this.contratoForm.get('rif').value;
+    const tiporif = this.contratoForm.get('tiporif')?.value || '';
+    if (rifBusqueda && tiporif && !rifBusqueda.toUpperCase().startsWith(tiporif.substring(0, 1))) {
+      rifBusqueda = tiporif + rifBusqueda;
+    }
     this.xAPI.funcion = environment.xApi.CONSULTAR_EMPRESA
-    this.xAPI.parametros = this.contratoForm.get('rif').value
+    this.xAPI.parametros = rifBusqueda || this.contratoForm.get('rif').value
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if (data != null) {
+        if (data != null && data.length > 0) {
           let Empresa = data[0]
-          this.contratoForm.get('rif').setValue(Empresa.rif)
+          let rifStr: string = Empresa.rif || '';
+          const match = rifStr.match(/^(J|V|G|E|P|C)-?/i);
+          if (match) {
+            const prefix = match[1].toUpperCase() + '-';
+            this.contratoForm.get('tiporif')?.setValue(prefix);
+            rifStr = rifStr.substring(match[0].length);
+          }
+          this.contratoForm.get('rif').setValue(rifStr || Empresa.rif)
           this.contratoForm.get('razonsocial').setValue(Empresa.razonsocial)
           this.contratoForm.get('Politicas.tipocuenta').setValue(Empresa.tipo)
           this.contratoForm.get('Politicas.numerocuenta').setValue(Empresa.numerocuenta)
