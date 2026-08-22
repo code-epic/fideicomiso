@@ -718,6 +718,9 @@ export class ComprobanteComponent implements OnInit {
         );
         this.dataSource.paginator = this.paginator;
         this.Limpiar();
+        this.toastrService.success("Comprobante registrado exitosamente", "Comprobante");
+        this.GenerarSemillero();
+        this.cargarComprobantes();
       },
       (err) => {}
     );
