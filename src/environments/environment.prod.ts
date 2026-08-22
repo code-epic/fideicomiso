@@ -64,6 +64,7 @@ export const environment = {
     // Reportes contables
     CONSULTAR_BALANCE_COMPROBACION: 'FID_CBalanceComprobacion',
     CONSULTAR_BALANCE_FECHA: 'FID_CBalanceFecha',
+    CONSULTAR_BALANCE_FECHA_PLAN: 'FID_CBalanceFechaPlan',
     CONSULTAR_MAYOR_ANALITICO: 'FID_CMayorAnalitico',
     CONSULTAR_AUXILIAR: 'FID_CAuxiliar',
     CONSULTAR_SEMILLERO_CONTABLE: 'FID_CSemilleroContable',
@@ -73,6 +74,10 @@ export const environment = {
     INSERTAR_SALDOS_CIERRE: 'FID_ISaldosCierre',
     BORRAR_CIERRE_SEMESTRAL: 'FID_DCierreSemestral',
     CONSULTAR_MOVIMIENTOS_SEMESTRALES: 'FID_CMovimientosSemestrales',
+
+    // Rendición de cuentas
+    CONSULTAR_PLANES_FIDEICOMISO: 'FID_CPlanesFideicomiso',
+    CONSULTAR_ESTADO_CUENTA_PLAN: 'FID_CEstadoCuentaPlan',
 
     // Inversiones
     CONSULTAR_INVERSIONES: 'FID_CInversiones',

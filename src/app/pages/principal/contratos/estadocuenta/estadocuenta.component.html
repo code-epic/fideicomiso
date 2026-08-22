@@ -1,37 +1,82 @@
-<h1 mat-dialog-title>Estado de cuenta</h1>
+<h1 mat-dialog-title>Estado de Cuenta</h1>
 
 <mat-divider></mat-divider>
 <mat-dialog-content class="py-4">
     <ngx-ui-loader loaderId="load-EstadoCuenta"></ngx-ui-loader>
+
+    <div class="row encabezado-contrato">
+        <div class="col-12">
+            <span class="fideicomiso-label">Fideicomiso:</span>
+            <span class="fideicomiso-nombre">{{Contrato.razonsocial | uppercase}}</span>
+        </div>
+        <div class="col-12" *ngIf="Contrato.oficinatutora">
+            <span class="oficina-texto">{{Contrato.oficinatutora.split('|')[0]}}</span>
+        </div>
+    </div>
+
+    <div class="row align-items-end" style="margin-top: 8px;">
+        <div class="col-md-3">
+            <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Desde</mat-label>
+                <input matInput [matDatepicker]="dpDesde" [(ngModel)]="desde">
+                <mat-datepicker-toggle matSuffix [for]="dpDesde"></mat-datepicker-toggle>
+                <mat-datepicker #dpDesde></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Hasta</mat-label>
+                <input matInput [matDatepicker]="dpHasta" [(ngModel)]="hasta">
+                <mat-datepicker-toggle matSuffix [for]="dpHasta"></mat-datepicker-toggle>
+                <mat-datepicker #dpHasta></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <button mat-flat-button color="primary" (click)="consultarEstadoCuenta()" class="w-100 btn-consultar">
+                <mat-icon>search</mat-icon>&nbsp;Consultar
+            </button>
+        </div>
+    </div>
+
     <div class="mat-elevation-z8">
-        <table mat-table [dataSource]="dataSource">
+        <table mat-table [dataSource]="dataSource" class="tabla-estado-cuenta">
 
-            <!-- Position Column -->
-            <ng-container matColumnDef="fecha_operacion">
-                <th mat-header-cell *matHeaderCellDef> Fecha Operacion. </th>
-                <td mat-cell *matCellDef="let element"> {{element.fecha_operacion}} </td>
-            </ng-container>
-
-            <!-- Name Column -->
-            <ng-container matColumnDef="debe">
-                <th mat-header-cell *matHeaderCellDef> Debe </th>
-                <td mat-cell *matCellDef="let element"> {{element.debe}} </td>
-            </ng-container>
-
-            <!-- Weight Column -->
-            <ng-container matColumnDef="haber">
-                <th mat-header-cell *matHeaderCellDef> Haber </th>
-                <td mat-cell *matCellDef="let element"> {{element.haber}} </td>
-            </ng-container>
-
-            <!-- Symbol Column -->
             <ng-container matColumnDef="descripcion">
-                <th mat-header-cell *matHeaderCellDef> Cuenta </th>
-                <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
+                <th mat-header-cell *matHeaderCellDef class="col-descripcion"> Descripción Movimiento </th>
+                <td mat-cell *matCellDef="let element" [ngClass]="{'fila-saldo': element.esSaldo}">
+                    {{element.descripcion}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="fecha">
+                <th mat-header-cell *matHeaderCellDef class="col-centro"> Fecha </th>
+                <td mat-cell *matCellDef="let element" class="col-centro"> {{element.fecha}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="dias">
+                <th mat-header-cell *matHeaderCellDef class="col-centro"> Días </th>
+                <td mat-cell *matCellDef="let element" class="col-centro"> {{element.dias}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="ingresos">
+                <th mat-header-cell *matHeaderCellDef class="col-derecha"> Ingresos </th>
+                <td mat-cell *matCellDef="let element" class="col-derecha">
+                    {{element.ingresos != null ? (element.ingresos | number:'1.2-2') : ''}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="egresos">
+                <th mat-header-cell *matHeaderCellDef class="col-derecha"> Egresos </th>
+                <td mat-cell *matCellDef="let element" class="col-derecha">
+                    {{element.egresos != null ? (element.egresos | number:'1.2-2') : ''}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="saldo">
+                <th mat-header-cell *matHeaderCellDef class="col-derecha"> Saldo </th>
+                <td mat-cell *matCellDef="let element" class="col-derecha col-saldo">
+                    {{element.saldo | number:'1.2-2'}} </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'fila-saldo': row.esSaldo}"></tr>
         </table>
 
         <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
@@ -40,7 +85,9 @@
     </div>
 </mat-dialog-content>
 <mat-divider></mat-divider>
-
 <mat-dialog-actions align="end">
+    <button mat-flat-button color="primary" (click)="imprimir()" [disabled]="lstMovimientos.length == 0">
+        <mat-icon>print</mat-icon>&nbsp;Imprimir
+    </button>
     <button mat-stroked-button color="warn" mat-dialog-close>Salir</button>
 </mat-dialog-actions>

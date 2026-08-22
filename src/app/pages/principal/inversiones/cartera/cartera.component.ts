@@ -29,6 +29,8 @@ export class CarteraComponent implements OnInit {
   public fecha_al: string = ''
 
   public lstCartera = []
+  public plan: string = '%'
+  public lstPlanesFideicomiso: any[] = []
 
   constructor(
     private util: UtilService,
@@ -37,7 +39,39 @@ export class CarteraComponent implements OnInit {
     private _imprimir: ImprimirService
   ) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.ListarPlanesFideicomiso()
+  }
+
+  ListarPlanesFideicomiso() {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PLANES_FIDEICOMISO
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstPlanesFideicomiso = data.Cuerpo || []
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  }
+
+  nombrePlan(plan: any): string {
+    if (plan.observacion && plan.observacion.indexOf('|') > -1) {
+      return plan.observacion.split('|')[1].trim().toUpperCase()
+    }
+    return (plan.observacion || plan.fideicomiso || '').toUpperCase()
+  }
+
+  seleccionarPlan() {
+    if (this.plan != '%') {
+      this.toasService.info(
+        "La cartera individual por plan estará disponible al activar el portafolio de inversiones. Por ahora se muestra la cartera general.",
+        "Rendición de cuentas"
+      )
+      this.plan = '%'
+    }
+  }
 
   CalcularDias(fechai, fechaf): number {
     let calculo = this.util.CalcuarDiasTranscurridos(fechai, fechaf) + 1

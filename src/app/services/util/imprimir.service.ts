@@ -49,44 +49,58 @@ export class ImprimirService {
         } else {
             headContent = ` 
             <base href="${window.location.origin}/">
-            <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
             <style type="text/css">
                 @media print {
                     @page { 
                         size: landscape; 
+                        margin: 10mm;
                     }
                     table {
                         border-collapse: collapse;
                         font-size: 10.5px;
                         width: 100%;
                     }
-                    div, table, thead, tbody, tfoot, tr, th, td, p { font-family: "Roboto"; font-size: x-small; }
-                    .titulo th { border: 1px solid black; }
-                    .cabecera th { border: 1px solid black; text-align: center; background-color: rgb(182, 167, 167); }
-                    tr td { border: 1px solid black; text-align: center; }
-                    td, th { padding: 0.5rem; }
-                    .right { text-align: right; }
-                    .bgblue { background-color: rgb(182, 167, 167); color: white; }
-                    .none { border: none; }
-                    .linea { background-color: rgb(255, 255, 255); }
-                    .yellow { background-color: rgb(97, 97, 75); }
+                }
+
+                @page { 
+                    size: landscape; 
+                    margin: 10mm;
+                }
+
+                body { 
+                    font-family: 'IBM Plex Sans', sans-serif;
+                    font-size: 11px;
+                    line-height: 1.4;
+                    color: #0F172A;
+                    margin: 0;
+                    padding: 0;
                 }
 
                 table {
                     border-collapse: collapse;
                     font-size: 10.5px;
                     width: 100%;
+                    page-break-inside: auto;
                 }
-                div, table, thead, tbody, tfoot, tr, th, td, p { font-family: "Roboto"; font-size: x-small; }
-                .titulo th { border: 1px solid black; }
-                .cabecera th { border: 1px solid black; text-align: center; background-color: rgb(182, 167, 167); }
-                tr td { border: 1px solid black; text-align: center; }
-                td, th { padding: 0.5rem; }
+                tr { page-break-inside: auto; }
+
+                .titulo th { border-bottom: 1px solid #ccc; }
+                .cabecera th { 
+                    text-align: center; 
+                    background-color: #eeeee4; 
+                    color: #0F172A; 
+                    font-weight: 600; 
+                    border-bottom: 2px solid #1a237e; 
+                    padding: 6px 8px;
+                }
+                tr td { text-align: center; border-bottom: 1px solid #e5e7eb; padding: 5px 8px; }
+                td, th { padding: 5px 8px; }
                 .right { text-align: right; }
-                .bgblue { background-color: rgb(182, 167, 167); color: white; }
+                .bgblue { background-color: #eeeee4; color: #0F172A; font-weight: 600; }
                 .none { border: none; }
-                .linea { background-color: rgb(255, 255, 255); }
-                .yellow { background-color: rgb(97, 97, 75); }
+                .linea { background-color: #ffffff; }
+                .yellow { background-color: #eeeee4; }
             </style>`;
         }
 

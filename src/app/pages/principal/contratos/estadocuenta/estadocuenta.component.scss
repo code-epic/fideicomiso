@@ -1,3 +1,52 @@
 table {
     width: 100%;
 }
+
+.encabezado-contrato {
+    margin-bottom: 4px;
+
+    .fideicomiso-label {
+        font-weight: 600;
+        color: #0F172A;
+    }
+
+    .fideicomiso-nombre {
+        font-weight: 700;
+        color: #1a237e;
+        margin-left: 4px;
+    }
+
+    .oficina-texto {
+        font-size: 13px;
+        color: #64748B;
+    }
+}
+
+.btn-consultar {
+    height: 56px;
+    margin-top: -2px;
+}
+
+.tabla-estado-cuenta {
+    .col-descripcion {
+        width: 38%;
+        text-align: left;
+    }
+
+    .col-centro {
+        text-align: center;
+    }
+
+    .col-derecha {
+        text-align: right;
+    }
+
+    .col-saldo {
+        font-weight: 600;
+    }
+
+    .fila-saldo {
+        background-color: #eeeee4;
+        font-weight: bold;
+    }
+}

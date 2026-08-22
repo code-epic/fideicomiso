@@ -128,7 +128,7 @@ export class AportesComponent implements OnInit {
       "coleccion": "aportes",
       "objeto": this.Aporte,
       "donde": `{\"numero\":\"${this.Aporte.numero}\"}`,
-      "driver": "MDBFIDE",
+      "driver": "MGDBA",
       "upsert": true
     }
 

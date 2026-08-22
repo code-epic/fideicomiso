@@ -450,7 +450,7 @@ export class ContratosComponent implements OnInit {
 
   getTipoFideicomiso() {
     const codigo = this.contratoForm.get('plan').value
-    this.contratoForm.get('tipo').setValue('')
+    const tipoActual = this.contratoForm.get('tipo').value
 
     this.lstTipoFid = []
     this.lstTipoFideicomiso.forEach(e => {
@@ -459,6 +459,10 @@ export class ContratosComponent implements OnInit {
         this.lstTipoFid = e.val
       }
     });
+
+    if (tipoActual && !this.lstTipoFid.some(e => e.val === tipoActual)) {
+      this.contratoForm.get('tipo').setValue('')
+    }
   }
 
   Listar() {
@@ -655,7 +659,7 @@ export class ContratosComponent implements OnInit {
       "coleccion": "contratos",
       "objeto": this.Contrato,
       "donde": `{\"numero\":\"${this.Contrato.numero}\"}`,
-      "driver": "MDBFIDE",
+      "driver": "MGDBA",
       "upsert": true
     }
 

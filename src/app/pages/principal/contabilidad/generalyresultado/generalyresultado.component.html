@@ -14,8 +14,11 @@
     <div class="col-md-2">
       <mat-form-field appearance="outline">
         <mat-label>Plan</mat-label>
-        <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}">
+        <mat-select placeholder="Plan" [(ngModel)]="plan" (selectionChange)="seleccionarPlan()">
           <mat-option value='%'>TODOS</mat-option>
+          <mat-option *ngFor="let p of lstPlanesFideicomiso" [value]="p.id">
+            {{nombrePlan(p)}}
+          </mat-option>
         </mat-select>
 
       </mat-form-field>
@@ -73,7 +76,7 @@
       <p class="membrete" style="text-align: center;">
         BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
         DIRECCION DE FIDEICOMISO<br>
-        ESTADO DE SITUACION FINANCIERA AL - {{fechaTexto}}
+        {{tituloReporte()}} - {{fechaTexto}}
       </p>
     </div>
     <div style="width: 33%;"></div>
@@ -88,7 +91,7 @@
       <p class="membrete" style="text-align: center;">
         BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
         DIRECCION DE FIDEICOMISO<br>
-        ESTADO DE SITUACION FINANCIERA - AL {{fechaTexto}}
+        {{tituloReporte()}} - {{fechaTexto}}
       </p>
     </div>
     <div style="width: 33%;"></div>

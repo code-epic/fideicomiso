@@ -177,7 +177,7 @@ export class AfiliadosComponent implements OnInit {
       "coleccion": "afiliados",
       "objeto": this.Afiliado,
       "donde": `{\"rif\":\"${this.Afiliado.cedula}\"}`,
-      "driver": "MDBFIDE",
+      "driver": "MGDBA",
       "upsert": true
     }
 

@@ -214,7 +214,7 @@ export class EjecutivosComponent implements OnInit {
       "coleccion": "ejecutivo",
       "objeto": this.Ejecutivo,
       "donde": `{\"cedula\":\"${this.Ejecutivo.cedula}\"}`,
-      "driver": "MDBFIDE",
+      "driver": "MGDBA",
       "upsert": true
     }
 

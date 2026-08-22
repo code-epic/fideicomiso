@@ -58,6 +58,8 @@ export class GeneralyresultadoComponent implements OnInit {
 
   public plan : string = '%'
   public tipoVista: string = 'TODAS'
+  public lstPlanesFideicomiso: any[] = []
+  public planNombre: string = ''
 
   public lstIndex = [] //Cuentas totalizadores de Fideicomiso
 
@@ -73,6 +75,43 @@ export class GeneralyresultadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.consultarUltimoCierre()
+    this.ListarPlanesFideicomiso()
+  }
+
+  ListarPlanesFideicomiso() {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PLANES_FIDEICOMISO
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstPlanesFideicomiso = data.Cuerpo || []
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  }
+
+  nombrePlan(plan: any): string {
+    if (plan.observacion && plan.observacion.indexOf('|') > -1) {
+      return plan.observacion.split('|')[1].trim().toUpperCase()
+    }
+    return (plan.observacion || plan.fideicomiso || '').toUpperCase()
+  }
+
+  tituloReporte(): string {
+    if (this.planNombre) {
+      return `ESTADO DE SITUACION FINANCIERA - ${this.planNombre} AL`
+    }
+    return 'ESTADO DE SITUACION FINANCIERA AL'
+  }
+
+  seleccionarPlan() {
+    if (this.plan != '%') {
+      const found = this.lstPlanesFideicomiso.find(p => p.id == this.plan)
+      this.planNombre = found ? this.nombrePlan(found) : ''
+    } else {
+      this.planNombre = ''
+    }
   }
 
   async consultarUltimoCierre() {
@@ -158,9 +197,13 @@ export class GeneralyresultadoComponent implements OnInit {
 
   consultarBalance() {
   // Asignar la fecha restada a this.fecha
-    this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
-
-    this.xAPI.parametros = `${this.fecha},${this.estatus}`
+    if (this.plan != '%') {
+      this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA_PLAN
+      this.xAPI.parametros = `${this.fecha},${this.estatus},${this.plan}`
+    } else {
+      this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
+      this.xAPI.parametros = `${this.fecha},${this.estatus}`
+    }
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
@@ -549,7 +592,7 @@ export class GeneralyresultadoComponent implements OnInit {
         </div>
         <hr style="border: none; border-top: 2px solid #1a237e; margin: 3px 0;">
         <div style="text-align: center;">
-          <p style="font-weight: 700; font-size: ${this.tipoVista === 'MADRES' ? '12px' : '13px'}; margin: 1px 0;">ESTADO DE SITUACION FINANCIERA AL - ${fecha}</p>
+          <p style="font-weight: 700; font-size: ${this.tipoVista === 'MADRES' ? '12px' : '13px'}; margin: 1px 0;">${this.tituloReporte()} - ${fecha}</p>
         </div>
         ${balanceHTML}
         ${resultadosHTML}
@@ -559,7 +602,8 @@ export class GeneralyresultadoComponent implements OnInit {
       <div style="font-family: 'Roboto', sans-serif; font-size: 12px; color: #333; padding: 0; margin: 0;">
         <div style="margin-top: ${this.tipoVista === 'MADRES' ? '30px' : '90px'}; display: flex; flex-direction: column; align-items: center;">
           <hr style="width: 40%; border: none; border-top: 1px solid #333; margin-bottom: 0.5rem;">
-          <p style="font-weight: 600; font-size: 12px; margin: 0;">FIRMA AUTORIZADA</p>
+          <p style="font-weight: 600; font-size: 12px; margin: 0;">Tcnel. Carlos Contreras</p>
+          <p style="font-weight: 500; font-size: 12px; margin: 0; color: #555;">Director de Fideicomiso</p>
         </div>
       </div>
     `;

@@ -194,7 +194,7 @@ export class EmpresaComponent implements OnInit {
       "coleccion": "empresa",
       "objeto": this.Empresa,
       "donde": `{\"rif\":\"${this.Empresa.rif}\"}`,
-      "driver": "MDBFIDE",
+      "driver": "MGDBA",
       "upsert": false
     }
     this.apiService.ExecColeccion(obj).subscribe(
