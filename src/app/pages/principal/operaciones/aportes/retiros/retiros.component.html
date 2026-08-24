@@ -9,7 +9,6 @@
 
         <input matInput placeholder="Plan" [ngModelOptions]="{standalone: true}"
           [(ngModel)]="plan" value="{{plan}}" (blur)="ConsultarContrato()">
-        <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
 
       </mat-form-field>
     </div>
@@ -47,7 +46,7 @@
     </div>
     <div class="col-md-3">
       <mat-form-field appearance="outline">
-        <mat-label>Monto del incremento</mat-label>
+        <mat-label>Monto del retiro</mat-label>
 
         <input matInput placeholder="Monto" [ngModelOptions]="{standalone: true}"
           [(ngModel)]="monto" value=""  currencyMask
@@ -119,7 +118,7 @@
   <div class="row" *ngIf="blprocesar">
     <div class="col-md-12  text-right" >
         <button mat-flat-button color="accent" (click)="Procesar()" style="height: 50px;">
-         Procesar aportes
+         Procesar retiros
         </button>
   
   

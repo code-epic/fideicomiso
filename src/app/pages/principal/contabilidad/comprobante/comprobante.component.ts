@@ -459,6 +459,14 @@ export class ComprobanteComponent implements OnInit {
 
     this.formComprobante.reset();
     this.dataSource = null;
+    this.ELEMENT_DATA = [];
+    this.saldo_debe = "0.00";
+    this.saldo_haber = "0.00";
+    this.debe = 0;
+    this.haber = 0;
+    this.cuenta = "";
+    this.mostrarImprimir = false;
+    this.myCuentas.setValue("");
     this.fechaejercicio.setValue(new Date());
     if (this.formComprobante && this.formComprobante.get("fechaEjercicio")) {
       this.formComprobante

@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LIncremento } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -52,6 +53,7 @@ export class IncrementosComponent implements OnInit {
 
   constructor(private apiService: ApiService,
     private ngxService: NgxUiLoaderService,
+    private toastr: ToastrService,
     private util: UtilService,
     public formatter: NgbDateParserFormatter,) { }
 
@@ -103,25 +105,27 @@ export class IncrementosComponent implements OnInit {
   Seleccionar() { }
 
   ConsultarContrato() {
+    if (!this.plan) return
     this.ngxService.startLoader('load-cont')
-    // this.plan = this.util.zfill(this.plan, 4)
+    this.plan = this.plan.padStart(4, '0')
     this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATO
     this.xAPI.parametros = this.plan
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
-        if (data != null) {
+        if (data != null && data.length > 0) {
           let Contrato = data[0]
           this.rif = Contrato.rif + '-' + Contrato.razonsocial
           this.fideicomiso = Contrato.plan
           this.idplan = parseInt(this.plan)
-
+        } else {
+          this.toastr.warning('Plan no encontrado', 'Incrementos')
         }
         this.ngxService.stopLoader('load-cont')
       },
       (error) => {
         this.ngxService.stopLoader('load-cont')
+        this.toastr.error('Error al consultar el plan', 'Incrementos')
         console.error(error)
       }
     )

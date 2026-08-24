@@ -1,11 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
-import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import {  LIncremento } from 'src/app/services/banfanb/contabilidad.service';
+import { LIncremento } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
 
@@ -15,15 +14,15 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./retiros.component.scss']
 })
 export class RetirosComponent implements OnInit {
-  public Incremento : any
   public blprocesar: boolean = false
   public fechai: any
-  public idplan : number = 0
-  public fideicomiso : string = ''
+  public idplan: number = 0
+  public fideicomiso: string = ''
   public plan = ''
   public rif = ''
-
   public monto = ''
+  public fechaultimo = ''
+  public max: number = 0
 
   public ELEMENT_DATA: LIncremento[] = [];
   displayedColumns: string[] = [
@@ -36,64 +35,65 @@ export class RetirosComponent implements OnInit {
   dataSource: any;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-
   public xAPI: IAPICore = {
     funcion: '',
     parametros: ''
   }
 
-  public fechaultimo = ''
-
-  public max : number = 0
-
-
-  constructor(private apiService: ApiService,
-    private _snackBar: MatSnackBar,
+  constructor(
+    private apiService: ApiService,
     private ngxService: NgxUiLoaderService,
+    private toastr: ToastrService,
     private util: UtilService,
-    public formatter: NgbDateParserFormatter,) { }
-
-
-
+  ) { }
 
   ngOnInit(): void {
     let d = new Date().toISOString().substring(0, 10).split('-')
     this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
   }
 
-
-  Seleccionar(){}
-
   ConsultarContrato() {
+    if (!this.plan) return
     this.ngxService.startLoader('load-cont')
-    this.plan = this.util.zfill(this.plan, 4)
+    this.plan = this.plan.padStart(4, '0')
 
     this.xAPI.funcion = environment.xApi.CONSULTAR_CONTRATO
     this.xAPI.parametros = this.plan
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if (data != null) {
-         let Contrato = data[0]
-          this.rif = Contrato.rif + '-' + Contrato.razonsocial   
+        if (data != null && data.length > 0) {
+          let Contrato = data[0]
+          this.rif = Contrato.rif + '-' + Contrato.razonsocial
           this.fideicomiso = Contrato.plan
           this.idplan = parseInt(this.plan)
-              
+        } else {
+          this.toastr.warning('Plan no encontrado', 'Retiros')
         }
         this.ngxService.stopLoader('load-cont')
       },
       (error) => {
         this.ngxService.stopLoader('load-cont')
+        this.toastr.error('Error al consultar el plan', 'Retiros')
         console.error(error)
       }
     )
   }
 
-  Add(){
-
-    if ( this.plan == '') {
+  Add() {
+    if (!this.plan) {
+      this.toastr.warning('Debe ingresar un plan', 'Retiros')
       return
     }
+    if (!this.monto || parseFloat(this.monto) <= 0) {
+      this.toastr.warning('Debe ingresar un monto válido', 'Retiros')
+      return
+    }
+    if (!this.fechai) {
+      this.toastr.warning('Debe seleccionar una fecha', 'Retiros')
+      return
+    }
+
     this.ELEMENT_DATA.push({
       id: this.idplan,
       codigo: this.plan,
@@ -109,29 +109,44 @@ export class RetirosComponent implements OnInit {
     this.monto = ''
     this.fechai = ''
     this.rif = ''
+    this.fideicomiso = ''
     this.plan = ''
+    this.idplan = 0
     this.blprocesar = true
   }
 
+  Cancel() {
+    this.ELEMENT_DATA = []
+    this.dataSource = new MatTableDataSource<LIncremento>(this.ELEMENT_DATA)
+    this.blprocesar = false
+    this.monto = ''
+    this.fechai = ''
+    this.rif = ''
+    this.fideicomiso = ''
+    this.plan = ''
+    this.idplan = 0
+  }
 
-  Procesar(){
+  Procesar() {
+    if (this.ELEMENT_DATA.length === 0) {
+      this.toastr.warning('No hay retiros para procesar', 'Retiros')
+      return
+    }
+    this.ngxService.startLoader('load-cont')
     this.max = this.ELEMENT_DATA.length
     this.insertData(0)
   }
 
-  close(){
+  close() {
     this.ngxService.stopLoader('load-cont')
-      this.ELEMENT_DATA = []
-      this.dataSource = new MatTableDataSource<LIncremento>(
-        this.ELEMENT_DATA
-      );
-      this.dataSource.paginator = this.paginator;
-      this.blprocesar = false
-      this.apiService.Mensaje('Proceso exitoso', 'Se han creado los comprobantes', 'info', 'comprobante')
+    this.ELEMENT_DATA = []
+    this.dataSource = new MatTableDataSource<LIncremento>(this.ELEMENT_DATA)
+    this.dataSource.paginator = this.paginator
+    this.blprocesar = false
+    this.toastr.success('Retiros procesados exitosamente', 'Retiros')
   }
 
-  insertData(cant : number) {
-    
+  insertData(cant: number) {
     if (cant == this.max) {
       this.close()
       return
@@ -142,7 +157,7 @@ export class RetirosComponent implements OnInit {
     let Comprobante = {
       plan: idplan,
       codigo: this.ELEMENT_DATA[cant].codigo,
-      descripcion: "INCREMENTO DE CAPITAL",
+      descripcion: "RETIRO DE CAPITAL",
       detalle: `${this.ELEMENT_DATA[cant].plan}`,
       fecha_operacion: fecha,
       fecha_ejercicio: fecha,
@@ -157,9 +172,8 @@ export class RetirosComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-
         this.xAPI.funcion = environment.xApi.INSERTAR_RETIROS
-        this.xAPI.parametros = `${data.msj},${monto},${fecha},${idplan}`, 
+        this.xAPI.parametros = `${data.msj},${monto},${fecha},${idplan}`
         this.xAPI.valores = ''
         this.apiService.Ejecutar(this.xAPI).subscribe(
           data => {
@@ -168,29 +182,19 @@ export class RetirosComponent implements OnInit {
           (error) => {
             console.error(error)
             this.ngxService.stopLoader('load-cont')
+            this.toastr.error('Error al registrar el retiro', 'Retiros')
           }
         )
-        // this.InsertData(cant)
       },
       (error) => {
         console.error(error)
         this.ngxService.stopLoader('load-cont')
+        this.toastr.error('Error al crear el comprobante', 'Retiros')
       }
     )
-
-
   }
 
-
-
-  getMoneda(e) : string {
-    let data = this.util.ConvertirMoneda(e)
-    return data
+  getMoneda(e): string {
+    return this.util.ConvertirMoneda(e)
   }
-
-  Cancel(){
-
-  }
-
-
 }
