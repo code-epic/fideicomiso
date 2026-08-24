@@ -1,6 +1,4 @@
-
-
-table{
+table {
   border-collapse: collapse;
   font-size: 10.5px;
   width: 100%;
@@ -11,18 +9,19 @@ table{
 }
 
 .cabecera th {
-  border: 1px solid black;
+  border-bottom: 2px solid #1a237e;
   text-align: center;
-  background-color: rgb(182, 167, 167);
+  background-color: #eeeee4;
+  font-weight: 600;
+  color: #0F172A;
 }
 
 tr td {
-  border: 1px solid black;
+  border-bottom: 1px solid #e5e7eb;
   text-align: center;
 }
 
-
-td, th{
+td, th {
   padding: 0.5rem;
 }
 
@@ -31,18 +30,37 @@ td, th{
 }
 
 .bgblue {
-  background-color: rgb(182, 167, 167);
-  color: white;
+  background-color: #eeeee4;
+  color: #0F172A;
+  font-weight: 600;
 }
 
 .none {
-  border:none ;
+  border: none;
 }
 
 .linea {
-  background-color: rgb(255, 255, 255);
+  background-color: #ffffff;
 }
 
 .yellow {
-background-color: rgb(97, 97, 75);
+  background-color: #eeeee4;
+}
+
+// Formulario cartera
+.form-cartera {
+  margin-bottom: 8px;
+}
+
+.campo-botones {
+  position: relative;
+  height: 72px;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 10px;
+
+  button {
+    height: 56px;
+    margin-bottom: 0;
+  }
 }
