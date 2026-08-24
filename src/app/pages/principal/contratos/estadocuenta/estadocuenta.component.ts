@@ -19,7 +19,8 @@ export class EstadocuentaComponent implements OnInit {
 
   dataSource: any
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  displayedColumns: string[] = ['descripcion', 'fecha', 'dias', 'ingresos', 'egresos', 'saldo'];
+  displayedColumns: string[] = ['descripcion', 'fecha', 'ingresos', 'egresos', 'saldo'];
+  public consultado: boolean = false
 
   public Contrato: Contrato
   public desde: Date
@@ -76,6 +77,7 @@ export class EstadocuentaComponent implements OnInit {
         this.dataSource = new MatTableDataSource<any>(this.lstMovimientos)
         this.dataSource.paginator = this.paginator;
         this.ngxService.stopLoader('load-EstadoCuenta')
+        this.consultado = true
       },
       error: (err) => {
         console.error(err)
@@ -92,16 +94,17 @@ export class EstadocuentaComponent implements OnInit {
     this.totalEgresos = 0
 
     let saldo = 0
-    let fechaAnterior: Date = new Date(this.desde)
+
+    const fechaAnterior = new Date(this.desde)
+    fechaAnterior.setDate(fechaAnterior.getDate() - 1)
 
     cuerpo.forEach(e => {
       if (e.tipo == 'INICIAL') {
         saldo = parseFloat(e.saldo || 0)
         this.saldoInicial = saldo
         this.lstMovimientos.push({
-          descripcion: `SALDO AL ${this.fechaTexto(this.desde)}`,
+          descripcion: `SALDO AL ${this.fechaTexto(fechaAnterior)}`,
           fecha: null,
-          dias: 0,
           ingresos: null,
           egresos: null,
           saldo: saldo,
@@ -110,20 +113,17 @@ export class EstadocuentaComponent implements OnInit {
       } else if (e.tipo == 'MOVIMIENTO') {
         const ingresos = parseFloat(e.ingresos || 0)
         const egresos = parseFloat(e.egresos || 0)
-        const fecha = new Date(e.fecha_operacion)
         saldo += ingresos - egresos
         this.totalIngresos += ingresos
         this.totalEgresos += egresos
         this.lstMovimientos.push({
           descripcion: e.descripcion,
-          fecha: this.fechaTexto(fecha),
-          dias: this.diasEntre(fechaAnterior, fecha),
+          fecha: this.fechaTexto(new Date(e.fecha_operacion)),
           ingresos: ingresos,
           egresos: egresos,
           saldo: saldo,
           esSaldo: false
         })
-        fechaAnterior = fecha
       } else if (e.tipo == 'FINAL') {
         this.saldoFinal = parseFloat(e.saldo || 0)
       }
@@ -132,7 +132,6 @@ export class EstadocuentaComponent implements OnInit {
     this.lstMovimientos.push({
       descripcion: 'SALDO FINAL DEL PERÍODO',
       fecha: null,
-      dias: null,
       ingresos: this.totalIngresos,
       egresos: this.totalEgresos,
       saldo: this.saldoFinal,
@@ -153,7 +152,6 @@ export class EstadocuentaComponent implements OnInit {
         <tr style="${estilo}">
           <td style="padding: 6px 8px; text-align: left; ${estilo}">${e.descripcion || ''}</td>
           <td style="padding: 6px 8px; text-align: center; ${estilo}">${e.fecha || ''}</td>
-          <td style="padding: 6px 8px; text-align: center; ${estilo}">${e.dias != null ? e.dias : ''}</td>
           <td style="padding: 6px 8px; text-align: right; ${estilo}">${e.ingresos != null ? this.moneda(e.ingresos) : ''}</td>
           <td style="padding: 6px 8px; text-align: right; ${estilo}">${e.egresos != null ? this.moneda(e.egresos) : ''}</td>
           <td style="padding: 6px 8px; text-align: right; ${estilo}">${this.moneda(e.saldo)}</td>
@@ -186,7 +184,6 @@ export class EstadocuentaComponent implements OnInit {
             <tr style="background-color: #eeeee4;">
               <th style="padding: 6px 8px; text-align: left; font-weight: 600;">Descripción Movimiento</th>
               <th style="padding: 6px 8px; text-align: center; font-weight: 600;">Fecha</th>
-              <th style="padding: 6px 8px; text-align: center; font-weight: 600;">Días</th>
               <th style="padding: 6px 8px; text-align: right; font-weight: 600;">Ingresos</th>
               <th style="padding: 6px 8px; text-align: right; font-weight: 600;">Egresos</th>
               <th style="padding: 6px 8px; text-align: right; font-weight: 600;">Saldo</th>
