@@ -27,8 +27,6 @@ export class EstadocuentaComponent implements OnInit {
   public hasta: Date
   public saldoInicial: number = 0
   public saldoFinal: number = 0
-  public totalIngresos: number = 0
-  public totalEgresos: number = 0
   public lstMovimientos: any[] = []
 
   constructor(
@@ -90,8 +88,6 @@ export class EstadocuentaComponent implements OnInit {
     this.lstMovimientos = []
     this.saldoInicial = 0
     this.saldoFinal = 0
-    this.totalIngresos = 0
-    this.totalEgresos = 0
 
     let saldo = 0
 
@@ -114,8 +110,6 @@ export class EstadocuentaComponent implements OnInit {
         const ingresos = parseFloat(e.ingresos || 0)
         const egresos = parseFloat(e.egresos || 0)
         saldo += ingresos - egresos
-        this.totalIngresos += ingresos
-        this.totalEgresos += egresos
         this.lstMovimientos.push({
           descripcion: e.descripcion,
           fecha: this.fechaTexto(new Date(e.fecha_operacion)),
@@ -130,10 +124,10 @@ export class EstadocuentaComponent implements OnInit {
     })
 
     this.lstMovimientos.push({
-      descripcion: 'SALDO FINAL DEL PERÍODO',
+      descripcion: '',
       fecha: null,
-      ingresos: this.totalIngresos,
-      egresos: this.totalEgresos,
+      ingresos: null,
+      egresos: null,
       saldo: this.saldoFinal,
       esSaldo: true
     })
@@ -184,8 +178,8 @@ export class EstadocuentaComponent implements OnInit {
             <tr style="background-color: #eeeee4;">
               <th style="padding: 6px 8px; text-align: left; font-weight: 600;">Descripción Movimiento</th>
               <th style="padding: 6px 8px; text-align: center; font-weight: 600;">Fecha</th>
-              <th style="padding: 6px 8px; text-align: right; font-weight: 600;">Ingresos</th>
-              <th style="padding: 6px 8px; text-align: right; font-weight: 600;">Egresos</th>
+              <th style="padding: 6px 8px; text-align: right; font-weight: 600;">Crédito</th>
+              <th style="padding: 6px 8px; text-align: right; font-weight: 600;">Débito</th>
               <th style="padding: 6px 8px; text-align: right; font-weight: 600;">Saldo</th>
             </tr>
           </thead>
