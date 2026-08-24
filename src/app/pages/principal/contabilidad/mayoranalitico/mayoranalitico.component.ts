@@ -145,7 +145,7 @@ export class MayoranaliticoComponent implements OnInit {
     const cuentaId = this.cuentaIdSeleccionada > 0 ? this.cuentaIdSeleccionada : '%';
 
     this.xAPI.funcion = environment.xApi.CONSULTAR_MAYOR_ANALITICO;
-    this.xAPI.parametros = `${sInicio},${sFin},${cuentaId},${this.filtroCuentas}`;
+    this.xAPI.parametros = `${sInicio},${sFin},${cuentaId}`;
     this.xAPI.valores = '';
 
     this.ngxService.startLoader('load-cont');
@@ -161,6 +161,7 @@ export class MayoranaliticoComponent implements OnInit {
         }
 
         this.procesarDatos(data.Cuerpo);
+        this.aplicarFiltro();
         this.mostrarResultados = true;
       },
       (error) => {
@@ -235,6 +236,28 @@ export class MayoranaliticoComponent implements OnInit {
 
     this.totalGeneralDebe = this.cuentasConMovimientos.reduce((sum, c) => sum + c.total_debe, 0);
     this.totalGeneralHaber = this.cuentasConMovimientos.reduce((sum, c) => sum + c.total_haber, 0);
+  }
+
+  aplicarFiltro() {
+    if (this.filtroCuentas === '%') return;
+
+    this.cuentasConMovimientos = this.cuentasConMovimientos.filter(cuenta => {
+      const tieneSaldoInicial = cuenta.saldo_inicial !== 0;
+      const tieneMovimientos = cuenta.movimientos.length > 0;
+
+      switch (this.filtroCuentas) {
+        case 'sin_saldo_sin_mov': return !tieneSaldoInicial && !tieneMovimientos;
+        case 'sin_saldo_con_mov': return !tieneSaldoInicial && tieneMovimientos;
+        case 'con_saldo_con_mov': return tieneSaldoInicial && tieneMovimientos;
+        case 'con_saldo_sin_mov': return tieneSaldoInicial && !tieneMovimientos;
+        default: return true;
+      }
+    });
+
+    this.totalGeneralDebe = this.cuentasConMovimientos.reduce((sum, c) => sum + c.total_debe, 0);
+    this.totalGeneralHaber = this.cuentasConMovimientos.reduce((sum, c) => sum + c.total_haber, 0);
+    this.totalGeneralSaldoInicial = this.cuentasConMovimientos.reduce((sum, c) => sum + c.saldo_inicial, 0);
+    this.totalGeneralSaldoFinal = this.cuentasConMovimientos.reduce((sum, c) => sum + c.saldo_final, 0);
   }
 
   getFechaHoy(): string {
@@ -390,10 +413,13 @@ export class MayoranaliticoComponent implements OnInit {
     this._imprimir.createHtmlSectionForPrint(contenido, 0);
   }
 
-  formatFecha(fecha: string): string {
+  formatFecha(fecha: any): string {
     if (!fecha) return '';
-    const parts = fecha.substring(0, 10).split('-');
-    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    const d = fecha instanceof Date ? fecha : new Date(fecha);
+    const dia = String(d.getDate()).padStart(2, '0');
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const anio = d.getFullYear();
+    return `${dia}/${mes}/${anio}`;
   }
 
   exportCSV() {
