@@ -45,7 +45,7 @@
       </mat-form-field>
     </div>
 
-    <div class="col-md-2 d-flex align-items-center" style="padding-top: 0;">
+    <div class="col-md-2 d-flex align-items-start" style="padding-top: 4px;">
       <button mat-flat-button color="primary" (click)="ConsultarMayor()" style="height: 50px;">
         <mat-icon>search</mat-icon>&nbsp;CONSULTAR
       </button>
@@ -188,7 +188,7 @@
 
 <div *ngIf="mostrarResultados" style="margin-top: 16px; text-align: right;">
   <button mat-flat-button color="accent" (click)="exportCSV()" style="height: 50px; margin-right: 8px;">
-    <mat-icon>file_download</mat-icon>&nbsp;Exportar XLS
+    <mat-icon>file_download</mat-icon>&nbsp;EXPORTAR CSV
   </button>
   <button mat-flat-button color="warn" (click)="imprimir()" style="height: 50px;">
     <mat-icon>print</mat-icon>&nbsp;Imprimir reporte
