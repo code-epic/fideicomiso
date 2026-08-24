@@ -180,6 +180,7 @@ export class RetirosComponent implements OnInit {
       fecha_ejercicio: fecha,
       debe: monto,
       haber: monto,
+      llave: 'M'
     }
 
     this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
