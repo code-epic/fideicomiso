@@ -48,8 +48,25 @@ export class RetirosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    let d = new Date().toISOString().substring(0, 10).split('-')
-    this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
+    this.UltimoCierre()
+  }
+
+  UltimoCierre() {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_ULTIMO_CIERRE
+    this.xAPI.parametros = ''
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        if (data != null && data.Cuerpo && data.Cuerpo.length > 0) {
+          let fecha = data.Cuerpo[0].fecha_cierre
+          let d = fecha.split('-')
+          this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
+        }
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
   }
 
   ConsultarContrato() {
