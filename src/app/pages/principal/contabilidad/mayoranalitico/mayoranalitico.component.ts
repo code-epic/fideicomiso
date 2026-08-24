@@ -71,6 +71,7 @@ export class MayoranaliticoComponent implements OnInit {
   public plan: string = '%';
   public estatus: string = '%';
   public bAntes: boolean = true;
+  public filtroCuentas: string = '%';
 
   constructor(
     private apiService: ApiService,
@@ -144,7 +145,7 @@ export class MayoranaliticoComponent implements OnInit {
     const cuentaId = this.cuentaIdSeleccionada > 0 ? this.cuentaIdSeleccionada : '%';
 
     this.xAPI.funcion = environment.xApi.CONSULTAR_MAYOR_ANALITICO;
-    this.xAPI.parametros = `${sInicio},${sFin},${cuentaId}`;
+    this.xAPI.parametros = `${sInicio},${sFin},${cuentaId},${this.filtroCuentas}`;
     this.xAPI.valores = '';
 
     this.ngxService.startLoader('load-cont');
@@ -255,9 +256,9 @@ export class MayoranaliticoComponent implements OnInit {
           <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">${this.formatFecha(mov.fecha_operacion)}</td>
           <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">${mov.id_comprobante}</td>
           <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">${mov.descripcion_comprobante}</td>
-          <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">${mov.debe > 0 ? mov.debe.toFixed(2) : ''}</td>
-          <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">${mov.haber > 0 ? mov.haber.toFixed(2) : ''}</td>
-          <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">${mov.saldo_corrido.toFixed(2)}</td>
+          <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">${mov.debe > 0 ? this.util.ConvertirMoneda(mov.debe) : ''}</td>
+          <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">${mov.haber > 0 ? this.util.ConvertirMoneda(mov.haber) : ''}</td>
+          <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">${this.util.ConvertirMoneda(mov.saldo_corrido)}</td>
         </tr>
       `).join('');
 
@@ -282,16 +283,16 @@ export class MayoranaliticoComponent implements OnInit {
                 <td colspan="3" style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; border-bottom: 1px solid #E4E5E7;">SALDO INICIAL</td>
                 <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
                 <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
-                <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; text-align: right; border-bottom: 1px solid #E4E5E7;">${cuenta.saldo_inicial.toFixed(2)}</td>
+                <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; text-align: right; border-bottom: 1px solid #E4E5E7;">${this.util.ConvertirMoneda(cuenta.saldo_inicial)}</td>
               </tr>
               ${filasMovimientos}
             </tbody>
             <tfoot>
               <tr style="background: #F1F5F9; font-weight: 700;">
                 <td colspan="3" style="padding: 10px 16px; font-size: 12px; color: #1E293B; border-top: 2px solid #1E293B;">TOTALES</td>
-                <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">${cuenta.total_debe.toFixed(2)}</td>
-                <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">${cuenta.total_haber.toFixed(2)}</td>
-                <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">${cuenta.saldo_final.toFixed(2)}</td>
+                <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">${this.util.ConvertirMoneda(cuenta.total_debe)}</td>
+                <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">${this.util.ConvertirMoneda(cuenta.total_haber)}</td>
+                <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">${this.util.ConvertirMoneda(cuenta.saldo_final)}</td>
               </tr>
             </tfoot>
           </table>
@@ -393,5 +394,39 @@ export class MayoranaliticoComponent implements OnInit {
     if (!fecha) return '';
     const parts = fecha.substring(0, 10).split('-');
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+
+  exportCSV() {
+    const headers = ['Código Cuenta', 'Nombre Cuenta', 'Fecha', 'Comprobante', 'Descripción', 'Débito', 'Crédito', 'Saldo'];
+    const rows = [];
+
+    this.cuentasConMovimientos.forEach(cuenta => {
+      rows.push([cuenta.codigo_cuenta, cuenta.nombre_cuenta, 'SALDO INICIAL', '', '', '', '', cuenta.saldo_inicial.toFixed(2)]);
+      cuenta.movimientos.forEach(mov => {
+        rows.push([
+          cuenta.codigo_cuenta,
+          cuenta.nombre_cuenta,
+          this.formatFecha(mov.fecha_operacion),
+          mov.id_comprobante,
+          mov.descripcion_comprobante,
+          mov.debe > 0 ? mov.debe.toFixed(2) : '',
+          mov.haber > 0 ? mov.haber.toFixed(2) : '',
+          mov.saldo_corrido.toFixed(2)
+        ]);
+      });
+      rows.push([cuenta.codigo_cuenta, cuenta.nombre_cuenta, 'TOTALES', '', '', cuenta.total_debe.toFixed(2), cuenta.total_haber.toFixed(2), cuenta.saldo_final.toFixed(2)]);
+      rows.push([]);
+    });
+
+    let csvContent = headers.join(';') + '\n';
+    rows.forEach(row => {
+      csvContent += row.join(';') + '\n';
+    });
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `mayor_analitico_${this.formatFecha(this.fechaInicio)}_${this.formatFecha(this.fechaFin)}.csv`;
+    link.click();
   }
 }
