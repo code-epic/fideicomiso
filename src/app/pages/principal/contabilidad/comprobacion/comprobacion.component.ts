@@ -43,33 +43,7 @@ export class ComprobacionComponent implements OnInit {
 
   printv: boolean = false
 
-  public lstFecha = [
-    { id: 0, value: '2023-12-01,2023-12-31,2023-11-30', nombre: 'DICIEMBRE - 2023' },
-    { id: 1, value: '2024-01-01,2024-01-31,2023-12-31', nombre: 'ENERO - 2024' },
-    { id: 2, value: '2024-02-01,2024-02-28,2024-01-31', nombre: 'FEBRERO - 2024' },
-    { id: 3, value: '2024-03-01,2024-03-31,2024-02-28', nombre: 'MARZO - 2024' },
-    { id: 4, value: '2024-04-01,2024-04-30,2024-03-31', nombre: 'ABRIL - 2024' },
-    { id: 5, value: '2024-05-01,2024-05-31,2024-04-30', nombre: 'MAYO - 2024' },
-    { id: 6, value: '2024-06-01,2024-06-30,2024-05-31', nombre: 'JUNIO - 2024' },
-    { id: 7, value: '2024-07-01,2024-07-31,2024-06-30', nombre: 'JULIO - 2024' },
-    { id: 8, value: '2024-08-01,2024-08-31,2024-07-31', nombre: 'AGOSTO - 2024' },
-    { id: 9, value: '2024-09-01,2024-09-30,2024-08-31', nombre: 'SEPTIEMBRE - 2024' },
-    { id: 10, value: '2024-10-01,2024-10-31,2024-09-30', nombre: 'OCTUBRE - 2024' },
-    { id: 11, value: '2024-11-01,2024-11-30,2024-10-31', nombre: 'NOVIEMBRE - 2024' },
-    { id: 12, value: '2024-12-01,2024-12-31,2024-11-30', nombre: 'DICIEMBRE - 2024' },
-    { id: 13, value: '2025-01-01,2025-01-31,2024-12-31', nombre: 'ENERO - 2025' },
-    { id: 14, value: '2025-02-01,2025-02-28,2025-01-31', nombre: 'FEBRERO - 2025' },
-    { id: 15, value: '2025-03-01,2025-03-31,2025-02-28', nombre: 'MARZO - 2025' },
-    { id: 16, value: '2025-04-01,2025-04-30,2025-03-31', nombre: 'ABRIL - 2025' },
-    { id: 17, value: '2025-05-01,2025-05-31,2025-04-30', nombre: 'MAYO - 2025' },
-    { id: 18, value: '2025-06-01,2025-06-30,2025-05-31', nombre: 'JUNIO - 2025' },
-    { id: 19, value: '2025-07-01,2025-07-31,2025-06-30', nombre: 'JULIO - 2025' },
-    { id: 20, value: '2025-08-01,2025-08-31,2025-07-31', nombre: 'AGOSTO - 2025' },
-    { id: 21, value: '2025-09-01,2025-09-30,2025-08-31', nombre: 'SEPTIEMBRE - 2025' },
-    { id: 22, value: '2025-10-01,2025-10-31,2025-09-30', nombre: 'OCTUBRE - 2025' },
-    { id: 23, value: '2025-11-01,2025-11-30,2025-10-31', nombre: 'NOVIEMBRE - 2025' },
-    { id: 24, value: '2025-12-01,2025-12-31,2025-11-30', nombre: 'DICIEMBRE - 2025' },
-  ]
+  public lstFecha: { id: number; value: string; nombre: string }[] = []
 
   public lstIndex = [
     {
@@ -130,13 +104,51 @@ export class ComprobacionComponent implements OnInit {
 
   ngOnInit(): void {
     this.consultarUltimoCierre()
-
   }
 
   async consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
     this.fechaultimo = await this.cierre.getUltimoCierre()
+    this.generarMeses()
     this.ngxService.stopLoader('load-precierre')
+  }
+
+  generarMeses() {
+    const meses = []
+    const hoy = new Date()
+    const inicio = new Date('2024-01-01')
+
+    const fecha = new Date(inicio)
+    let id = 0
+
+    while (fecha <= hoy) {
+      const anio = fecha.getFullYear()
+      const mes = fecha.getMonth()
+
+      const desde = new Date(anio, mes, 1)
+      const hasta = new Date(anio, mes + 1, 0)
+      const vienen = new Date(anio, mes, 0)
+
+      const formato = (d: Date) => {
+        const y = d.getFullYear()
+        const m = String(d.getMonth() + 1).padStart(2, '0')
+        const dia = String(d.getDate()).padStart(2, '0')
+        return `${y}-${m}-${dia}`
+      }
+
+      const nombreMes = desde.toLocaleDateString('es-ES', { month: 'long' }).toUpperCase()
+
+      meses.push({
+        id: id++,
+        value: `${formato(desde)},${formato(hasta)},${formato(vienen)}`,
+        nombre: `${nombreMes} - ${anio}`
+      })
+
+      fecha.setMonth(fecha.getMonth() + 1)
+    }
+
+    this.lstFecha = meses.reverse()
+    this.mes = 0
   }
 
   ConsultarComprobacion() {

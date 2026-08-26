@@ -4,7 +4,7 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 export const environment = {
   production: false,
-  ID : 'ID-003',
+  ID : 'fideicomiso',
   Url: 'http://localhost',
   API: '/v1/api/',
   Hash: ':c521f27fb1b3311d686d511b668e5bd4',
