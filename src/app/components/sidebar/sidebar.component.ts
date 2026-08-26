@@ -44,7 +44,7 @@ export class SidebarComponent implements OnInit {
       let i = 0
       App.Rol.Menu.forEach(e => {
         
-        if (i == 1){
+        if (i == 1 && !e.url.includes('administracion')){
           ROUTES.push({
             path : '/administracion',
             title: 'Administracion',
