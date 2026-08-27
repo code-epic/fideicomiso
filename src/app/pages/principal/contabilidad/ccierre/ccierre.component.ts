@@ -71,6 +71,7 @@ export class CcierreComponent implements OnInit {
 
   lstData = []
   public semestral: boolean = false
+  public plan: string = '1'
 
   events: string[] = [];
   blista: boolean = false
@@ -192,7 +193,7 @@ export class CcierreComponent implements OnInit {
     }
 
     let usuario = 'Administrador'
-    let plan = '1'
+    let plan = this.plan
 
     this.ngxService.startLoader('load-precierre')
     this.xAPI.funcion = environment.xApi.INSERTAR_SALDOS_CIERRE
