@@ -85,7 +85,7 @@ export class AporteinicialComponent implements OnInit {
           this.ELEMENT_DATA.push({
             id: e.id,
             codigo: e.fideicomiso.toUpperCase(),
-            plan: e.observacion.toUpperCase(),
+            plan: e.observacion,
             monto: e.monto_apertura
           });
         })
@@ -125,13 +125,12 @@ export class AporteinicialComponent implements OnInit {
     }
     let monto = parseFloat(this.ELEMENT_DATA[cant].monto)
     let idplan = this.ELEMENT_DATA[cant].id.toString()
-    let detalle = this.ELEMENT_DATA[cant].plan.split('|')
 
     this.Comprobante = {
       plan: this.ELEMENT_DATA[cant].id,
       codigo: "",
       descripcion: "APORTE INICIAL",
-      detalle: `${detalle[0]} - ${detalle[1]}`,
+      detalle: this.ELEMENT_DATA[cant].plan,
       fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
       fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
       debe: monto,

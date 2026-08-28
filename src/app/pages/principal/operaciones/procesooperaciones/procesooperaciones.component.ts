@@ -128,7 +128,7 @@ export class ProcesooperacionesComponent implements OnInit {
         plan: e.id,
         codigo: this.util.GenerarUnicId(),
         descripcion: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
-        detalle: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
+        detalle: e.plan,
         fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
         fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
         debe: e.calculo_capital,

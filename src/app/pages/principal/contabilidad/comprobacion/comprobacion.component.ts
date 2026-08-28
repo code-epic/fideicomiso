@@ -135,8 +135,14 @@ export class ComprobacionComponent implements OnInit {
       this.planNombre = 'TODOS LOS PLANES'
     } else {
       const plan = this.lstPlanesFideicomiso.find(p => p.id == this.plan)
-      this.planNombre = plan ? plan.fideicomiso : ''
+      this.planNombre = plan ? plan.observacion : ''
     }
+  }
+
+  getNombrePlan(): string {
+    if (this.plan === '%') return 'TODOS LOS PLANES';
+    const plan = this.lstPlanesFideicomiso.find(p => p.id == this.plan);
+    return plan ? (plan.observacion || plan.fideicomiso) : '';
   }
 
   generarMeses() {
@@ -266,7 +272,7 @@ export class ComprobacionComponent implements OnInit {
         e.nivel_2;
       titulo = `
       <tr>  
-          <td>${txt + ". " + e.descripcion.toUpperCase()}</td>
+          <td>${txt + ". " + e.descripcion.toUpperCase()}<span style="color:#2563EB;">${e.plan_nombre ? " - " + e.plan_nombre : ""}</span></td>
           <td class="text-right">${this.getMoneda(saldo_inicial) == "0"
           ? "-"
           : this.getMoneda(saldo_inicial)

@@ -424,46 +424,61 @@ export class ProcesosComponent implements OnInit {
 
   async ejecutarGeneracionComprobantes(fecha: string) {
     try {
-      // 1. Comprobante Devengo
+      const sinPlan: string[] = [];
+
+      // 1. Comprobantes Devengo (uno por inversión)
       if (this.lstAsientos.length > 0) {
-        const comprobanteDevengo: FID_IComprobante = {
-          plan: 1,
-          codigo: this.util.GenerarUnicId(),
-          descripcion: `DEVENGO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
-          detalle: `DEVENGO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
-          fecha_operacion: fecha,
-          fecha_ejercicio: fecha,
-          debe: this.acum_debe,
-          haber: this.acum_haber,
-          llave: "M",
-        };
-
-        const apiDev: IAPICore = {
-          funcion: environment.xApi.INSERTAR_COMPROBANTE,
-          parametros: "",
-          valores: JSON.stringify(comprobanteDevengo)
-        };
-
-        const resDev = await firstValueFrom(this.apiService.Ejecutar(apiDev));
-        if (resDev && resDev.msj) {
-          const apiDevData: IAPICore = {
-            funcion: environment.xApi.INSERTAR_DEVENGO_INVERIONES,
-            parametros: resDev.msj + "," + fecha,
-            valores: ""
+        for (const e of this.lstAsientos) {
+          const planDev = e.id_plan ? Number(e.id_plan) : 0;
+          if (!planDev) {
+            sinPlan.push(`DEVENGO ${e.codigo || ""}`.trim());
+            continue;
+          }
+          const montoDev = parseFloat(e.interes_acumulado || 0);
+          const comprobanteDevengo: FID_IComprobante = {
+            plan: planDev,
+            codigo: this.util.GenerarUnicId(),
+            descripcion: `DEVENGO DE INVERSIONES ${e.instrumento || ""} ${this.util.ConvertirFechaHumana(fecha)}`.trim(),
+            detalle: e.plan_nombre || `DEVENGO DE INVERSIONES ${e.instrumento || ""} ${this.util.ConvertirFechaHumana(fecha)}`.trim(),
+            fecha_operacion: fecha,
+            fecha_ejercicio: fecha,
+            debe: montoDev,
+            haber: montoDev,
+            llave: "M",
           };
-          await firstValueFrom(this.apiService.Ejecutar(apiDevData));
+
+          const apiDev: IAPICore = {
+            funcion: environment.xApi.INSERTAR_COMPROBANTE,
+            parametros: "",
+            valores: JSON.stringify(comprobanteDevengo)
+          };
+
+          const resDev = await firstValueFrom(this.apiService.Ejecutar(apiDev));
+          if (resDev && resDev.msj) {
+            const apiDevData: IAPICore = {
+              funcion: environment.xApi.INSERTAR_DEVENGO_INVERIONES,
+              parametros: resDev.msj + "," + fecha + "," + e.codigo,
+              valores: ""
+            };
+            await firstValueFrom(this.apiService.Ejecutar(apiDevData));
+          }
         }
       }
 
       // 2. Comprobantes Vencimiento
       if (this.lstVencimiento.length > 0) {
         for (const e of this.lstVencimiento) {
+          const planVenc = e.id_plan ? Number(e.id_plan) : 0;
+          if (!planVenc) {
+            sinPlan.push(`VENCIMIENTO ${e.codigo || ""}`.trim());
+            continue;
+          }
           const monto = parseFloat(e.valor_nominal) + this.RendicionCupon(e);
           const vencimiento = {
-            plan: 1,
+            plan: planVenc,
             codigo: this.util.GenerarUnicId(),
             descripcion: `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
-            detalle: `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+            detalle: e.plan_nombre || `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
             fecha_operacion: fecha,
             fecha_ejercicio: fecha,
             debe: monto,
@@ -492,11 +507,16 @@ export class ProcesosComponent implements OnInit {
       // 3. Comprobantes Compra
       if (this.lstCompra.length > 0) {
         for (const e of this.lstCompra) {
+          const planComp = e.id_plan ? Number(e.id_plan) : 0;
+          if (!planComp) {
+            sinPlan.push(`COMPRA ${e.codigo || ""}`.trim());
+            continue;
+          }
           const compra = {
-            plan: 1,
+            plan: planComp,
             codigo: this.util.GenerarUnicId(),
             descripcion: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
-            detalle: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+            detalle: e.plan_nombre || `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
             fecha_operacion: fecha,
             fecha_ejercicio: fecha,
             debe: e.valor_nominal,
@@ -527,11 +547,20 @@ export class ProcesosComponent implements OnInit {
       this.limpiarPantalla();
       this.generandoComprobante = false;
 
-      Swal.fire({
-        title: "Comprobantes generados correctamente",
-        confirmButtonColor: '#3085d6',
-        icon: 'success'
-      });
+      if (sinPlan.length > 0) {
+        Swal.fire({
+          title: "Inversiones sin portafolio omitidas",
+          html: `Los siguientes movimientos se omitieron porque sus inversiones no tienen un portafolio con plan asignado:<br><b>${sinPlan.join("</b><br><b>")}</b>`,
+          icon: "warning",
+          confirmButtonColor: '#3085d6',
+        });
+      } else {
+        Swal.fire({
+          title: "Comprobantes generados correctamente",
+          confirmButtonColor: '#3085d6',
+          icon: 'success'
+        });
+      }
     } catch (error) {
       console.error(error);
       this.ngxService.stopLoader("load-cont");

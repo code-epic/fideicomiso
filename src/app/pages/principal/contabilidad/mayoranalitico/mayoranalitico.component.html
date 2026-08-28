@@ -5,7 +5,7 @@
     <div class="col-md-2">
       <mat-form-field appearance="outline">
         <mat-label>FECHA INICIO</mat-label>
-        <input matInput [matDatepicker]="startPicker" [(ngModel)]="fechaInicio">
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="fechaInicio" (ngModelChange)="filtrarPlanesPorFecha()">
         <mat-datepicker #startPicker></mat-datepicker>
         <mat-icon matSuffix (click)="startPicker.open()">event</mat-icon>
       </mat-form-field>
@@ -50,7 +50,7 @@
         <mat-label>PLAN</mat-label>
         <mat-select [(ngModel)]="plan">
           <mat-option value="%">TODOS</mat-option>
-          <mat-option *ngFor="let p of lstPlanesFideicomiso" value="{{p.id}}">{{p.fideicomiso}}</mat-option>
+          <mat-option *ngFor="let p of planesHabilitados" value="{{p.id}}">{{p.observacion}}</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
@@ -61,6 +61,12 @@
       </button>
     </div>
   </div>
+</div>
+
+<div *ngIf="mostrarAvisoPlan" style="margin: 0 16px 8px; padding: 8px 16px; background: #FEF3C7; border-left: 3px solid #F59E0B; border-radius: 4px;">
+  <span style="font-size: 12px; color: #92400E;">
+    Los movimientos anteriores al 31/07/2026 están consolidados en el Plan 1. Los planes 2 y 3 no tienen saldos históricos.
+  </span>
 </div>
 
 <div *ngIf="cuentaSeleccionada" style="margin: 0 16px 8px; padding: 8px 16px; background: #F1F5F9; border-radius: 4px; border-left: 3px solid #2563EB;">
@@ -100,6 +106,9 @@
       <p *ngIf="cuentaSeleccionada" style="margin: 4px 0 0 0; font-size: 13px; color: #64748B;">
         Cuenta: {{ cuentaSeleccionada }}
       </p>
+      <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748B;">
+        Plan: {{ getNombrePlan() }}
+      </p>
     </div>
 
     <div *ngFor="let cuenta of cuentasConMovimientos" style="margin-bottom: 24px; page-break-inside: avoid;">
@@ -112,6 +121,7 @@
             <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Fecha</th>
             <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Comprobante</th>
             <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Descripción</th>
+            <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Plan</th>
             <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7;">Debe</th>
             <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7;">Haber</th>
             <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7;">Saldo</th>
@@ -119,7 +129,7 @@
         </thead>
         <tbody>
           <tr style="background: #F1F5F9;">
-            <td colspan="3" style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; border-bottom: 1px solid #E4E5E7;">SALDO INICIAL</td>
+            <td colspan="4" style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; border-bottom: 1px solid #E4E5E7;">SALDO INICIAL</td>
             <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
             <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
             <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ cuenta.saldo_inicial | number:'1.2-2' }}</td>
@@ -128,6 +138,7 @@
             <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ mov.fecha_operacion | date:'dd/MM/yyyy' }}</td>
             <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ mov.id_comprobante }}</td>
             <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ mov.descripcion_comprobante }}</td>
+            <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">{{ mov.plan_nombre }}</td>
             <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ mov.debe > 0 ? (mov.debe | number:'1.2-2') : '' }}</td>
             <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ mov.haber > 0 ? (mov.haber | number:'1.2-2') : '' }}</td>
             <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">{{ mov.saldo_corrido | number:'1.2-2' }}</td>
@@ -135,7 +146,7 @@
         </tbody>
           <tfoot>
           <tr style="background: #F1F5F9; font-weight: 700;">
-            <td colspan="3" style="padding: 10px 16px; font-size: 12px; color: #1E293B; border-top: 2px solid #1E293B;">TOTALES</td>
+            <td colspan="4" style="padding: 10px 16px; font-size: 12px; color: #1E293B; border-top: 2px solid #1E293B;">TOTALES</td>
             <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">{{ cuenta.total_debe | number:'1.2-2' }}</td>
             <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">{{ cuenta.total_haber | number:'1.2-2' }}</td>
             <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">{{ cuenta.saldo_final | number:'1.2-2' }}</td>

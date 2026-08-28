@@ -33,7 +33,7 @@
           <mat-label>Plan</mat-label>
           <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}">
             <mat-option value='%'>TODOS</mat-option>
-            <mat-option *ngFor="let p of lstPlanesFideicomiso" value='{{p.id}}'>{{p.fideicomiso}}</mat-option>
+            <mat-option *ngFor="let p of lstPlanesFideicomiso" value='{{p.id}}'>{{p.observacion}}</mat-option>
           </mat-select>
     
         </mat-form-field>
@@ -74,8 +74,11 @@
               <div class="col-md-2 texto-detalle auto-title">
                 CUENTA
               </div>
-              <div class="col-md-6 texto-detalle auto-title">
+              <div class="col-md-4 texto-detalle auto-title">
                 DESCRIPCION
+              </div>
+              <div class="col-md-2 texto-detalle auto-title">
+                PLAN
               </div>
               <div class="col-md-2 texto-detalle auto-title">
                 DEBE
@@ -91,8 +94,11 @@
               <div class="col-md-2 texto-detalle auto-ajuste">
                 {{ e.cuenta }}
               </div>
-              <div class="col-md-6 texto-detalle auto-ajuste">
+              <div class="col-md-4 texto-detalle auto-ajuste">
                 {{ e.descripcion | uppercase }}
+              </div>
+              <div class="col-md-2 texto-detalle auto-ajuste">
+                {{ e.plan_nombre }}
               </div>
               <div class="col-md-2 texto-detalle auto-ajuste">
                 {{ getMoneda(e.debe) }}

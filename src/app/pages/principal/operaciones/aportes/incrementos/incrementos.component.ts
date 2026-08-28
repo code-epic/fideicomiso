@@ -26,6 +26,8 @@ export class IncrementosComponent implements OnInit {
   public plan = ''
   public rif = ''
 
+  public observacion = ''
+
   public monto = ''
 
   public ELEMENT_DATA: LIncremento[] = [];
@@ -118,6 +120,7 @@ export class IncrementosComponent implements OnInit {
           this.rif = Contrato.rif + '-' + Contrato.razonsocial
           this.fideicomiso = Contrato.plan
           this.idplan = parseInt(this.plan)
+          this.ConsultarObservacion(this.idplan)
         } else {
           this.toastr.warning('Plan no encontrado', 'Incrementos')
         }
@@ -131,12 +134,27 @@ export class IncrementosComponent implements OnInit {
     )
   }
 
+  ConsultarObservacion(idplan: number) {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PLANES_FIDEICOMISO
+    this.xAPI.parametros = ''
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        if (data != null && data.Cuerpo && data.Cuerpo.length > 0) {
+          const p = data.Cuerpo.find((x: any) => Number(x.id) === idplan)
+          this.observacion = p ? p.observacion : ''
+        }
+      },
+      (error) => console.error(error)
+    )
+  }
+
   Add() {
     this.ELEMENT_DATA.push({
       id: this.idplan,
       codigo: this.plan,
       tipo: this.fideicomiso.toUpperCase(),
-      plan: this.rif.toUpperCase(),
+      plan: this.observacion || this.rif.toUpperCase(),
       monto: this.monto,
       fecha: this.util.ConvertirFechaDB(this.fechai)
     })
@@ -147,6 +165,7 @@ export class IncrementosComponent implements OnInit {
     this.monto = ''
     this.fechai = ''
     this.rif = ''
+    this.observacion = ''
     this.plan = ''
     this.blprocesar = true
   }

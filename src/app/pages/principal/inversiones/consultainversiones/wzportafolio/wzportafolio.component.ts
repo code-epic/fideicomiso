@@ -160,6 +160,12 @@ export class WzportafolioComponent implements OnInit {
       return true;
     }
 
+    const montoParaInvertir = Number(String(this.monto_general).replace(/[^0-9.]/g, ''));
+
+    if (montoParaInvertir > this.monto) {
+      return true;
+    }
+
     return false;
   }
 
@@ -257,19 +263,14 @@ export class WzportafolioComponent implements OnInit {
 
   ConsultarMontoPortafolio(){
     const portf = this.portafolio.split('|')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_MONTO_PORTAFOLIO
+    this.xAPI.funcion = environment.xApi.CONSULTAR_SALDO_PORTAFOLIO
     this.xAPI.parametros = portf[0]
     this.xAPI.valores = ''
 
     this.apiService.Ejecutar(this.xAPI).subscribe({
       next: (data) => { 
-        let suma = 0
-        data.Cuerpo.forEach((e:any) => {
-          suma += Number(e.valor_porcentual)
-        })
-        console.log(suma)
-        // this.monto = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto), 0)
-        // this.monto_general = data.Cuerpo.reduce((sum, e) => sum + parseFloat(e.monto_general), 0)
+        const cuerpo = data.Cuerpo && data.Cuerpo[0] ? data.Cuerpo[0] : null
+        this.monto = cuerpo ? Number(cuerpo.saldo) : 0
       },
       error: (error) => {
         console.error(error)
