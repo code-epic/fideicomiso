@@ -92,6 +92,8 @@ export class ComprobacionComponent implements OnInit {
   public fechaTexto = ''
   public fechai: any
   public mes = 0
+  public lstPlanesFideicomiso: any[] = []
+  public planNombre: string = ''
 
   constructor(
     private apiService: ApiService,
@@ -104,6 +106,7 @@ export class ComprobacionComponent implements OnInit {
 
   ngOnInit(): void {
     this.consultarUltimoCierre()
+    this.ListarPlanesFideicomiso()
   }
 
   async consultarUltimoCierre() {
@@ -111,6 +114,29 @@ export class ComprobacionComponent implements OnInit {
     this.fechaultimo = await this.cierre.getUltimoCierre()
     this.generarMeses()
     this.ngxService.stopLoader('load-precierre')
+  }
+
+  ListarPlanesFideicomiso() {
+    const xAPI: IAPICore = {
+      funcion: 'FID_CPlanesFideicomiso',
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data) => {
+        this.lstPlanesFideicomiso = data.Cuerpo || []
+      },
+      error: (err) => console.error(err)
+    })
+  }
+
+  seleccionarPlan() {
+    if (this.plan === '%') {
+      this.planNombre = 'TODOS LOS PLANES'
+    } else {
+      const plan = this.lstPlanesFideicomiso.find(p => p.id == this.plan)
+      this.planNombre = plan ? plan.fideicomiso : ''
+    }
   }
 
   generarMeses() {
@@ -154,7 +180,7 @@ export class ComprobacionComponent implements OnInit {
   ConsultarComprobacion() {
     this.ngxService.startLoader('load-cont')
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
-    this.xAPI.parametros = `${this.lstFecha[this.mes].value},S`
+    this.xAPI.parametros = `${this.lstFecha[this.mes].value},S,${this.plan}`
     this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(

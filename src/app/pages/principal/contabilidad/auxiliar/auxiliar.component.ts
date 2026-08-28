@@ -42,10 +42,11 @@ export class AuxiliarComponent implements OnInit {
 
   public lstIndex = [] 
   public cuenta = ''
-  public plan = ''
+  public plan = '%'
   lstData = []
   public total_debe : number = 0
   public total_haber : number = 0
+  public lstPlanesFideicomiso: any[] = []
 
   constructor(private apiService: ApiService,
     private toastrService: ToastrService,
@@ -62,6 +63,21 @@ export class AuxiliarComponent implements OnInit {
     this.plan = '%'
     this.consultarUltimoPreCierre()
     this.iniciarIndex()
+    this.ListarPlanesFideicomiso()
+  }
+
+  ListarPlanesFideicomiso() {
+    const xAPI: IAPICore = {
+      funcion: 'FID_CPlanesFideicomiso',
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data) => {
+        this.lstPlanesFideicomiso = data.Cuerpo || []
+      },
+      error: (err) => console.error(err)
+    })
   }
 
   iniciarIndex() {
@@ -131,7 +147,7 @@ export class AuxiliarComponent implements OnInit {
     
     this.ngxService.startLoader('load-precierre')
     this.xAPI.funcion = environment.xApi.CONSULTAR_AUXILIAR
-    this.xAPI.parametros = `${fecha},${this.cuenta}`
+    this.xAPI.parametros = `${fecha},${this.cuenta},${this.plan}`
     this.xAPI.valores = ''
 
     this.apiService.Ejecutar(this.xAPI).subscribe(

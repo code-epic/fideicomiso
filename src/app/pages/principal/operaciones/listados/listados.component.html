@@ -2,7 +2,7 @@
 
 <div class="row">
 
-  <div class="col-md-7">
+  <div class="col-md-5">
     <mat-form-field appearance="outline">
       <mat-label>FECHA DEL PLAN</mat-label>
 
@@ -19,8 +19,17 @@
   </mat-form-field>
   </div>
 
+  <div class="col-md-3">
+    <mat-form-field appearance="outline">
+      <mat-label>PLAN</mat-label>
+      <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}" (selectionChange)="ConsultarComprobante()">
+        <mat-option value='%'>TODOS</mat-option>
+        <mat-option *ngFor="let p of lstPlanesFideicomiso" value='{{p.id}}'>{{p.fideicomiso}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 
-  <div class="col-md-3"></div>
+  <div class="col-md-2"></div>
 
 </div>
 

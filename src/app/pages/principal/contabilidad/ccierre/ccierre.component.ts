@@ -72,6 +72,7 @@ export class CcierreComponent implements OnInit {
   lstData = []
   public semestral: boolean = false
   public plan: string = '1'
+  public lstPlanesFideicomiso: any[] = []
 
   events: string[] = [];
   blista: boolean = false
@@ -86,6 +87,21 @@ export class CcierreComponent implements OnInit {
 
   ngOnInit(): void {
     this.consultarUltimoCierre()
+    this.ListarPlanesFideicomiso()
+  }
+
+  ListarPlanesFideicomiso() {
+    const xAPI: IAPICore = {
+      funcion: 'FID_CPlanesFideicomiso',
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data) => {
+        this.lstPlanesFideicomiso = data.Cuerpo || []
+      },
+      error: (err) => console.error(err)
+    })
   }
 
 

@@ -45,6 +45,16 @@
       </mat-form-field>
     </div>
 
+    <div class="col-md-2">
+      <mat-form-field appearance="outline">
+        <mat-label>PLAN</mat-label>
+        <mat-select [(ngModel)]="plan">
+          <mat-option value="%">TODOS</mat-option>
+          <mat-option *ngFor="let p of lstPlanesFideicomiso" value="{{p.id}}">{{p.fideicomiso}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
     <div class="col-md-2 d-flex align-items-start" style="padding-top: 4px;">
       <button mat-flat-button color="primary" (click)="ConsultarMayor()" style="height: 50px;">
         <mat-icon>search</mat-icon>&nbsp;CONSULTAR

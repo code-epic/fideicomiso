@@ -72,6 +72,7 @@ export class MayoranaliticoComponent implements OnInit {
   public estatus: string = '%';
   public bAntes: boolean = true;
   public filtroCuentas: string = '%';
+  public lstPlanesFideicomiso: any[] = [];
 
   constructor(
     private apiService: ApiService,
@@ -86,6 +87,7 @@ export class MayoranaliticoComponent implements OnInit {
     this.fechaInicio = new Date();
     this.fechaFin = new Date();
     this.cargarCuentas();
+    this.ListarPlanesFideicomiso();
     this.filteredCuentas = this.lstCuentas;
 
     this.cuentaControl.valueChanges.pipe(
@@ -94,6 +96,20 @@ export class MayoranaliticoComponent implements OnInit {
     ).subscribe(result => {
       this.filteredCuentas = result;
     });
+  }
+
+  ListarPlanesFideicomiso() {
+    const xAPI: IAPICore = {
+      funcion: 'FID_CPlanesFideicomiso',
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data) => {
+        this.lstPlanesFideicomiso = data.Cuerpo || []
+      },
+      error: (err) => console.error(err)
+    })
   }
 
   private _filterCuentas(value: string): CuentaItem[] {
@@ -145,7 +161,7 @@ export class MayoranaliticoComponent implements OnInit {
     const cuentaId = this.cuentaIdSeleccionada > 0 ? this.cuentaIdSeleccionada : '%';
 
     this.xAPI.funcion = environment.xApi.CONSULTAR_MAYOR_ANALITICO;
-    this.xAPI.parametros = `${sInicio},${sFin},${cuentaId}`;
+    this.xAPI.parametros = `${sInicio},${sFin},${cuentaId},${this.plan}`;
     this.xAPI.valores = '';
 
     this.ngxService.startLoader('load-cont');

@@ -33,7 +33,7 @@
           <mat-label>Plan</mat-label>
           <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}">
             <mat-option value='%'>TODOS</mat-option>
-            <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
+            <mat-option *ngFor="let p of lstPlanesFideicomiso" value='{{p.id}}'>{{p.fideicomiso}}</mat-option>
           </mat-select>
     
         </mat-form-field>
