@@ -55,6 +55,7 @@ import { CurrencyMaskModule } from "ng2-currency-mask";
 import { CuentaComponent } from 'src/app/pages/principal/contabilidad/cuenta/cuenta.component';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatMenuModule} from '@angular/material/menu';
+import {MatDividerModule} from '@angular/material/divider';
 
 import { NgxMaskModule, IConfig } from 'ngx-mask'
 import { OperacionesComponent } from 'src/app/pages/principal/operaciones/operaciones.component';
@@ -120,6 +121,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     MatSelectModule,
     MatTooltipModule,
     MatMenuModule,
+    MatDividerModule,
     MatStepperModule,
     MatDatepickerModule,
     MatNativeDateModule,

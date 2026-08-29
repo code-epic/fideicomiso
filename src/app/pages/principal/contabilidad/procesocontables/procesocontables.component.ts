@@ -138,10 +138,8 @@ export class ProcesocontablesComponent implements OnInit {
     this.xAPI.valores = ''
     if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.parametros = fini + ',' + this.estatus
-    console.log(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        console.log('ARTE ... ', data)
         this.lstMovimientos = data.Cuerpo
         this.lstMovimientos.map(e => {
           this.total_debe += parseFloat(e.debe)
@@ -175,10 +173,8 @@ export class ProcesocontablesComponent implements OnInit {
     this.xAPI.parametros = fini + ',' + this.estatus    
     this.xAPI.valores = ''
 
-    console.log('GenerarPrecierre ... ', this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        console.log('GenerarPrecierre ... ', data)
         this.apiService.Mensaje(
           "Proceso exitoso",
           "Se ha realizado el Precierre",
@@ -274,7 +270,6 @@ export class ProcesocontablesComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log(data)
         let debe = 0
         let haber = 0
         data.Cuerpo.forEach(e => {
@@ -416,17 +411,8 @@ export class ProcesocontablesComponent implements OnInit {
           fechaUltimoAux.setUTCDate(fechaUltimoAux.getUTCDate() + 2);
           const fechaUltimoUTCAux = fechaUltimoAux.toISOString();
 
-          console.log('ultimoPrecierreDate', ultimoPrecierreDate);
-          console.log('fechaAPrecerrarDate', fechaAPrecerrarDate);
-          console.log('fechaUltimoUTCAux', fechaUltimoUTCAux);
-          console.log('fechaAPrecerrarDate < ultimoPrecierreDate', fechaAPrecerrarDate < ultimoPrecierreDate);
-          console.log('fechaAPrecerrarDate >= fechaUltimoUTCAux', fechaAPrecerrarDate >= fechaUltimoUTCAux);
-          console.log('fechaAPrecerrarDate == ultimoPrecierreDate', fechaAPrecerrarDate == ultimoPrecierreDate);
-          
-
           if (this.cierre.getSemestral(this.util.ConvertirFechaHumana(fechaAPrecerrar)) && this.estatus == 'S') {            
               this.ValidarPreCierreSemestral()
-               console.log('ValidarPreCierre precierre semestral ... ', this.xAPI)
               return;
           }
 
@@ -513,10 +499,8 @@ export class ProcesocontablesComponent implements OnInit {
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.ngxService.startLoader('load-precierre')
-    console.log('ValidarPreCierreSemestral ... ', this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log('ValidarPreCierreSemestral ... ', data)
         if (data.Cuerpo != undefined ){
           let fentrada = data.Cuerpo[0].fecha.substring(0, 10);
           let finicio = this.util.ConvertirFechaDB(this.fechai);          
@@ -530,7 +514,6 @@ export class ProcesocontablesComponent implements OnInit {
             )
             this.ngxService.stopLoader('load-precierre')
           }else{
-            console.log('ValidarPreCierreSemestral GenerarPrecierre semestral ... ')
             this.GenerarPrecierre()
           }      
         }

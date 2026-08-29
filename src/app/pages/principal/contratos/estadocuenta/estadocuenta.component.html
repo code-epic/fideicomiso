@@ -38,6 +38,12 @@
         </div>
     </div>
 
+    <div *ngIf="mostrarAviso" style="background: #FEF3C7; border-left: 3px solid #F59E0B; padding: 8px 16px; margin-bottom: 12px; border-radius: 4px;">
+        <span style="font-size: 12px; color: #92400E;">
+            Los datos de este plan están consolidados en el Plan 1 hasta el 31/07/2026. El saldo inicial será 0 para períodos anteriores.
+        </span>
+    </div>
+
     <div class="mat-elevation-z8">
         <table mat-table [dataSource]="dataSource" class="tabla-estado-cuenta">
 

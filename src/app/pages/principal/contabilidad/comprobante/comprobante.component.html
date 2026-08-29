@@ -91,20 +91,26 @@
                         <div class="col-md-2 texto-lista auto-ajuste">
                           Bs. {{ getMoneda(e) }}
                         </div>
-                        <div class="col-md-1 text-right d-flex flex-column justify-content-center align-items-end">
-                          <button *ngIf="!esPeriodoCerrado(e)" mat-icon-button aria-label="Eliminar"
-                            (click)="eliminarComprobante(e)" matTooltip="Eliminar">
-                            <mat-icon class="texto-gray">delete</mat-icon>
+                        <div class="col-md-1 text-left d-flex justify-content-start align-items-center">
+                          <button mat-icon-button [matMenuTriggerFor]="menuAcciones" aria-label="Acciones"
+                            matTooltip="Acciones">
+                            <mat-icon class="texto-gray">more_vert</mat-icon>
                           </button>
-
-                          <button *ngIf="!esPeriodoCerrado(e)" mat-icon-button aria-label="Editar" (click)="editar(e)" matTooltip="Editar">
-                            <mat-icon class="texto-gray">edit</mat-icon>
-                          </button>
-
-                          <button mat-icon-button aria-label="Imprimir" (click)="abrirDialogo(e)" matTooltip="Imprimir">
-                            <mat-icon class="texto-gray">print</mat-icon>
-                          </button>
-
+                          <mat-menu #menuAcciones="matMenu">
+                            <button *ngIf="!esPeriodoCerrado(e)" mat-menu-item (click)="editar(e)">
+                              <mat-icon>edit</mat-icon>
+                              <span>Editar</span>
+                            </button>
+                            <button *ngIf="!esPeriodoCerrado(e)" mat-menu-item (click)="eliminarComprobante(e)">
+                              <mat-icon>delete</mat-icon>
+                              <span>Eliminar</span>
+                            </button>
+                            <mat-divider *ngIf="!esPeriodoCerrado(e)"></mat-divider>
+                            <button mat-menu-item (click)="abrirDialogo(e)">
+                              <mat-icon>print</mat-icon>
+                              <span>Imprimir</span>
+                            </button>
+                          </mat-menu>
                         </div>
                       </div>
                     </mat-list>

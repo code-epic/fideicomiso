@@ -123,38 +123,51 @@ export class ProcesooperacionesComponent implements OnInit {
       valores: ''
     }
 
-    this.lstComisiones.forEach((e) =>{
-      let Comprobante = {
-        plan: e.id,
-        codigo: this.util.GenerarUnicId(),
-        descripcion: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
-        detalle: e.plan,
-        fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
-        fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
-        debe: e.calculo_capital,
-        haber: e.calculo_capital,
-        llave: 'M'
+    let xApiDelete: IAPICore = {
+      funcion: environment.xApi.ELIMINAR_COMISIONES_ADMINISTRATIVAS,
+      parametros: fecha,
+      valores: ''
+    }
+
+    this.apiService.Ejecutar(xApiDelete).subscribe({
+      next: () => {
+        this.lstComisiones.forEach((e) =>{
+          let Comprobante = {
+            plan: e.id,
+            codigo: this.util.GenerarUnicId(),
+            descripcion: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
+            detalle: e.plan,
+            fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
+            fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
+            debe: e.calculo_capital,
+            haber: e.calculo_capital,
+            llave: 'M'
+          }
+
+          xApi.valores = JSON.stringify(Comprobante)      
+
+          this.apiService.Ejecutar(xApi).subscribe(
+            data => {
+              this.InsertData(data, this.lstComisiones.length, Comprobante)
+            },
+            (error) => {
+              console.error(error)
+              this.ngxService.stopLoader('load-cont')
+            }
+          )
+        })
+
+        this.apiService.Mensaje(
+          "Proceso exitoso",
+          "Se realizaron los comprobantes para el dia: " + this.util.ConvertirFechaHumana(this.fechai),
+          "success",
+          "Comprobantes"
+        )
+      },
+      error: (error) => {
+        console.error('Error eliminando comisiones existentes', error)
       }
-
-      xApi.valores = JSON.stringify(Comprobante)      
-
-      this.apiService.Ejecutar(xApi).subscribe(
-        data => {
-          this.InsertData(data, this.lstComisiones.length, Comprobante)
-        },
-        (error) => {
-          console.error(error)
-          this.ngxService.stopLoader('load-cont')
-        }
-      )
     })
-
-    this.apiService.Mensaje(
-      "Proceso exitoso",
-      "Se realizaron los comprobantes para el dia: " + this.util.ConvertirFechaHumana(this.fechai),
-      "success",
-      "Comprobantes"
-    )
   }
 
   InsertData(dt: any, cant: number, e: any) {

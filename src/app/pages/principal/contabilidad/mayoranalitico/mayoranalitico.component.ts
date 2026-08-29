@@ -102,6 +102,11 @@ export class MayoranaliticoComponent implements OnInit {
       map(value => this._filterCuentas(value))
     ).subscribe(result => {
       this.filteredCuentas = result;
+      if (!this.cuentaControl.value || this.cuentaControl.value === '') {
+        this.cuentaIdSeleccionada = 0;
+        this.cuentaSeleccionada = '';
+        this.cuentaDescripcionSeleccionada = '';
+      }
     });
   }
 
@@ -205,9 +210,13 @@ export class MayoranaliticoComponent implements OnInit {
       }
     }
     const fechaCierre = this.fechaultimo || sInicio;
+    const fechaCierreDB = this.util.ConvertirFechaDB(fechaCierre);
+    const fechaSaldo = new Date(fechaCierreDB);
+    fechaSaldo.setDate(fechaSaldo.getDate() - 1);
+    const fechaSaldoStr = fechaSaldo.toISOString().substring(0, 10);
 
     this.xAPI.funcion = environment.xApi.CONSULTAR_MAYOR_ANALITICO;
-    this.xAPI.parametros = `${sInicio},${sFin},${filtroCuenta},${this.plan},${fechaCierre}`;
+    this.xAPI.parametros = `${sInicio},${sFin},${filtroCuenta},${this.plan},${fechaSaldoStr}`;
     this.xAPI.valores = '';
 
     this.ngxService.startLoader('load-cont');
