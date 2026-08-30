@@ -1,7 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { FID_IComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { Inversion, InversionPortafolio } from 'src/app/services/banfanb/inversiones.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
@@ -209,7 +210,9 @@ export class WzportafolioComponent implements OnInit {
     this.index = i
   }
 
-  Commit() {
+  async Commit() {
+    await this.procesarVencimientosAutomaticos();
+
     if (this.editado) {
       this.Borrar().subscribe({
         next: () => {
@@ -261,21 +264,45 @@ export class WzportafolioComponent implements OnInit {
   }
 
 
-  ConsultarMontoPortafolio(){
+  async ConsultarMontoPortafolio() {
     const portf = this.portafolio.split('|')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_SALDO_PORTAFOLIO
-    this.xAPI.parametros = portf[0]
-    this.xAPI.valores = ''
+    const idPortafolio = portf[0]
 
-    this.apiService.Ejecutar(this.xAPI).subscribe({
-      next: (data) => { 
-        const cuerpo = data.Cuerpo && data.Cuerpo[0] ? data.Cuerpo[0] : null
-        this.monto = cuerpo ? Number(cuerpo.saldo) : 0
-      },
-      error: (error) => {
-        console.error(error)
+    const apiSaldo: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_SALDO_PORTAFOLIO,
+      parametros: idPortafolio,
+      valores: ''
+    };
+
+    try {
+      const data = await firstValueFrom(this.apiService.Ejecutar(apiSaldo));
+      const cuerpo = data.Cuerpo && data.Cuerpo[0] ? data.Cuerpo[0] : null;
+      let saldo = cuerpo ? Number(cuerpo.saldo) : 0;
+
+      const portafolioSeleccionado = this.lstDataPortafolio.find((p: any) => Number(p.id) === Number(idPortafolio));
+      const idPlan = portafolioSeleccionado?.id_plan;
+
+      const fechaCompra = this.Inversiones.fecha_compra?.substring(0, 10);
+      if (fechaCompra && idPlan) {
+        const apiVenc: IAPICore = {
+          funcion: environment.xApi.CONSULTAR_VENCIMIENTO_INVERSIONES,
+          parametros: fechaCompra,
+          valores: ''
+        };
+        const vencData = await firstValueFrom(this.apiService.Ejecutar(apiVenc));
+
+        if (vencData?.Cuerpo?.length) {
+          for (const v of vencData.Cuerpo) {
+            if (v.id_plan != idPlan) continue;
+            saldo += parseFloat(v.valor_nominal) + this.RendicionCupon(v);
+          }
+        }
       }
-    })
+
+      this.monto = saldo;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   private editandoPorcentaje = false;
@@ -313,6 +340,64 @@ export class WzportafolioComponent implements OnInit {
       this.bloquearPorcentaje = false;
     }
     this.editandoMonto = false;
+  }
+
+  RendicionCupon(inv): number {
+    let rendicion =
+      (inv.valor_nominal * inv.tasa_cupon * (inv.plazo_cupon / 100)) /
+      inv.base_calculo;
+    return parseFloat(rendicion.toFixed(2));
+  }
+
+  async procesarVencimientosAutomaticos(): Promise<void> {
+    const fechaCompra = this.Inversiones.fecha_compra?.substring(0, 10);
+    if (!fechaCompra) return;
+
+    const apiVenc: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_VENCIMIENTO_INVERSIONES,
+      parametros: fechaCompra,
+      valores: ''
+    };
+
+    try {
+      const data = await firstValueFrom(this.apiService.Ejecutar(apiVenc));
+      if (!data?.Cuerpo?.length) return;
+
+      for (const v of data.Cuerpo) {
+        if (!v.id_plan) continue;
+
+        const monto = parseFloat(v.valor_nominal) + this.RendicionCupon(v);
+        const comprobante: FID_IComprobante = {
+          plan: Number(v.id_plan),
+          codigo: this._util.GenerarUnicId(),
+          descripcion: `VENCIMIENTO DE INVERSIONES ${this._util.ConvertirFechaHumana(fechaCompra)}`,
+          detalle: v.plan_nombre || `VENCIMIENTO DE INVERSIONES ${this._util.ConvertirFechaHumana(fechaCompra)}`,
+          fecha_operacion: fechaCompra,
+          fecha_ejercicio: fechaCompra,
+          debe: monto,
+          haber: monto,
+          llave: 'M',
+        };
+
+        const apiComp: IAPICore = {
+          funcion: environment.xApi.INSERTAR_COMPROBANTE,
+          parametros: '',
+          valores: JSON.stringify(comprobante)
+        };
+
+        const res = await firstValueFrom(this.apiService.Ejecutar(apiComp));
+        if (res?.msj) {
+          const apiData: IAPICore = {
+            funcion: environment.xApi.INSERTAR_VENCIMIENTO_INVERSIONES,
+            parametros: res.msj + ',' + fechaCompra + ',' + v.codigo,
+            valores: ''
+          };
+          await firstValueFrom(this.apiService.Ejecutar(apiData));
+        }
+      }
+    } catch (error) {
+      console.error('Error procesando vencimientos automáticos:', error);
+    }
   }
 
   limpiarCampos() {

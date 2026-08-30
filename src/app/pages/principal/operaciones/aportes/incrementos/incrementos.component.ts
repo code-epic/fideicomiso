@@ -93,7 +93,11 @@ export class IncrementosComponent implements OnInit {
           this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
           this.minDate = new Date(this.fechaultimo)
           this.maxDate = new Date(2024, 12, 31)
-          
+
+          // Fecha valor = siguiente día al último cierre
+          let fechaCierre = new Date(parseInt(d[0]), parseInt(d[1]) - 1, parseInt(d[2]))
+          fechaCierre.setDate(fechaCierre.getDate() + 1)
+          this.fechai = fechaCierre
         }
         this.ngxService.stopLoader('load-cont')
       },
@@ -184,7 +188,7 @@ export class IncrementosComponent implements OnInit {
     );
     this.dataSource.paginator = this.paginator;
     this.blprocesar = false
-    this.apiService.Mensaje('Proceso exitoso', 'Se han creado los comprobantes', 'info', 'comprobante')
+    this.apiService.Mensaje('Proceso exitoso', 'Se han creado los comprobantes', 'success', 'comprobante')
   }
 
   insertData(cant: number) {

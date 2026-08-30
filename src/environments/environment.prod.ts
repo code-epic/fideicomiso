@@ -109,6 +109,8 @@ export const environment = {
     CALCULAR_COMISION: 'FID_CalcularComision',
     INSERTAR_COMISIONES_ADMINISTRATIVAS: 'FID_IComisionesAdministrativas',
     ELIMINAR_COMISIONES_ADMINISTRATIVAS: 'FID_EComisionesAdministrativas',
+    CONSULTAR_INCREMENTOS_POR_FECHA: 'FID_CIncrementosPorFecha',
+    CONSULTAR_RETIROS_POR_FECHA: 'FID_CRetirosPorFecha',
     INSERTAR_MOVIMIENTO_COMISION: 'FID_IMovComision',
     INSERTAR_MOVIMIENTOS_LOTE: 'FID_BashIPosicion',
     BORRAR_MOVIMIENTOS_LOTE: 'FID_BashDPosicion',

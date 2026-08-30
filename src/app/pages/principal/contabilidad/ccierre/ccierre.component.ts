@@ -150,13 +150,18 @@ export class CcierreComponent implements OnInit {
           this.ngxService.stopLoader('load-precierre');
           let listaHTML = '<ul style="text-align: left; margin: 10px 0; padding-left: 20px;">';
           faltantes.forEach(f => {
-            listaHTML += `<li style="margin: 5px 0;"><strong>${f.tipo}</strong>: Faltan ${f.esperado - f.existe} de ${f.esperado}</li>`;
+            if (f.existe == f.esperado) {
+              // Comprobantes existen pero movimientos no → precierre pendiente
+              listaHTML += `<li style="margin: 5px 0;"><strong>${f.tipo}</strong>: Los comprobantes existen pero no se registraron los movimientos. Realiza el precierre del día.</li>`;
+            } else {
+              listaHTML += `<li style="margin: 5px 0;"><strong>${f.tipo}</strong>: Faltan ${f.esperado - f.existe} comprobantes de ${f.esperado}</li>`;
+            }
           });
           listaHTML += '</ul>';
 
           Swal.fire({
             title: 'Comprobantes incompletos',
-            html: `No se puede cerrar el día porque faltan comprobantes:${listaHTML}`,
+            html: `No se puede cerrar el día:${listaHTML}`,
             icon: 'warning',
             confirmButtonColor: '#3085d6',
             confirmButtonText: 'Entendido'

@@ -62,6 +62,11 @@ export class RetirosComponent implements OnInit {
           let fecha = data.Cuerpo[0].fecha_cierre
           let d = fecha.split('-')
           this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
+
+          // Fecha valor = siguiente día al último cierre
+          let fechaCierre = new Date(parseInt(d[0]), parseInt(d[1]) - 1, parseInt(d[2]))
+          fechaCierre.setDate(fechaCierre.getDate() + 1)
+          this.fechai = fechaCierre
         }
       },
       (error) => {

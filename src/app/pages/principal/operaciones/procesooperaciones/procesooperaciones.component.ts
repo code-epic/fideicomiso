@@ -21,6 +21,8 @@ export class ProcesooperacionesComponent implements OnInit {
 
   public lstAsientos = []
   public lstComisiones = []
+  public lstIncrementos: any[] = []
+  public lstRetiros: any[] = []
   public bcuentat = false
   public dias: number = 0
   public acum_debe = 0
@@ -61,7 +63,7 @@ export class ProcesooperacionesComponent implements OnInit {
 
   async consultarUltimoPrecierre() {
     this.ngxService.stopLoader('load-precierre')
-    this.fechaultimo = await this.cierre.getUltimoPrecierre()
+    this.fechaultimo = await this.cierre.getUltimoCierre()
     this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);
     this.fechaf = this.cierre.getSiguienteDia(this.fechaultimo);    
     this.dias = 1
@@ -70,9 +72,10 @@ export class ProcesooperacionesComponent implements OnInit {
 
   consultarComisiones() {
     let dia = parseInt(this.dias.toString())
+    let fechaFin = this.util.ConvertirFechaDB(this.fechai)
     this.ngxService.stopLoader('load-precierre')
     this.xAPI.funcion = environment.xApi.CALCULAR_COMISION
-    this.xAPI.parametros = dia + ',360'
+    this.xAPI.parametros = dia + ',360,' + fechaFin
     this.xAPI.valores = ''
     this.visible = false
     this.blComprobante = true
@@ -89,6 +92,9 @@ export class ProcesooperacionesComponent implements OnInit {
         })
         if (this.lstComisiones.length > 0) this.visible = true
 
+        this.ConsultarIncrementos()
+        this.ConsultarRetiros()
+
         let factual = new Date(this.fechau + ' 00:00:00')
         let fcalculo = new Date(this.fechai)
         
@@ -104,6 +110,36 @@ export class ProcesooperacionesComponent implements OnInit {
 
   CalcularDias(type: string) {
     this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1
+  }
+
+  ConsultarIncrementos() {
+    let fecha = this.util.ConvertirFechaDB(this.fechai)
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INCREMENTOS_POR_FECHA
+    this.xAPI.parametros = fecha
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstIncrementos = data.Cuerpo || []
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  }
+
+  ConsultarRetiros() {
+    let fecha = this.util.ConvertirFechaDB(this.fechai)
+    this.xAPI.funcion = environment.xApi.CONSULTAR_RETIROS_POR_FECHA
+    this.xAPI.parametros = fecha
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstRetiros = data.Cuerpo || []
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
   }
 
   getMoneda(numero: number): string {
