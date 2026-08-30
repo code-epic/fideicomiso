@@ -138,7 +138,7 @@ export class RetirosComponent implements OnInit {
       codigo: this.plan,
       tipo: this.fideicomiso.toUpperCase(),
       plan: this.observacion || this.rif.toUpperCase(),
-      monto: this.monto,
+      monto: parseFloat(this.monto) || 0,
       fecha: this.util.ConvertirFechaDB(this.fechai)
     })
 
@@ -192,7 +192,7 @@ export class RetirosComponent implements OnInit {
       this.close()
       return
     }
-    let monto = parseFloat(this.ELEMENT_DATA[cant].monto)
+    let monto = this.ELEMENT_DATA[cant].monto
     let idplan = this.ELEMENT_DATA[cant].id
     let fecha = this.ELEMENT_DATA[cant].fecha
     let Comprobante = {

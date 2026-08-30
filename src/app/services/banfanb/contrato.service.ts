@@ -59,7 +59,7 @@ export interface Contrato {
   oficinatutora: string;
   fecha: Date;
   Direccion: Direccion;
-  Ejecutivo: any;
+  Ejecutivo: Ejecutivo[];
   Politicas: Politicas;
   Saldos: Saldos;
 }

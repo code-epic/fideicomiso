@@ -205,15 +205,30 @@ export class CuentaComponent implements OnInit {
   }
 
   Guardar() {
-    this.txtCuenta.length;
+    if (!this.txtCuenta || this.txtCuenta.trim() === "") {
+      this._snackBar.open("Debe indicar el código de la cuenta.", "Ok");
+      return;
+    }
+    if (!this.Cuenta.descripcion || this.Cuenta.descripcion.trim() === "") {
+      this._snackBar.open("Debe indicar la descripción de la cuenta.", "Ok");
+      return;
+    }
+    if (!this.Cuenta.aumenta || this.Cuenta.aumenta.trim() === "") {
+      this._snackBar.open("Debe indicar por dónde aumenta (DEBE/HABER).", "Ok");
+      return;
+    }
+    if (!this.Cuenta.disminuye || this.Cuenta.disminuye.trim() === "") {
+      this._snackBar.open("Debe indicar por dónde disminuye (DEBE/HABER).", "Ok");
+      return;
+    }
+    if (!this.cmbTotalizadora) {
+      this._snackBar.open("Debe indicar si es cuenta totalizadora.", "Ok");
+      return;
+    }
 
     
     this.Cuenta.totalizadora = parseInt(this.cmbTotalizadora);
 
-    if (this.Cuenta.codigo == "") {
-      this._snackBar.open("Debe verificar todos los campos...", "Ok");
-      return;
-    }
     this.ngxService.startLoader("load-inver");
     this.xAPI.funcion = environment.xApi.INSERTAR_CUENTA
     this.xAPI.parametros = "";
@@ -223,9 +238,9 @@ export class CuentaComponent implements OnInit {
       (data) => {
         this.apiService.Mensaje(
           "Proceso exitoso",
-          "Felicitaciones",
+          "Cuenta guardada correctamente",
           "success",
-          "inversion"
+          "cuenta"
         );
         this.ngxService.stopLoader("load-inver");
         this.Limpiar();
@@ -233,12 +248,24 @@ export class CuentaComponent implements OnInit {
       },
       (error) => {
         console.error(error);
+        this.ngxService.stopLoader("load-inver");
       }
     );
   }
 
   getTotalizadora(codigo: number): string {
     return codigo == 1 ? "SI" : "NO";
+  }
+
+  soloCodigoCuenta(event: KeyboardEvent): boolean {
+    const permitidas = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'F5'];
+    if (permitidas.includes(event.key)) return true;
+    if (event.ctrlKey || event.metaKey) return true;
+    if (event.key.length === 1 && !/^[0-9.]$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
   }
 
   getDebe(tipo: string): string {

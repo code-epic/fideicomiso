@@ -142,8 +142,8 @@ export class ProcesocontablesComponent implements OnInit {
       async data => {
         this.lstMovimientos = data.Cuerpo
         this.lstMovimientos.map(e => {
-          this.total_debe += parseFloat(e.debe)
-          this.total_haber += parseFloat(e.haber)
+          this.total_debe += parseFloat(e.debe) || 0
+          this.total_haber += parseFloat(e.haber) || 0
         })
         this.blista = true
 
@@ -167,7 +167,7 @@ export class ProcesocontablesComponent implements OnInit {
     }
     let fini = this.util.ConvertirFechaDB(this.fechai)
 
-    this.ngxService.stopLoader('load-precierre')
+    this.ngxService.startLoader('load-precierre')
     this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIVIENTOS_COMPROBANTES
     if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.parametros = fini + ',' + this.estatus    
@@ -192,7 +192,9 @@ export class ProcesocontablesComponent implements OnInit {
       },
 
       (error) => {
-        console.error(error)
+        console.error(error);
+        this.ngxService.stopLoader('load-precierre');
+        this._snackBar.open('Error al generar el precierre. Intente de nuevo.', 'Ok');
       }
     )
   }

@@ -42,7 +42,7 @@ export interface LAporteInicial {
   id: number
   codigo: string
   plan: string
-  monto: string
+  monto: number
 }
 
 export interface LIncremento {
@@ -50,14 +50,14 @@ export interface LIncremento {
   codigo: string
   plan: string
   tipo : string
-  monto: string
+  monto: number
   fecha: string
 }
 
 export interface LPosicionInversiones {
   codigo: string
   instrumento: string
-  valor_nominal: string
+  valor_nominal: number
   costo_adquisicion: number
   interes_diario: number
   interes_acumulado: number

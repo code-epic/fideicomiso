@@ -14,7 +14,7 @@ export interface Comprobante {
   detalle : string
   tipo: string // debe o haber
   estatus : boolean 
-  items : []
+  items : any[]
 }
 
 

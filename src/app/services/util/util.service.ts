@@ -25,9 +25,9 @@ export class UtilService {
       String(date.getDate()).padStart(2, "0");
     return output;
   }
-  //retorna fecha en formato Dia/Mes/Anio
+  //retorna fecha en formato AAAA-MM-DD
   ConvertirFecha(fecha: any): string {
-    return fecha.year + "-" + +fecha.month + "-" + fecha.day;
+    return fecha.year + "-" + String(fecha.month).padStart(2, "0") + "-" + String(fecha.day).padStart(2, "0");
   }
 
   Semillero(id: string): string {
@@ -174,5 +174,70 @@ export class UtilService {
       str += line + "\r\n";
     }
     return str;
+  }
+
+  // ==================== VALIDACIONES DE FECHAS ====================
+
+  /**
+   * Valida que una fecha tenga formato YYYY-MM-DD
+   */
+  validarFormatoFecha(fecha: string): boolean {
+    if (!fecha) return false;
+    return /^\d{4}-\d{2}-\d{2}$/.test(fecha);
+  }
+
+  /**
+   * Valida que fecha_fin sea >= fecha_inicio
+   */
+  validarRangoFechas(inicio: string, fin: string): boolean {
+    if (!inicio || !fin) return false;
+    return new Date(inicio) <= new Date(fin);
+  }
+
+  /**
+   * Valida que una fecha sea futura (mayor a hoy)
+   */
+  validarFechaFutura(fecha: string): boolean {
+    if (!fecha) return false;
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    return new Date(fecha) > hoy;
+  }
+
+  /**
+   * Valida que una fecha no sea anterior a otra fecha de referencia
+   */
+  validarFechaNoAnterior(fecha: string, referencia: string): boolean {
+    if (!fecha || !referencia) return false;
+    return new Date(fecha) >= new Date(referencia);
+  }
+
+  /**
+   * Valida orden de fechas: emision <= compra <= vencimiento
+   */
+  validarOrdenFechasInversion(emision: string, compra: string, vencimiento: string): string | null {
+    if (!emision || !compra || !vencimiento) return 'Faltan campos de fecha';
+    if (!this.validarFormatoFecha(emision)) return 'Fecha de emision con formato invalido';
+    if (!this.validarFormatoFecha(compra)) return 'Fecha de compra con formato invalido';
+    if (!this.validarFormatoFecha(vencimiento)) return 'Fecha de vencimiento con formato invalido';
+    if (new Date(emision) > new Date(compra)) return 'La fecha de emision no puede ser posterior a la fecha de compra';
+    if (new Date(compra) > new Date(vencimiento)) return 'La fecha de compra no puede ser posterior a la fecha de vencimiento';
+    return null;
+  }
+
+  /**
+   * Valida que el monto sea un numero positivo
+   */
+  validarMontoPositivo(valor: any): boolean {
+    const num = parseFloat(valor);
+    return !isNaN(num) && num > 0;
+  }
+
+  /**
+   * Valida que el valor sea un numero valido (no NaN)
+   */
+  esNumeroValido(valor: any): boolean {
+    const num = parseFloat(valor);
+    return !isNaN(num);
   }
 }

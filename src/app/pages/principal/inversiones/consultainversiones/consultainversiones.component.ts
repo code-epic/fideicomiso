@@ -621,10 +621,51 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
       this._snackBar.open("La tasa de cupón no puede ser negativa.", "Ok");
       return;
     }
+    if (!this.Inversiones.emisor || String(this.Inversiones.emisor).trim() === "") {
+      this._snackBar.open("Debe indicar el emisor.", "Ok");
+      return;
+    }
+    if (!this.Inversiones.custodio || String(this.Inversiones.custodio).trim() === "") {
+      this._snackBar.open("Debe indicar el custodio.", "Ok");
+      return;
+    }
+    if (this.Inversiones.plazo_cupon !== null && this.Inversiones.plazo_cupon !== undefined && this.Inversiones.plazo_cupon <= 0) {
+      this._snackBar.open("El plazo de cupón debe ser mayor que cero.", "Ok");
+      return;
+    }
+    if (!this.tipo_moneda || parseInt(this.tipo_moneda) <= 0) {
+      this._snackBar.open("Debe seleccionar un tipo de moneda.", "Ok");
+      return;
+    }
+    if (!this.estatus || parseInt(this.estatus) <= 0) {
+      this._snackBar.open("Debe seleccionar un estatus.", "Ok");
+      return;
+    }
+    if (!this.tipo_inversion || parseInt(this.tipo_inversion) <= 0) {
+      this._snackBar.open("Debe seleccionar un tipo de inversión.", "Ok");
+      return;
+    }
     const fechaEmision = this.obtenerFechaEfectiva(this.fecha_emi, this.Inversiones.fecha_emision);
+    const fechaCompra = this.obtenerFechaEfectiva(this.fecha_com, this.Inversiones.fecha_compra);
     const fechaVencimiento = this.obtenerFechaEfectiva(this.fecha_ven, this.Inversiones.fecha_vencimiento);
-    if (fechaEmision && fechaVencimiento && this.compararFechasISO(fechaVencimiento, fechaEmision) < 0) {
-      this._snackBar.open("La fecha de vencimiento no puede ser anterior a la de emisión.", "Ok");
+    if (!fechaEmision) {
+      this._snackBar.open("Debe indicar la fecha de emisión.", "Ok");
+      return;
+    }
+    if (!fechaCompra) {
+      this._snackBar.open("Debe indicar la fecha de compra.", "Ok");
+      return;
+    }
+    if (!fechaVencimiento) {
+      this._snackBar.open("Debe indicar la fecha de vencimiento.", "Ok");
+      return;
+    }
+    if (fechaCompra < fechaEmision) {
+      this._snackBar.open("La fecha de compra no puede ser anterior a la fecha de emisión.", "Ok");
+      return;
+    }
+    if (fechaVencimiento < fechaCompra) {
+      this._snackBar.open("La fecha de vencimiento no puede ser anterior a la fecha de compra.", "Ok");
       return;
     }
 
@@ -635,7 +676,7 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     this.Inversiones.tipo_moneda = parseInt(this.tipo_moneda)
     this.Inversiones.estatus = parseInt(this.estatus)
     this.Inversiones.tipo_inversion = parseInt(this.tipo_inversion)
-    this.Inversiones.codigo_isin = parseInt(this.Inversiones.codigo_isin)
+    this.Inversiones.codigo_isin = this.Inversiones.codigo_isin?.toString().trim() || ''
     this.Inversiones.fecha_emision = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_emi) : this.Inversiones.fecha_emision.substring(0, 10)
     this.Inversiones.fecha_compra = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_com) : this.Inversiones.fecha_compra.substring(0, 10)
     this.Inversiones.fecha_vencimiento = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_ven) : this.Inversiones.fecha_vencimiento.substring(0, 10)
@@ -663,7 +704,9 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
         await this.AsientoInversion(this.Inversiones)
       },
       (error) => {
-        console.error(error)
+        console.error(error);
+        this.ngxService.stopLoader("load-inver");
+        this._snackBar.open("Error al guardar la inversión. Intente de nuevo.", "Ok");
       }
     )
   }
@@ -829,6 +872,13 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
   }
 
   esPeriodoCerrado(e: any): boolean {
+    if (!this.fechaUltimo) return false;
+    const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
+    const fechaCompra = (e.fecha_compra || '').substring(0, 10);
+    return new Date(fechaCierre) > new Date(fechaCompra);
+  }
+
+  portafolioReadOnly(e: any): boolean {
     if (!this.fechaUltimo) return false;
     const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
     const fechaCompra = (e.fecha_compra || '').substring(0, 10);

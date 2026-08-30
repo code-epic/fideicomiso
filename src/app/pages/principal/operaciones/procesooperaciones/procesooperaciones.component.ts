@@ -62,18 +62,16 @@ export class ProcesooperacionesComponent implements OnInit {
   }
 
   async consultarUltimoPrecierre() {
-    this.ngxService.stopLoader('load-precierre')
     this.fechaultimo = await this.cierre.getUltimoCierre()
     this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);
     this.fechaf = this.cierre.getSiguienteDia(this.fechaultimo);    
     this.dias = 1
-    this.ngxService.stopLoader('load-precierre')
   }
 
   consultarComisiones() {
     let dia = parseInt(this.dias.toString())
     let fechaFin = this.util.ConvertirFechaDB(this.fechai)
-    this.ngxService.stopLoader('load-precierre')
+    this.ngxService.startLoader('load-cont')
     this.xAPI.funcion = environment.xApi.CALCULAR_COMISION
     this.xAPI.parametros = dia + ',360,' + fechaFin
     this.xAPI.valores = ''
@@ -100,10 +98,11 @@ export class ProcesooperacionesComponent implements OnInit {
         
         if( factual.getTime() >= fcalculo.getTime() ) this.blComprobante = false
 
-        this.ngxService.stopLoader('load-precierre')
+        this.ngxService.stopLoader('load-cont')
       },
       (error) => {
         console.error(error)
+        this.ngxService.stopLoader('load-cont')
       }
     )
   }

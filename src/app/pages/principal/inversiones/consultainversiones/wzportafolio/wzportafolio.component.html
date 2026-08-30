@@ -4,6 +4,10 @@
 
     <hr style="margin-top: 0;">
 
+    <div *ngIf="soloLectura" class="alert alert-info" style="padding: 8px 12px; margin-bottom: 10px; font-size: 13px; background-color: #e3f2fd; border-radius: 4px;">
+        <i class="fa fa-info-circle"></i> Solo consulta: La fecha de compra ya fue procesada. No se puede modificar la asignacion del portafolio.
+    </div>
+
     <div class="row">
         <div class="col-md-12">
             <p>
@@ -19,7 +23,7 @@
                 <mat-label>Portafolio</mat-label>
 
                 <mat-select placeholder="Portafolio" [ngModelOptions]="{standalone: true}" [(ngModel)]="portafolio"
-                    (selectionChange)="ConsultarMontoPortafolio()" value="{{portafolio}}">
+                    (selectionChange)="ConsultarMontoPortafolio()" value="{{portafolio}}" [disabled]="soloLectura">
                     <mat-option *ngFor="let e of lstDataPortafolio"
                         value="{{e.id + '|' + e.descripcion}}">{{e.descripcion | uppercase}}</mat-option>
                 </mat-select>
@@ -35,7 +39,7 @@
                     [(ngModel)]="monto_general"
                     value="{{monto_general}}"
                     (input)="onMontoChange()"
-                    [readonly]="bloquearMonto">
+                    [readonly]="bloquearMonto || soloLectura">
             </mat-form-field>
         </div>
         <div class="col-md-2">
@@ -49,17 +53,17 @@
                     value="{{porcentaje}}"
                     (keypress)="soloNumeros($event)"
                     (input)="onPorcentajeChange()"
-                    [readonly]="bloquearPorcentaje">
+                    [readonly]="bloquearPorcentaje || soloLectura">
             </mat-form-field>
         </div>
         <div class="col-md-2">
             <div class="asistente-button-container">
 
-                <button mat-mini-fab color="primary" [disabled]="habilitar()" (click)="Agregar()" [matTooltip]="editando ? 'Editar' : 'Agregar'">
+                <button mat-mini-fab color="primary" [disabled]="habilitar() || soloLectura" (click)="Agregar()" [matTooltip]="editando ? 'Editar' : 'Agregar'">
                     <mat-icon>{{editando ? 'edit' : 'add'}}</mat-icon>
                 </button>
                 &nbsp; &nbsp;
-                <button mat-mini-fab color="warn" (click)="limpiarCampos()" matTooltip="Limpiar campos">
+                <button mat-mini-fab color="warn" [disabled]="soloLectura" (click)="limpiarCampos()" matTooltip="Limpiar campos">
                     <mat-icon>clear</mat-icon>
                 </button>
             </div>
@@ -90,7 +94,7 @@
 
                         <div class="col-md-1 text-right">
 
-                            <button mat-icon-button aria-label="Editar" matTooltip="Editar" (click)="editar(e, i)">
+                            <button mat-icon-button aria-label="Editar" matTooltip="Editar" (click)="editar(e, i)" [disabled]="soloLectura">
                                 <mat-icon class="texto-gray">edit</mat-icon>
                             </button>
 
@@ -125,7 +129,7 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button mat-flat-button color="primary" (click)="Commit()" *ngIf="blSave">
+    <button mat-flat-button color="primary" (click)="Commit()" *ngIf="blSave && !soloLectura">
         <mat-icon>{{editado ? 'edit' : 'save'}}</mat-icon>&nbsp;{{editado ? 'Editar' : 'Guardar'}}
     </button>
 

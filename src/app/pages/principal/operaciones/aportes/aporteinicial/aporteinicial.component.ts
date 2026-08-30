@@ -123,7 +123,7 @@ export class AporteinicialComponent implements OnInit {
       this.apiService.Mensaje('Proceso exitoso', 'Se han creado los comprobantes', 'info', 'comprobante')
       return
     }
-    let monto = parseFloat(this.ELEMENT_DATA[cant].monto)
+    let monto = this.ELEMENT_DATA[cant].monto
     let idplan = this.ELEMENT_DATA[cant].id.toString()
 
     this.Comprobante = {

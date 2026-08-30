@@ -247,7 +247,7 @@ export class ContratosComponent implements OnInit {
       oficina: [''],
 
       fechar: [''],
-      fechai: [{value: '', disabled: true}, Validators.required],
+      fechai: ['', Validators.required],
       saldo_inicio: [0, Validators.required],
       total_disponible: [''],
       saldo_disponible: [''],
@@ -307,9 +307,10 @@ export class ContratosComponent implements OnInit {
     const sAntes = new Date(antes).toISOString().substring(0, 10)
 
     const fecha = `${sAntes},${sHoy}`
+    const idPlan = this.planFideicomiso.identificador || '%'
 
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
-    this.xAPI.parametros = `${fecha},${this.estatus}`
+    this.xAPI.parametros = `${fecha},${this.estatus},${idPlan}`
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       
@@ -592,11 +593,11 @@ export class ContratosComponent implements OnInit {
   getPlanFideicomisoDB() {
     this.Contrato = this.contratoForm.getRawValue()
 
-    this.fechai = this.contratoForm.get('Saldos.fechainicio').value
+    this.fechai = this.contratoForm.get('fechai').value
     this.fecharegistro = this.contratoForm.get('fechar').value
     this.saldo_inicio = this.contratoForm.get('saldo_inicio').value
 
-    this.planFideicomiso.fecha_apertura = typeof this.fechai == 'object' ? this.util.ConvertirFecha(this.fechai) : this.Contrato.Saldos.fechainicio.substring(0, 10)
+    this.planFideicomiso.fecha_apertura = typeof this.fechai == 'object' ? this.util.ConvertirFecha(this.fechai) : (this.fechai || '').substring(0, 10)
 
     this.planFideicomiso.observacion = this.Contrato.rif + '|' + this.Contrato.razonsocial
     this.planFideicomiso.monto_apertura = parseFloat(this.saldo_inicio)
@@ -621,9 +622,13 @@ export class ContratosComponent implements OnInit {
 
     this.getPlanFideicomisoDB()
 
+    if (!this.planFideicomiso.fecha_apertura || this.planFideicomiso.fecha_apertura === '') {
+      this._snackBar.open("Debe seleccionar una fecha de apertura", "Ok");
+      return
+    }
 
-    if (this.Contrato.Saldos.fechainicio == "" && this.saldo_inicio == '') {
-      this._snackBar.open("Debe verificar todos los campos de fecha...", "Ok");
+    if (!this.saldo_inicio || this.saldo_inicio == '') {
+      this._snackBar.open("Debe ingresar el monto de apertura", "Ok");
       return
     }
 
@@ -635,17 +640,90 @@ export class ContratosComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data != null && data.msj != undefined) {
-          let numero = this.planFideicomiso.identificador > 0 ? this.planFideicomiso.identificador : data.msj
+          let numero = this.planFideicomiso.identificador > 0 ? this.planFideicomiso.identificador : parseInt(data.msj)
+
+          if (isNaN(numero)) {
+            this.ngxService.stopLoader('load-cont')
+            this._snackBar.open("Error al crear el plan: " + data.msj, "Ok")
+            return
+          }
 
           this.Contrato.numero = this.util.zfill(numero, 4)
           this.Contrato.Saldos.fechainicio = this.planFideicomiso.fecha_apertura
           this.Contrato.Saldos.saldoinicio = this.planFideicomiso.monto_apertura
-          this.guardarContrato()
+
+          if (this.planFideicomiso.identificador == 0) {
+            const detalle = `${this.Contrato.tiporif}${this.Contrato.rif} - ${this.Contrato.razonsocial}`
+            this.crearComprobanteInicial(numero, this.planFideicomiso.fecha_apertura, this.planFideicomiso.monto_apertura, detalle)
+          } else {
+            this.guardarContrato()
+          }
         }
       },
       (error) => {
         console.error(error)
         this.ngxService.stopLoader('load-cont')
+      }
+    )
+  }
+
+  private crearComprobanteInicial(planId: number, fecha: string, monto: number, detalle: string) {
+    if (!fecha || isNaN(planId) || planId <= 0) {
+      console.error('crearComprobanteInicial: parámetros inválidos', { planId, fecha, monto })
+      this.guardarContrato()
+      return
+    }
+
+    const codigo = this.util.zfill(planId.toString(), 4)
+
+    let xApiComprobante: IAPICore = {
+      funcion: 'FID_IComprobante',
+      parametros: '',
+      valores: JSON.stringify({
+        plan: planId,
+        codigo: codigo,
+        descripcion: 'APORTE INICIAL',
+        detalle: detalle,
+        fecha_operacion: fecha,
+        fecha_ejercicio: fecha,
+        debe: monto,
+        haber: monto,
+        llave: 'M'
+      })
+    }
+
+    this.apiService.Ejecutar(xApiComprobante).subscribe(
+      (data) => {
+        const idComprobante = parseInt(data.msj)
+        if (isNaN(idComprobante)) {
+          this.guardarContrato()
+          return
+        }
+
+        const xApiDebe: IAPICore = {
+          funcion: environment.xApi.INSERTAR_DETALLE_COMPROBANTE,
+          parametros: '',
+          valores: JSON.stringify({ id_comprobante: idComprobante, cuenta: 3, debe: monto, haber: 0, fecha_operacion: fecha, fecha_ejercicio: fecha, plan: planId })
+        }
+
+        this.apiService.Ejecutar(xApiDebe).subscribe({
+          next: () => {
+            const xApiHaber: IAPICore = {
+              funcion: environment.xApi.INSERTAR_DETALLE_COMPROBANTE,
+              parametros: '',
+              valores: JSON.stringify({ id_comprobante: idComprobante, cuenta: 19, debe: 0, haber: monto, fecha_operacion: fecha, fecha_ejercicio: fecha, plan: planId })
+            }
+            this.apiService.Ejecutar(xApiHaber).subscribe({
+              next: () => this.guardarContrato(),
+              error: () => this.guardarContrato()
+            })
+          },
+          error: () => this.guardarContrato()
+        })
+      },
+      (error) => {
+        console.error(error)
+        this.guardarContrato()
       }
     )
   }

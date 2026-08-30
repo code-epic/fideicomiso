@@ -30,6 +30,8 @@ export const environment = {
     CONSULTAR_PORTAFOLIOS: 'FID_CPortafolios',
     CONSULTAR_PORTAFOLIO: 'FID_CPortafolio',
     INSERTAR_PORTAFOLIO: 'FID_IPortafolio',
+    ACTUALIZAR_PORTAFOLIO: 'FID_UPortafolio',
+    INSERTAR_SALDOS_PLAN: 'FID_ISaldosPlan',
     CONSULTAR_MONTO_PORTAFOLIO: 'FID_CMontoPortafolio',
     CONSULTAR_SALDO_PORTAFOLIO: 'FID_CSaldoPortafolio',
     CONSULTAR_APORTE_INICIAL: 'FID_CAporteInicial',

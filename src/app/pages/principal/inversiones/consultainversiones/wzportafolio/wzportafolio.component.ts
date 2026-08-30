@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { FID_IComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { Inversion, InversionPortafolio } from 'src/app/services/banfanb/inversiones.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -88,18 +89,29 @@ export class WzportafolioComponent implements OnInit {
 
   bloquearMonto = false;
   bloquearPorcentaje = false;
+  soloLectura = false;
 
   constructor(
     private apiService: ApiService, 
     private _util: UtilService,
+    private _cierre: CierreService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit(): void {
     this.Inversiones = this.data
     this.valor_inversion = this.Inversiones.valor_nominal
+    this.evaluarSoloLectura()
     this.Consultar()
     this.ListarPortafolio()
+  }
+
+  async evaluarSoloLectura() {
+    const fechaUltimo = await this._cierre.getUltimoCierre();
+    if (!fechaUltimo) { this.soloLectura = false; return; }
+    const fechaCierre = this._util.ConvertirFechaDB(fechaUltimo);
+    const fechaCompra = (this.Inversiones.fecha_compra || '').substring(0, 10);
+    this.soloLectura = new Date(fechaCierre) > new Date(fechaCompra);
   }
 
   Consultar() {
@@ -221,6 +233,7 @@ export class WzportafolioComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
+          this.apiService.Mensaje('Error', 'No se pudieron eliminar las asignaciones previas', 'error', 'Portafolio');
         }
       });
     } else {
@@ -242,6 +255,7 @@ export class WzportafolioComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
+          this.apiService.Mensaje('Error', 'No se pudo guardar la asignación del portafolio', 'error', 'Portafolio');
         }
       });
     });

@@ -202,7 +202,7 @@ export class GeneralyresultadoComponent implements OnInit {
       this.xAPI.parametros = `${this.fecha},${this.estatus},${this.plan}`
     } else {
       this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
-      this.xAPI.parametros = `${this.fecha},${this.estatus}`
+      this.xAPI.parametros = `${this.fecha},${this.estatus},%`
     }
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
