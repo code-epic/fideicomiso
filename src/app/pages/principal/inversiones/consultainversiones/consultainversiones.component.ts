@@ -888,14 +888,14 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     if (!this.fechaUltimo) return false;
     const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
     const fechaCompra = (e.fecha_compra || '').substring(0, 10);
-    return new Date(fechaCierre) > new Date(fechaCompra);
+    return new Date(fechaCierre) >= new Date(fechaCompra);
   }
 
   portafolioReadOnly(e: any): boolean {
     if (!this.fechaUltimo) return false;
     const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
     const fechaCompra = (e.fecha_compra || '').substring(0, 10);
-    return new Date(fechaCierre) > new Date(fechaCompra);
+    return new Date(fechaCierre) >= new Date(fechaCompra);
   }
 
 
