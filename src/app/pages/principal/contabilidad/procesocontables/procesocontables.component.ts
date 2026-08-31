@@ -80,7 +80,7 @@ export class ProcesocontablesComponent implements OnInit {
 
 
   public IDComprobante: FID_IDetalleComprobante = {
-    comprobante: 0,
+    id_comprobante: 0,
     cuenta: 0,
     debe: 0,
     haber: 0,
@@ -349,7 +349,7 @@ export class ProcesocontablesComponent implements OnInit {
   }
 
   async GuardarDetalle(comprobante: number) {
-    this.IDComprobante.comprobante = comprobante;
+    this.IDComprobante.id_comprobante = comprobante;
     await this.lstData.map(async (e) => {      
       this.IDComprobante.debe = e.debe
       this.IDComprobante.haber = e.haber

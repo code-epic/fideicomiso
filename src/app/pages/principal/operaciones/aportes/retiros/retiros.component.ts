@@ -133,6 +133,17 @@ export class RetirosComponent implements OnInit {
       return
     }
 
+    // Validar que la fecha no sea anterior o igual al último cierre
+    const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaultimo)
+    const fechaOperacion = this.util.ConvertirFechaDB(this.fechai)
+    if (fechaCierreDB && fechaOperacion && fechaOperacion <= fechaCierreDB) {
+      this.toastr.error(
+        `La fecha ${fechaOperacion} no puede ser anterior o igual al último cierre (${fechaCierreDB})`,
+        'Error'
+      );
+      return;
+    }
+
     this.ELEMENT_DATA.push({
       id: this.idplan,
       codigo: this.plan,

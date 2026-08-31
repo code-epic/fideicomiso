@@ -61,7 +61,7 @@ export class CcierreComponent implements OnInit {
   };
 
   public IDComprobante: FID_IDetalleComprobante = {
-    comprobante: 0,
+    id_comprobante: 0,
     cuenta: 0,
     debe: 0,
     haber: 0,

@@ -9,6 +9,7 @@ import { FID_IComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { LAporteInicial } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 
 @Component({
   selector: 'app-aporteinicial',
@@ -57,11 +58,13 @@ export class AporteinicialComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
+    private cierre: CierreService,
     public formatter: NgbDateParserFormatter,) { }
 
   ngOnInit(): void {
-    let d = new Date().toISOString().substring(0, 10).split('-')
-    this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
+    this.cierre.getUltimoCierre().then(fecha => {
+      this.fechaultimo = fecha
+    })
   }
 
 
@@ -107,6 +110,17 @@ export class AporteinicialComponent implements OnInit {
 
 
   Procesar() {
+    // Validar que la fecha no sea anterior o igual al último cierre
+    const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaultimo)
+    const fechaOperacion = this.util.ConvertirFechaDB(this.fechai)
+    if (fechaCierreDB && fechaOperacion && fechaOperacion <= fechaCierreDB) {
+      this._snackBar.open(
+        `La fecha ${fechaOperacion} no puede ser anterior o igual al último cierre (${fechaCierreDB})`,
+        'Ok'
+      );
+      return;
+    }
+
     this.max = this.ELEMENT_DATA.length;
     this.InsertData(0)
   }

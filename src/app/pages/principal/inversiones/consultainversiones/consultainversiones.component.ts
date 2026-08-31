@@ -669,6 +669,19 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Validar que las fechas no sean anteriores o iguales al último cierre
+    const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaUltimo);
+    if (fechaCierreDB) {
+      if (fechaEmision <= fechaCierreDB) {
+        this._snackBar.open(`La fecha de emisión ${fechaEmision} no puede ser anterior o igual al último cierre (${fechaCierreDB})`, "Ok");
+        return;
+      }
+      if (fechaCompra <= fechaCierreDB) {
+        this._snackBar.open(`La fecha de compra ${fechaCompra} no puede ser anterior o igual al último cierre (${fechaCierreDB})`, "Ok");
+        return;
+      }
+    }
+
     const esEdicion = this.Inversiones.identificador > 0;
 
     this.ngxService.startLoader("load-inver");

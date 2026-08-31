@@ -106,6 +106,10 @@ export class UtilService {
       }
       return faux;
     } else {
+      // Detectar NgbDate (tiene year, month, day)
+      if (f.year && f.month && f.day) {
+        return `${f.year}-${String(f.month).padStart(2, '0')}-${String(f.day).padStart(2, '0')}`;
+      }
       const ISODate = new Date(f).toISOString();
       const fe = ISODate.substr(0, 10);
       const fa = fe.split("-");

@@ -10,6 +10,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LIncremento } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 
 @Component({
   selector: 'app-incrementos',
@@ -57,6 +58,7 @@ export class IncrementosComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private toastr: ToastrService,
     private util: UtilService,
+    private cierre: CierreService,
     public formatter: NgbDateParserFormatter,) { }
 
   // Establecer el rango de fechas
@@ -154,6 +156,17 @@ export class IncrementosComponent implements OnInit {
   }
 
   Add() {
+    // Validar que la fecha no sea anterior o igual al último cierre
+    const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaultimo)
+    const fechaOperacion = this.util.ConvertirFechaDB(this.fechai)
+    if (fechaCierreDB && fechaOperacion && fechaOperacion <= fechaCierreDB) {
+      this.toastr.error(
+        `La fecha ${fechaOperacion} no puede ser anterior o igual al último cierre (${fechaCierreDB})`,
+        'Error'
+      );
+      return;
+    }
+
     this.ELEMENT_DATA.push({
       id: this.idplan,
       codigo: this.plan,

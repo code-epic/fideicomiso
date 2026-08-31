@@ -135,7 +135,7 @@ export class ComprobanteComponent implements OnInit {
   private auxComprobante: string;
 
   public IDComprobante: FID_IDetalleComprobante = {
-    comprobante: 0,
+    id_comprobante: 0,
     cuenta: 0,
     debe: 0,
     haber: 0,
@@ -267,13 +267,6 @@ export class ComprobanteComponent implements OnInit {
 
     this.actualizarPlanConCeros();
     this.ConsultarContrato();
-
-    // Suscribirse a los cambios de plan
-    this.formComprobante.get("plan").valueChanges.subscribe((val) => {
-      if (val && Number(val) > 0 && val.toString().length < 4) {
-        this.actualizarPlanConCeros();
-      }
-    });
   }
 
   private actualizarPlanConCeros() {
@@ -667,6 +660,17 @@ export class ComprobanteComponent implements OnInit {
   async Guardar() {
     this.convertirComprobante();
 
+    // Validar que la fecha no sea anterior o igual al último cierre
+    const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaUltimo);
+    const fechaOperacion = this.Comprobante.fecha_operacion;
+    if (fechaCierreDB && fechaOperacion && fechaOperacion <= fechaCierreDB) {
+      this.apiService.Mensaje(
+        `La fecha ${fechaOperacion} no puede ser anterior o igual al último cierre (${fechaCierreDB})`,
+        "Advertencia", "warning", "comprobante"
+      );
+      return;
+    }
+
     if (this.saldo_debe != this.saldo_haber) {
       let saldo = parseFloat(this.saldo_debe) - parseFloat(this.saldo_haber);
       let msj = "Existe una diferencia de Bs. " + saldo * -1;
@@ -738,7 +742,7 @@ export class ComprobanteComponent implements OnInit {
     const plan = Number(this.formComprobante.get("plan").value);
     const promises = this.ELEMENT_DATA.map((e) => {
       const detalle: FID_IDetalleComprobante = {
-        comprobante: comprobante,
+        id_comprobante: comprobante,
         cuenta: this.getIDCuenta(e.cuenta),
         debe: e.debe,
         haber: e.haber,

@@ -31,7 +31,7 @@ export interface FID_IComprobante {
 }
 
 export interface FID_IDetalleComprobante {
-	comprobante	 :	number
+	id_comprobante	 :	number
 	cuenta	 :	number
 	debe	 :	number
 	haber	 :	number
