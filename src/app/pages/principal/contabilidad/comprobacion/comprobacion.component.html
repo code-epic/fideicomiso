@@ -27,9 +27,9 @@
     <div class="col-md-4">
       <mat-form-field appearance="outline">
         <mat-label>Mes</mat-label>
-        <mat-select placeholder="CUENTAS CONTABLES" [(ngModel)]="mes" value="{{mes}}">
+        <mat-select name="mesSelect" placeholder="CUENTAS CONTABLES" [(ngModel)]="mes" (selectionChange)="onMesChange($event)">
           
-          <mat-option *ngFor="let e of lstFecha" value='{{e.id}}'>{{e.nombre}}</mat-option>
+          <mat-option *ngFor="let e of lstFecha" [value]="e.id">{{e.nombre}}</mat-option>
          
         </mat-select>
   
@@ -58,7 +58,7 @@
         <p align="center" style="font-weight: bold;font-size: 13px;">
           BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
           DIRECCION DE FIDEICOMISO<br>
-          BALANCE DE COMPROBACION DEL MES {{lstFecha[mes].nombre}}<br>
+          BALANCE DE COMPROBACION DEL MES {{lstFecha[mes]?.nombre}}<br>
           PLAN DE FIDEICOMISO: {{ getNombrePlan() }}
         </p>
       </div>

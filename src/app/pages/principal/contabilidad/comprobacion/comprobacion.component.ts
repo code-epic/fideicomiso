@@ -139,6 +139,10 @@ export class ComprobacionComponent implements OnInit {
     }
   }
 
+  onMesChange(event: any) {
+    this.mes = Number(event.value)
+  }
+
   getNombrePlan(): string {
     if (this.plan === '%') return 'TODOS LOS PLANES';
     const plan = this.lstPlanesFideicomiso.find(p => p.id == this.plan);
@@ -148,10 +152,9 @@ export class ComprobacionComponent implements OnInit {
   generarMeses() {
     const meses = []
     const hoy = new Date()
-    const inicio = new Date('2024-01-01')
+    const inicio = new Date(2023, 11, 1)
 
     const fecha = new Date(inicio)
-    let id = 0
 
     while (fecha <= hoy) {
       const anio = fecha.getFullYear()
@@ -171,7 +174,7 @@ export class ComprobacionComponent implements OnInit {
       const nombreMes = desde.toLocaleDateString('es-ES', { month: 'long' }).toUpperCase()
 
       meses.push({
-        id: id++,
+        id: 0,
         value: `${formato(desde)},${formato(hasta)},${formato(vienen)}`,
         nombre: `${nombreMes} - ${anio}`
       })
@@ -180,13 +183,17 @@ export class ComprobacionComponent implements OnInit {
     }
 
     this.lstFecha = meses.reverse()
+    this.lstFecha.forEach((item, index) => {
+      item.id = index
+    })
     this.mes = 0
   }
 
   ConsultarComprobacion() {
     this.ngxService.startLoader('load-cont')
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
-    this.xAPI.parametros = `${this.lstFecha[this.mes].value},S,${this.plan}`
+    const mesIndex = Number(this.mes)
+    this.xAPI.parametros = `${this.lstFecha[mesIndex].value},S,${this.plan}`
     this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
