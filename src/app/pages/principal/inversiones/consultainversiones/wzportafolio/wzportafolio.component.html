@@ -98,6 +98,10 @@
                                 <mat-icon class="texto-gray">edit</mat-icon>
                             </button>
 
+                            <button mat-icon-button aria-label="Eliminar" matTooltip="Eliminar" (click)="eliminar(i)" [disabled]="soloLectura">
+                                <mat-icon class="texto-delete">delete</mat-icon>
+                            </button>
+
                         </div>
                     </div>
                 </mat-list>

@@ -3,37 +3,33 @@
     <form>
 
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <mat-form-field appearance="outline">
-                    <mat-label>Nacionalidad</mat-label>
-                    <mat-select placeholder="Estatus Ejecutivo" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.nacionalidad" value="{{Ejecutivo.nacionalidad}}">
-                        <mat-option value="V-">VENEZOLANO</mat-option>
-                        <mat-option value="E-">EXTRANJERO</mat-option>
+                    <mat-label><span class="requerido">*</span> Tipo Documento</mat-label>
+                    <mat-select placeholder="Tipo" [(ngModel)]="tipoDocumento" name="tipoDocumento">
+                        <mat-option value="V">V - Venezolano</mat-option>
+                        <mat-option value="E">E - Extranjero</mat-option>
                     </mat-select>
-                    <!-- <mat-icon matSuffix>public</mat-icon> -->
                 </mat-form-field>
             </div>
 
-            <div class="col-md-4">
-                <mat-form-field appearance="outline">
-                    <mat-label>Cedula</mat-label>
-                    <input matInput placeholder="Cedula" (blur)="Consultar()" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.cedula" value="{{Ejecutivo.cedula}}">
+            <div class="col-md-3">
+                <mat-form-field appearance="outline" [ngClass]="{'campo-invalido': campoInvalido('numeroDocumento')}">
+                    <mat-label><span class="requerido">*</span> Número de Cédula</mat-label>
+                    <input matInput placeholder="Ej: 12345678" (blur)="Consultar()" name="numeroDocumento"
+                        [(ngModel)]="numeroDocumento" maxlength="10">
+                    <mat-error *ngIf="campoInvalido('numeroDocumento')">{{ mensajeError('numeroDocumento') }}</mat-error>
                     <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
                 </mat-form-field>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <mat-form-field appearance="outline">
-                    <mat-label>Actividad del Cliente</mat-label>
-
-                    <mat-select placeholder="Actividad del Ejecutivo" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.actividad" value="{{Ejecutivo.actividad}}">
+                    <mat-label><span class="requerido">*</span> Actividad del Cliente</mat-label>
+                    <mat-select placeholder="Actividad del Ejecutivo" [(ngModel)]="Ejecutivo.actividad"
+                        name="actividad">
                         <mat-option value="NEGOCIO">NEGOCIO</mat-option>
                         <mat-option value="EJECUTIVO">AUTORIZADO DE LA EMPRESA</mat-option>
                     </mat-select>
-
-
                 </mat-form-field>
             </div>
 
@@ -42,20 +38,17 @@
 
         <div class="row">
             <div class="col-md-6">
-                <mat-form-field appearance="outline">
-                    <mat-label>Nombre Completo</mat-label>
-                    <input matInput placeholder="Nombre Completo" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.pnombre" value="{{Ejecutivo.pnombre}}">
-
-
+                <mat-form-field appearance="outline" [ngClass]="{'campo-invalido': campoInvalido('pnombre')}">
+                    <mat-label><span class="requerido">*</span> Nombre Completo</mat-label>
+                    <input matInput placeholder="Nombre Completo" [(ngModel)]="Ejecutivo.pnombre"
+                        name="pnombre">
                 </mat-form-field>
             </div>
             <div class="col-md-6">
-                <mat-form-field appearance="outline">
-                    <mat-label>Apellido Completo</mat-label>
-                    <input matInput placeholder="Apellido Completo" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.papellido" value="{{Ejecutivo.papellido}}">
-
+                <mat-form-field appearance="outline" [ngClass]="{'campo-invalido': campoInvalido('papellido')}">
+                    <mat-label><span class="requerido">*</span> Apellido Completo</mat-label>
+                    <input matInput placeholder="Apellido Completo" [(ngModel)]="Ejecutivo.papellido"
+                        name="papellido">
                 </mat-form-field>
             </div>
 
@@ -65,28 +58,29 @@
 
         <div class="row">
             <div class="col-md-4">
-                <mat-form-field appearance="outline">
-                    <mat-label>Correo electronico</mat-label>
-                    <input matInput placeholder="Correo Electronico" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.Direccion.correo" value="{{Ejecutivo.Direccion.correo}}">
-
+                <mat-form-field appearance="outline" [ngClass]="{'campo-invalido': campoInvalido('correo')}">
+                    <mat-label><span class="requerido">*</span> Correo Electrónico</mat-label>
+                    <input matInput placeholder="Correo Electrónico" [(ngModel)]="Ejecutivo.Direccion.correo"
+                        name="correo">
+                    <mat-error *ngIf="campoInvalido('correo')">{{ mensajeError('correo') }}</mat-error>
+                    <mat-icon matSuffix>email</mat-icon>
                 </mat-form-field>
             </div>
             <div class="col-md-4">
-                <mat-form-field appearance="outline">
-                    <mat-label>Telefono de Oficina</mat-label>
-                    <input matInput placeholder="Telefono de Habitacion" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.Direccion.telefono" value="{{Ejecutivo.Direccion.telefono}}">
+                <mat-form-field appearance="outline" [ngClass]="{'campo-invalido': campoInvalido('telefono')}">
+                    <mat-label><span class="requerido">*</span> Teléfono de Oficina</mat-label>
+                    <input matInput placeholder="Teléfono de Oficina" [(ngModel)]="Ejecutivo.Direccion.telefono"
+                        name="telefono">
+                    <mat-error *ngIf="campoInvalido('telefono')">{{ mensajeError('telefono') }}</mat-error>
                 </mat-form-field>
             </div>
 
             <div class="col-md-4">
-                <mat-form-field appearance="outline">
-                    <mat-label>Telefono Celular</mat-label>
-                    <input matInput placeholder="Telefono Celular" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Ejecutivo.Direccion.celular" value="{{Ejecutivo.Direccion.celular}}">
-
-
+                <mat-form-field appearance="outline" [ngClass]="{'campo-invalido': campoInvalido('celular')}">
+                    <mat-label><span class="requerido">*</span> Teléfono Celular</mat-label>
+                    <input matInput placeholder="Teléfono Celular" [(ngModel)]="Ejecutivo.Direccion.celular"
+                        name="celular">
+                    <mat-error *ngIf="campoInvalido('celular')">{{ mensajeError('celular') }}</mat-error>
                 </mat-form-field>
             </div>
         </div>
@@ -95,7 +89,10 @@
         <div class="row">
             <div class="col-md-12 text-right">
                 <hr>
-                <button mat-flat-button color="primary" (click)="Guardar()">Aceptar</button>
+                <button mat-flat-button color="primary" (click)="Guardar()" [disabled]="!formularioValido()">
+                    <mat-icon>{{ esEdicion ? 'save' : 'add' }}</mat-icon>
+                    {{ esEdicion ? 'Actualizar' : 'Aceptar' }}
+                </button>
                 &nbsp;&nbsp;&nbsp;
                 <button mat-raised-button (click)="Seleccionar()">Listar</button>
             </div>

@@ -83,6 +83,7 @@ export class WzportafolioComponent implements OnInit {
 
   public total = 0
   public totalPorcentaje = 0
+  public totalInicial = 0
 
 
   public titulo = 'DETALLES DE LA INVERSION POR PORTAFOLIO'
@@ -123,11 +124,13 @@ export class WzportafolioComponent implements OnInit {
         this.lstInversiones = data.Cuerpo
         if( this.lstInversiones!= undefined ) {
           this.total =  this.lstInversiones.reduce((sum, e) => sum + parseFloat(e.porcentaje), 0)
+          this.totalInicial = this.total
           this.editado = true
         }else{
+          this.totalInicial = 0
           this.editado = false
         }
-
+        this.actualizarBlSave()
         this.Limpiar()
       },
       error => {
@@ -186,7 +189,23 @@ export class WzportafolioComponent implements OnInit {
     return status == '1' ? 'ACTIVO' : 'INACTIVO'
   }
 
+  actualizarBlSave() {
+    if (this.total == 100) {
+      this.blSave = true
+    } else if (this.editado && this.total != this.totalInicial) {
+      this.blSave = true
+    } else if (this.editado && this.lstInversiones.length === 0) {
+      this.blSave = true
+    } else {
+      this.blSave = false
+    }
+  }
+
   Agregar() {
+    const porcentajeNumerico = Number(this.porcentaje);
+    const porcentajeRestante = 100 - this.total;
+    if (porcentajeNumerico <= 0 || porcentajeNumerico > porcentajeRestante) return
+
     const portf = this.portafolio.split('|')
     const fecha = new Date()
     const fechaFormato = this._util.ConvertirFechaDB(fecha)
@@ -200,7 +219,7 @@ export class WzportafolioComponent implements OnInit {
         fecha: fechaFormato
       }
       this.total += parseFloat(this.porcentaje)
-      this.blSave = this.total == 100
+      this.actualizarBlSave()
 
       this.valor_inversion -= Number(this.monto_general)
       this.Limpiar()
@@ -214,12 +233,25 @@ export class WzportafolioComponent implements OnInit {
 
   }
 
+  eliminar(i: number) {
+    this.total -= parseFloat(this.lstInversiones[i].porcentaje)
+    this.lstInversiones.splice(i, 1)
+    this.actualizarBlSave()
+    if (this.editando && this.index === i) {
+      this.editando = false
+      this.index = null
+    } else if (this.editando && this.index > i) {
+      this.index--
+    }
+  }
+
   editar(e: any, i: number){
     this.porcentaje = e.porcentaje
     this.portafolio = e.id_portafolio + '|' + e.descripcion 
     this.editando = true
     this.total -= e.porcentaje
     this.index = i
+    this.actualizarBlSave()
   }
 
   async Commit() {
@@ -242,16 +274,25 @@ export class WzportafolioComponent implements OnInit {
   }
 
   private ejecutarInserciones() {
+    if (this.lstInversiones.length === 0) {
+      this.apiService.Mensaje('Proceso exitoso', 'Asignaciones eliminadas correctamente', 'success', 'inversion');
+      this.Consultar();
+      return;
+    }
+
     this.xAPI.funcion = environment.xApi.INSERTAR_INVERSIONES_PORTAFOLIO;
     this.xAPI.parametros = '';
 
+    let completados = 0;
     this.lstInversiones.forEach(inv => {
       this.xAPI.valores = JSON.stringify(inv);
       this.apiService.Ejecutar(this.xAPI).subscribe({
         next: (data) => {
-          this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion');
-          this.Consultar();
-          this.Limpiar();
+          completados++
+          if (completados === this.lstInversiones.length) {
+            this.apiService.Mensaje('Proceso exitoso', 'Asignaciones guardadas correctamente', 'success', 'inversion');
+            this.Consultar();
+          }
         },
         error: (err) => {
           console.error(err);
@@ -415,9 +456,15 @@ export class WzportafolioComponent implements OnInit {
   }
 
   limpiarCampos() {
-    this.porcentaje = '';
-    this.monto_general = '';
-    this.bloquearMonto = false;
-    this.bloquearPorcentaje = false;
+    if (this.editando && this.index !== null) {
+      this.total += parseFloat(this.lstInversiones[this.index].porcentaje)
+    }
+    this.editando = false
+    this.index = null
+    this.porcentaje = ''
+    this.monto_general = ''
+    this.portafolio = null
+    this.bloquearMonto = false
+    this.bloquearPorcentaje = false
   }
 }
