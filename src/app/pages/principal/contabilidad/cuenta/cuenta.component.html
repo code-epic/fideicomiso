@@ -1,6 +1,6 @@
 <ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
 <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" (selectedTabChange)="tabActive($event)"
-  [selectedIndex]="selectedIndex" style="padding:10px;">
+  [(selectedIndex)]="selectedIndex" style="padding:10px;">
   <mat-tab>
     <ng-template mat-tab-label>
       &nbsp;CONSULTA CUENTA
@@ -104,6 +104,10 @@
       &nbsp;REGISTRO DE CUENTA
     </ng-template>
     <br>
+
+    <div *ngIf="avisoEdicion" class="aviso-edicion">
+      <i class="fas fa-exclamation-triangle"></i> <b>Funcion en desarrollo:</b> La edicion de cuentas existentes estara disponible proximamente. Los cambios crearan un nuevo registro.
+    </div>
 
     <div class="card">
       <div class="card-body" style="padding:20px;">

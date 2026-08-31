@@ -56,6 +56,8 @@ export class CuentaComponent implements OnInit {
 
   public focus: boolean = false;
   public active: boolean = false;
+  private cambioProgramatico: boolean = false;
+  public avisoEdicion: boolean = false;
 
   public porta_insert: string = "";
   public porta_search: string = "none";
@@ -80,9 +82,17 @@ export class CuentaComponent implements OnInit {
   }
 
   editar(e) {
-    this.Cuenta = e;
-    this.porta_insert = "";
-    this.porta_search = "none";
+    this.Limpiar()
+    this.avisoEdicion = true
+
+    this.txtCuenta = e.cuenta || ''
+    this.Cuenta.descripcion = e.descripcion || ''
+    this.Cuenta.aumenta = e.aumenta_por || ''
+    this.Cuenta.disminuye = e.disminuye_por || ''
+    this.cmbTotalizadora = e.codigo_asignacion != null ? e.codigo_asignacion.toString() : '0'
+
+    this.cambioProgramatico = true
+    this.selectedIndex = 1
   }
 
   Consultar() {
@@ -141,7 +151,7 @@ export class CuentaComponent implements OnInit {
   }
 
   Limpiar() {
-
+    this.avisoEdicion = false
 
     this.Cuenta = {
       moneda: "",
@@ -279,6 +289,10 @@ export class CuentaComponent implements OnInit {
 
   tabActive(event) {
     this.selectedIndex = event.index;
+    if (this.cambioProgramatico) {
+      this.cambioProgramatico = false;
+      return;
+    }
     if (!this.active) {
       this.Limpiar();
       this.txtCuenta = ''

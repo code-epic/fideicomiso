@@ -98,8 +98,10 @@ export class TablasComponent implements OnInit {
 
   public blcod: boolean = false;
   public txtInstrumento: boolean = false;
+  public avisoEdicion: boolean = false;
 
   public posicion: number = 0;
+  private cambioProgramatico: boolean = false;
 
   constructor(
     private apiService: ApiService,
@@ -119,6 +121,10 @@ export class TablasComponent implements OnInit {
 
   tabActive(event) {
     this.selectedIndex = event.index;
+    if (this.cambioProgramatico) {
+      this.cambioProgramatico = false;
+      return;
+    }
     if (!this.active) {
       this.Limpiar();
       this.txtCuenta = "";
@@ -133,11 +139,49 @@ export class TablasComponent implements OnInit {
   }
 
   editar(e) {
-    this.porta_insert = "";
-    this.porta_search = "none";
+    this.Limpiar()
+    this.posicion = 0
+    this.avisoEdicion = true
+
+    this.concepto = e.tipo || ''
+    this.operaciones = e.operacion != null ? e.operacion.toString() : ''
+    this.validar()
+
+    if (e.definicion === 'AUMENTA' || e.accion === 'AUMENTA') {
+      this.definicion = 'A'
+    } else if (e.definicion === 'DISMINUYE' || e.accion === 'DISMINUYE') {
+      this.definicion = 'D'
+    } else {
+      this.definicion = e.definicion || ''
+    }
+
+    const codigoCuenta = e.cuenta || ''
+    const matchCuenta = this.lstXC.find((item: string) => {
+      const parts = item.split('|')
+      return parts.length > 0 && parts[0].trim().startsWith(codigoCuenta)
+    })
+    if (matchCuenta) {
+      this.cuenta = matchCuenta.split('|').slice(0, 2).join('|').trim()
+      this.myCuentas.setValue(this.cuenta)
+    } else {
+      this.cuenta = codigoCuenta
+      this.myCuentas.setValue(codigoCuenta)
+    }
+
+    if (e.instrumento) {
+      const matchInstrumento = this.lstInstrumento.find((item: string) =>
+        item === e.instrumento || item.startsWith(e.instrumento)
+      )
+      this.instrumento = matchInstrumento || e.instrumento
+      this.myInstrumento.setValue(this.instrumento)
+    }
+
+    this.cambioProgramatico = true
+    this.selectedIndex = 1
   }
 
   Limpiar() {
+    this.avisoEdicion = false
     this.ICuenta = {
       accion: "",
       cuenta: 0,
@@ -149,8 +193,11 @@ export class TablasComponent implements OnInit {
     this.instrumento = "";
     this.definicion = "";
     this.concepto = "";
+    this.operaciones = "";
     this.myCuentas.setValue("");
+    this.myInstrumento.setValue("");
     this.txtInstrumento = false;
+    this.blInstrumento = false;
     this.ELEMENT_DATA_CUENTA = [];
     this.dataSourceCuenta = new MatTableDataSource<ILConfiguracionCuenta>(
       this.ELEMENT_DATA_CUENTA
@@ -400,8 +447,7 @@ export class TablasComponent implements OnInit {
   }
 
   validar() {
-    this.blInstrumento = false
-    if (this.operaciones == '1') this.blInstrumento = true
+    this.blInstrumento = this.operaciones === '1'
   }
 
   getInstrumento(e): string {
