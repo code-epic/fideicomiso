@@ -21,6 +21,7 @@ import { ComprobanteDialogComponent } from "./comprobante-dialog/comprobante-dia
 import { MatDialog } from "@angular/material/dialog";
 import { environment } from "src/environments/environment";
 import { CierreService } from "src/app/services/banfanb/cierre.service";
+import { PlanGuardService } from "src/app/services/banfanb/plan-guard.service";
 
 @Component({
   selector: "app-comprobante",
@@ -188,7 +189,8 @@ export class ComprobanteComponent implements OnInit {
     private util: UtilService,
     private dialog: MatDialog,
     private _fb: FormBuilder,
-    private _cierre: CierreService
+    private _cierre: CierreService,
+    private planGuard: PlanGuardService
   ) {}
 
   async ngOnInit() {
@@ -660,6 +662,17 @@ export class ComprobanteComponent implements OnInit {
   async Guardar() {
     this.convertirComprobante();
 
+    const planId = parseInt(this.formComprobante.get("plan").value);
+    
+    // Verificar estatus del plan desde MySQL
+    if (planId) {
+      const bloqueado = await this.verificarPlanBloqueado(planId);
+      if (bloqueado) {
+        this._snackBar.open("El plan seleccionado está bloqueado (finiquitado o cerrado)", "Ok");
+        return;
+      }
+    }
+
     // Validar que la fecha no sea anterior o igual al último cierre
     const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaUltimo);
     const fechaOperacion = this.Comprobante.fecha_operacion;
@@ -736,6 +749,32 @@ export class ComprobanteComponent implements OnInit {
       },
       (err) => {}
     );
+  }
+
+  async verificarPlanBloqueado(idPlan: number): Promise<boolean> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_PLANES_FIDEICOMISO,
+      parametros: '',
+      valores: ''
+    };
+    return new Promise((resolve) => {
+      this.apiService.Ejecutar(xAPI).subscribe(
+        (data) => {
+          if (data?.Cuerpo) {
+            const plan = data.Cuerpo.find((p: any) => parseInt(p.id) === idPlan);
+            if (plan) {
+              const estatus = parseInt(plan.estatus) || 0;
+              resolve(estatus === 3 || estatus === 4);
+            } else {
+              resolve(false);
+            }
+          } else {
+            resolve(false);
+          }
+        },
+        () => resolve(false)
+      );
+    });
   }
 
   async GuardarDetalle(comprobante: number) {

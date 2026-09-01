@@ -1,0 +1,169 @@
+<ngx-ui-loader [loaderId]="'load-finiquito'"></ngx-ui-loader>
+
+<div class="row">
+  <div class="col-md-12">
+    <h3>Finiquito de Plan de Fideicomiso</h3>
+    <hr>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Plan de Fideicomiso</mat-label>
+      <mat-select [(ngModel)]="planSeleccionado" (selectionChange)="seleccionarPlan($event.value)">
+        <mat-option [value]="null">-- Seleccione --</mat-option>
+        <mat-option *ngFor="let p of lstPlanes" [value]="p">
+          {{ p.id }} - {{ p.observacion }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="col-md-3">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Fecha de último cierre</mat-label>
+      <input matInput [(ngModel)]="fechaultimo" disabled>
+      <mat-icon matSuffix>event</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <div class="col-md-3">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Fecha de finiquito</mat-label>
+      <input matInput [matDatepicker]="pickerFiniquito" [(ngModel)]="fechaFiniquito" (dateChange)="validarPrerrequisitos()">
+      <mat-datepicker #pickerFiniquito></mat-datepicker>
+      <mat-icon matSuffix (click)="pickerFiniquito.open()">event</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <div class="col-md-2 text-right" *ngIf="planSeleccionado && validacionesPasadas && !resultadoFiniquito">
+    <button mat-flat-button color="primary" (click)="procesarFiniquito()" [disabled]="procesando" style="height: 50px;">
+      <mat-icon>done_all</mat-icon>&nbsp;Procesar
+    </button>
+  </div>
+</div>
+
+<div class="row" *ngIf="planSeleccionado">
+  <div class="col-md-12">
+    <mat-card>
+      <mat-card-title>Validaciones</mat-card-title>
+      <mat-card-content>
+        <div *ngIf="errores.length > 0" class="alert alert-danger">
+          <ul>
+            <li *ngFor="let e of errores">{{ e }}</li>
+          </ul>
+        </div>
+        <div *ngIf="errores.length === 0" class="alert alert-success">
+          <mat-icon>check_circle</mat-icon> Todas las validaciones fueron superadas. Puede proceder con el finiquito.
+        </div>
+
+        <div *ngIf="inversionesActivas.length > 0">
+          <h5>Inversiones activas detectadas</h5>
+          <table class="table table-sm table-bordered">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Instrumento</th>
+                <th>Valor nominal</th>
+                <th>Vencimiento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let inv of inversionesActivas">
+                <td>{{ inv.identificador }}</td>
+                <td>{{ inv.instrumento }}</td>
+                <td class="text-right">{{ formatearMonto(inv.valor_nominal) }}</td>
+                <td>{{ inv.fecha_vencimiento }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="comprobantesPendientes.length > 0">
+          <h5>Comprobantes pendientes detectados</h5>
+          <table class="table table-sm table-bordered">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Debe</th>
+                <th>Haber</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of comprobantesPendientes">
+                <td>{{ c.codigo }}</td>
+                <td>{{ c.descripcion }}</td>
+                <td>{{ c.fecha_operacion }}</td>
+                <td class="text-right">{{ formatearMonto(c.debe) }}</td>
+                <td class="text-right">{{ formatearMonto(c.haber) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div class="row mt-3" *ngIf="planSeleccionado && saldos.size > 0">
+  <div class="col-md-6">
+    <mat-card>
+      <mat-card-title>Resumen contable</mat-card-title>
+      <mat-card-content>
+        <table class="table table-sm">
+          <tbody>
+            <tr>
+              <td>Disponibilidad (711)</td>
+              <td class="text-right">{{ formatearMonto(getSaldo('711')) }}</td>
+            </tr>
+            <tr>
+              <td>Comisiones por pagar (722)</td>
+              <td class="text-right">{{ formatearMonto(getSaldo('722')) }}</td>
+            </tr>
+            <tr>
+              <td>Patrimonio asignado (731)</td>
+              <td class="text-right">{{ formatearMonto(getSaldo('731')) }}</td>
+            </tr>
+            <tr>
+              <td>Resultados acumulados (734)</td>
+              <td class="text-right">{{ formatearMonto(getSaldo('734')) }}</td>
+            </tr>
+            <tr>
+              <td>Gastos (740)</td>
+              <td class="text-right">{{ formatearMonto(getSaldo('740')) }}</td>
+            </tr>
+            <tr>
+              <td>Ingresos (750)</td>
+              <td class="text-right">{{ formatearMonto(getSaldo('750')) }}</td>
+            </tr>
+            <tr class="table-primary font-weight-bold">
+              <td>Remanente a devolver (731 + 734)</td>
+              <td class="text-right">{{ formatearMonto(remanente) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="col-md-6" *ngIf="resultadoFiniquito">
+    <mat-card class="bg-light">
+      <mat-card-title>Resultado del finiquito</mat-card-title>
+      <mat-card-content>
+        <p><strong>Plan:</strong> {{ planSeleccionado?.observacion }}</p>
+        <p><strong>Fecha:</strong> {{ resultadoFiniquito.fecha_finiquito || fechaOperacionFormateada }}</p>
+        <p><strong>Remanente:</strong> {{ formatearMonto(resultadoFiniquito.remanente) }}</p>
+        <p><strong>Comprobante pasivos:</strong> {{ resultadoFiniquito.comprobante_pasivos || 'N/A' }}</p>
+        <p><strong>Comprobante resultados:</strong> {{ resultadoFiniquito.comprobante_resultado || 'N/A' }}</p>
+        <p><strong>Comprobante finiquito:</strong> {{ resultadoFiniquito.comprobante_finiquito || 'N/A' }}</p>
+
+        <button mat-flat-button color="accent" (click)="imprimirActa()">
+          <mat-icon>print</mat-icon>&nbsp;Imprimir acta
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

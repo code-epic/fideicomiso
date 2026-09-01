@@ -15,6 +15,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { environment } from 'src/environments/environment';
 import { EstadocuentaComponent } from './estadocuenta/estadocuenta.component';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 
 @Component({
   selector: 'app-contratos',
@@ -172,6 +173,7 @@ export class ContratosComponent implements OnInit {
 
   public selectedIndex = 0;
   public active: boolean = false
+  public soloLectura: boolean = false
   public contrato_search: string = 'none'
 
   public xAPI: IAPICore = {
@@ -213,7 +215,8 @@ export class ContratosComponent implements OnInit {
     public dialog: MatDialog,
     public formatter: NgbDateParserFormatter,
     private fb: FormBuilder,
-    private cierre: CierreService
+    private cierre: CierreService,
+    private planGuard: PlanGuardService
   ) { }
 
   ngOnInit(): void {
@@ -428,7 +431,7 @@ export class ContratosComponent implements OnInit {
 
   }
 
-  editar(e: any) {
+  async editar(e: any) {
     this.Contrato = e
     this.Limpiar()
     this.contratoForm.patchValue(this.Contrato)
@@ -447,6 +450,15 @@ export class ContratosComponent implements OnInit {
     this.tabSaldos = true
     this.ConsultarSaldos()
 
+    // Obtener estatus real desde MySQL
+    const planId = parseInt(this.Contrato.numero)
+    const estatusReal = await this.planGuard.obtenerEstatus(planId)
+    this.contratoForm.get('estatus').setValue(estatusReal.toString())
+
+    this.soloLectura = this.planGuard.esEstatusBloqueado(estatusReal)
+    if (this.soloLectura) {
+      this._snackBar.open(`Plan ${this.planGuard.getNombreEstatus(estatusReal)}. Solo lectura.`, 'Ok')
+    }
   }
 
   getTipoFideicomiso() {
@@ -619,6 +631,10 @@ export class ContratosComponent implements OnInit {
   }
 
   Guardar() {
+    if (this.soloLectura) {
+      this._snackBar.open('No se puede modificar un plan finiquitado o cerrado', 'Ok')
+      return
+    }
 
     this.getPlanFideicomisoDB()
 
@@ -652,78 +668,12 @@ export class ContratosComponent implements OnInit {
           this.Contrato.Saldos.fechainicio = this.planFideicomiso.fecha_apertura
           this.Contrato.Saldos.saldoinicio = this.planFideicomiso.monto_apertura
 
-          if (this.planFideicomiso.identificador == 0) {
-            const detalle = `${this.Contrato.tiporif}${this.Contrato.rif} - ${this.Contrato.razonsocial}`
-            this.crearComprobanteInicial(numero, this.planFideicomiso.fecha_apertura, this.planFideicomiso.monto_apertura, detalle)
-          } else {
-            this.guardarContrato()
-          }
+          this.guardarContrato()
         }
       },
       (error) => {
         console.error(error)
         this.ngxService.stopLoader('load-cont')
-      }
-    )
-  }
-
-  private crearComprobanteInicial(planId: number, fecha: string, monto: number, detalle: string) {
-    if (!fecha || isNaN(planId) || planId <= 0) {
-      console.error('crearComprobanteInicial: parámetros inválidos', { planId, fecha, monto })
-      this.guardarContrato()
-      return
-    }
-
-    const codigo = this.util.zfill(planId.toString(), 4)
-
-    let xApiComprobante: IAPICore = {
-      funcion: 'FID_IComprobante',
-      parametros: '',
-      valores: JSON.stringify({
-        plan: planId,
-        codigo: codigo,
-        descripcion: 'APORTE INICIAL',
-        detalle: detalle,
-        fecha_operacion: fecha,
-        fecha_ejercicio: fecha,
-        debe: monto,
-        haber: monto,
-        llave: 'M'
-      })
-    }
-
-    this.apiService.Ejecutar(xApiComprobante).subscribe(
-      (data) => {
-        const idComprobante = parseInt(data.msj)
-        if (isNaN(idComprobante)) {
-          this.guardarContrato()
-          return
-        }
-
-        const xApiDebe: IAPICore = {
-          funcion: environment.xApi.INSERTAR_DETALLE_COMPROBANTE,
-          parametros: '',
-          valores: JSON.stringify({ id_comprobante: idComprobante, cuenta: 3, debe: monto, haber: 0, fecha_operacion: fecha, fecha_ejercicio: fecha, plan: planId })
-        }
-
-        this.apiService.Ejecutar(xApiDebe).subscribe({
-          next: () => {
-            const xApiHaber: IAPICore = {
-              funcion: environment.xApi.INSERTAR_DETALLE_COMPROBANTE,
-              parametros: '',
-              valores: JSON.stringify({ id_comprobante: idComprobante, cuenta: 19, debe: 0, haber: monto, fecha_operacion: fecha, fecha_ejercicio: fecha, plan: planId })
-            }
-            this.apiService.Ejecutar(xApiHaber).subscribe({
-              next: () => this.guardarContrato(),
-              error: () => this.guardarContrato()
-            })
-          },
-          error: () => this.guardarContrato()
-        })
-      },
-      (error) => {
-        console.error(error)
-        this.guardarContrato()
       }
     )
   }

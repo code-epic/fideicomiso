@@ -117,7 +117,18 @@ export const environment = {
     INSERTAR_MOVIMIENTOS_LOTE: 'FID_BashIPosicion',
     BORRAR_MOVIMIENTOS_LOTE: 'FID_BashDPosicion',
     DISTRIBUIR_INTERESES: 'FID_BashIntereses',
-    INSERTAR_INCREMENTO: 'FID_IIncremento'
+    INSERTAR_INCREMENTO: 'FID_IIncremento',
+
+    // Aportes
+    CONSULTAR_COMPROBANTE_APORTE_INICIAL: 'FID_CComprobanteAporteInicial',
+
+    // Finiquito
+    CONSULTAR_SALDOS_FINIQUITO_PLAN: 'FID_CSaldosFiniquitoPlan',
+    CONSULTAR_INVERSIONES_ACTIVAS_PLAN: 'FID_CInversionesActivasPlan',
+    CONSULTAR_COMPROBANTES_PENDIENTES_PLAN: 'FID_CComprobantesPendientesPlan',
+    ACTUALIZAR_ESTATUS_PLAN: 'FID_UCambiarEstatusPlan',
+    INSERTAR_FINIQUITO: 'FID_IFiniquito',
+    CONSULTAR_FINIQUITO: 'FID_CFiniquito',
   }, //total 69
 
   functions: {

@@ -7,6 +7,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LIncremento } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 
 @Component({
   selector: 'app-retiros',
@@ -46,6 +47,7 @@ export class RetirosComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private toastr: ToastrService,
     private util: UtilService,
+    private planGuard: PlanGuardService,
   ) { }
 
   ngOnInit(): void {
@@ -90,7 +92,7 @@ export class RetirosComponent implements OnInit {
           this.rif = Contrato.rif + '-' + Contrato.razonsocial
           this.fideicomiso = Contrato.plan
           this.idplan = parseInt(this.plan)
-          this.ConsultarObservacion(this.idplan)
+          this.verificarEstatusPlan(this.idplan)
         } else {
           this.toastr.warning('Plan no encontrado', 'Retiros')
         }
@@ -102,6 +104,41 @@ export class RetirosComponent implements OnInit {
         console.error(error)
       }
     )
+  }
+
+  verificarEstatusPlan(idPlan: number) {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_PLANES_FIDEICOMISO,
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe(
+      (data) => {
+        if (data?.Cuerpo) {
+          const plan = data.Cuerpo.find((p: any) => parseInt(p.id) === idPlan)
+          if (plan) {
+            const estatus = parseInt(plan.estatus) || 0
+            if (estatus === 3 || estatus === 4) {
+              const nombre = estatus === 3 ? 'FINIQUITADO' : 'CERRADO'
+              this.toastr.error(`Este plan está ${nombre}. No se permiten retiros.`, 'Plan bloqueado')
+              this.limpiarFormulario()
+            } else {
+              this.ConsultarObservacion(idPlan)
+            }
+          }
+        }
+      },
+      (error) => console.error(error)
+    )
+  }
+
+  limpiarFormulario() {
+    this.plan = ''
+    this.rif = ''
+    this.fideicomiso = ''
+    this.idplan = 0
+    this.observacion = ''
+    this.monto = ''
   }
 
   ConsultarObservacion(idplan: number) {
@@ -119,7 +156,7 @@ export class RetirosComponent implements OnInit {
     )
   }
 
-  Add() {
+  async Add() {
     if (!this.plan) {
       this.toastr.warning('Debe ingresar un plan', 'Retiros')
       return
@@ -142,6 +179,14 @@ export class RetirosComponent implements OnInit {
         'Error'
       );
       return;
+    }
+
+    // Verificar si el plan está bloqueado
+    const bloqueado = await this.planGuard.planBloqueado(this.idplan)
+    if (bloqueado) {
+      this.toastr.error('Este plan está finiquitado o cerrado. No se permiten retiros.', 'Plan bloqueado')
+      this.limpiarFormulario()
+      return
     }
 
     this.ELEMENT_DATA.push({

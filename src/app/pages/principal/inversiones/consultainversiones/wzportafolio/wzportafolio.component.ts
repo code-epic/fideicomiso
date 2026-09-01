@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 import { FID_IComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { Inversion, InversionPortafolio } from 'src/app/services/banfanb/inversiones.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -96,6 +97,7 @@ export class WzportafolioComponent implements OnInit {
     private apiService: ApiService, 
     private _util: UtilService,
     private _cierre: CierreService,
+    private planGuard: PlanGuardService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
@@ -108,6 +110,15 @@ export class WzportafolioComponent implements OnInit {
   }
 
   async evaluarSoloLectura() {
+    const planId = this.data.id_plan || this.data.plan;
+    if (planId) {
+      const bloqueado = await this.planGuard.planBloqueado(planId);
+      if (bloqueado) {
+        this.soloLectura = true;
+        return;
+      }
+    }
+
     const fechaUltimo = await this._cierre.getUltimoCierre();
     if (!fechaUltimo) { this.soloLectura = false; return; }
     const fechaCierre = this._util.ConvertirFechaDB(fechaUltimo);

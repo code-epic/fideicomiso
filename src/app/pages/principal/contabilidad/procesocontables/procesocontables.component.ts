@@ -9,6 +9,7 @@ import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
@@ -99,6 +100,7 @@ export class ProcesocontablesComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
     private cierre: CierreService,
+    private planGuard: PlanGuardService,
     public formatter: NgbDateParserFormatter,
   ) { }
 
@@ -141,6 +143,16 @@ export class ProcesocontablesComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.lstMovimientos = data.Cuerpo
+
+        const filtered = [];
+        for (const e of this.lstMovimientos) {
+          const planId = e.id_plan || e.plan;
+          if (!planId || !(await this.planGuard.planBloqueado(planId))) {
+            filtered.push(e);
+          }
+        }
+        this.lstMovimientos = filtered;
+
         this.lstMovimientos.map(e => {
           this.total_debe += parseFloat(e.debe) || 0
           this.total_haber += parseFloat(e.haber) || 0

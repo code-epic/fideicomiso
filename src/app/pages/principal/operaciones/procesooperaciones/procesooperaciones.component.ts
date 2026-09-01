@@ -5,6 +5,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { FID_IComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -54,6 +55,7 @@ export class ProcesooperacionesComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private cierre: CierreService,
     private util: UtilService,
+    private planGuard: PlanGuardService,
     public formatter: NgbDateParserFormatter
   ) { }
 
@@ -83,6 +85,14 @@ export class ProcesooperacionesComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.lstComisiones = data.Cuerpo
+
+        const filtered = [];
+        for (const e of this.lstComisiones) {
+          if (!(await this.planGuard.planBloqueado(e.id))) {
+            filtered.push(e);
+          }
+        }
+        this.lstComisiones = filtered;
         
         this.lstComisiones.map(e => {
           this.acum_debe += parseFloat(e.calculo_capital)

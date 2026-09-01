@@ -17,7 +17,7 @@
         <mat-label>Plan</mat-label>
         <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}" (selectionChange)="seleccionarPlan()">
           <mat-option value='%'>TODOS</mat-option>
-          <mat-option *ngFor="let p of lstPlanesFideicomiso" value='{{p.id}}'>{{p.observacion}}</mat-option>
+          <mat-option *ngFor="let p of lstPlanesFideicomiso" value='{{p.id}}'>{{p.displayName || p.observacion}}</mat-option>
         </mat-select>
   
       </mat-form-field>

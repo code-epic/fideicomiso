@@ -29,6 +29,7 @@ import { ProcesooperacionesComponent } from 'src/app/pages/principal/operaciones
 import { AporteinicialComponent } from 'src/app/pages/principal/operaciones/aportes/aporteinicial/aporteinicial.component'
 import { IncrementosComponent } from 'src/app/pages/principal/operaciones/aportes/incrementos/incrementos.component'
 import { RetirosComponent } from 'src/app/pages/principal/operaciones/aportes/retiros/retiros.component'
+import { FiniquitoComponent } from 'src/app/pages/principal/operaciones/aportes/finiquito/finiquito.component'
 import { ProcesocontablesComponent } from 'src/app/pages/principal/contabilidad/procesocontables/procesocontables.component'
 import { GeneralyresultadoComponent } from 'src/app/pages/principal/contabilidad/generalyresultado/generalyresultado.component'
 import { ComprobacionComponent } from 'src/app/pages/principal/contabilidad/comprobacion/comprobacion.component'
@@ -182,6 +183,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'retiros',
         component: RetirosComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'finiquito',
+        component: FiniquitoComponent,
         canActivate: [AuthGuardGuard]
     },{
         path: 'npanel',

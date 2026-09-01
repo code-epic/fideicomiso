@@ -10,6 +10,7 @@ import { LAporteInicial } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-aporteinicial',
@@ -28,6 +29,7 @@ export class AporteinicialComponent implements OnInit {
     "codigo",
     "plan",
     "monto",
+    "estado",
   ];
   dataSource: any;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -35,6 +37,8 @@ export class AporteinicialComponent implements OnInit {
   public acum_debe = 0
   public acum_haber = 0
   public max = 0
+
+  public planVerificado: Map<number, boolean> = new Map();
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -64,53 +68,18 @@ export class AporteinicialComponent implements OnInit {
   ngOnInit(): void {
     this.cierre.getUltimoCierre().then(fecha => {
       this.fechaultimo = fecha
+      this.fechai = this.cierre.getSiguienteDia(fecha)
     })
   }
-
-
 
   Listar() { }
 
   Calcular() {
-
     if (this.fechai == undefined) {
       this._snackBar.open('Recuerde seleccionar una fecha', 'OK')
       return
     }
-    let fini = this.util.ConvertirFechaDB(this.fechai)
-    this.ngxService.startLoader('load-cont')
-    this.xAPI.funcion = environment.xApi.CONSULTAR_APORTE_INICIAL
-    this.xAPI.parametros = fini
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        data.Cuerpo.map(e => {
-          this.ELEMENT_DATA.push({
-            id: e.id,
-            codigo: e.fideicomiso.toUpperCase(),
-            plan: e.observacion,
-            monto: e.monto_apertura
-          });
-        })
 
-        this.dataSource = new MatTableDataSource<LAporteInicial>(
-          this.ELEMENT_DATA
-
-        );
-        this.dataSource.paginator = this.paginator;
-        this.blprocesar = true
-        this.ngxService.stopLoader('load-cont')
-      },
-      (error) => {
-        console.error(error)
-        this.ngxService.stopLoader('load-cont')
-      }
-    )
-  }
-
-
-  Procesar() {
-    // Validar que la fecha no sea anterior o igual al último cierre
     const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaultimo)
     const fechaOperacion = this.util.ConvertirFechaDB(this.fechai)
     if (fechaCierreDB && fechaOperacion && fechaOperacion <= fechaCierreDB) {
@@ -121,30 +90,151 @@ export class AporteinicialComponent implements OnInit {
       return;
     }
 
-    this.max = this.ELEMENT_DATA.length;
-    this.InsertData(0)
+    let fini = this.util.ConvertirFechaDB(this.fechai)
+    this.ngxService.startLoader('load-cont')
+
+    const xAPIConsulta: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_APORTE_INICIAL,
+      parametros: fini,
+      valores: ''
+    }
+
+    this.apiService.Ejecutar(xAPIConsulta).subscribe(
+      data => {
+        const planes = (data.Cuerpo || []).filter(
+          (e: any) => parseInt(e.estatus) === 1 && e.monto_apertura && parseFloat(e.monto_apertura) > 0
+        )
+
+        if (planes.length === 0) {
+          this.ELEMENT_DATA = []
+          this.dataSource = new MatTableDataSource<LAporteInicial>([])
+          this.blprocesar = true
+          this.ngxService.stopLoader('load-cont')
+          return
+        }
+
+        this.verificarComprobantes(planes)
+      },
+      (error) => {
+        console.error(error)
+        this.ngxService.stopLoader('load-cont')
+      }
+    )
   }
 
-  InsertData(cant: number) {
-    if (cant == this.max) {
-      this.ngxService.stopLoader('load-cont')
-      this.ELEMENT_DATA = []
-      this.dataSource = new MatTableDataSource<LAporteInicial>(
-        this.ELEMENT_DATA
+  verificarComprobantes(planes: any[]) {
+    let verificados = 0
+    this.ELEMENT_DATA = []
+    this.planVerificado.clear()
+
+    planes.forEach(plan => {
+      const xAPIVerificar: IAPICore = {
+        funcion: environment.xApi.CONSULTAR_COMPROBANTE_APORTE_INICIAL,
+        parametros: plan.id.toString(),
+        valores: ''
+      }
+
+      this.apiService.Ejecutar(xAPIVerificar).subscribe(
+        data => {
+          const total = data?.Cuerpo?.[0]?.total || 0
+          this.planVerificado.set(plan.id, total > 0)
+
+          this.ELEMENT_DATA.push({
+            id: plan.id,
+            codigo: plan.fideicomiso.toUpperCase(),
+            plan: plan.observacion,
+            monto: plan.monto_apertura
+          })
+
+          verificados++
+          if (verificados === planes.length) {
+            this.dataSource = new MatTableDataSource<LAporteInicial>(this.ELEMENT_DATA)
+            this.dataSource.paginator = this.paginator
+            this.blprocesar = true
+            this.ngxService.stopLoader('load-cont')
+          }
+        },
+        () => {
+          this.planVerificado.set(plan.id, false)
+
+          this.ELEMENT_DATA.push({
+            id: plan.id,
+            codigo: plan.fideicomiso.toUpperCase(),
+            plan: plan.observacion,
+            monto: plan.monto_apertura
+          })
+
+          verificados++
+          if (verificados === planes.length) {
+            this.dataSource = new MatTableDataSource<LAporteInicial>(this.ELEMENT_DATA)
+            this.dataSource.paginator = this.paginator
+            this.blprocesar = true
+            this.ngxService.stopLoader('load-cont')
+          }
+        }
+      )
+    })
+  }
+
+  tieneComprobante(idPlan: number): boolean {
+    return this.planVerificado.get(idPlan) || false
+  }
+
+  Procesar() {
+    const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaultimo)
+    const fechaOperacion = this.util.ConvertirFechaDB(this.fechai)
+    if (fechaCierreDB && fechaOperacion && fechaOperacion <= fechaCierreDB) {
+      this._snackBar.open(
+        `La fecha ${fechaOperacion} no puede ser anterior o igual al último cierre (${fechaCierreDB})`,
+        'Ok'
       );
-      this.dataSource.paginator = this.paginator;
-      this.blprocesar = false
-      this.apiService.Mensaje('Proceso exitoso', 'Se han creado los comprobantes', 'info', 'comprobante')
+      return;
+    }
+
+    const planesPendientes = this.ELEMENT_DATA.filter(
+      e => !this.tieneComprobante(e.id)
+    )
+
+    if (planesPendientes.length === 0) {
+      this._snackBar.open('Todos los planes ya tienen comprobante APORTE INICIAL', 'Ok')
       return
     }
-    let monto = this.ELEMENT_DATA[cant].monto
-    let idplan = this.ELEMENT_DATA[cant].id.toString()
+
+    Swal.fire({
+      title: '¿Procesar aportes iniciales?',
+      text: `Se crearán comprobantes para ${planesPendientes.length} plan(es)`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Procesar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.max = planesPendientes.length;
+        this.InsertData(0, planesPendientes)
+      }
+    })
+  }
+
+  InsertData(cant: number, planes: LAporteInicial[]) {
+    if (cant == planes.length) {
+      this.ngxService.stopLoader('load-cont')
+      this.ELEMENT_DATA = []
+      this.dataSource = new MatTableDataSource<LAporteInicial>([])
+      this.dataSource.paginator = this.paginator;
+      this.blprocesar = false
+      this.apiService.Mensaje('Proceso exitoso', 'Se han creado los comprobantes de aporte inicial', 'success', 'comprobante')
+      return
+    }
+    let monto = planes[cant].monto
+    let idplan = planes[cant].id.toString()
 
     this.Comprobante = {
-      plan: this.ELEMENT_DATA[cant].id,
+      plan: planes[cant].id,
       codigo: "",
       descripcion: "APORTE INICIAL",
-      detalle: this.ELEMENT_DATA[cant].plan,
+      detalle: planes[cant].plan,
       fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
       fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
       debe: monto,
@@ -152,19 +242,23 @@ export class AporteinicialComponent implements OnInit {
       llave: 'M'
     }
 
-    this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE
-    this.xAPI.parametros = ''
-    this.xAPI.valores = JSON.stringify(this.Comprobante)
+    const xAPIComprobante: IAPICore = {
+      funcion: environment.xApi.INSERTAR_COMPROBANTE,
+      parametros: '',
+      valores: JSON.stringify(this.Comprobante)
+    }
     cant++
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
+    this.apiService.Ejecutar(xAPIComprobante).subscribe(
       data => {
-        this.xAPI.funcion = environment.xApi.INSERTAR_APORTE_INICIAL
-        this.xAPI.parametros = data.msj + ',' + idplan
-        this.xAPI.valores = ''
-        this.apiService.Ejecutar(this.xAPI).subscribe(
+        const xAPIAporte: IAPICore = {
+          funcion: environment.xApi.INSERTAR_APORTE_INICIAL,
+          parametros: data.msj + ',' + idplan,
+          valores: ''
+        }
+        this.apiService.Ejecutar(xAPIAporte).subscribe(
           data => {
-            this.InsertData(cant)
+            this.InsertData(cant, planes)
           },
           (error) => {
             console.error(error)
@@ -177,6 +271,5 @@ export class AporteinicialComponent implements OnInit {
         this.ngxService.stopLoader('load-cont')
       }
     )
-
   }
 }

@@ -11,6 +11,7 @@ import { LIncremento } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 
 @Component({
   selector: 'app-incrementos',
@@ -59,6 +60,7 @@ export class IncrementosComponent implements OnInit {
     private toastr: ToastrService,
     private util: UtilService,
     private cierre: CierreService,
+    private planGuard: PlanGuardService,
     public formatter: NgbDateParserFormatter,) { }
 
   // Establecer el rango de fechas
@@ -112,7 +114,16 @@ export class IncrementosComponent implements OnInit {
 
   Seleccionar() { }
 
-  ConsultarContrato() {
+  limpiarFormulario() {
+    this.plan = ''
+    this.rif = ''
+    this.fideicomiso = ''
+    this.idplan = 0
+    this.observacion = ''
+    this.monto = ''
+  }
+
+  async ConsultarContrato() {
     if (!this.plan) return
     this.ngxService.startLoader('load-cont')
     this.plan = this.plan.padStart(4, '0')
@@ -126,7 +137,9 @@ export class IncrementosComponent implements OnInit {
           this.rif = Contrato.rif + '-' + Contrato.razonsocial
           this.fideicomiso = Contrato.plan
           this.idplan = parseInt(this.plan)
-          this.ConsultarObservacion(this.idplan)
+
+          // Verificar estatus del plan desde MySQL
+          this.verificarEstatusPlan(this.idplan)
         } else {
           this.toastr.warning('Plan no encontrado', 'Incrementos')
         }
@@ -137,6 +150,32 @@ export class IncrementosComponent implements OnInit {
         this.toastr.error('Error al consultar el plan', 'Incrementos')
         console.error(error)
       }
+    )
+  }
+
+  verificarEstatusPlan(idPlan: number) {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_PLANES_FIDEICOMISO,
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe(
+      (data) => {
+        if (data?.Cuerpo) {
+          const plan = data.Cuerpo.find((p: any) => parseInt(p.id) === idPlan)
+          if (plan) {
+            const estatus = parseInt(plan.estatus) || 0
+            if (estatus === 3 || estatus === 4) {
+              const nombre = estatus === 3 ? 'FINIQUITADO' : 'CERRADO'
+              this.toastr.error(`Este plan está ${nombre}. No se permiten incrementos.`, 'Plan bloqueado')
+              this.limpiarFormulario()
+            } else {
+              this.ConsultarObservacion(idPlan)
+            }
+          }
+        }
+      },
+      (error) => console.error(error)
     )
   }
 
@@ -155,7 +194,7 @@ export class IncrementosComponent implements OnInit {
     )
   }
 
-  Add() {
+  async Add() {
     // Validar que la fecha no sea anterior o igual al último cierre
     const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaultimo)
     const fechaOperacion = this.util.ConvertirFechaDB(this.fechai)
@@ -165,6 +204,14 @@ export class IncrementosComponent implements OnInit {
         'Error'
       );
       return;
+    }
+
+    // Verificar si el plan está bloqueado
+    const bloqueado = await this.planGuard.planBloqueado(this.idplan)
+    if (bloqueado) {
+      this.toastr.error('Este plan está finiquitado o cerrado. No se permiten incrementos.', 'Plan bloqueado')
+      this.limpiarFormulario()
+      return
     }
 
     this.ELEMENT_DATA.push({

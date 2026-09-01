@@ -5,6 +5,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -101,7 +102,8 @@ export class ComprobacionComponent implements OnInit {
     private util: UtilService,
     public formatter: NgbDateParserFormatter,
     private _imprimir: ImprimirService,
-    private cierre: CierreService
+    private cierre: CierreService,
+    private planGuard: PlanGuardService
   ) { }
 
   ngOnInit(): void {
@@ -124,7 +126,16 @@ export class ComprobacionComponent implements OnInit {
     }
     this.apiService.Ejecutar(xAPI).subscribe({
       next: (data) => {
-        this.lstPlanesFideicomiso = data.Cuerpo || []
+        this.lstPlanesFideicomiso = (data.Cuerpo || []).map((p: any) => {
+          const estatus = parseInt(p.estatus) || 0;
+          const bloqueado = this.planGuard.esBloqueado(estatus);
+          return {
+            ...p,
+            displayName: bloqueado
+              ? `${p.observacion} [${this.planGuard.getNombreEstatus(estatus)}]`
+              : p.observacion
+          };
+        })
       },
       error: (err) => console.error(err)
     })
@@ -135,7 +146,7 @@ export class ComprobacionComponent implements OnInit {
       this.planNombre = 'TODOS LOS PLANES'
     } else {
       const plan = this.lstPlanesFideicomiso.find(p => p.id == this.plan)
-      this.planNombre = plan ? plan.observacion : ''
+      this.planNombre = plan ? (plan.displayName || plan.observacion) : ''
     }
   }
 
@@ -146,7 +157,7 @@ export class ComprobacionComponent implements OnInit {
   getNombrePlan(): string {
     if (this.plan === '%') return 'TODOS LOS PLANES';
     const plan = this.lstPlanesFideicomiso.find(p => p.id == this.plan);
-    return plan ? (plan.observacion || plan.fideicomiso) : '';
+    return plan ? (plan.displayName || plan.observacion || plan.fideicomiso) : '';
   }
 
   generarMeses() {

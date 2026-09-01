@@ -137,9 +137,11 @@
                                                 <mat-form-field appearance="outline">
                                                     <mat-label>Estatus del Plan</mat-label>
                                                     <mat-select placeholder="Estatus del Plan" formControlName="estatus"
-                                                        readonly>
+                                                        [disabled]="soloLectura">
                                                         <mat-option value=1>ACTIVO</mat-option>
                                                         <mat-option value=2>EN PROCESO</mat-option>
+                                                        <mat-option value=3>FINIQUITADO</mat-option>
+                                                        <mat-option value=4>CERRADO</mat-option>
                                                         <mat-option value=0>INACTIVO</mat-option>
                                                     </mat-select>
                                                 </mat-form-field>

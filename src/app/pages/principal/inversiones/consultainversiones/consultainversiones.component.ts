@@ -12,6 +12,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { environment } from "src/environments/environment";
 import { WzportafolioComponent } from "./wzportafolio/wzportafolio.component";
 import { CierreService } from "src/app/services/banfanb/cierre.service";
+import { PlanGuardService } from "src/app/services/banfanb/plan-guard.service";
 import { InversionDialogComponent } from "./inversion-dialog/inversion-dialog.component";
 
 @Component({
@@ -128,6 +129,7 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     private util: UtilService,
     public formatter: NgbDateParserFormatter,
     private _cierre: CierreService,
+    private planGuard: PlanGuardService,
   ) {}
 
   async ngOnInit() {
@@ -275,7 +277,16 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     return this.util.zfill(numero , 4) 
   }
 
-  editar(e) {
+  async editar(e) {
+    const planId = e.id_plan || e.plan;
+    if (planId) {
+      const bloqueado = await this.planGuard.planBloqueado(planId);
+      if (bloqueado) {
+        this._snackBar.open("El plan asociado está bloqueado (finiquitado o cerrado)", "Ok");
+        return;
+      }
+    }
+
     this.Inversiones = { ...e }
     this.selectedIndex = 1
     this.active = true
