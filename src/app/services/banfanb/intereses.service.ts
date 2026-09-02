@@ -10,6 +10,7 @@ export interface InteresProyectado {
   dias: number;
   saldo_promedio: number;
   interes_calculado: number;
+  interes_diario: number;
   porcentaje?: number;
   interes_real?: number;
   diferencia?: number;
@@ -29,6 +30,7 @@ export interface DistribucionPlan {
   plan: string;
   saldo_promedio: number;
   interes_calculado: number;
+  interes_diario: number;
   porcentajeTramo: number;
   interesRealTramo: number;
   diferenciaTramo: number;

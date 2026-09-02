@@ -197,13 +197,13 @@
             </div>
           </div>
 
-          <div class="tabla-container">
+           <div class="tabla-container">
             <table class="table" [attr.aria-label]="'Distribución del pago ' + (i + 1)">
               <thead>
                 <tr>
                   <th scope="col">Plan</th>
                   <th scope="col" class="text-right">Saldo Base</th>
-                  <th scope="col" class="text-right">Interés Calculado</th>
+                  <th scope="col" class="text-right">Interés Diario</th>
                   <th scope="col" class="text-right">% Tramo</th>
                   <th scope="col" class="text-right">Interés Real</th>
                   <th scope="col" class="text-right">Diferencia</th>
@@ -213,7 +213,7 @@
                 <tr *ngFor="let dist of tramo.distribuciones">
                   <td>{{ dist.plan }}</td>
                   <td class="text-right">{{ formatearMonto(dist.saldo_promedio) }}</td>
-                  <td class="text-right">{{ formatearMonto(dist.interes_calculado) }}</td>
+                  <td class="text-right">{{ formatearMonto(dist.interes_diario) }}</td>
                   <td class="text-right">{{ dist.porcentajeTramo | number:'1.2-2' }}%</td>
                   <td class="text-right">{{ formatearMonto(dist.interesRealTramo) }}</td>
                   <td class="text-right" [style.color]="dist.diferenciaTramo > 0 ? 'green' : dist.diferenciaTramo < 0 ? 'red' : 'inherit'">

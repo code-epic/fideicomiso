@@ -78,11 +78,11 @@ export class InteresesComponent implements OnInit {
     const fechaDiaAnterior = `${this.anio}-${String(this.mes).padStart(2, '0')}-${String(diaAnterior).padStart(2, '0')}`;
 
     const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaultimo);
-    this.mesCerrado = !(fechaCierreDB && fechaDiaAnterior > fechaCierreDB);
+    this.mesCerrado = !!(fechaCierreDB && fechaFin <= fechaCierreDB);
 
     if (!this.mesCerrado) {
       this.toastr.info(
-        `El mes aún no está listo. El día ${diaAnterior} de ${this.lstMeses[this.mes - 1].nombre} no ha sido cerrado.`,
+        `El mes aún no está listo. El día ${diaAnterior} de ${this.lstMeses[this.mes - 1].nombre} no ha sido cerrado. Se calculará la disponibilidad del día ${ultimoDia} con saldo del día anterior + incrementos.`,
         'Mes no cerrado'
       );
     }
@@ -98,21 +98,50 @@ export class InteresesComponent implements OnInit {
         mapaSaldos.set(item.id_plan, { ...item });
       });
 
-      incrementos.forEach(inc => {
-        const existente = mapaSaldos.get(inc.id_plan);
-        if (existente) {
-          existente.saldo_promedio = parseFloat(existente.saldo_promedio as any) + parseFloat(inc.incrementos as any);
-          existente.interes_calculado = parseFloat(existente.saldo_promedio as any) * this.tasa / 100 / 360 * parseFloat(existente.dias as any);
-        }
-      });
+      // REGLA CRÍTICA: Si el último día NO tiene cierre, proyectar saldo del último día
+      if (!this.mesCerrado) {
+        // Obtener saldos del día anterior para cada plan
+        const datosDiaAnterior = await this.interesesService.calcularIntereses(fechaDiaAnterior, fechaDiaAnterior);
+        const mapaAnterior = new Map<number, any>();
+        datosDiaAnterior.forEach(item => mapaAnterior.set(item.id_plan, item));
 
-      this.lstIntereses = Array.from(mapaSaldos.values()).map(item => ({
-        ...item,
-        tasa: this.tasa,
-        porcentaje: 0,
-        interes_real: 0,
-        diferencia: 0
-      }));
+        // Para cada plan, calcular saldo del último día = saldo día anterior + incrementos
+        for (const [idPlan, item] of mapaSaldos) {
+          const saldoAnterior = mapaAnterior.has(idPlan)
+            ? (parseFloat(mapaAnterior.get(idPlan).saldo_promedio as any) || 0)
+            : 0;
+          
+          const incrementoPlan = incrementos.find((inc: any) => inc.id_plan === idPlan);
+          const montoIncremento = incrementoPlan ? (parseFloat(incrementoPlan.incrementos as any) || 0) : 0;
+
+          // Saldo Último Día = Saldo Día Anterior + Incrementos
+          const saldoUltimoDia = saldoAnterior + montoIncremento;
+
+          // Interés Último Día = SaldoÚltimo Día × Tasa / 360
+          const interesUltimoDia = saldoUltimoDia * this.tasa / 100 / 360;
+
+          // Interés Teórico Total = Intereses días anteriores + Interés último día
+          const interesDiasAnteriores = parseFloat(item.interes_calculado as any) || 0;
+          item.interes_calculado = interesDiasAnteriores + interesUltimoDia;
+          item.saldo_promedio = saldoUltimoDia;
+          item.dias = ultimoDia;
+        }
+      }
+
+      this.lstIntereses = Array.from(mapaSaldos.values()).map(item => {
+        const interesMensual = parseFloat(item.interes_calculado as any) || 0;
+        const dias = parseInt(item.dias as any) || 30;
+        const interesDiario = interesMensual / dias;
+
+        return {
+          ...item,
+          tasa: this.tasa,
+          interes_diario: interesDiario,
+          porcentaje: 0,
+          interes_real: 0,
+          diferencia: 0
+        };
+      });
 
       this.calcularTotales();
       this.mostrarResultados = true;
@@ -209,7 +238,6 @@ export class InteresesComponent implements OnInit {
     this.mostrarFormPago = false;
     this.editandoPagoId = null;
     this.calcularDistribucionPorTramo();
-    console.log('DEBUG tramosConDistribucion:', JSON.parse(JSON.stringify(this.tramosConDistribucion)));
   }
 
   eliminarPago(id: number): void {
@@ -220,24 +248,19 @@ export class InteresesComponent implements OnInit {
   // ============ DISTRIBUCIÓN POR TRAMO ============
 
   calcularDistribucionPorTramo(): void {
-    console.log('DEBUG lstPagos:', JSON.parse(JSON.stringify(this.lstPagos)));
     this.tramosConDistribucion = this.lstPagos.map(pago => {
       const planesTramo = this.lstIntereses.filter(
         i => pago.planesIds.includes(Number(i.id_plan))
       );
-      console.log('DEBUG planesTramo:', planesTramo.length, 'planesIds:', pago.planesIds);
 
       // Total de saldos del tramo (base para distribución)
       const totalSaldos = planesTramo.reduce(
         (sum, p) => sum + (parseFloat(String(p.saldo_promedio || '0').replace(/,/g, '.')) || 0), 0
       );
-      
-      console.log('DEBUG totalSaldos:', totalSaldos, 'planes:', planesTramo.length);
-      console.log('DEBUG pago:', pago);
 
-      // Total teórico de intereses
+      // Total teórico de intereses (diario)
       const totalTeorico = planesTramo.reduce(
-        (sum, p) => sum + (parseFloat(p.interes_calculado as any) || 0), 0
+        (sum, p) => sum + ((Number(p.interes_diario) || 0)), 0
       );
 
       // Distribución basada en SALDO
@@ -245,8 +268,7 @@ export class InteresesComponent implements OnInit {
         const saldoRaw = String(plan.saldo_promedio || '0');
         const saldo = parseFloat(saldoRaw.replace(/,/g, '.')) || 0;
         const interesCalc = Number(plan.interes_calculado) || 0;
-        
-        console.log('DEBUG:', { plan: plan.plan, saldoRaw, saldo, totalSaldos, montoPago: pago.montoPago });
+        const interesDiario = Number(plan.interes_diario) || 0;
         
         // % = Saldo del Plan / Suma de Saldos
         const porcentaje = totalSaldos > 0 ? (saldo / totalSaldos) * 100 : 0;
@@ -259,9 +281,10 @@ export class InteresesComponent implements OnInit {
           plan: plan.plan,
           saldo_promedio: saldo,
           interes_calculado: interesCalc,
+          interes_diario: interesDiario,
           porcentajeTramo: porcentaje,
           interesRealTramo: interesReal,
-          diferenciaTramo: Math.round((interesReal - interesCalc) * 100) / 100
+          diferenciaTramo: Math.round((interesReal - interesDiario) * 100) / 100
         };
       });
 
