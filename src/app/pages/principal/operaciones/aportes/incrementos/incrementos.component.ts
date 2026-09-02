@@ -227,7 +227,7 @@ export class IncrementosComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
 
     this.monto = ''
-    this.fechai = ''
+    this.fechai = this.cierre.getSiguienteDia(this.fechaultimo)
     this.rif = ''
     this.observacion = ''
     this.plan = ''

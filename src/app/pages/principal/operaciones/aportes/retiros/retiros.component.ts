@@ -8,6 +8,7 @@ import { LIncremento } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
 import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 
 @Component({
   selector: 'app-retiros',
@@ -48,6 +49,7 @@ export class RetirosComponent implements OnInit {
     private toastr: ToastrService,
     private util: UtilService,
     private planGuard: PlanGuardService,
+    private cierre: CierreService,
   ) { }
 
   ngOnInit(): void {
@@ -202,7 +204,7 @@ export class RetirosComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
 
     this.monto = ''
-    this.fechai = ''
+    this.fechai = this.cierre.getSiguienteDia(this.fechaultimo)
     this.rif = ''
     this.observacion = ''
     this.fideicomiso = ''

@@ -79,6 +79,7 @@ import { AporteinicialComponent } from 'src/app/pages/principal/operaciones/apor
 import { IncrementosComponent } from 'src/app/pages/principal/operaciones/aportes/incrementos/incrementos.component';
 import { RetirosComponent } from 'src/app/pages/principal/operaciones/aportes/retiros/retiros.component';
 import { FiniquitoComponent } from 'src/app/pages/principal/operaciones/aportes/finiquito/finiquito.component';
+import { InteresesComponent } from 'src/app/pages/principal/operaciones/aportes/intereses/intereses.component';
 import { ProcesocontablesComponent } from 'src/app/pages/principal/contabilidad/procesocontables/procesocontables.component';
 import { GeneralyresultadoComponent } from 'src/app/pages/principal/contabilidad/generalyresultado/generalyresultado.component';
 import { ComprobacionComponent } from 'src/app/pages/principal/contabilidad/comprobacion/comprobacion.component';
@@ -183,6 +184,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     IncrementosComponent,
     RetirosComponent,
     FiniquitoComponent,
+    InteresesComponent,
     ProcesocontablesComponent,
     GeneralyresultadoComponent,
     ComprobacionComponent,

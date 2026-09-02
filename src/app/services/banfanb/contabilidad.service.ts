@@ -28,6 +28,7 @@ export interface LCuenta {
 }
 
 export interface LConfiguracionCuenta {
+  id: number
   cuenta: string
   descripcion: string
   instrumento: string
@@ -91,6 +92,7 @@ export interface PlanFideicomiso {
   metodo_ganancia: number
   frecuencia: number
   tasa_flat: number //decimales
+  tasa_anual: number //decimales
   comision_flat: number
   tipo_calculo: number
   tasa_comision: number //decimales

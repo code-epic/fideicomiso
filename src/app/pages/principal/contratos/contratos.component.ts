@@ -55,7 +55,8 @@ export class ContratosComponent implements OnInit {
     numeromaximo: 0,
     intervalominimo: 0,
     flat: 'NO',
-    tasaflat: 0
+    tasaflat: 0,
+    tasa_anual: 0
   }
 
   public Saldos: Saldos = {
@@ -120,6 +121,7 @@ export class ContratosComponent implements OnInit {
     metodo_ganancia: 0,
     frecuencia: 0,
     tasa_flat: 0,
+    tasa_anual: 0,
     comision_flat: 0,
     tipo_calculo: 0,
     tasa_comision: 0,
@@ -267,6 +269,7 @@ export class ContratosComponent implements OnInit {
         tipocalculo: ['', Validators.required],
         flat: [0, Validators.required],
         tasaflat: [0, Validators.required],
+        tasa_anual: [0, Validators.required],
         numeromaximo: [0, Validators.required],
         condicionganancia: ['', Validators.required],
         metodoganancia: ['', Validators.required],
@@ -437,6 +440,9 @@ export class ContratosComponent implements OnInit {
     this.contratoForm.patchValue(this.Contrato)
     this.contratoForm.get('saldo_inicio').setValue(this.Contrato.Saldos.saldoinicio)
     this.contratoForm.get('Politicas.tipocuenta').setValue(this.Contrato.Politicas.tipocuenta)
+    // Asegurar que tasa_anual tenga valor por defecto
+    const tasaAnual = this.Contrato.Politicas.tasa_anual || 2
+    this.contratoForm.get('Politicas.tasa_anual').setValue(tasaAnual)
 
     this.selectedIndex = 1
     this.active = true
@@ -618,6 +624,7 @@ export class ContratosComponent implements OnInit {
     this.planFideicomiso.metodo_ganancia = parseInt(this.Contrato.Politicas.metodoganancia)
     this.planFideicomiso.frecuencia = parseInt(this.Contrato.Politicas.condicionganancia)
     this.planFideicomiso.tasa_flat = parseFloat(this.Contrato.Politicas.tasaflat.toString())
+    this.planFideicomiso.tasa_anual = parseFloat(this.Contrato.Politicas.tasa_anual.toString())
     this.planFideicomiso.comision_flat = parseInt(this.Contrato.Politicas.flat)
     this.planFideicomiso.tipo_calculo = parseInt(this.Contrato.Politicas.tipocalculo.toString())
     this.planFideicomiso.tasa_comision = parseFloat(this.Contrato.Politicas.tasa.toString())

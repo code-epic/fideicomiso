@@ -19,7 +19,7 @@
                   <br>
                   <div class="row">
 
-                    <div class="col-md-6 col-lg-6 col-xl-8 text-center">
+                    <div class="col-md-3 col-lg-4 col-xl-4 text-center">
                       <mat-form-field appearance="outline">
                         <mat-label>Buscar</mat-label>
                         <input matInput placeholder="Buscar..." [(ngModel)]="buscar" (ngModelChange)="filtrarLista()" />
@@ -27,7 +27,19 @@
                       </mat-form-field>
                     </div>
 
-                    <div class="col-md-6 col-lg-3 col-xl-2 text-center">
+                    <div class="col-md-3 col-lg-4 col-xl-4 text-center">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Plan</mat-label>
+                        <mat-select [(ngModel)]="planFiltro" (selectionChange)="cargarComprobantes()">
+                          <mat-option value="%">TODOS</mat-option>
+                          <mat-option *ngFor="let p of lstPlanes" [value]="p.id">
+                            {{ p.id }} - {{ p.observacion }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-md-3 col-lg-2 col-xl-2 text-center">
                       <mat-form-field appearance="outline">
                         <mat-label>Mes</mat-label>
                         <mat-select [(ngModel)]="mes" (selectionChange)="cargarComprobantes()">
@@ -38,7 +50,7 @@
                       </mat-form-field>
                     </div>
 
-                    <div class="col-md-6 col-lg-3 col-xl-2 text-center">
+                    <div class="col-md-3 col-lg-2 col-xl-2 text-center">
                       <mat-form-field appearance="outline">
                         <mat-label>Año</mat-label>
                         <mat-select [(ngModel)]="anio" (selectionChange)="cargarComprobantes()">

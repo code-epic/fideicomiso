@@ -54,12 +54,15 @@
     </div>
   
     <div class="col-md-3">
-  
+
       <button mat-flat-button color="primary" (click)="Add()" style="margin-top: 5px; height: 50px;" >
         <mat-icon>verified</mat-icon>&nbsp;Agregar
       </button>
-  
-  
+
+      <button mat-flat-button color="warn" (click)="limpiarFormulario()" style="margin-top: 5px; height: 50px; margin-left: 5px;" *ngIf="blprocesar">
+        <mat-icon>cancel</mat-icon>&nbsp;Cancelar
+      </button>
+
     </div>
   </div>
 

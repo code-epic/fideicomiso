@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { environment } from 'src/environments/environment';
@@ -87,6 +88,7 @@ export class MayoranaliticoComponent implements OnInit {
     private _imprimir: ImprimirService,
     private cierre: CierreService,
     public formatter: NgbDateParserFormatter,
+    private planGuard: PlanGuardService,
   ) { }
 
   ngOnInit(): void {

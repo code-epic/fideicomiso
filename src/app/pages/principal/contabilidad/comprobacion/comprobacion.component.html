@@ -1,82 +1,85 @@
 
 <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
 
-<div class="centrar">
-  <div class="row">
-    <div class="col-md-2">
-      <mat-form-field appearance="outline">
-        <mat-label>Ultimo Cierre</mat-label>
-        <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
-          [(ngModel)]="fechaultimo" disabled="disabled">
-        <mat-icon matSuffix>event</mat-icon>
-      </mat-form-field>
-    </div>
-    
-    <div class="col-md-3">
-      <mat-form-field appearance="outline">
-        <mat-label>Plan</mat-label>
-        <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}" (selectionChange)="seleccionarPlan()">
-          <mat-option value='%'>TODOS</mat-option>
-          <mat-option *ngFor="let p of lstPlanesFideicomiso" value='{{p.id}}'>{{p.displayName || p.observacion}}</mat-option>
-        </mat-select>
-  
-      </mat-form-field>
-    </div>
-
-
-    <div class="col-md-4">
-      <mat-form-field appearance="outline">
-        <mat-label>Mes</mat-label>
-        <mat-select name="mesSelect" placeholder="CUENTAS CONTABLES" [(ngModel)]="mes" (selectionChange)="onMesChange($event)">
-          
-          <mat-option *ngFor="let e of lstFecha" [value]="e.id">{{e.nombre}}</mat-option>
-         
-        </mat-select>
-  
-      </mat-form-field>
-    </div>
-
-    
-  
-    <div class="col-md-2 text-left">
-      <button mat-flat-button color="primary" (click)="ConsultarComprobacion()" style="margin-top: 5px; height: 50px;">
-        <mat-icon>verified</mat-icon>&nbsp;Procesar reporte
-      </button>
-    </div>
-  
-  
-  </div>
-</div>
-
-
-<div id="DivPrintPage" name="DivPrintPage" *ngIf="printv">
-    <div class="row" style="display: flex; align-items: center;">
-      <div style="width: 33%;">
-        <img src="./assets/img/brand/logo.png" alt="Imagen" style="margin-right: 20px; height: 5rem;">
+<div class="comprobacion-container">
+  <div class="centrar">
+    <div class="row filtros-form">
+      <div class="col-12 col-sm-6 col-md-3 col-lg-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Ultimo Cierre</mat-label>
+          <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="fechaultimo" disabled="disabled">
+          <mat-icon matSuffix>event</mat-icon>
+        </mat-form-field>
       </div>
-      <div style="width: 33%;" style="flex-grow: 1; text-align: center;">
-        <p align="center" style="font-weight: bold;font-size: 13px;">
+      
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <mat-form-field appearance="outline">
+          <mat-label>Plan</mat-label>
+          <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}" (selectionChange)="seleccionarPlan()">
+            <mat-option value='%'>TODOS</mat-option>
+            <mat-option *ngFor="let p of lstPlanesFideicomiso" value='{{p.id}}'>{{p.displayName || p.observacion}}</mat-option>
+          </mat-select>
+    
+        </mat-form-field>
+      </div>
+
+
+      <div class="col-12 col-sm-6 col-md-4 col-lg-4">
+        <mat-form-field appearance="outline">
+          <mat-label>Mes</mat-label>
+          <mat-select name="mesSelect" placeholder="CUENTAS CONTABLES" [(ngModel)]="mes" (selectionChange)="onMesChange($event)">
+            
+            <mat-option *ngFor="let e of lstFecha" [value]="e.id">{{e.nombre}}</mat-option>
+           
+          </mat-select>
+    
+        </mat-form-field>
+      </div>
+
+      
+    
+      <div class="col-12 col-sm-6 col-md-1 col-lg-2">
+        <button mat-flat-button color="primary" (click)="ConsultarComprobacion()" class="btn-procesar">
+          <mat-icon>verified</mat-icon>&nbsp;Procesar
+        </button>
+      </div>
+    
+    
+    </div>
+  </div>
+
+
+  <div id="DivPrintPage" name="DivPrintPage" *ngIf="printv">
+      <div class="reporte-header">
+        <div>
+          <img src="./assets/img/brand/logo.png" alt="Imagen" class="logo">
+        </div>
+        <div class="titulo">
           BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA<br>
           DIRECCION DE FIDEICOMISO<br>
           BALANCE DE COMPROBACION DEL MES {{lstFecha[mes]?.nombre}}<br>
-          PLAN DE FIDEICOMISO: {{ getNombrePlan() }}
-        </p>
+          <ng-container *ngIf="plan !== '%'">FIDEICOMISO: {{ getNombrePlan() }}</ng-container>
+          <ng-container *ngIf="plan === '%'">PLAN: TODOS</ng-container>
+        </div>
+        <div class="logo-placeholder">
+          <img src="./assets/img/brand/logo.png" alt="Imagen" class="logo">
+        </div>
       </div>
-      <div style="width: 33%;"></div>
-    </div>
 
-  <br>
-  <div class="row" [innerHtml]="HTMLComprobacion"></div>
-</div>
-
-<div class="row" *ngIf="printv">
-  <div class="col-md-6"></div>
-
-  <div class="col-md-6 text-right">
-    <button mat-flat-button color="primary" (click)="imprimir()" style="margin-top: 5px; height: 50px;">
-      &nbsp;Imprimir reporte
-    </button>
+    <br>
+    <div class="tabla-container" [innerHtml]="HTMLComprobacion"></div>
   </div>
 
+  <div class="row" *ngIf="printv">
+    <div class="col-6"></div>
 
+    <div class="col-6 text-right">
+      <button mat-flat-button color="primary" (click)="imprimir()" class="btn-imprimir">
+        &nbsp;Imprimir reporte
+      </button>
+    </div>
+
+
+  </div>
 </div>

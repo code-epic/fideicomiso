@@ -181,6 +181,9 @@ export class ComprobanteComponent implements OnInit {
 
   public lstOriginal: any[] = []; // Lista original sin filtrar
 
+  public lstPlanes: any[] = []; // Lista de planes para filtro
+  public planFiltro: string = '%'; // '% = todos, o id del plan
+
   constructor(
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
@@ -202,7 +205,24 @@ export class ComprobanteComponent implements OnInit {
     this.cargarContenido();
     this.GenerarSemillero();
     this.cargarComprobantes()
+    this.cargarPlanes()
     this.fechaUltimo = await this._cierre.getUltimoCierre()
+  }
+
+  cargarPlanes() {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_PLANES_FIDEICOMISO,
+      parametros: '',
+      valores: ''
+    };
+    this.apiService.Ejecutar(xAPI).subscribe(
+      (data) => {
+        this.lstPlanes = data?.Cuerpo || [];
+      },
+      (err) => {
+        console.error(err);
+      }
+    );
   }
 
   cargarComprobantes(){
@@ -306,13 +326,22 @@ export class ComprobanteComponent implements OnInit {
 
   filtrarLista() {
     const texto = (this.buscar || '').toLowerCase();
-    if (!texto) {
-      this.lst = [...this.lstOriginal];
-      return;
+    let filtrados = [...this.lstOriginal];
+
+    // Filtro por texto
+    if (texto) {
+      filtrados = filtrados.filter(e =>
+        (e.descripcion || '').toLowerCase().includes(texto)
+      );
     }
-    this.lst = this.lstOriginal.filter(e =>
-      (e.descripcion || '').toLowerCase().includes(texto)
-    );
+
+    // Filtro por plan
+    if (this.planFiltro && this.planFiltro !== '%') {
+      const planId = parseInt(this.planFiltro);
+      filtrados = filtrados.filter(e => parseInt(e.plan) === planId);
+    }
+
+    this.lst = filtrados;
   }
 
   // Añade este método para manejar cambios de página

@@ -28,6 +28,7 @@ export interface Politicas {
   tasa: number;
   flat: string;
   tasaflat: number;
+  tasa_anual: number;
   enviar: string;
   numeromaximo: number;
   intervalominimo: number;

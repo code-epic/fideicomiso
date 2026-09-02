@@ -80,10 +80,6 @@
     </ng-template>
     <br>
 
-    <div *ngIf="avisoEdicion" class="aviso-edicion">
-      <i class="fas fa-exclamation-triangle"></i> <b>Funcion en desarrollo:</b> La edicion de registros existentes estara disponible proximamente. Los cambios crearan un nuevo registro.
-    </div>
-
     <div class="card">
       <div class="card-body" style="padding:20px;">
         <div style="padding: 20px;">
@@ -254,7 +250,7 @@
 
           <div class="col-md-12 text-right">
             <button mat-flat-button color="primary" (click)="Guardar()" style="height: 50px;">
-              <mat-icon>verified</mat-icon>&nbsp;Registar</button>
+              <mat-icon>verified</mat-icon>&nbsp;{{ esEdicion ? 'Actualizar' : 'Registrar' }}</button>
             &nbsp;&nbsp;
             <button mat-flat-button color="warn" (click)="Limpiar()" style="height: 50px;">
               <mat-icon>delete</mat-icon>&nbsp;Cancelar</button>

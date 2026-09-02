@@ -60,9 +60,15 @@ export const environment = {
     CONSULTAR_CUENTAS: 'FID_CCuentas',
     CONSULTAR_CUENTA: 'FID_CCuenta',
     INSERTAR_CUENTA: 'FID_ICuenta',
+    ACTUALIZAR_CUENTA: 'FID_UCuenta',
     BORRAR_CUENTA: 'FID_DCuentaContable',
     CONSULTAR_PLAN_CONTABLE: 'FID_CPlanContable',
     CONSULTAR_ESTADO_CUENTA: 'FID_CEstadoCuenta',
+
+    // Configuracion de cuentas
+    CONSULTAR_CONFIGURACION_CUENTAS: 'FID_CConfiguracionCuentas',
+    INSERTAR_CONFIGURACION_CUENTA: 'FID_IConfiguracionCuenta',
+    ACTUALIZAR_CONFIGURACION_CUENTA: 'FID_UConfiguracionCuenta',
 
     // Reportes contables
     CONSULTAR_BALANCE_COMPROBACION: 'FID_CBalanceComprobacion',

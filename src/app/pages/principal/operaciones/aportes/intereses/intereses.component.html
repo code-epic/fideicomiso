@@ -1,0 +1,111 @@
+<ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
+
+<div class="intereses-container">
+  <div class="row">
+    <div class="col-12">
+      <h3>Intereses por Disponibilidad</h3>
+      <hr>
+    </div>
+  </div>
+
+  <div class="row filtros-form">
+    <div class="col-6 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Mes</mat-label>
+        <mat-select [(ngModel)]="mes" (selectionChange)="consultar()">
+          <mat-option *ngFor="let m of lstMeses" [value]="m.valor">
+            {{ m.valor }} - {{ m.nombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Año</mat-label>
+        <mat-select [(ngModel)]="anio" (selectionChange)="consultar()">
+          <mat-option *ngFor="let a of anios" [value]="a">{{ a }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Tasa Anual (%)</mat-label>
+        <input matInput type="number" [(ngModel)]="tasa" (change)="consultar()">
+      </mat-form-field>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Monto Pagado Banco (Bs.)</mat-label>
+        <input matInput type="number" [(ngModel)]="montoBanco" (change)="onMontoBancoChange()">
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 col-md-3 text-right">
+      <button mat-flat-button color="primary" (click)="consultar()" class="btn-consultar">
+        <mat-icon>search</mat-icon>&nbsp;Consultar
+      </button>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="mostrarResultados">
+    <div class="col-12">
+      <mat-card>
+        <mat-card-title>Resultado de Conciliación</mat-card-title>
+        <mat-card-content>
+          <div class="tabla-container">
+            <table class="table table-sm table-bordered">
+              <thead>
+                <tr>
+                  <th class="col-plan">Plan</th>
+                  <th class="col-nombre">Nombre</th>
+                  <th class="col-monto text-right">Saldo Promedio</th>
+                  <th class="col-monto text-right">Interés Calculado</th>
+                  <th class="col-porcentaje text-right">% Participación</th>
+                  <th class="col-monto text-right">Interés Real</th>
+                  <th class="col-monto text-right">Diferencia</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of lstIntereses">
+                  <td>{{ e.id_plan }}</td>
+                  <td>{{ e.plan }}</td>
+                  <td class="text-right">{{ formatearMonto(e.saldo_promedio) }}</td>
+                  <td class="text-right">{{ formatearMonto(e.interes_calculado) }}</td>
+                  <td class="text-right">{{ e.porcentaje | number:'1.2-2' }}%</td>
+                  <td class="text-right">{{ formatearMonto(e.interes_real) }}</td>
+                  <td class="text-right" [style.color]="e.diferencia > 0 ? 'green' : e.diferencia < 0 ? 'red' : 'inherit'">
+                    {{ formatearMonto(e.diferencia) }}
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="font-weight-bold">
+                  <td colspan="2">TOTAL</td>
+                  <td class="text-right"></td>
+                  <td class="text-right">{{ formatearMonto(totalInteresCalculado) }}</td>
+                  <td class="text-right">100%</td>
+                  <td class="text-right">{{ formatearMonto(totalInteresReal) }}</td>
+                  <td class="text-right"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col-12 text-right">
+              <button mat-flat-button color="warn" (click)="generarComprobantes()" [disabled]="!mesCerrado" class="btn-comprobantes">
+                <mat-icon>receipt_long</mat-icon>&nbsp;Generar Comprobantes
+              </button>
+              <span *ngIf="!mesCerrado" class="text-muted ml-2">
+                <i class="fas fa-info-circle"></i> Mes aún no cerrado
+              </span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

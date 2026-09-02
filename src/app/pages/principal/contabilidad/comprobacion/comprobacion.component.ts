@@ -204,22 +204,21 @@ export class ComprobacionComponent implements OnInit {
     this.ngxService.startLoader('load-cont')
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
     const mesIndex = Number(this.mes)
-    this.xAPI.parametros = `${this.lstFecha[mesIndex].value},S,${this.plan}`
+    this.xAPI.parametros = `${this.lstFecha[mesIndex].value},M,${this.plan}`
     this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         this.lstComprobacion = data.Cuerpo;
         this.HTMLComprobacion = `
-          <table class="asientos" >
-                          
-          <thead background-color: #e1e1d154; height: 35px;>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">
-              <th style="text-align: left; " >DESCRIPCION DE LA CUENTA</th>
-              <th style="text-align: center;">SALDO INICIAL</th>
-              <th style="text-align: center;">MONTO DEBE</th>
-              <th style="text-align: center;">MONTO HABER</th>
-              <th style="text-align: center;">SALDO ACTUAL</th>
+          <table class="asientos" style="width: 100%; min-width: 700px; border-collapse: collapse; font-size: 11px;">
+          <thead>
+            <tr style="border: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">
+              <th style="text-align: left; padding: 6px 10px; width: 46%;">DESCRIPCION DE LA CUENTA</th>
+              <th style="text-align: right; padding: 6px 12px; width: 13%;">SALDO INICIAL</th>
+              <th style="text-align: right; padding: 6px 12px; width: 13%;">MONTO DEBE</th>
+              <th style="text-align: right; padding: 6px 12px; width: 13%;">MONTO HABER</th>
+              <th style="text-align: right; padding: 6px 12px; width: 15%;">SALDO ACTUAL</th>
             </tr>
           </thead>
           <tbody>
@@ -238,21 +237,21 @@ export class ComprobacionComponent implements OnInit {
         let result = this.lstIndex[4].haber - this.lstIndex[3].debe;
 
         this.HTMLComprobacion += `
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
-              <th >${this.lstIndex[this.posicion].nombre} </th>
-              <th class="text-right">${this.getMoneda(this.acum_saldo_inicial) == "0"
+            <tr style="border-top: 2px solid #999; border-bottom: 1px solid #ccc; background-color: #d4d4c8; height: 40px;">  
+              <th style="padding: 8px 10px; text-align: left;">${this.lstIndex[this.posicion].nombre} </th>
+              <th style="padding: 8px 12px; text-align: right;">${this.getMoneda(this.acum_saldo_inicial) == "0"
             ? "-"
             : this.getMoneda(this.acum_saldo_inicial)
           }</th>
-              <th class="text-right">${this.getMoneda(this.acumuladord) == "0"
+              <th style="padding: 8px 12px; text-align: right;">${this.getMoneda(this.acumuladord) == "0"
             ? "-"
             : this.getMoneda(this.acumuladord)
           }</th>
-              <th class="text-right">${this.getMoneda(this.acumuladorh) == "0"
+              <th style="padding: 8px 12px; text-align: right;">${this.getMoneda(this.acumuladorh) == "0"
             ? "-"
             : this.getMoneda(this.acumuladorh)
           }</th>
-              <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+              <th style="padding: 8px 12px; text-align: right;">${this.getMoneda(this.acum_saldo_actual) == "0"
             ? "-"
             : this.getMoneda(this.acum_saldo_actual)
           }</th>
@@ -289,17 +288,17 @@ export class ComprobacionComponent implements OnInit {
         "." +
         e.nivel_2;
       titulo = `
-      <tr>  
-          <td>${txt + ". " + e.descripcion.toUpperCase()}<span style="color:#2563EB;">${e.plan_nombre ? " - " + e.plan_nombre : ""}</span></td>
-          <td class="text-right">${this.getMoneda(saldo_inicial) == "0"
+      <tr style="border-bottom: 1px solid #eee;">  
+          <td style="padding: 4px 10px;">${txt + ". " + e.descripcion.toUpperCase()}</td>
+          <td style="text-align: right; padding: 4px 12px;">${this.getMoneda(saldo_inicial) == "0"
           ? "-"
           : this.getMoneda(saldo_inicial)
         }</td>
-          <td class="text-right">${this.getMoneda(debe) == "0" ? "-" : this.getMoneda(debe)
+          <td style="text-align: right; padding: 4px 12px;">${this.getMoneda(debe) == "0" ? "-" : this.getMoneda(debe)
         }</td>
-          <td class="text-right">${this.getMoneda(haber) == "0" ? "-" : this.getMoneda(haber)
+          <td style="text-align: right; padding: 4px 12px;">${this.getMoneda(haber) == "0" ? "-" : this.getMoneda(haber)
         }</td>
-          <td class="text-right">${this.getMoneda(saldo_actual) == "0"
+          <td style="text-align: right; padding: 4px 12px;">${this.getMoneda(saldo_actual) == "0"
           ? "-"
           : this.getMoneda(saldo_actual)
         }</td>
@@ -332,27 +331,27 @@ export class ComprobacionComponent implements OnInit {
       this.lstIndex[this.posicion].haber = this.acumuladorh;
 
       this.HTMLComprobacion += `
-        <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
-          <th >${this.lstIndex[this.posicion].nombre} </th>
-          <th class="text-right">${this.getMoneda(this.acum_saldo_inicial) == "0"
+        <tr style="border-top: 2px solid #999; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
+          <th style="padding: 6px 10px; text-align: left;">${this.lstIndex[this.posicion].nombre} </th>
+          <th style="padding: 6px 12px; text-align: right;">${this.getMoneda(this.acum_saldo_inicial) == "0"
           ? "-"
           : this.getMoneda(this.acum_saldo_inicial)
         }</th>
-          <th class="text-right">${this.getMoneda(this.acumuladord) == "0"
+          <th style="padding: 6px 12px; text-align: right;">${this.getMoneda(this.acumuladord) == "0"
           ? "-"
           : this.getMoneda(this.acumuladord)
         }</th>
-          <th class="text-right">${this.getMoneda(this.acumuladorh) == "0"
+          <th style="padding: 6px 12px; text-align: right;">${this.getMoneda(this.acumuladorh) == "0"
           ? "-"
           : this.getMoneda(this.acumuladorh)
         }</th>
-          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          <th style="padding: 6px 12px; text-align: right;">${this.getMoneda(this.acum_saldo_actual) == "0"
           ? "-"
           : this.getMoneda(this.acum_saldo_actual)
         }</th>
         </tr>
         <tr>  
-          <td  colspan="5">${this.getTitulosACuentas(e)} </td>
+          <td colspan="5" style="padding: 4px 10px;">${this.getTitulosACuentas(e)} </td>
         </tr>
         
       `;

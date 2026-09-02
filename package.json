@@ -3,7 +3,7 @@
   "version": "1.4.0",
   "scripts": {
     "ng": "ng",
-    "start": "NODE_OPTIONS=\"--max-http-header-size=100000\" ng serve --host 0.0.0.0 --port 4203 --proxy-config ./src/proxy.conf.json --prod=false ",
+    "start": "NODE_OPTIONS=\"--max-http-header-size=100000\" ng serve --host 0.0.0.0 --port 4203 --proxy-config ./src/proxy.conf.json --prod=false --disable-host-check",
     "build": "ng build --configuration production --base-href=\".\"",
     "test": "ng test",
     "lint": "ng lint",

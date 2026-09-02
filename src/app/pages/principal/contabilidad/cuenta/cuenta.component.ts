@@ -58,6 +58,8 @@ export class CuentaComponent implements OnInit {
   public active: boolean = false;
   private cambioProgramatico: boolean = false;
   public avisoEdicion: boolean = false;
+  public esEdicion: boolean = false;
+  public cuentaId: number = 0;
 
   public porta_insert: string = "";
   public porta_search: string = "none";
@@ -83,7 +85,8 @@ export class CuentaComponent implements OnInit {
 
   editar(e) {
     this.Limpiar()
-    this.avisoEdicion = true
+    this.esEdicion = true
+    this.cuentaId = e.codigo
 
     this.txtCuenta = e.cuenta || ''
     this.Cuenta.descripcion = e.descripcion || ''
@@ -152,6 +155,8 @@ export class CuentaComponent implements OnInit {
 
   Limpiar() {
     this.avisoEdicion = false
+    this.esEdicion = false
+    this.cuentaId = 0
 
     this.Cuenta = {
       moneda: "",
@@ -240,21 +245,29 @@ export class CuentaComponent implements OnInit {
     this.Cuenta.totalizadora = parseInt(this.cmbTotalizadora);
 
     this.ngxService.startLoader("load-inver");
-    this.xAPI.funcion = environment.xApi.INSERTAR_CUENTA
-    this.xAPI.parametros = "";
-    this.xAPI.valores = JSON.stringify(this.Cuenta);
+    
+    if (this.esEdicion && this.cuentaId > 0) {
+      this.xAPI.funcion = environment.xApi.ACTUALIZAR_CUENTA;
+      this.xAPI.parametros = `${this.cuentaId},${this.Cuenta.descripcion}`;
+      this.xAPI.valores = "";
+    } else {
+      this.xAPI.funcion = environment.xApi.INSERTAR_CUENTA;
+      this.xAPI.parametros = "";
+      this.xAPI.valores = JSON.stringify(this.Cuenta);
+    }
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.apiService.Mensaje(
           "Proceso exitoso",
-          "Cuenta guardada correctamente",
+          this.esEdicion ? "Cuenta actualizada correctamente" : "Cuenta guardada correctamente",
           "success",
           "cuenta"
         );
         this.ngxService.stopLoader("load-inver");
         this.Limpiar();
         this.txtCuenta = "";
+        this.cargarContenido();
       },
       (error) => {
         console.error(error);
