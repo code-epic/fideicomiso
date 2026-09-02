@@ -1,8 +1,34 @@
+// ============================================
+// Estilos del Módulo de Intereses por Disponibilidad
+// UI/UX Pro Max - Consistente con el sistema BANFANB
+// ============================================
+
+// Variables del sistema (consistentes con styles.scss)
+$primary-color: rgb(47, 84, 150);
+$text-dark: rgb(49, 118, 238);
+$text-muted: rgb(112, 110, 110);
+$border-color: rgba(224, 223, 223, 0.945);
+$bg-hover: rgba(224, 223, 223, 0.3);
+$success-color: #2e7d32;
+$warning-color: #f57c00;
+$error-color: #c62828;
+
 .intereses-container {
-  padding: 10px;
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
+// ============================================
+// Sección de Filtros
+// ============================================
 .filtros-form {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+
   .mat-form-field {
     width: 100%;
     font-size: 13px;
@@ -12,30 +38,221 @@
     width: 100%;
     height: 48px;
     margin-top: 4px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(47, 84, 150, 0.3);
+    }
   }
 }
 
+// ============================================
+// Formulario de Pago
+// ============================================
+.form-pago-card {
+  border-left: 4px solid $primary-color;
+  background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  mat-card-header {
+    padding: 16px 16px 8px;
+  }
+
+  mat-card-content {
+    padding: 0 16px 16px;
+  }
+
+  mat-card-actions {
+    padding: 8px 16px 16px;
+    display: flex;
+    gap: 8px;
+
+    button {
+      font-weight: 500;
+    }
+  }
+}
+
+// ============================================
+// Selector de Planes
+// ============================================
+.planes-selector {
+  margin: 16px 0;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 6px;
+  border: 1px solid $border-color;
+
+  .planes-label {
+    font-weight: 500;
+    font-size: 13px;
+    color: $text-muted;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .planes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    mat-checkbox {
+      font-size: 13px;
+      margin: 4px 0;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: $bg-hover;
+        border-radius: 4px;
+      }
+    }
+  }
+}
+
+// ============================================
+// Distribución Preliminar
+// ============================================
+.distribucion-preliminar {
+  margin-top: 16px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  > label {
+    font-weight: 500;
+    font-size: 13px;
+    color: $text-muted;
+    margin-bottom: 12px;
+    display: block;
+  }
+}
+
+// ============================================
+// Tramos de Distribución
+// ============================================
+.tramo-card {
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.tramo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
+  border-bottom: 1px solid $border-color;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  &.tramo-error {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    border-bottom-color: $warning-color;
+  }
+}
+
+.tramo-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tramo-fecha {
+  color: $text-muted;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tramo-monto {
+  font-weight: 600;
+  font-size: 15px;
+  color: $primary-color;
+}
+
+.tramo-status {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+
+  &.cuadra-ok {
+    background: rgba(46, 125, 50, 0.1);
+    color: $success-color;
+    border: 1px solid rgba(46, 125, 50, 0.2);
+  }
+
+  &.cuadra-error {
+    background: rgba(198, 40, 40, 0.1);
+    color: $error-color;
+    border: 1px solid rgba(198, 40, 40, 0.2);
+  }
+}
+
+.tramo-acciones {
+  display: flex;
+  gap: 4px;
+
+  button {
+    width: 36px;
+    height: 36px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $bg-hover;
+    }
+  }
+}
+
+// ============================================
+// Tabla de Distribución
+// ============================================
 .tabla-container {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  margin: 10px 0;
+  margin: 16px 0;
 
   &::-webkit-scrollbar {
-    height: 8px;
+    height: 6px;
   }
 
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 4px;
+    border-radius: 3px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+    background: #c1c1c1;
+    border-radius: 3px;
 
     &:hover {
-      background: #555;
+      background: #a8a8a8;
     }
   }
 }
@@ -43,10 +260,30 @@
 .table {
   min-width: 800px;
   font-size: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
 
-  th, td {
-    padding: 6px 8px;
+  th {
+    padding: 10px 12px;
     white-space: nowrap;
+    font-weight: 600;
+    color: $text-muted;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid $border-color;
+    background: #fafafa;
+  }
+
+  td {
+    padding: 10px 12px;
+    white-space: nowrap;
+    border-bottom: 1px solid $border-color;
+    transition: background 0.15s ease;
+  }
+
+  tr:hover td {
+    background: $bg-hover;
   }
 
   .col-plan {
@@ -66,21 +303,121 @@
   }
 }
 
-.btn-comprobantes {
-  height: 44px;
+// ============================================
+// Resumen
+// ============================================
+.resumen-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid $border-color;
+  font-size: 13px;
 
-  @media (max-width: 576px) {
-    width: 100%;
+  &:last-child {
+    border-bottom: none;
+  }
+
+  span:first-child {
+    color: $text-muted;
   }
 }
 
-/* Responsive: movil */
+.resumen-status {
+  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+// ============================================
+// Planes sin Asignar
+// ============================================
+.plan-sin-asignar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid $border-color;
+  font-size: 13px;
+  transition: background 0.15s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: $bg-hover;
+  }
+}
+
+// ============================================
+// Estados de Validación
+// ============================================
+.cuadra-ok {
+  color: $success-color;
+  font-weight: 500;
+}
+
+.cuadra-error {
+  color: $error-color;
+  font-weight: 500;
+}
+
+// ============================================
+// Botones de Acción
+// ============================================
+.btn-comprobantes {
+  height: 48px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(198, 40, 40, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================
+// Responsive: Tablets (≤992px)
+// ============================================
+@media (max-width: 992px) {
+  .intereses-container {
+    padding: 12px;
+  }
+
+  .tramo-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tramo-info {
+    width: 100%;
+  }
+
+  .tramo-acciones {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+// ============================================
+// Responsive: Móviles (≤576px)
+// ============================================
 @media (max-width: 576px) {
   .intereses-container {
-    padding: 5px;
+    padding: 8px;
   }
 
   .filtros-form {
+    padding: 12px;
+
     .mat-form-field {
       font-size: 12px;
     }
@@ -90,11 +427,57 @@
     }
   }
 
+  .form-pago-card {
+    margin: 0 -8px;
+    border-radius: 0;
+    border-left: none;
+    border-top: 3px solid $primary-color;
+  }
+
+  .tabla-container {
+    margin: 8px -8px;
+    width: calc(100% + 16px);
+  }
+
   .table {
     font-size: 11px;
 
     th, td {
-      padding: 4px 6px;
+      padding: 8px 10px;
     }
   }
+
+  .tramo-header {
+    padding: 10px 12px;
+  }
+
+  .tramo-monto {
+    font-size: 14px;
+  }
+
+  .btn-comprobantes {
+    width: 100%;
+    height: 44px;
+  }
+
+  .resumen-status {
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+}
+
+// ============================================
+// Accesibilidad
+// ============================================
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+// Focus visible para navegación por teclado
+mat-checkbox:focus-visible,
+button:focus-visible {
+  outline: 2px solid $primary-color;
+  outline-offset: 2px;
 }

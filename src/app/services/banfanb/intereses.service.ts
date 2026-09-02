@@ -15,6 +15,33 @@ export interface InteresProyectado {
   diferencia?: number;
 }
 
+export interface PagoTramo {
+  id: number;
+  referencia: string;
+  fechaValor: string;
+  montoPago: number;
+  planesIds: number[];
+  estaContabilizado: boolean;
+}
+
+export interface DistribucionPlan {
+  id_plan: number;
+  plan: string;
+  saldo_promedio: number;
+  interes_calculado: number;
+  porcentajeTramo: number;
+  interesRealTramo: number;
+  diferenciaTramo: number;
+}
+
+export interface TramoConDistribucion {
+  pago: PagoTramo;
+  distribuciones: DistribucionPlan[];
+  totalTeorico: number;
+  totalReal: number;
+  cuadra: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class InteresesService {
 
