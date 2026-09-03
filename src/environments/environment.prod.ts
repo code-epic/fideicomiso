@@ -10,7 +10,7 @@ export const environment = {
     CONSULTAR_ULTIMO_CIERRE: 'FID_CUltimoCierre',
     CONSULTAR_ULTIMO_PRECIERRE: 'FID_CUltimoPreCierre',
     CONSULTAR_ULTIMO_CIERRE_SEMESTRAL: 'FID_CFechaMaxPreCierreSemestral',
-    VALIDAR_CIERRE:'FID_CValidarCierre',
+    VALIDAR_CIERRE:'FID_CValidarReconciliacion',
 
     // Ubicaciones geográficas
     LISTAR_PAISES: 'ListarPaises',

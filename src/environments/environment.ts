@@ -87,7 +87,7 @@ export const environment = {
     INSERTAR_SALDOS_CIERRE: 'FID_ISaldosCierre',
     BORRAR_CIERRE_SEMESTRAL: 'FID_DCierreSemestral',
     CONSULTAR_MOVIMIENTOS_SEMESTRALES: 'FID_CMovimientosSemestrales',
-    VALIDAR_CIERRE:'FID_CValidarCierre',
+    VALIDAR_CIERRE:'FID_CValidarReconciliacion',
     VERIFICAR_MOVIMIENTOS_D: 'FID_CVerificarMovimientosD',
     VERIFICAR_CIERRE_MENSUAL: 'FID_CVerificarCierreMensual',
     BORRAR_CIERRE_MENSUAL: 'FID_DCierreMensual',

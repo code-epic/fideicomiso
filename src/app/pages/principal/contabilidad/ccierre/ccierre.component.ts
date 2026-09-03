@@ -197,12 +197,9 @@ export class CcierreComponent implements OnInit {
           this.ngxService.stopLoader('load-precierre');
           let listaHTML = '<ul style="text-align: left; margin: 10px 0; padding-left: 20px;">';
           faltantes.forEach(f => {
-            if (f.existe == f.esperado) {
-              // Comprobantes existen pero movimientos no → precierre pendiente
-              listaHTML += `<li style="margin: 5px 0;"><strong>${f.tipo}</strong>: Los comprobantes existen pero no se registraron los movimientos. Realiza el precierre del día.</li>`;
-            } else {
-              listaHTML += `<li style="margin: 5px 0;"><strong>${f.tipo}</strong>: Faltan ${f.esperado - f.existe} comprobantes de ${f.esperado}</li>`;
-            }
+            const n = f.existe || 0;
+            const msg = this.mensajeFaltante(f.tipo, n, f.existe, f.esperado);
+            listaHTML += `<li style="margin: 5px 0;">${msg}</li>`;
           });
           listaHTML += '</ul>';
 
@@ -222,6 +219,33 @@ export class CcierreComponent implements OnInit {
         this.ngxService.stopLoader('load-precierre');
       }
     })
+  }
+
+  mensajeFaltante(tipo: string, n: number, existe: any, esperado: any): string {
+    const nombre = tipo.toUpperCase();
+    switch (nombre) {
+      case 'COMPROBANTE_SIN_MOV':
+        return `<strong>Comprobantes sin movimientos:</strong> ${n} comprobante(s) del día no tienen movimientos. Realiza el precierre del día.`;
+      case 'MOV_SIN_COMPROBANTE':
+        return `<strong>Movimientos sin comprobante:</strong> ${n} movimiento(s) del día no tienen comprobante asociado (huérfanos).`;
+      case 'DESCUADRE_MONTO':
+        return `<strong>Descuadre de montos:</strong> ${n} comprobante(s) tienen montos que no concuerdan entre el comprobante y sus movimientos.`;
+      case 'COMISION':
+        if (existe == esperado) {
+          return `<strong>Comisiones:</strong> Se generaron ${n} comprobantes de comisiones pero algunos no tienen movimientos. Realiza el precierre del día.`;
+        }
+        return `<strong>Comisiones:</strong> Faltan ${esperado - existe} comprobante(s) de comisión de ${esperado} planes activos.`;
+      case 'DEVENGO':
+        if (existe == esperado) {
+          return `<strong>Devengos:</strong> Se generaron ${n} comprobantes de devengo pero algunos no tienen movimientos. Realiza el precierre del día.`;
+        }
+        return `<strong>Devengos:</strong> Faltan ${esperado - existe} comprobante(s) de devengo de ${esperado} inversiones vigentes.`;
+      default:
+        if (existe == esperado) {
+          return `<strong>${nombre}</strong>: Los comprobantes existen pero no se registraron los movimientos. Realiza el precierre del día.`;
+        }
+        return `<strong>${nombre}</strong>: Faltan ${esperado - existe} comprobantes de ${esperado}`;
+    }
   }
 
   CrearSaldos(llave = 'M') {
