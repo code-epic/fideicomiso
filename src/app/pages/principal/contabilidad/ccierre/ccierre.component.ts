@@ -7,9 +7,11 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banfanb/comprobante.service';
+import { InteresesService } from 'src/app/services/banfanb/intereses.service';
 import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
+import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -75,12 +77,24 @@ export class CcierreComponent implements OnInit {
   events: string[] = [];
   blista: boolean = false
   bauxiliar: boolean = false
+  // Cierre mensual
+  public esUltimoDiaMes: boolean = false;
+  public esPrimerDiaMes: boolean = false;
+  public cierreDiarioCompletado: boolean = false;
+  public interesesGenerados: boolean = false;
+  public precierreEjecutado: boolean = false;
+  public cierreMensualCompletado: boolean = false;
+  public movimientosDEncontrados: boolean = false;
+  public lstInteresesGenerados: any[] = [];
+  public tasaInteres: number = 2.00;
+
   constructor(
     private apiService: ApiService,
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
     public formatter: NgbDateParserFormatter,
-    private cierre: CierreService
+    private cierre: CierreService,
+    private interesesService: InteresesService
   ) { }
 
   ngOnInit(): void {
@@ -93,6 +107,39 @@ export class CcierreComponent implements OnInit {
     this.fechaf = this.fechai
     this.semestral = this.cierre.getSemestral(this.fechaultimo)
     this.dias = 1
+    this.verificarUltimoDiaMes()
+  }
+
+  verificarUltimoDiaMes() {
+    const hoy = new Date();
+    const fechai = new Date(this.fechai);
+    const ultimoDiaMes = new Date(fechai.getFullYear(), fechai.getMonth() + 1, 0);
+    this.esUltimoDiaMes = hoy.getFullYear() === fechai.getFullYear() && 
+                          hoy.getMonth() === fechai.getMonth() && 
+                          hoy.getDate() === ultimoDiaMes.getDate();
+    this.esPrimerDiaMes = fechai.getDate() === 1;
+
+    if (this.esPrimerDiaMes) {
+      this.verificarMovimientosD();
+      this.verificarCierreMensual();
+    }
+  }
+
+  async verificarCierreMensual() {
+    try {
+      const d = this.fechaultimo.split('/');
+      const fechaVerificar = `${d[2]}-${d[1]}-${d[0]}`;
+      this.xAPI.funcion = environment.xApi.VERIFICAR_CIERRE_MENSUAL;
+      this.xAPI.parametros = fechaVerificar;
+      this.xAPI.valores = '';
+
+      const data = await firstValueFrom(this.apiService.Ejecutar(this.xAPI));
+      const total = data?.Cuerpo?.[0]?.total ?? 0;
+      this.cierreMensualCompletado = parseInt(total, 10) > 0;
+    } catch (error) {
+      console.error('Error verificando cierre mensual:', error);
+      this.cierreMensualCompletado = false;
+    }
   }
 
   CalcularDias(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -185,7 +232,7 @@ export class CcierreComponent implements OnInit {
     d = dt.split('T')
     let fopera = d[0]
 
-    if (llave == 'S') {
+    if (llave == 'S' || llave == 'D') {
       let f = new Date(fopera);
       f.setDate(f.getDate() - 1);
       fopera = f.toISOString().split('T')[0]
@@ -241,5 +288,264 @@ export class CcierreComponent implements OnInit {
     )
   }
 
+  // ============ CIERRE MENSUAL ============
+
+  async ejecutarCierreDiario() {
+    Swal.fire({
+      title: 'Cierre Diario del Último Día',
+      text: 'Se procederá a cerrar el último día del mes. ¿Continuar?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, cerrar',
+      cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        this.ngxService.startLoader('load-precierre');
+        await this.CrearSaldosAsync('M');
+        this.cierreDiarioCompletado = true;
+        this.ngxService.stopLoader('load-precierre');
+        this.apiService.Mensaje(
+          'Cierre Diario',
+          'Último día del mes cerrado correctamente',
+          'success',
+          'Cierre Mensual'
+        );
+      }
+    });
+  }
+
+  async generarInteresesDisponibilidad() {
+    this.ngxService.startLoader('load-precierre');
+    try {
+      // Usar la fecha seleccionada por el usuario
+      const fechaSeleccionada = this.util.ConvertirFechaDB(this.fechai);
+      const partes = fechaSeleccionada.split('-');
+      const anio = partes[0];
+      const mes = partes[1];
+      const ultimoDia = new Date(parseInt(anio), parseInt(mes), 0).getDate();
+      const fechaInicio = `${anio}-${mes}-01`;
+      const fechaFin = `${anio}-${mes}-${String(ultimoDia).padStart(2, '0')}`;
+
+      // Eliminar comprobantes de intereses existentes para esta fecha
+      await this.interesesService.eliminarInteresesDisponibilidad(fechaFin);
+
+      const datos = await this.interesesService.calcularIntereses(fechaInicio, fechaFin);
+      
+      this.lstInteresesGenerados = [];
+      let comprobantesGenerados = 0;
+
+      for (const plan of datos) {
+        const idPlan = plan.id_plan;
+        const interesCalc = parseFloat(plan.interes_calculado as any) || 0;
+        
+        if (interesCalc <= 0) continue;
+
+        const comprobante: FID_IComprobante = {
+          plan: idPlan,
+          codigo: '',
+          descripcion: `INTERESES POR DISPONIBILIDAD MES ${this.util.ConvertirFechaHumana(fechaFin)}`,
+          detalle: plan.plan,
+          fecha_operacion: fechaFin,
+          fecha_ejercicio: fechaFin,
+          debe: interesCalc,
+          haber: interesCalc,
+          llave: 'D'
+        };
+
+        const idComprobante = await this.interesesService.insertarComprobante(comprobante);
+        
+        await this.interesesService.insertarDetalleInteres(
+          idComprobante,
+          interesCalc,
+          fechaFin,
+          idPlan
+        );
+
+        this.lstInteresesGenerados.push({
+          id_plan: idPlan,
+          plan: plan.plan,
+          interes_calculado: interesCalc
+        });
+        
+        comprobantesGenerados++;
+      }
+
+      this.interesesGenerados = true;
+      this.ngxService.stopLoader('load-precierre');
+      
+      this.apiService.Mensaje(
+        'Intereses Generados',
+        `Se generaron ${comprobantesGenerados} comprobantes de intereses por disponibilidad`,
+        'success',
+        'Cierre Mensual'
+      );
+    } catch (error) {
+      console.error(error);
+      this.ngxService.stopLoader('load-precierre');
+      this.apiService.Mensaje(
+        'Error',
+        'Error al generar intereses por disponibilidad',
+        'error',
+        'Cierre Mensual'
+      );
+    }
+  }
+
+  async ejecutarPrecierreMensual() {
+    this.ngxService.startLoader('load-precierre');
+    try {
+      // Usar la fecha seleccionada por el usuario (fechaf o fechai)
+      const fechaSeleccionada = this.util.ConvertirFechaDB(this.fechai);
+
+      this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIVIENTOS_COMPROBANTES;
+      this.xAPI.parametros = `${fechaSeleccionada},D`;
+      this.xAPI.valores = '';
+
+      await firstValueFrom(this.apiService.Ejecutar(this.xAPI));
+
+      this.precierreEjecutado = true;
+      await this.verificarMovimientosD();
+      this.ngxService.stopLoader('load-precierre');
+      
+      this.apiService.Mensaje(
+        'Precierre Ejecutado',
+        `El precierre del ${this.util.ConvertirFechaHumana(this.fechai)} se ejecutó correctamente`,
+        'success',
+        'Cierre Mensual'
+      );
+    } catch (error) {
+      console.error(error);
+      this.ngxService.stopLoader('load-precierre');
+      this.apiService.Mensaje(
+        'Error',
+        'Error al ejecutar el precierre mensual',
+        'error',
+        'Cierre Mensual'
+      );
+    }
+  }
+
+  CrearSaldosAsync(llave = 'M'): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let d = this.fechaultimo.split('/')
+      let fultimo = d[2] + '-' + d[1] + '-' + d[0];
+      let dt = new Date(this.fechai).toISOString()
+
+      d = dt.split('T')
+      let fopera = d[0]
+
+      if (llave == 'S' || llave == 'D') {
+        let f = new Date(fopera);
+        f.setDate(f.getDate() - 1);
+        fopera = f.toISOString().split('T')[0]
+
+        let fo = new Date(fultimo);
+        fo.setDate(f.getDate() - 1);
+        fultimo = fo.toISOString().split('T')[0]
+      }
+
+      let usuario = 'Administrador'
+      let plan = '%'
+
+      this.xAPI.funcion = environment.xApi.INSERTAR_SALDOS_CIERRE
+      this.xAPI.parametros = `${fopera},${usuario},${llave},${plan},${fultimo}`
+      this.xAPI.valores = ''
+
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        async data => {
+          this.consultarUltimoCierre()
+          this.cierre.actualizarCierres()
+          resolve();
+        },
+        (error) => {
+          console.error(error)
+          reject(error)
+        }
+      )
+    });
+  }
+
+  async verificarMovimientosD() {
+    try {
+      const d = this.fechaultimo.split('/');
+      const fechaVerificar = `${d[2]}-${d[1]}-${d[0]}`;
+      this.xAPI.funcion = environment.xApi.VERIFICAR_MOVIMIENTOS_D;
+      this.xAPI.parametros = fechaVerificar;
+      this.xAPI.valores = '';
+
+      const data = await firstValueFrom(this.apiService.Ejecutar(this.xAPI));
+      const total = data?.Cuerpo?.[0]?.total ?? 0;
+      this.movimientosDEncontrados = parseInt(total, 10) > 0;
+    } catch (error) {
+      console.error('Error verificando movimientos D:', error);
+      this.movimientosDEncontrados = false;
+    }
+  }
+
+  async ejecutarCierreMensual() {
+    this.ngxService.startLoader('load-precierre');
+    try {
+      const d = this.fechaultimo.split('/');
+      const fultimo = `${d[2]}-${d[1]}-${d[0]}`;
+
+      // Verificar si ya se realizó el cierre mensual
+      this.xAPI.funcion = environment.xApi.VERIFICAR_CIERRE_MENSUAL;
+      this.xAPI.parametros = fultimo;
+      this.xAPI.valores = '';
+      const verif = await firstValueFrom(this.apiService.Ejecutar(this.xAPI));
+      const total = verif?.Cuerpo?.[0]?.total ?? 0;
+
+      if (parseInt(total, 10) > 0) {
+        this.cierreMensualCompletado = true;
+        this.ngxService.stopLoader('load-precierre');
+        this.apiService.Mensaje(
+          'Cierre Mensual Ya Realizado',
+          `El cierre mensual del ${this.util.ConvertirFechaHumana(fultimo)} ya fue ejecutado`,
+          'warning',
+          'Cierre Mensual'
+        );
+        return;
+      }
+
+      // PASO 1: Borrar saldos del último día del mes (llave M)
+      this.xAPI.funcion = environment.xApi.BORRAR_CIERRE_MENSUAL;
+      this.xAPI.parametros = fultimo;
+      this.xAPI.valores = '';
+      await firstValueFrom(this.apiService.Ejecutar(this.xAPI));
+
+      // PASO 2: Insertar saldos con llave D usando CrearSaldosAsync (mismo patrón que semestral)
+      await this.CrearSaldosAsync('D');
+
+      this.cierreMensualCompletado = true;
+      this.ngxService.stopLoader('load-precierre');
+
+      this.apiService.Mensaje(
+        'Cierre Mensual Ejecutado',
+        `El cierre mensual del ${this.util.ConvertirFechaHumana(fultimo)} se ejecutó correctamente`,
+        'success',
+        'Cierre Mensual'
+      );
+    } catch (error) {
+      console.error(error);
+      this.ngxService.stopLoader('load-precierre');
+      this.apiService.Mensaje(
+        'Error',
+        'Error al ejecutar el cierre mensual',
+        'error',
+        'Cierre Mensual'
+      );
+    }
+  }
+
+  resetearEstadoCierreMensual() {
+    this.cierreDiarioCompletado = false;
+    this.interesesGenerados = false;
+    this.precierreEjecutado = false;
+    this.cierreMensualCompletado = false;
+    this.movimientosDEncontrados = false;
+    this.lstInteresesGenerados = [];
+  }
 
 }

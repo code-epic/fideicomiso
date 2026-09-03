@@ -55,6 +55,7 @@ export const environment = {
     CONTAR_COMPROBANTES: 'FID_CCantidadComprobantes',
     ULTIMO_COMPROBANTE: 'FID_CUltimoComprobante',
     ELIMINAR_COMPROBANTES_INVERSIONES: 'FID_EComprobantesInversiones',
+    ELIMINAR_INTERESES_DISPONIBILIDAD: 'FID_EInteresesDisponibilidad',
 
     // Cuentas contables
     CONSULTAR_CUENTAS: 'FID_CCuentas',
@@ -83,6 +84,10 @@ export const environment = {
     INSERTAR_SALDOS_CIERRE: 'FID_ISaldosCierre',
     BORRAR_CIERRE_SEMESTRAL: 'FID_DCierreSemestral',
     CONSULTAR_MOVIMIENTOS_SEMESTRALES: 'FID_CMovimientosSemestrales',
+    VERIFICAR_MOVIMIENTOS_D: 'FID_CVerificarMovimientosD',
+    VERIFICAR_CIERRE_MENSUAL: 'FID_CVerificarCierreMensual',
+    BORRAR_CIERRE_MENSUAL: 'FID_DCierreMensual',
+    INSERTAR_SALDOS_CIERRE_MENSUAL: 'FID_ISaldosCierreMensual',
 
     // Rendición de cuentas
     CONSULTAR_PLANES_FIDEICOMISO: 'FID_CPlanesFideicomiso',

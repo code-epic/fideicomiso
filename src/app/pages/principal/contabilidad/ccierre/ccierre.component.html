@@ -56,7 +56,7 @@
           &nbsp;Cierre diario
         </button>
         &nbsp;&nbsp;
-        <button mat-flat-button color="warn"  style="height: 50px;">
+        <button *ngIf="esPrimerDiaMes" mat-flat-button color="warn" [disabled]="!movimientosDEncontrados || cierreMensualCompletado" (click)="ejecutarCierreMensual()" style="height: 50px;">
           &nbsp;Cierre mensual
         </button>
         &nbsp;&nbsp;

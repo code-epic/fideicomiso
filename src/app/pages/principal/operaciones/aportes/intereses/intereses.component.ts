@@ -404,7 +404,7 @@ export class InteresesComponent implements OnInit {
             fecha_ejercicio: tramo.pago.fechaValor,
             debe: dist.interesRealTramo,
             haber: dist.interesRealTramo,
-            llave: 'M'
+            llave: 'D'
           });
 
           await this.interesesService.insertarDetalleInteres(

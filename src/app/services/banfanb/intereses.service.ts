@@ -107,6 +107,15 @@ export class InteresesService {
     await lastValueFrom(this.apiService.Ejecutar(xAPI));
   }
 
+  async eliminarInteresesDisponibilidad(fecha: string): Promise<void> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.ELIMINAR_INTERESES_DISPONIBILIDAD,
+      parametros: fecha,
+      valores: ''
+    };
+    await lastValueFrom(this.apiService.Ejecutar(xAPI));
+  }
+
   async obtenerDevengosDia(fecha: string): Promise<any[]> {
     const xAPI: IAPICore = {
       funcion: 'FID_CDevengosDia',

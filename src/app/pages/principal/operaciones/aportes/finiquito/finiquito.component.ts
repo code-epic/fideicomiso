@@ -77,6 +77,7 @@ export class FiniquitoComponent implements OnInit {
     try {
       const data: any = await this.apiService.Ejecutar(this.xAPI).toPromise();
       this.lstPlanes = (data?.Cuerpo || [])
+        .filter((p: any) => p.estatus !== 3 && p.estatus !== 4)
         .map((p: any) => ({
           id: p.id,
           fideicomiso: p.fideicomiso,
