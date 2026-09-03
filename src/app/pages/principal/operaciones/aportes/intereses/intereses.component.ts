@@ -41,6 +41,7 @@ export class InteresesComponent implements OnInit {
   public fechaultimo: string = '';
   public mostrarResultados: boolean = false;
   public mesCerrado: boolean = false;
+  public puedeGenerar: boolean = false;
 
   // Formulario de pago inline
   public mostrarFormPago: boolean = false;
@@ -79,6 +80,14 @@ export class InteresesComponent implements OnInit {
 
     const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaultimo);
     this.mesCerrado = !!(fechaCierreDB && fechaFin <= fechaCierreDB);
+
+    // Verificar si hoy es el último día del mes seleccionado o posterior
+    const hoy = new Date();
+    const ultimoDiaMesSeleccionado = new Date(this.anio, this.mes, 0);
+    const esUltimoDiaMesOMas = hoy >= ultimoDiaMesSeleccionado;
+
+    // Permitir generar comprobantes si el mes está cerrado O si es el último día del mes o posterior
+    this.puedeGenerar = this.mesCerrado || esUltimoDiaMesOMas;
 
     if (!this.mesCerrado) {
       this.toastr.info(
@@ -253,28 +262,28 @@ export class InteresesComponent implements OnInit {
         i => pago.planesIds.includes(Number(i.id_plan))
       );
 
-      // Total de saldos del tramo (base para distribución)
-      const totalSaldos = planesTramo.reduce(
-        (sum, p) => sum + (parseFloat(String(p.saldo_promedio || '0').replace(/,/g, '.')) || 0), 0
+      // Total de intereses calculados del tramo (base para distribución)
+      const totalIntereses = planesTramo.reduce(
+        (sum, p) => sum + ((Number(p.interes_calculado) || 0)), 0
       );
 
-      // Total teórico de intereses (diario)
-      const totalTeorico = planesTramo.reduce(
-        (sum, p) => sum + ((Number(p.interes_diario) || 0)), 0
-      );
+      // Total teórico de intereses
+      const totalTeorico = totalIntereses;
 
-      // Distribución basada en SALDO
+      // Distribución basada en INTERÉS CALCULADO
       const distribuciones: DistribucionPlan[] = planesTramo.map(plan => {
         const saldoRaw = String(plan.saldo_promedio || '0');
         const saldo = parseFloat(saldoRaw.replace(/,/g, '.')) || 0;
         const interesCalc = Number(plan.interes_calculado) || 0;
         const interesDiario = Number(plan.interes_diario) || 0;
         
-        // % = Saldo del Plan / Suma de Saldos
-        const porcentaje = totalSaldos > 0 ? (saldo / totalSaldos) * 100 : 0;
+        // % = Interés Calculado del Plan / Total Intereses
+        const porcentaje = totalIntereses > 0 ? (interesCalc / totalIntereses) * 100 : 0;
         
-        // Interés Real = Saldo/Total × Monto del Pago
-        const interesReal = Math.round((saldo / totalSaldos) * pago.montoPago * 100) / 100;
+        // Interés Real = Interés Calc/Total × Monto del Pago
+        const interesReal = totalIntereses > 0 
+          ? Math.round((interesCalc / totalIntereses) * pago.montoPago * 100) / 100 
+          : 0;
 
         return {
           id_plan: plan.id_plan,
@@ -284,7 +293,7 @@ export class InteresesComponent implements OnInit {
           interes_diario: interesDiario,
           porcentajeTramo: porcentaje,
           interesRealTramo: interesReal,
-          diferenciaTramo: Math.round((interesReal - interesDiario) * 100) / 100
+          diferenciaTramo: Math.round((interesReal - interesCalc) * 100) / 100
         };
       });
 
@@ -326,8 +335,8 @@ export class InteresesComponent implements OnInit {
 
   get planesSinAsignar(): InteresProyectado[] {
     const todosPlanesAsignados = new Set<number>();
-    this.lstPagos.forEach(p => p.planesIds.forEach(id => todosPlanesAsignados.add(id)));
-    return this.lstIntereses.filter(i => !todosPlanesAsignados.has(i.id_plan));
+    this.lstPagos.forEach(p => p.planesIds.forEach(id => todosPlanesAsignados.add(Number(id))));
+    return this.lstIntereses.filter(i => !todosPlanesAsignados.has(Number(i.id_plan)));
   }
 
   getTotalSaldosSeleccion(): number {
@@ -345,14 +354,21 @@ export class InteresesComponent implements OnInit {
     }
 
     if (this.planesSinAsignar.length > 0) {
-      const nombres = this.planesSinAsignar.map(p => p.plan).join(', ');
+      const nombres = this.planesSinAsignar.map(p => `<b>${p.plan}</b>`).join('<br>');
       const confirmar = await Swal.fire({
-        title: 'Planes sin pago',
-        text: `Los planes ${nombres} no tienen pago asignado. ¿Continuar sin incluirlos?`,
+        title: 'Planes sin pago asignado',
+        html: `Los siguientes planes no tienen pago asignado:<br><br>${nombres}<br><br>¿Continuar sin incluirlos?`,
         icon: 'warning',
         showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
         confirmButtonText: 'Sí, continuar',
-        cancelButtonText: 'No, cancelar'
+        cancelButtonText: 'No, cancelar',
+        customClass: {
+          confirmButton: 'swal2-confirm btn btn-primary',
+          cancelButton: 'swal2-cancel btn btn-secondary'
+        },
+        buttonsStyling: false
       });
       if (!confirmar.isConfirmed) return;
     }
@@ -391,25 +407,12 @@ export class InteresesComponent implements OnInit {
             llave: 'M'
           });
 
-          await this.interesesService.insertarDetalleComprobante({
-            id_comprobante: idComprobante,
-            cuenta: 3,
-            debe: dist.interesRealTramo,
-            haber: 0,
-            fecha_operacion: tramo.pago.fechaValor,
-            fecha_ejercicio: tramo.pago.fechaValor,
-            plan: dist.id_plan
-          });
-
-          await this.interesesService.insertarDetalleComprobante({
-            id_comprobante: idComprobante,
-            cuenta: 53,
-            debe: 0,
-            harbor: dist.interesRealTramo,
-            fecha_operacion: tramo.pago.fechaValor,
-            fecha_ejercicio: tramo.pago.fechaValor,
-            plan: dist.id_plan
-          });
+          await this.interesesService.insertarDetalleInteres(
+            idComprobante,
+            dist.interesRealTramo,
+            tramo.pago.fechaValor,
+            dist.id_plan
+          );
 
           comprobantesGenerados++;
         }
@@ -441,6 +444,7 @@ export class InteresesComponent implements OnInit {
     this.totalTeoricoGlobal = 0;
     this.mostrarResultados = false;
     this.mesCerrado = false;
+    this.puedeGenerar = false;
     this.mostrarFormPago = false;
   }
 

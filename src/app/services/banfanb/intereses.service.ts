@@ -97,4 +97,23 @@ export class InteresesService {
     };
     await lastValueFrom(this.apiService.Ejecutar(xAPI));
   }
+
+  async insertarDetalleInteres(idComprobante: number, monto: number, fecha: string, idPlan: number): Promise<void> {
+    const xAPI: IAPICore = {
+      funcion: 'FID_IInteresDisponibilidad',
+      parametros: `${idComprobante}, ${monto}, ${fecha}, ${idPlan}`,
+      valores: ''
+    };
+    await lastValueFrom(this.apiService.Ejecutar(xAPI));
+  }
+
+  async obtenerDevengosDia(fecha: string): Promise<any[]> {
+    const xAPI: IAPICore = {
+      funcion: 'FID_CDevengosDia',
+      parametros: fecha,
+      valores: ''
+    };
+    const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
+    return (data?.Cuerpo || []) as any[];
+  }
 }
