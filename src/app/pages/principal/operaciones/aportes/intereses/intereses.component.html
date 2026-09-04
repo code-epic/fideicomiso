@@ -78,10 +78,13 @@
           </table>
         </div>
 
-        <div class="mt-3" *ngIf="!mostrarFormPago">
+        <div class="mt-3" *ngIf="!mostrarFormPago && planesUsados.length < lstIntereses.length">
           <button mat-flat-button color="accent" (click)="abrirFormPago()" aria-label="Agregar nuevo pago">
             <mat-icon>add</mat-icon>&nbsp;Agregar Pago
           </button>
+        </div>
+        <div class="mt-3" *ngIf="!mostrarFormPago && planesUsados.length >= lstIntereses.length">
+          <span class="text-muted"><mat-icon>info</mat-icon> Todos los planes ya están asignados a pagos</span>
         </div>
       </mat-card-content>
     </mat-card>
@@ -111,14 +114,29 @@
 
         <!-- Selector de planes -->
         <div class="planes-selector" role="group" aria-label="Selección de planes para el pago">
-          <label class="planes-label">Seleccionar Planes:</label>
+          <div class="planes-label-row">
+            <label class="planes-label">Seleccionar Planes:</label>
+            <button mat-stroked-button color="primary" type="button"
+                    (click)="seleccionarTodosPlanes()"
+                    class="btn-select-all"
+                    [attr.aria-label]="todosPlanesSeleccionados ? 'Deseleccionar todos los planes' : 'Seleccionar todos los planes'">
+              <mat-icon>{{ todosPlanesSeleccionados ? 'deselect' : 'checklist' }}</mat-icon>
+              {{ todosPlanesSeleccionados ? 'Limpiar' : 'Seleccionar Todos' }}
+            </button>
+          </div>
           <div class="planes-list">
-            <mat-checkbox *ngFor="let plan of lstIntereses"
-              [checked]="isPlanSeleccionado(plan.id_plan)"
-              (change)="togglePlanSeleccion(plan.id_plan)"
-              [attr.aria-label]="'Seleccionar plan ' + plan.plan">
-              {{ plan.plan }} ({{ formatearMonto(plan.interes_calculado) }})
-            </mat-checkbox>
+            <div *ngFor="let plan of lstIntereses" class="plan-item">
+              <mat-checkbox
+                *ngIf="isPlanDisponible(plan.id_plan)"
+                [checked]="isPlanSeleccionado(plan.id_plan)"
+                (change)="togglePlanSeleccion(plan.id_plan)"
+                [attr.aria-label]="'Seleccionar plan ' + plan.plan">
+                {{ plan.plan }} ({{ formatearMonto(plan.interes_calculado) }})
+              </mat-checkbox>
+            </div>
+            <span *ngIf="planesUsados.length > 0" class="text-muted planes-en-uso-hint">
+              {{ planesUsados.length }} plan(es) ya asignado(s) a otros pagos
+            </span>
           </div>
         </div>
 

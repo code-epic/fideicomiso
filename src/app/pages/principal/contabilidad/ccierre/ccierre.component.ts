@@ -240,6 +240,18 @@ export class CcierreComponent implements OnInit {
           return `<strong>Devengos:</strong> Se generaron ${n} comprobantes de devengo pero algunos no tienen movimientos. Realiza el precierre del día.`;
         }
         return `<strong>Devengos:</strong> Faltan ${esperado - existe} comprobante(s) de devengo de ${esperado} inversiones vigentes.`;
+      case 'VENCIMIENTO':
+        if (existe == esperado) {
+          return `<strong>Vencimientos:</strong> Se generaron ${n} comprobantes de vencimiento pero algunos no tienen movimientos. Realiza el precierre del día.`;
+        }
+        return `<strong>Vencimientos:</strong> Faltan ${esperado - existe} comprobante(s) de vencimiento de ${esperado} inversiones.`;
+      case 'COMPRA':
+        if (existe == esperado) {
+          return `<strong>Compras:</strong> Se generaron ${n} comprobantes de compra pero algunos no tienen movimientos. Realiza el precierre del día.`;
+        }
+        return `<strong>Compras:</strong> Faltan ${esperado - existe} comprobante(s) de compra de ${esperado} inversiones.`;
+      case 'COMPRA_SIN_PORTAFOLIO':
+        return `<strong>Compra sin portafolio:</strong> ${n} compra(s) del día no están asignadas a un portafolio activo. Asigna el portafolio antes de cerrar el día.`;
       default:
         if (existe == esperado) {
           return `<strong>${nombre}</strong>: Los comprobantes existen pero no se registraron los movimientos. Realiza el precierre del día.`;

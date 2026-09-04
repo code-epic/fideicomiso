@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ToastrService } from 'ngx-toastr';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -49,6 +49,7 @@ export class InteresesComponent implements OnInit {
   public nuevoPagoFecha: string = '';
   public nuevoPagoMonto: number = 0;
   public nuevoPagoPlanes: number[] = [];
+  public planesUsados: number[] = [];
 
   private contadorPagos: number = 0;
 
@@ -57,7 +58,8 @@ export class InteresesComponent implements OnInit {
     private toastr: ToastrService,
     private util: UtilService,
     private cierre: CierreService,
-    private interesesService: InteresesService
+    private interesesService: InteresesService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -154,8 +156,10 @@ export class InteresesComponent implements OnInit {
 
       this.calcularTotales();
       this.mostrarResultados = true;
+      console.log('consultar - lstPagos ANTES de limpiar:', this.lstPagos.length);
       this.lstPagos = [];
       this.tramosConDistribucion = [];
+      this.actualizarPlanesUsados();
     } catch (error) {
       console.error(error);
       this.toastr.error('Error al calcular intereses', 'Error');
@@ -177,6 +181,13 @@ export class InteresesComponent implements OnInit {
     this.nuevoPagoFecha = `${this.anio}-${String(this.mes).padStart(2, '0')}-31`;
     this.nuevoPagoMonto = 0;
     this.nuevoPagoPlanes = [];
+    this.actualizarPlanesUsados();
+    console.log('abrirFormPago - lstPagos:', JSON.stringify(this.lstPagos.map(p => ({id: p.id, planes: p.planesIds}))));
+    console.log('abrirFormPago - planesUsados:', this.planesUsados);
+    console.log('abrirFormPago - lstIntereses:', this.lstIntereses.map(p => ({id: p.id_plan, tipo: typeof p.id_plan})));
+    this.lstIntereses.forEach(p => {
+      console.log(`  isPlanDisponible(${p.id_plan}) = ${this.isPlanDisponible(p.id_plan)}, planesUsados.indexOf(${Number(p.id_plan)}) = ${this.planesUsados.indexOf(Number(p.id_plan))}`);
+    });
     this.mostrarFormPago = true;
   }
 
@@ -185,6 +196,7 @@ export class InteresesComponent implements OnInit {
     this.nuevoPagoFecha = pago.fechaValor;
     this.nuevoPagoMonto = pago.montoPago;
     this.nuevoPagoPlanes = pago.planesIds.map(Number);
+    this.actualizarPlanesUsados();
     this.mostrarFormPago = true;
   }
 
@@ -192,9 +204,29 @@ export class InteresesComponent implements OnInit {
     this.mostrarFormPago = false;
     this.editandoPagoId = null;
     this.nuevoPagoPlanes = [];
+    this.actualizarPlanesUsados();
+  }
+
+  actualizarPlanesUsados(): void {
+    const usados = new Set<number>();
+    this.lstPagos.forEach(p => {
+      if (this.editandoPagoId === null || p.id !== this.editandoPagoId) {
+        p.planesIds.forEach(id => usados.add(Number(id)));
+      }
+    });
+    this.planesUsados = [...usados];
+    this.cdr.detectChanges();
+  }
+
+  isPlanDisponible(planId: number): boolean {
+    return this.planesUsados.indexOf(Number(planId)) === -1;
   }
 
   togglePlanSeleccion(planId: number): void {
+    if (this.planesUsados.includes(planId)) {
+      this.toastr.info('Este plan ya está asignado a otro pago', 'Plan en uso');
+      return;
+    }
     const idx = this.nuevoPagoPlanes.indexOf(planId);
     if (idx >= 0) {
       this.nuevoPagoPlanes.splice(idx, 1);
@@ -205,6 +237,22 @@ export class InteresesComponent implements OnInit {
 
   isPlanSeleccionado(planId: number): boolean {
     return this.nuevoPagoPlanes.includes(planId);
+  }
+
+  get todosPlanesSeleccionados(): boolean {
+    const disponibles = this.lstIntereses.filter(p => this.isPlanDisponible(p.id_plan));
+    return disponibles.length > 0 &&
+           disponibles.every(p => this.nuevoPagoPlanes.includes(p.id_plan));
+  }
+
+  seleccionarTodosPlanes(): void {
+    if (this.todosPlanesSeleccionados) {
+      this.nuevoPagoPlanes = [];
+    } else {
+      this.nuevoPagoPlanes = this.lstIntereses
+        .filter(p => this.isPlanDisponible(p.id_plan))
+        .map(p => p.id_plan);
+    }
   }
 
   guardarPago(): void {
@@ -218,6 +266,16 @@ export class InteresesComponent implements OnInit {
     }
     if (this.nuevoPagoPlanes.length === 0) {
       this.toastr.warning('Seleccione al menos un plan', 'Validación');
+      return;
+    }
+
+    const planesBloqueados = this.nuevoPagoPlanes.filter(id => this.planesUsados.includes(id));
+    if (planesBloqueados.length > 0) {
+      const nombres = planesBloqueados.map(id => {
+        const p = this.lstIntereses.find(i => i.id_plan === id);
+        return p ? p.plan : `Plan ${id}`;
+      }).join(', ');
+      this.toastr.error(`Los planes ${nombres} ya están asignados a otro pago`, 'Planes en uso');
       return;
     }
 
@@ -246,11 +304,16 @@ export class InteresesComponent implements OnInit {
 
     this.mostrarFormPago = false;
     this.editandoPagoId = null;
+    this.nuevoPagoPlanes = [];
+    this.actualizarPlanesUsados();
+    console.log('guardarPago - lstPagos DESPUES:', JSON.stringify(this.lstPagos.map(p => ({id: p.id, planes: p.planesIds}))));
+    console.log('guardarPago - planesUsados DESPUES:', this.planesUsados);
     this.calcularDistribucionPorTramo();
   }
 
   eliminarPago(id: number): void {
     this.lstPagos = this.lstPagos.filter(p => p.id !== id);
+    this.actualizarPlanesUsados();
     this.calcularDistribucionPorTramo();
   }
 
@@ -446,6 +509,7 @@ export class InteresesComponent implements OnInit {
     this.mesCerrado = false;
     this.puedeGenerar = false;
     this.mostrarFormPago = false;
+    this.planesUsados = [];
   }
 
   formatearMonto(monto: number): string {
