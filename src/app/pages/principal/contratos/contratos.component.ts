@@ -192,6 +192,7 @@ export class ContratosComponent implements OnInit {
   public tabSaldos: boolean = false
   public focus: boolean = false
   public buscar = ''
+  public portafolioModificado: boolean = false
 
   myControl = new FormControl('');
   options: string[] = [];
@@ -228,7 +229,7 @@ export class ContratosComponent implements OnInit {
     this.ListarEstados()
     this.ListarEjecutivos()
     this.ListarOficinas()
-    this.ListarPortafolio()
+    this.buscarPortafolioPlan()
     this.consultarUltimoCierre()
   }
 
@@ -440,6 +441,10 @@ export class ContratosComponent implements OnInit {
     this.contratoForm.patchValue(this.Contrato)
     this.contratoForm.get('saldo_inicio').setValue(this.Contrato.Saldos.saldoinicio)
     this.contratoForm.get('Politicas.tipocuenta').setValue(this.Contrato.Politicas.tipocuenta)
+
+    // Restaurar portafolio desde MySQL (dato de verdad) y marcar en select
+    this.portafolioModificado = false
+    this.buscarPortafolioPlan()
     // Asegurar que tasa_anual tenga valor por defecto
     const tasaAnual = this.Contrato.Politicas.tasa_anual || 2
     this.contratoForm.get('Politicas.tasa_anual').setValue(tasaAnual)
@@ -447,6 +452,7 @@ export class ContratosComponent implements OnInit {
     this.selectedIndex = 1
     this.active = true
     this.fechainicio = NgbDate.from(this.formatter.parse(this.Contrato.Saldos.fechainicio))
+    this.contratoForm.get('fechai').setValue(this.fechainicio)
 
     this.myOficina.setValue(this.Contrato.oficinatutora.toUpperCase())
     this.lstEjecutivos = this.Contrato.Ejecutivo
@@ -465,6 +471,10 @@ export class ContratosComponent implements OnInit {
     if (this.soloLectura) {
       this._snackBar.open(`Plan ${this.planGuard.getNombreEstatus(estatusReal)}. Solo lectura.`, 'Ok')
     }
+  }
+
+  onPortafolioChange() {
+    this.portafolioModificado = true
   }
 
   getTipoFideicomiso() {
@@ -602,6 +612,7 @@ export class ContratosComponent implements OnInit {
 
   Limpiar() {
     this.contratoForm.reset()
+    this.portafolioModificado = false
 
     this.getTipoFideicomiso()
     this.lstEjecutivos = []
@@ -615,7 +626,7 @@ export class ContratosComponent implements OnInit {
     this.fecharegistro = this.contratoForm.get('fechar').value
     this.saldo_inicio = this.contratoForm.get('saldo_inicio').value
 
-    this.planFideicomiso.fecha_apertura = typeof this.fechai == 'object' ? this.util.ConvertirFecha(this.fechai) : (this.fechai || '').substring(0, 10)
+    this.planFideicomiso.fecha_apertura = this.fechai && typeof this.fechai == 'object' ? this.util.ConvertirFecha(this.fechai) : (this.fechai || '').toString().substring(0, 10)
 
     this.planFideicomiso.observacion = this.Contrato.rif + '|' + this.Contrato.razonsocial
     this.planFideicomiso.monto_apertura = parseFloat(this.saldo_inicio)
@@ -634,7 +645,13 @@ export class ContratosComponent implements OnInit {
     this.planFideicomiso.fideicomiso = this.Contrato.plan
     this.planFideicomiso.porcentaje = this.Contrato.Politicas.numeromaximo
 
-    this.planFideicomiso.portafolio = parseInt(this.Contrato.Politicas.portafolionomb)
+    const portafolioSel = this.contratoForm.get('Politicas.portafolionomb')?.value ?? ''
+    const portafolioNum = parseInt(String(portafolioSel), 10)
+    this.planFideicomiso.portafolio = isNaN(portafolioNum)
+      ? (this.lstDataPortafolio.find(
+          (p: any) => p.descripcion?.toUpperCase() === String(portafolioSel).toUpperCase()
+        )?.id ?? null)
+      : portafolioNum
   }
 
   Guardar() {
@@ -690,6 +707,12 @@ export class ContratosComponent implements OnInit {
     let ofc = this.myOficina.value + ''
     this.Contrato.oficinatutora = ofc.toUpperCase()
 
+    // Normalizar Politicas.portafolionomb al ID numérico (consistente con contratos nuevos)
+    if (this.planFideicomiso.portafolio) {
+      this.Contrato.Politicas.portafolionomb = String(this.planFideicomiso.portafolio)
+      this.Contrato.Politicas.portafolio = String(this.planFideicomiso.portafolio)
+    }
+
     var obj = {
       "coleccion": "contratos",
       "objeto": this.Contrato,
@@ -701,6 +724,7 @@ export class ContratosComponent implements OnInit {
     this.apiService.ExecColeccion(obj).subscribe(
       (data) => {
         this.ngxService.stopLoader('load-cont')
+        this.portafolioModificado = false
         this.apiService.Mensaje(
           "Felicitaciones, Proceso exitoso",
           "Codigo de plan #" + this.Contrato.numero,
@@ -718,8 +742,7 @@ export class ContratosComponent implements OnInit {
 
   ListarPortafolio() {
     this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIOS
-    this.xAPI.parametros = this.Contrato.Politicas.portafolio
-    this.xAPI.parametros = this.contratoForm.get('Politicas.portafolio').value
+    this.xAPI.parametros = ''
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -727,10 +750,27 @@ export class ContratosComponent implements OnInit {
       },
       (error) => {
         console.error(error)
-
       }
     )
+  }
 
+  buscarPortafolioPlan() {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIOS
+    this.xAPI.parametros = ''
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstDataPortafolio = data.Cuerpo
+        const planId = parseInt(this.Contrato.numero)
+        const port = this.lstDataPortafolio.find(
+          (p: any) => p.id_plan && Number(p.id_plan) === planId
+        )
+        this.contratoForm.get('Politicas.portafolionomb').setValue(port ? port.id : '')
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
   }
 
   openDialog(): void {

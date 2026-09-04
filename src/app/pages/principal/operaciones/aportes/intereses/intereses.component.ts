@@ -122,7 +122,7 @@ export class InteresesComponent implements OnInit {
             ? (parseFloat(mapaAnterior.get(idPlan).saldo_promedio as any) || 0)
             : 0;
           
-          const incrementoPlan = incrementos.find((inc: any) => inc.id_plan === idPlan);
+          const incrementoPlan = incrementos.find((inc: any) => Number(inc.id_plan) === Number(idPlan));
           const montoIncremento = incrementoPlan ? (parseFloat(incrementoPlan.incrementos as any) || 0) : 0;
 
           // Saldo Último Día = Saldo Día Anterior + Incrementos
@@ -146,6 +146,7 @@ export class InteresesComponent implements OnInit {
 
         return {
           ...item,
+          id_plan: Number(item.id_plan),
           tasa: this.tasa,
           interes_diario: interesDiario,
           porcentaje: 0,
@@ -156,7 +157,6 @@ export class InteresesComponent implements OnInit {
 
       this.calcularTotales();
       this.mostrarResultados = true;
-      console.log('consultar - lstPagos ANTES de limpiar:', this.lstPagos.length);
       this.lstPagos = [];
       this.tramosConDistribucion = [];
       this.actualizarPlanesUsados();
@@ -178,16 +178,11 @@ export class InteresesComponent implements OnInit {
 
   abrirFormPago(): void {
     this.editandoPagoId = null;
-    this.nuevoPagoFecha = `${this.anio}-${String(this.mes).padStart(2, '0')}-31`;
+    const ultimoDia = new Date(this.anio, this.mes, 0).getDate();
+    this.nuevoPagoFecha = `${this.anio}-${String(this.mes).padStart(2, '0')}-${String(ultimoDia).padStart(2, '0')}`;
     this.nuevoPagoMonto = 0;
     this.nuevoPagoPlanes = [];
     this.actualizarPlanesUsados();
-    console.log('abrirFormPago - lstPagos:', JSON.stringify(this.lstPagos.map(p => ({id: p.id, planes: p.planesIds}))));
-    console.log('abrirFormPago - planesUsados:', this.planesUsados);
-    console.log('abrirFormPago - lstIntereses:', this.lstIntereses.map(p => ({id: p.id_plan, tipo: typeof p.id_plan})));
-    this.lstIntereses.forEach(p => {
-      console.log(`  isPlanDisponible(${p.id_plan}) = ${this.isPlanDisponible(p.id_plan)}, planesUsados.indexOf(${Number(p.id_plan)}) = ${this.planesUsados.indexOf(Number(p.id_plan))}`);
-    });
     this.mostrarFormPago = true;
   }
 
@@ -223,26 +218,27 @@ export class InteresesComponent implements OnInit {
   }
 
   togglePlanSeleccion(planId: number): void {
-    if (this.planesUsados.includes(planId)) {
+    const id = Number(planId);
+    if (this.planesUsados.includes(id)) {
       this.toastr.info('Este plan ya está asignado a otro pago', 'Plan en uso');
       return;
     }
-    const idx = this.nuevoPagoPlanes.indexOf(planId);
+    const idx = this.nuevoPagoPlanes.indexOf(id);
     if (idx >= 0) {
       this.nuevoPagoPlanes.splice(idx, 1);
     } else {
-      this.nuevoPagoPlanes.push(planId);
+      this.nuevoPagoPlanes.push(id);
     }
   }
 
   isPlanSeleccionado(planId: number): boolean {
-    return this.nuevoPagoPlanes.includes(planId);
+    return this.nuevoPagoPlanes.includes(Number(planId));
   }
 
   get todosPlanesSeleccionados(): boolean {
     const disponibles = this.lstIntereses.filter(p => this.isPlanDisponible(p.id_plan));
     return disponibles.length > 0 &&
-           disponibles.every(p => this.nuevoPagoPlanes.includes(p.id_plan));
+           disponibles.every(p => this.nuevoPagoPlanes.includes(Number(p.id_plan)));
   }
 
   seleccionarTodosPlanes(): void {
@@ -251,7 +247,7 @@ export class InteresesComponent implements OnInit {
     } else {
       this.nuevoPagoPlanes = this.lstIntereses
         .filter(p => this.isPlanDisponible(p.id_plan))
-        .map(p => p.id_plan);
+        .map(p => Number(p.id_plan));
     }
   }
 
@@ -269,7 +265,7 @@ export class InteresesComponent implements OnInit {
       return;
     }
 
-    const planesBloqueados = this.nuevoPagoPlanes.filter(id => this.planesUsados.includes(id));
+    const planesBloqueados = this.nuevoPagoPlanes.filter(id => this.planesUsados.includes(Number(id)));
     if (planesBloqueados.length > 0) {
       const nombres = planesBloqueados.map(id => {
         const p = this.lstIntereses.find(i => i.id_plan === id);
@@ -306,8 +302,6 @@ export class InteresesComponent implements OnInit {
     this.editandoPagoId = null;
     this.nuevoPagoPlanes = [];
     this.actualizarPlanesUsados();
-    console.log('guardarPago - lstPagos DESPUES:', JSON.stringify(this.lstPagos.map(p => ({id: p.id, planes: p.planesIds}))));
-    console.log('guardarPago - planesUsados DESPUES:', this.planesUsados);
     this.calcularDistribucionPorTramo();
   }
 

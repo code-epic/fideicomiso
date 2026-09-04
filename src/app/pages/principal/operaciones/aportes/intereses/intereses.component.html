@@ -142,13 +142,13 @@
 
         <!-- Distribución preliminar -->
         <div class="distribucion-preliminar" *ngIf="nuevoPagoMonto > 0 && nuevoPagoPlanes.length > 0">
-          <label>Distribución Preliminar (basada en saldo):</label>
+          <label>Distribución Preliminar (basada en interés calculado):</label>
           <div class="tabla-container">
             <table class="table" aria-label="Distribución preliminar del pago">
               <thead>
                 <tr>
                   <th scope="col">Plan</th>
-                  <th scope="col" class="text-right">Saldo Base (711)</th>
+                  <th scope="col" class="text-right">Interés Calculado</th>
                   <th scope="col" class="text-right">% Participación</th>
                   <th scope="col" class="text-right">Interés Real</th>
                 </tr>
@@ -156,19 +156,19 @@
               <tbody>
                 <tr *ngFor="let planId of nuevoPagoPlanes">
                   <td>{{ getNombrePlan(planId) }}</td>
-                  <td class="text-right">{{ formatearMonto(getSaldoPlan(planId)) }}</td>
+                  <td class="text-right">{{ formatearMonto(getInteresTeoricoPlan(planId)) }}</td>
                   <td class="text-right">
-                    {{ getTotalSaldosSeleccion() > 0 ? ((getSaldoPlan(planId) / getTotalSaldosSeleccion()) * 100 | number:'1.2-2') : '0.00' }}%
+                    {{ getTotalTeoricoSeleccion() > 0 ? ((getInteresTeoricoPlan(planId) / getTotalTeoricoSeleccion()) * 100 | number:'1.2-2') : '0.00' }}%
                   </td>
                   <td class="text-right">
-                    {{ formatearMonto(getTotalSaldosSeleccion() > 0 ? ((getSaldoPlan(planId) / getTotalSaldosSeleccion()) * nuevoPagoMonto | number:'1.2-2') : 0) }}
+                    {{ getTotalTeoricoSeleccion() > 0 ? formatearMonto((getInteresTeoricoPlan(planId) / getTotalTeoricoSeleccion()) * nuevoPagoMonto) : formatearMonto(0) }}
                   </td>
                 </tr>
               </tbody>
               <tfoot>
                 <tr>
                   <td><strong>TOTAL</strong></td>
-                  <td class="text-right"><strong>{{ formatearMonto(getTotalSaldosSeleccion()) }}</strong></td>
+                  <td class="text-right"><strong>{{ formatearMonto(getTotalTeoricoSeleccion()) }}</strong></td>
                   <td class="text-right"><strong>100%</strong></td>
                   <td class="text-right"><strong>{{ formatearMonto(nuevoPagoMonto) }}</strong></td>
                 </tr>

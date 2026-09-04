@@ -494,7 +494,8 @@
                                                                         <mat-label>Portafolio</mat-label>
 
                                                                         <mat-select placeholder="Portafolio"
-                                                                            formControlName="portafolionomb">
+                                                                            formControlName="portafolionomb"
+                                                                            (selectionChange)="onPortafolioChange()">
                                                                             <mat-option
                                                                                 *ngFor="let e of lstDataPortafolio"
                                                                                 value="{{e.id}}">
@@ -581,7 +582,7 @@
 
                                             &nbsp;&nbsp;&nbsp;
 
-                                            <button mat-flat-button [disabled]="contratoForm.invalid" color="primary"
+                                            <button mat-flat-button [disabled]="tabSaldos ? !portafolioModificado : contratoForm.invalid" color="primary"
                                                 (click)="Guardar()">
                                                 {{!tabSaldos ? 'Guardar' : 'Editar'}}
                                                 Contrato
