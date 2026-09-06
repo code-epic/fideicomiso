@@ -40,10 +40,26 @@
   .table-primary {
     background-color: #b8daff;
   }
+
+  .table-danger {
+    background-color: #f8d7da;
+  }
+
+  .table-success {
+    background-color: #d4edda;
+  }
 }
 
 .text-right {
   text-align: right;
+}
+
+.text-danger {
+  color: #c62828;
+}
+
+.text-success {
+  color: #2e7d32;
 }
 
 .alert {
@@ -71,4 +87,18 @@
 
 ul {
   margin-bottom: 0;
+}
+
+mat-card {
+  margin-bottom: 1rem;
+}
+
+mat-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.bg-light {
+  background-color: #f8f9fa;
 }

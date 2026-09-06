@@ -144,6 +144,13 @@ export const environment = {
     ACTUALIZAR_ESTATUS_PLAN: 'FID_UCambiarEstatusPlan',
     INSERTAR_FINIQUITO: 'FID_IFiniquito',
     CONSULTAR_FINIQUITO: 'FID_CFiniquito',
+    CONSULTAR_DIAGNOSTICO_FINIQUITO: 'FID_CSeDiagnosticoFiniquito',
+    INSERTAR_MOVIMIENTOS_FINIQUITO: 'FID_IMovimientosFiniquito',
+    ELIMINAR_COMPROBANTES_FINIQUITO: 'FID_EDeleteComprobantesFiniquito',
+    ELIMINAR_MOVIMIENTOS_FINIQUITO: 'FID_EDeleteMovimientosFiniquito',
+    ELIMINAR_SALDOS_FINIQUITO: 'FID_EDeleteSaldosFiniquito',
+    CONSULTAR_CUENTAS_NOMINALES_PLAN: 'FID_CSeCuentasNominalesPlan',
+    AUDITORIA_BALANCE_CERO: 'FID_CSeAuditoriaBalanceCero',
 
     // Intereses por disponibilidad
     CALCULAR_INTERESES_DISPONIBILIDAD: 'FID_CalcularInteresesDisponibilidad',

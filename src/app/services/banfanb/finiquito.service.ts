@@ -28,6 +28,36 @@ export interface ComprobantePendiente {
   llave: string;
 }
 
+export interface CuentaNominal {
+  id_cuenta: number;
+  codigo_padre: string;
+  descripcion: string;
+  aumenta: string;
+  saldo: number;
+}
+
+export interface DiagnosticoFiniquito {
+  id_plan: number;
+  plan: string;
+  tasa: number;
+  ultimo_cierre: string;
+  saldo_711: number;
+  saldo_712: number;
+  saldo_714: number;
+  saldo_722: number;
+  saldo_731: number;
+  saldo_734: number;
+  saldo_740: number;
+  saldo_744: number;
+  saldo_750: number;
+  saldo_751: number;
+  saldo_752: number;
+  int_inicio: string;
+  int_dias: number;
+  intereses_proyectados: number;
+  remanente_neto: number;
+}
+
 export interface RegistroFiniquito {
   id_plan: number;
   fecha_finiquito: string;
@@ -41,6 +71,15 @@ export interface RegistroFiniquito {
   comprobante_pasivos: number;
   comprobante_resultado: number;
   comprobante_finiquito: number;
+  numero_oficio?: string;
+  banco_destino?: string;
+  cuenta_destino?: string;
+  referencia?: string;
+  intereses_disponibilidad?: number;
+  saldo_712?: number;
+  saldo_714?: number;
+  monto_liquidacion?: number;
+  comprobante_intereses?: number;
   estatus: string;
   usuario: string;
 }
@@ -62,6 +101,39 @@ export class FiniquitoService {
     return (data?.Cuerpo || []) as SaldoFiniquito[];
   }
 
+  async consultarDiagnostico(idPlan: number, fechaFiniquito: string): Promise<DiagnosticoFiniquito | null> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_DIAGNOSTICO_FINIQUITO,
+      parametros: `${idPlan}, ${fechaFiniquito}`,
+      valores: ''
+    };
+    const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
+    const cuerpo = data?.Cuerpo || [];
+    if (cuerpo.length === 0) return null;
+    const r = cuerpo[0];
+    return {
+      id_plan: parseInt(r.id_plan) || 0,
+      plan: r.plan,
+      tasa: parseFloat(r.tasa) || 0,
+      ultimo_cierre: r.ultimo_cierre,
+      saldo_711: parseFloat(r.saldo_711) || 0,
+      saldo_712: parseFloat(r.saldo_712) || 0,
+      saldo_714: parseFloat(r.saldo_714) || 0,
+      saldo_722: parseFloat(r.saldo_722) || 0,
+      saldo_731: parseFloat(r.saldo_731) || 0,
+      saldo_734: parseFloat(r.saldo_734) || 0,
+      saldo_740: parseFloat(r.saldo_740) || 0,
+      saldo_744: parseFloat(r.saldo_744) || 0,
+      saldo_750: parseFloat(r.saldo_750) || 0,
+      saldo_751: parseFloat(r.saldo_751) || 0,
+      saldo_752: parseFloat(r.saldo_752) || 0,
+      int_inicio: r.int_inicio,
+      int_dias: parseInt(r.int_dias) || 0,
+      intereses_proyectados: parseFloat(r.intereses_proyectados) || 0,
+      remanente_neto: parseFloat(r.remanente_neto) || 0
+    } as DiagnosticoFiniquito;
+  }
+
   async consultarInversionesActivasPlan(idPlan: number): Promise<InversionActiva[]> {
     const xAPI: IAPICore = {
       funcion: environment.xApi.CONSULTAR_INVERSIONES_ACTIVAS_PLAN,
@@ -80,6 +152,24 @@ export class FiniquitoService {
     };
     const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
     return (data?.Cuerpo || []) as ComprobantePendiente[];
+  }
+
+  async consultarCuentasNominalesPlan(idPlan: number): Promise<CuentaNominal[]> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_CUENTAS_NOMINALES_PLAN,
+      parametros: idPlan.toString(),
+      valores: ''
+    };
+    const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
+    const cuerpo = data?.Cuerpo || [];
+    console.log('[FiniquitoService] consultarCuentasNominalesPlan:', idPlan, '→', cuerpo.length, 'cuentas', cuerpo);
+    return cuerpo.map((c: any) => ({
+      id_cuenta: parseInt(c.id_cuenta) || 0,
+      codigo_padre: c.codigo_padre,
+      descripcion: c.descripcion,
+      aumenta: c.aumenta,
+      saldo: parseFloat(c.saldo) || 0
+    })) as CuentaNominal[];
   }
 
   async consultarFiniquitoPlan(idPlan: number): Promise<any | null> {
@@ -112,6 +202,42 @@ export class FiniquitoService {
       funcion: environment.xApi.INSERTAR_DETALLE_COMPROBANTE,
       parametros: '',
       valores: JSON.stringify(detalle)
+    };
+    await lastValueFrom(this.apiService.Ejecutar(xAPI));
+  }
+
+  async insertarMovimientosFiniquito(plan: number, fecha: string, llave: string): Promise<void> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.INSERTAR_MOVIMIENTOS_FINIQUITO,
+      parametros: `${fecha}, ${llave}, finiquito, ${plan}`,
+      valores: ''
+    };
+    await lastValueFrom(this.apiService.Ejecutar(xAPI));
+  }
+
+  async borrarComprobantesFiniquito(plan: number, fecha: string): Promise<void> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.ELIMINAR_COMPROBANTES_FINIQUITO,
+      parametros: `${plan}, ${fecha}`,
+      valores: ''
+    };
+    await lastValueFrom(this.apiService.Ejecutar(xAPI));
+  }
+
+  async borrarMovimientosFiniquito(plan: number, fecha: string): Promise<void> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.ELIMINAR_MOVIMIENTOS_FINIQUITO,
+      parametros: `${plan}, ${fecha}`,
+      valores: ''
+    };
+    await lastValueFrom(this.apiService.Ejecutar(xAPI));
+  }
+
+  async borrarSaldosFiniquito(plan: number, fecha: string): Promise<void> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.ELIMINAR_SALDOS_FINIQUITO,
+      parametros: `${plan}, ${fecha}`,
+      valores: ''
     };
     await lastValueFrom(this.apiService.Ejecutar(xAPI));
   }
