@@ -58,15 +58,17 @@
       <input matInput [(ngModel)]="cuentaDestino" (input)="validarPrerrequisitos()" placeholder="Ej: 0134-xxxx-xxxx-xxxx">
     </mat-form-field>
   </div>
-  <div class="col-md-2">
+  <div class="col-md-3">
     <mat-form-field appearance="outline" class="w-100">
       <mat-label>Referencia</mat-label>
       <input matInput [(ngModel)]="referencia" placeholder="Opcional">
     </mat-form-field>
   </div>
-  <div class="col-md-1 text-right">
+</div>
+<div class="row" *ngIf="planSeleccionado && !yaFiniquitado">
+  <div class="col-md-12 text-right">
     <button mat-flat-button color="primary" (click)="procesarFiniquito()" [disabled]="procesando || !validacionesPasadas" style="height: 50px;">
-      <mat-icon>done_all</mat-icon>&nbsp;Procesar
+      <mat-icon>done_all</mat-icon>&nbsp;Procesar finiquito
     </button>
   </div>
 </div>

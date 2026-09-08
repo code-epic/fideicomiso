@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
 
@@ -36,11 +37,16 @@ export class CarteraComponent implements OnInit {
     private util: UtilService,
     private toasService: ToastrService,
     private apiService: ApiService,
-    private _imprimir: ImprimirService
+    private _imprimir: ImprimirService,
+    private _cierre: CierreService
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.ListarPlanesFideicomiso()
+    const ultimoCierre = await this._cierre.getUltimoCierre()
+    if (ultimoCierre) {
+      this.fechai = this._cierre.getSiguienteDia(ultimoCierre)
+    }
   }
 
   ListarPlanesFideicomiso() {

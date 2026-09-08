@@ -166,7 +166,8 @@ export class FiniquitoComponent implements OnInit {
         }
       }
 
-      this.inversionesActivas = await this.finiquitoService.consultarInversionesActivasPlan(plan.id);
+      const fechaConsulta = this.fechaFiniquito ? this.util.ConvertirFechaDB(this.fechaFiniquito) : undefined;
+      this.inversionesActivas = await this.finiquitoService.consultarInversionesActivasPlan(plan.id, fechaConsulta);
       this.comprobantesPendientes = await this.finiquitoService.consultarComprobantesPendientesPlan(plan.id);
 
       this.validarPrerrequisitos();
@@ -183,6 +184,8 @@ export class FiniquitoComponent implements OnInit {
       const fecha = this.util.ConvertirFechaDB(this.fechaFiniquito);
       if (fecha) {
         await this.cargarDiagnostico(this.planSeleccionado.id, fecha);
+        // Reconsultar inversiones activas con la nueva fecha para filtrar vencidas
+        this.inversionesActivas = await this.finiquitoService.consultarInversionesActivasPlan(this.planSeleccionado.id, fecha);
       }
     }
     this.validarPrerrequisitos();

@@ -134,10 +134,10 @@ export class FiniquitoService {
     } as DiagnosticoFiniquito;
   }
 
-  async consultarInversionesActivasPlan(idPlan: number): Promise<InversionActiva[]> {
+  async consultarInversionesActivasPlan(idPlan: number, fechaFiniquito?: string): Promise<InversionActiva[]> {
     const xAPI: IAPICore = {
       funcion: environment.xApi.CONSULTAR_INVERSIONES_ACTIVAS_PLAN,
-      parametros: idPlan.toString(),
+      parametros: fechaFiniquito ? `${idPlan}, ${fechaFiniquito}` : idPlan.toString(),
       valores: ''
     };
     const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
