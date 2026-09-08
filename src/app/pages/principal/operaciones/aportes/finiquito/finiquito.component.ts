@@ -323,6 +323,18 @@ export class FiniquitoComponent implements OnInit {
     this.validarPrerrequisitos();
     if (!this.validacionesPasadas || !this.planSeleccionado) return;
 
+    // Re-validar contra la BD para evitar finiquito doble
+    try {
+      const existe = await this.finiquitoService.consultarFiniquitoPlan(this.planSeleccionado.id);
+      if (existe) {
+        this.yaFiniquitado = true;
+        this.toastr.error('Este plan ya fue finiquitado previamente.', 'Finiquito');
+        return;
+      }
+    } catch (e) {
+      console.error('[Finiquito] Error re-validando finiquito existente:', e);
+    }
+
     // Saldos para el diálogo de confirmación (se refrescan dentro del try)
     const saldo711Confirm = this.getSaldo('711');
     const saldo722Confirm = this.getSaldo('722');
@@ -371,10 +383,12 @@ export class FiniquitoComponent implements OnInit {
       if (!this.diagnostico || !this.diagnostico.intereses_proyectados) {
         // Fallback: calcular saldo_711 × tasa/100/360 × días(1° mes → corte)
         const tasa = this.diagnostico?.tasa || 2.00;
-        const fechaFinDate = fecha ? new Date(fecha) : null;
+        // Parsear como componentes locales para evitar desfase UTC
+        const partes = fecha.split('-').map(Number);
+        const fechaFinDate = new Date(partes[0], partes[1] - 1, partes[2]);
         // int_inicio = 1° del mes de la fecha de finiquito
-        const intInicio = fechaFinDate ? new Date(fechaFinDate.getFullYear(), fechaFinDate.getMonth(), 1) : null;
-        const intDias = (intInicio && fechaFinDate) ? Math.floor((fechaFinDate.getTime() - intInicio.getTime()) / 86400000) : 0;
+        const intInicio = new Date(partes[0], partes[1] - 1, 1);
+        const intDias = Math.floor((fechaFinDate.getTime() - intInicio.getTime()) / 86400000);
         const saldo711 = this.getSaldo('711');
         const interesesCalc = saldo711 * tasa / 100 / 360 * intDias;
         if (!this.diagnostico) {
@@ -383,7 +397,7 @@ export class FiniquitoComponent implements OnInit {
         this.diagnostico.intereses_proyectados = Math.round(interesesCalc * 100) / 100;
         this.diagnostico.tasa = tasa;
         this.diagnostico.ultimo_cierre = this.diagnostico?.ultimo_cierre || this.fechaultimo;
-        console.log('[Finiquito] Fallback cálculo intereses:', { saldo711, tasa, intDias, intInicio: intInicio?.toISOString().split('T')[0], interesesCalc: this.diagnostico.intereses_proyectados });
+        console.log('[Finiquito] Fallback cálculo intereses:', { saldo711, tasa, intDias, intInicio: fecha.split('-').slice(0, 2).join('-') + '-01', interesesCalc: this.diagnostico.intereses_proyectados });
       }
 
       // Recalcular saldos frescos del diagnóstico
@@ -509,12 +523,7 @@ export class FiniquitoComponent implements OnInit {
         throw new Error('La verificación de balance cero falló. Se revirtieron los cambios.');
       }
 
-      // Paso 8: Cambiar estatus del plan a finiquitado
-      const observacionOriginal = this.planSeleccionado?.observacion || '';
-      const observacionFiniquito = observacionOriginal + ' [FINIQUITADO - ' + fecha + ']';
-      await this.finiquitoService.cambiarEstatusPlan(planId, 3, observacionFiniquito);
-
-      // Paso 9: Registrar finiquito
+      // Paso 8: Registrar finiquito (ANTES de cambiar estatus para evitar estado inconsistente)
       const registro: RegistroFiniquito = {
         id_plan: planId,
         fecha_finiquito: fecha,
@@ -541,6 +550,12 @@ export class FiniquitoComponent implements OnInit {
         usuario: 'sistema'
       };
       await this.finiquitoService.registrarFiniquito(registro);
+
+      // Paso 9: Cambiar estatus del plan a finiquitado (solo si el INSERT fue exitoso)
+      const observacionOriginal = this.planSeleccionado?.observacion || '';
+      const observacionLimpia = observacionOriginal.replace(/\s*\[FINIQUITADO[^\]]*\]/g, '').trim();
+      const observacionFiniquito = observacionLimpia + ' [FINIQUITADO - ' + fecha + ']';
+      await this.finiquitoService.cambiarEstatusPlan(planId, 3, observacionFiniquito);
 
       // Paso 10: Reload resultado
       this.resultadoFiniquito = registro;
