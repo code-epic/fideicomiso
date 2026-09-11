@@ -125,6 +125,10 @@
                                                             <mat-icon>folder</mat-icon>
                                                             <span>Portafolio</span>
                                                         </button>
+                                                        <button mat-menu-item *ngIf="esVencible(e)" (click)="liquidarInversion(e)">
+                                                            <mat-icon>attach_money</mat-icon>
+                                                            <span>Liquidar</span>
+                                                        </button>
                                                         <mat-divider></mat-divider>
                                                         <button mat-menu-item (click)="imprimirInversion(e)">
                                                             <mat-icon>print</mat-icon>

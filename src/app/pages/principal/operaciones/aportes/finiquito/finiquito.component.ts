@@ -157,13 +157,11 @@ export class FiniquitoComponent implements OnInit {
           referencia: existe.referencia
         };
       } else {
-        // Consultar diagnostico completo
-        if (this.fechaFiniquito) {
-          await this.cargarDiagnostico(plan.id, this.util.ConvertirFechaDB(this.fechaFiniquito));
-        } else {
-          const saldos = await this.finiquitoService.consultarSaldosPlan(plan.id);
-          saldos.forEach(s => this.saldos.set(s.codigo_padre, s));
-        }
+        // Consultar diagnostico completo (siempre usar diagnostico dinamico)
+        const fechaConsulta = this.fechaFiniquito
+          ? this.util.ConvertirFechaDB(this.fechaFiniquito)
+          : this.util.ConvertirFechaDB(new Date());
+        await this.cargarDiagnostico(plan.id, fechaConsulta);
       }
 
       const fechaConsulta = this.fechaFiniquito ? this.util.ConvertirFechaDB(this.fechaFiniquito) : undefined;
@@ -195,6 +193,17 @@ export class FiniquitoComponent implements OnInit {
     try {
       this.diagnostico = await this.finiquitoService.consultarDiagnostico(planId, fecha);
       if (this.diagnostico) {
+        // Ajustar saldos 712/714 con comprobantes post-ultimo cierre
+        if (this.fechaultimo) {
+          try {
+            const fechaCierre = this.util.ConvertirFechaDB(this.fechaultimo);
+            const ajuste = await this.finiquitoService.consultarSaldosAjustados(planId, fechaCierre, fecha);
+            this.diagnostico.saldo_712 = ajuste.saldo_712;
+            this.diagnostico.saldo_714 = ajuste.saldo_714;
+          } catch (e) {
+            console.error('[Finiquito] Error ajustando saldos 712/714:', e);
+          }
+        }
         this.saldos.clear();
         this.saldos.set('711', { codigo_padre: '711', descripcion: 'Disponibilidad', saldo: this.diagnostico.saldo_711 });
         this.saldos.set('712', { codigo_padre: '712', descripcion: 'Inversiones', saldo: this.diagnostico.saldo_712 });
@@ -381,12 +390,11 @@ export class FiniquitoComponent implements OnInit {
         console.error('[Finiquito] Error recargando diagnóstico, fallback cálculo directo:', e);
       }
       if (!this.diagnostico || !this.diagnostico.intereses_proyectados) {
-        // Fallback: calcular saldo_711 × tasa/100/360 × días(1° mes → corte)
+        // Fallback: approximación conservadora con saldo final (subestima si saldo fue menor antes)
+        // La API FID_CSeDiagnosticoFiniquito v8.00 calcula la curva diaria real
         const tasa = this.diagnostico?.tasa || 2.00;
-        // Parsear como componentes locales para evitar desfase UTC
         const partes = fecha.split('-').map(Number);
         const fechaFinDate = new Date(partes[0], partes[1] - 1, partes[2]);
-        // int_inicio = 1° del mes de la fecha de finiquito
         const intInicio = new Date(partes[0], partes[1] - 1, 1);
         const intDias = Math.floor((fechaFinDate.getTime() - intInicio.getTime()) / 86400000);
         const saldo711 = this.getSaldo('711');
@@ -397,7 +405,7 @@ export class FiniquitoComponent implements OnInit {
         this.diagnostico.intereses_proyectados = Math.round(interesesCalc * 100) / 100;
         this.diagnostico.tasa = tasa;
         this.diagnostico.ultimo_cierre = this.diagnostico?.ultimo_cierre || this.fechaultimo;
-        console.log('[Finiquito] Fallback cálculo intereses:', { saldo711, tasa, intDias, intInicio: fecha.split('-').slice(0, 2).join('-') + '-01', interesesCalc: this.diagnostico.intereses_proyectados });
+        console.warn('[Finiquito] Fallback: usando approximación plana (API no respondió). Intereses pueden estar sobreestimados.', { saldo711, tasa, intDias, interesesCalc: this.diagnostico.intereses_proyectados });
       }
 
       // Recalcular saldos frescos del diagnóstico

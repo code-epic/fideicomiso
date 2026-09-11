@@ -103,6 +103,7 @@ export const environment = {
     INSERTAR_INVESION: 'FID_IInversion',
     ELIMINAR_INVERSION: 'FID_DInversion',
     ACTUALIZAR_INVERSION: 'FID_UInversion',
+    LIQUIDAR_INVERSION_ESTATUS: 'FID_ULiquidarInversion',
     CONSULTAR_EMISOR: 'FID_CEmisor',
     CONSULTAR_CUSTODIA: 'FID_CCustodia',
     CONSULTAR_INSTRUMENTO: 'FID_CInstrumento',
@@ -113,6 +114,7 @@ export const environment = {
     CONSULTAR_COMPRA_INVERSIONES: 'FID_CCompraInversiones',
     INSERTAR_DEVENGO_INVERIONES: 'FID_IDevengoInversiones',
     INSERTAR_VENCIMIENTO_INVERSIONES: 'FID_IVencimientoInversiones',
+    INSERTAR_LIQUIDACION_INVERSION: 'FID_ILiquidacionInversion',
     INSERTAR_COMPRA_INVERSIONES: 'FID_ICompraInversiones',
     INSERTAR_MOVIMIENTOS_INVERSION: 'FID_IMovInversion',
     ELIMINAR_MOVIMIENTOS_INVERSION: 'FID_DInversion',
@@ -151,6 +153,7 @@ export const environment = {
     ELIMINAR_SALDOS_FINIQUITO: 'FID_EDeleteSaldosFiniquito',
     CONSULTAR_CUENTAS_NOMINALES_PLAN: 'FID_CSeCuentasNominalesPlan',
     AUDITORIA_BALANCE_CERO: 'FID_CSeAuditoriaBalanceCero',
+    CONSULTAR_SALDOS_AJUSTADOS: 'FID_CSeSaldosAjustados',
 
     // Intereses por disponibilidad
     CALCULAR_INTERESES_DISPONIBILIDAD: 'FID_CalcularInteresesDisponibilidad',

@@ -410,8 +410,8 @@ export class WzportafolioComponent implements OnInit {
 
   RendicionCupon(inv): number {
     let rendicion =
-      (inv.valor_nominal * inv.tasa_cupon * (inv.plazo_cupon / 100)) /
-      inv.base_calculo;
+      (inv.valor_nominal * inv.tasa_cupon * inv.plazo_cupon) /
+      (100 * inv.base_calculo);
     return parseFloat(rendicion.toFixed(2));
   }
 
@@ -432,7 +432,7 @@ export class WzportafolioComponent implements OnInit {
       for (const v of data.Cuerpo) {
         if (!v.id_plan) continue;
 
-        const monto = parseFloat(v.valor_nominal) + this.RendicionCupon(v);
+        const monto = Math.round((parseFloat(v.valor_nominal) + parseFloat(v.rendimiento_vencimiento)) * 100) / 100;
         const comprobante: FID_IComprobante = {
           plan: Number(v.id_plan),
           codigo: this._util.GenerarUnicId(),
@@ -459,6 +459,14 @@ export class WzportafolioComponent implements OnInit {
             valores: ''
           };
           await firstValueFrom(this.apiService.Ejecutar(apiData));
+
+          // Actualizar estatus de inversión a 2 (VENCIDA)
+          const apiEstatus: IAPICore = {
+            funcion: environment.xApi.LIQUIDAR_INVERSION_ESTATUS,
+            parametros: `${v.codigo}, 2`,
+            valores: ''
+          };
+          await firstValueFrom(this.apiService.Ejecutar(apiEstatus));
         }
       }
     } catch (error) {

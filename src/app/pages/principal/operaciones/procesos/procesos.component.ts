@@ -369,8 +369,8 @@ export class ProcesosComponent implements OnInit {
 
   RendicionCupon(inv): number {
     let rendicion =
-      (inv.valor_nominal * inv.tasa_cupon * (inv.plazo_cupon / 100)) /
-      inv.base_calculo;
+      (inv.valor_nominal * inv.tasa_cupon * inv.plazo_cupon) /
+      (100 * inv.base_calculo);
     return parseFloat(rendicion.toFixed(2));
   }
 
@@ -473,7 +473,7 @@ export class ProcesosComponent implements OnInit {
             sinPlan.push(`VENCIMIENTO ${e.codigo || ""}`.trim());
             continue;
           }
-          const monto = parseFloat(e.valor_nominal) + this.RendicionCupon(e);
+           const monto = Math.round((parseFloat(e.valor_nominal) + parseFloat(e.rendimiento_vencimiento)) * 100) / 100;
           const vencimiento = {
             plan: planVenc,
             codigo: this.util.GenerarUnicId(),
@@ -501,6 +501,14 @@ export class ProcesosComponent implements OnInit {
             };
             await firstValueFrom(this.apiService.Ejecutar(apiVencData));
           }
+
+          // Actualizar estatus de inversión a 2 (VENCIDA)
+          const apiEstatus: IAPICore = {
+            funcion: environment.xApi.LIQUIDAR_INVERSION_ESTATUS,
+            parametros: `${e.codigo}, 2`,
+            valores: ""
+          };
+          await firstValueFrom(this.apiService.Ejecutar(apiEstatus));
         }
       }
 

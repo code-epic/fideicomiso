@@ -52,7 +52,7 @@ export class InteresesService {
   async calcularIntereses(fechaInicio: string, fechaFin: string): Promise<InteresProyectado[]> {
     const xAPI: IAPICore = {
       funcion: 'FID_CalcularInteresesDisponibilidad',
-      parametros: `${fechaInicio}, ${fechaFin}`,
+      parametros: `${fechaInicio},${fechaFin}`,
       valores: ''
     };
     const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
@@ -72,7 +72,7 @@ export class InteresesService {
   async verificarPagoIntereses(idPlan: number, fechaInicio: string, fechaFin: string): Promise<boolean> {
     const xAPI: IAPICore = {
       funcion: 'FID_CVerificarPagoIntereses',
-      parametros: `${idPlan}, ${fechaInicio}, ${fechaFin}`,
+      parametros: `${idPlan},${fechaInicio},${fechaFin}`,
       valores: ''
     };
     const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
@@ -101,7 +101,7 @@ export class InteresesService {
   async insertarDetalleInteres(idComprobante: number, monto: number, fecha: string, idPlan: number): Promise<void> {
     const xAPI: IAPICore = {
       funcion: 'FID_IInteresDisponibilidad',
-      parametros: `${idComprobante}, ${monto}, ${fecha}, ${idPlan}`,
+      parametros: `${idComprobante},${monto},${fecha},${idPlan}`,
       valores: ''
     };
     await lastValueFrom(this.apiService.Ejecutar(xAPI));
