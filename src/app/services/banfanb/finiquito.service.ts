@@ -277,4 +277,15 @@ export class FiniquitoService {
       saldo_714: parseFloat(r.saldo_714) || 0
     };
   }
+
+  async consultarUltimaFechaLiquidacion(idPlan: number): Promise<string | null> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_ULTIMA_FECHA_LIQUIDACION_712_714,
+      parametros: `${idPlan}`,
+      valores: ''
+    };
+    const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
+    const r = data?.Cuerpo?.[0];
+    return r?.ultima_fecha || null;
+  }
 }

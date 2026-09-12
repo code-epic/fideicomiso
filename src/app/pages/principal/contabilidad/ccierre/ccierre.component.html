@@ -61,7 +61,7 @@
         </button>
         &nbsp;&nbsp;
         <button *ngIf="semestral"
-        mat-flat-button color="warn" (click)="CrearSemestral('S')" style="height: 50px;">
+        mat-flat-button color="warn" [disabled]="!cierreMensualCompletado" (click)="CrearSemestral('S')" style="height: 50px;">
           &nbsp;Cierre semestral
         </button>
 

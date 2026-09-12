@@ -91,6 +91,18 @@ export class UtilService {
     //return fa[2] + "/" + fa[1] + "/" + fa[0];
   }
 
+  // Suma N días calendario a una fecha en formato YYYY-MM-DD
+  // Retorna fecha en formato YYYY-MM-DD
+  SumarDias(fecha: string, dias: number): string {
+    const partes = fecha.split('-').map(Number);
+    const f = new Date(partes[0], partes[1] - 1, partes[2]);
+    f.setDate(f.getDate() + dias);
+    const anio = f.getFullYear();
+    const mes = String(f.getMonth() + 1).padStart(2, '0');
+    const dia = String(f.getDate()).padStart(2, '0');
+    return `${anio}-${mes}-${dia}`;
+  }
+
   //Recibe  Fecha Formato: DD/MM/AAAA
   //Retorna Fecha Formato: AAAA-MM-DD
   ConvertirFechaDB(f: any): string {

@@ -55,6 +55,9 @@ export class FiniquitoComponent implements OnInit {
   public resultadoFiniquito: any = null;
   public yaFiniquitado: boolean = false;
 
+  // Última fecha de liquidación de inversiones (712/714)
+  public ultimaFechaLiquidacion: string | null = null;
+
   // Datos del diagnostico
   public diagnostico: DiagnosticoFiniquito | null = null;
 
@@ -122,6 +125,7 @@ export class FiniquitoComponent implements OnInit {
     this.saldos.clear();
     this.inversionesActivas = [];
     this.comprobantesPendientes = [];
+    this.ultimaFechaLiquidacion = null;
     this.diagnostico = null;
     this.numeroOficio = '';
     this.bancoDestino = '';
@@ -167,6 +171,7 @@ export class FiniquitoComponent implements OnInit {
       const fechaConsulta = this.fechaFiniquito ? this.util.ConvertirFechaDB(this.fechaFiniquito) : undefined;
       this.inversionesActivas = await this.finiquitoService.consultarInversionesActivasPlan(plan.id, fechaConsulta);
       this.comprobantesPendientes = await this.finiquitoService.consultarComprobantesPendientesPlan(plan.id);
+      this.ultimaFechaLiquidacion = await this.finiquitoService.consultarUltimaFechaLiquidacion(plan.id);
 
       this.validarPrerrequisitos();
     } catch (error) {
@@ -256,6 +261,14 @@ export class FiniquitoComponent implements OnInit {
     const saldo714 = this.getSaldo('714');
     if (saldo714 > 0) {
       this.errores.push(`El plan presenta rendimientos por cobrar no conciliados (714 = ${this.formatearMonto(saldo714)}). Requieren conciliación previa.`);
+    }
+
+    // Validar que la fecha de finiquito sea posterior a la liquidación de inversiones
+    if (this.ultimaFechaLiquidacion && this.fechaFiniquito) {
+      const fechaOperacion = this.util.ConvertirFechaDB(this.fechaFiniquito);
+      if (fechaOperacion && fechaOperacion < this.ultimaFechaLiquidacion) {
+        this.errores.push(`La fecha de finiquito (${fechaOperacion}) debe ser posterior a la fecha de liquidación de inversiones (${this.ultimaFechaLiquidacion}).`);
+      }
     }
 
     const saldo711 = this.getSaldo('711');

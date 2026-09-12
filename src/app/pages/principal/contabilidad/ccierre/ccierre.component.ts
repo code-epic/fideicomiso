@@ -10,6 +10,7 @@ import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banf
 import { InteresesService } from 'src/app/services/banfanb/intereses.service';
 import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
@@ -94,7 +95,8 @@ export class CcierreComponent implements OnInit {
     private util: UtilService,
     public formatter: NgbDateParserFormatter,
     private cierre: CierreService,
-    private interesesService: InteresesService
+    private interesesService: InteresesService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -307,6 +309,10 @@ export class CcierreComponent implements OnInit {
 
 
   CrearSemestral(llave) {
+    if (!this.cierreMensualCompletado) {
+      this.toastr.error('Debe completar el cierre mensual antes del cierre semestral', 'Cierre Semestral');
+      return;
+    }
     this.ngxService.startLoader('load-precierre')
     let d = this.fechaultimo.split('/')
     let fultimo = d[2] + '-' + d[1] + '-' + d[0]
@@ -315,11 +321,20 @@ export class CcierreComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        this.CrearSaldos(llave)
-        this.ngxService.stopLoader('load-precierre')
+        try {
+          await this.CrearSaldosAsync(llave)
+          this.toastr.success('Cierre semestral completado exitosamente', 'Cierre Semestral')
+        } catch (error) {
+          console.error('Error en CrearSaldos semestral:', error)
+          this.toastr.error('Error al generar saldos semestales. Se revirtió el proceso.', 'Cierre Semestral')
+        } finally {
+          this.ngxService.stopLoader('load-precierre')
+        }
       },
       (error) => {
-        console.error(error)
+        console.error('Error al borrar cierre semestral:', error)
+        this.toastr.error('Error al eliminar cierre semestral anterior', 'Cierre Semestral')
+        this.ngxService.stopLoader('load-precierre')
       }
     )
   }

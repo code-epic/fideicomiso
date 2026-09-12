@@ -154,10 +154,15 @@ export const environment = {
     CONSULTAR_CUENTAS_NOMINALES_PLAN: 'FID_CSeCuentasNominalesPlan',
     AUDITORIA_BALANCE_CERO: 'FID_CSeAuditoriaBalanceCero',
     CONSULTAR_SALDOS_AJUSTADOS: 'FID_CSeSaldosAjustados',
+    CONSULTAR_ULTIMA_FECHA_LIQUIDACION_712_714: 'FID_CSeUltimaFechaLiquidacion712_714',
 
     // Intereses por disponibilidad
     CALCULAR_INTERESES_DISPONIBILIDAD: 'FID_CalcularInteresesDisponibilidad',
     VERIFICAR_PAGO_INTERESES: 'FID_CVerificarPagoIntereses',
+
+    // Pago de rendimientos / intereses
+    CONSULTAR_DIAGNOSTICO_PAGO_INTERESES: 'FID_CSeDiagnosticoPagoIntereses',
+    INSERTAR_PAGO_INTERESES: 'FID_IPagoIntereses',
   }, 
 
   functions: {

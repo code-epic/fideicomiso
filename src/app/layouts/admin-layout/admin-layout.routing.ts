@@ -31,6 +31,7 @@ import { IncrementosComponent } from 'src/app/pages/principal/operaciones/aporte
 import { RetirosComponent } from 'src/app/pages/principal/operaciones/aportes/retiros/retiros.component'
 import { FiniquitoComponent } from 'src/app/pages/principal/operaciones/aportes/finiquito/finiquito.component'
 import { InteresesComponent } from 'src/app/pages/principal/operaciones/aportes/intereses/intereses.component'
+import { PagointeresesComponent } from 'src/app/pages/principal/operaciones/aportes/pagointereses/pagointereses.component'
 import { ProcesocontablesComponent } from 'src/app/pages/principal/contabilidad/procesocontables/procesocontables.component'
 import { GeneralyresultadoComponent } from 'src/app/pages/principal/contabilidad/generalyresultado/generalyresultado.component'
 import { ComprobacionComponent } from 'src/app/pages/principal/contabilidad/comprobacion/comprobacion.component'
@@ -192,6 +193,10 @@ export const AdminLayoutRoutes: Routes = [
     },{
         path: 'intereses',
         component: InteresesComponent,
+        canActivate: [AuthGuardGuard]
+    },{
+        path: 'pagointereses',
+        component: PagointeresesComponent,
         canActivate: [AuthGuardGuard]
     },{
         path: 'npanel',
