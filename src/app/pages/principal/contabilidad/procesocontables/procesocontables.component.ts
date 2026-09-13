@@ -11,6 +11,7 @@ import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.serv
 import { UtilService } from 'src/app/services/util/util.service';
 import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 import { environment } from 'src/environments/environment';
+import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -243,7 +244,7 @@ export class ProcesocontablesComponent implements OnInit {
     
     this.apiService.Ejecutar(this.xAPI).subscribe({
       next: async (data) => {
-        const planes = (data.Cuerpo || []).filter((p: any) => p.estatus === 1 || p.estatus === 2)
+        const planes = (data.Cuerpo || []).filter((p: any) => Number(p.estatus) === 1 || Number(p.estatus) === 2)
         
         if (planes.length === 0) {
           this._snackBar.open('No hay planes activos para procesar', 'OK')
@@ -344,21 +345,36 @@ export class ProcesocontablesComponent implements OnInit {
           });
 
           let saldo = debe - haber
-          let dcx = {
-            'comprobante': 0,
-            'cuenta': '40',
-            'debe': 0,
-            'haber': saldo,
-            'fecha_ejercicio': fecha,
-            'fecha_operacion': fecha
+          if (saldo > 0) {
+            // Utilidad → HABER 734 (aumenta patrimonio)
+            let dcx = {
+              'comprobante': 0,
+              'cuenta': '40',
+              'debe': 0,
+              'haber': saldo,
+              'fecha_ejercicio': fecha,
+              'fecha_operacion': fecha
+            }
+            this.lstData.push(dcx)
+          } else if (saldo < 0) {
+            // Pérdida → DEBE 734 (disminuye patrimonio)
+            let dcx = {
+              'comprobante': 0,
+              'cuenta': '40',
+              'debe': Math.abs(saldo),
+              'haber': 0,
+              'fecha_ejercicio': fecha,
+              'fecha_operacion': fecha
+            }
+            this.lstData.push(dcx)
           }
-          this.lstData.push(dcx)
+          // Si saldo == 0 → no se agrega línea 734
           this.Comprobante.debe = debe
           this.Comprobante.haber = debe
 
           // Insertar directamente sin confirmación (ya se confirmó en el flujo principal)
           this.Acepar().then(() => {
-            resolve()
+            resolve();
           })
         },
         error => {
@@ -414,7 +430,7 @@ export class ProcesocontablesComponent implements OnInit {
 
   async GuardarDetalle(comprobante: number) {
     this.IDComprobante.id_comprobante = comprobante;
-    await this.lstData.map(async (e) => {      
+    for (const e of this.lstData) {
       this.IDComprobante.debe = e.debe
       this.IDComprobante.haber = e.haber
       this.IDComprobante.fecha_ejercicio = e.fecha_ejercicio
@@ -424,13 +440,10 @@ export class ProcesocontablesComponent implements OnInit {
 
       this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE
       this.xAPI.parametros = "";
-      this.xAPI.valores = JSON.stringify(this.IDComprobante);      
+      this.xAPI.valores = JSON.stringify(this.IDComprobante);
 
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => { },
-        (err) => { }
-      );
-    })
+      await firstValueFrom(this.apiService.Ejecutar(this.xAPI));
+    }
     this.ConsultarComprobante()
   }
 
@@ -567,8 +580,9 @@ export class ProcesocontablesComponent implements OnInit {
     this.ngxService.startLoader('load-precierre')
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        if (data.Cuerpo != undefined ){
-          let fentrada = data.Cuerpo[0].fecha.substring(0, 10);
+        const fecha = data?.Cuerpo?.[0]?.fecha;
+        if (fecha) {
+          let fentrada = fecha.substring(0, 10);
           let finicio = this.util.ConvertirFechaDB(this.fechai);          
           
           if (fentrada == finicio){            
@@ -581,7 +595,10 @@ export class ProcesocontablesComponent implements OnInit {
             this.ngxService.stopLoader('load-precierre')
           }else{
             this.GenerarPrecierre()
-          }      
+          }
+        } else {
+          // No hay precierre semestral previo → proceder
+          this.GenerarPrecierre()
         }
       },
       err => {

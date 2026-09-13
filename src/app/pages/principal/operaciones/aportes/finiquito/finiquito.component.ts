@@ -67,8 +67,7 @@ export class FiniquitoComponent implements OnInit {
   public cuentaDestino: string = '';
   public referencia: string = '';
 
-  // IDs de comprobantes generados
-  private idComprobanteIntereses: number = 0;
+  // IDs de comprobantes generados (sin C1: los intereses los genera el proceso mensual)
   private idComprobantePasivos: number = 0;
   private idComprobanteResultado: number = 0;
   private idComprobanteFiniquito: number = 0;
@@ -306,8 +305,10 @@ export class FiniquitoComponent implements OnInit {
   }
 
   get montoLiquidacion(): number {
-    const intereses = this.diagnostico?.intereses_proyectados || 0;
-    return this.getSaldo('711') + intereses - this.getSaldo('722');
+    // Sin asiento de intereses en el finiquito: la 711 se transfiere neta de pasivos.
+    // Los intereses por disponibilidad los genera el proceso mensual y se pagan
+    // con el módulo de pago de intereses (DEBE 744 / HABER 711).
+    return this.getSaldo('711') - this.getSaldo('722');
   }
 
   get fechaOperacionFormateada(): string {
@@ -360,7 +361,6 @@ export class FiniquitoComponent implements OnInit {
     // Saldos para el diálogo de confirmación (se refrescan dentro del try)
     const saldo711Confirm = this.getSaldo('711');
     const saldo722Confirm = this.getSaldo('722');
-    const interesesConfirm = this.diagnostico?.intereses_proyectados || 0;
     const montoLiquidacionConfirm = this.montoLiquidacion;
 
     const confirm = await Swal.fire({
@@ -371,10 +371,10 @@ export class FiniquitoComponent implements OnInit {
           <p><strong>Fecha:</strong> ${this.fechaOperacionFormateada}</p>
           <table style="width: 100%; margin-top: 8px;">
             <tr><td>Disponibilidad (711)</td><td style="text-align: right;">${this.formatearMonto(saldo711Confirm)}</td></tr>
-            ${interesesConfirm > 0 ? `<tr><td>Intereses por disponibilidad</td><td style="text-align: right;">+ ${this.formatearMonto(interesesConfirm)}</td></tr>` : ''}
             ${saldo722Confirm > 0 ? `<tr><td>Comisiones por pagar (722)</td><td style="text-align: right; color: #c62828;">- ${this.formatearMonto(saldo722Confirm)}</td></tr>` : ''}
             <tr style="font-weight: bold; border-top: 1px solid #ccc;"><td>Monto a transferir</td><td style="text-align: right;">${this.formatearMonto(montoLiquidacionConfirm)}</td></tr>
           </table>
+          <p style="margin-top: 8px; font-size: 12px; color: #666;">Los intereses por disponibilidad se generan en el cierre mensual y se pagan con el módulo de Pago de Intereses.</p>
           <p style="margin-top: 8px;"><strong>Banco:</strong> ${this.bancoDestino}</p>
           <p><strong>Cuenta:</strong> ${this.cuentaDestino}</p>
         </div>
@@ -396,29 +396,14 @@ export class FiniquitoComponent implements OnInit {
       const planId = this.planSeleccionado.id;
       const fecha = this.fechaOperacionFormateada;
 
-      // Blindar diagnóstico: recargar para asegurar intereses_proyectados
+      // Blindar diagnóstico: recargar saldos frescos
+      // NOTA: NO se genera asiento de intereses en el finiquito.
+      // Los intereses por disponibilidad los calcula el proceso mensual (fin de mes)
+      // y se pagan con el módulo de pago de intereses (DEBE 744 / HABER 711).
       try {
         this.diagnostico = await this.finiquitoService.consultarDiagnostico(planId, fecha);
       } catch (e) {
-        console.error('[Finiquito] Error recargando diagnóstico, fallback cálculo directo:', e);
-      }
-      if (!this.diagnostico || !this.diagnostico.intereses_proyectados) {
-        // Fallback: approximación conservadora con saldo final (subestima si saldo fue menor antes)
-        // La API FID_CSeDiagnosticoFiniquito v8.00 calcula la curva diaria real
-        const tasa = this.diagnostico?.tasa || 2.00;
-        const partes = fecha.split('-').map(Number);
-        const fechaFinDate = new Date(partes[0], partes[1] - 1, partes[2]);
-        const intInicio = new Date(partes[0], partes[1] - 1, 1);
-        const intDias = Math.floor((fechaFinDate.getTime() - intInicio.getTime()) / 86400000);
-        const saldo711 = this.getSaldo('711');
-        const interesesCalc = saldo711 * tasa / 100 / 360 * intDias;
-        if (!this.diagnostico) {
-          this.diagnostico = {} as any;
-        }
-        this.diagnostico.intereses_proyectados = Math.round(interesesCalc * 100) / 100;
-        this.diagnostico.tasa = tasa;
-        this.diagnostico.ultimo_cierre = this.diagnostico?.ultimo_cierre || this.fechaultimo;
-        console.warn('[Finiquito] Fallback: usando approximación plana (API no respondió). Intereses pueden estar sobreestimados.', { saldo711, tasa, intDias, interesesCalc: this.diagnostico.intereses_proyectados });
+        console.error('[Finiquito] Error recargando diagnóstico:', e);
       }
 
       // Recalcular saldos frescos del diagnóstico
@@ -433,19 +418,10 @@ export class FiniquitoComponent implements OnInit {
       const saldo752 = this.getSaldo('752');
       const saldo712 = this.getSaldo('712');
       const saldo714 = this.getSaldo('714');
-      const intereses = this.diagnostico?.intereses_proyectados || 0;
       const montoLiquidacion = this.montoLiquidacion;
 
       // Limpieza defensiva (idempotencia)
       await this.compensarSilencioso(planId, fecha);
-
-      // C1: Intereses por disponibilidad — cuenta canónica 53 (ingresos por disponibilidades)
-      this.idComprobanteIntereses = 0;
-      if (intereses > 0) {
-        this.idComprobanteIntereses = await this.crearComprobante(planId, fecha, 'FINIQUITO - INTERESES POR DISPONIBILIDAD', intereses);
-        await this.crearDetalle(this.idComprobanteIntereses, planId, fecha, 3, intereses, 0);  // DEBE 711.02
-        await this.crearDetalle(this.idComprobanteIntereses, planId, fecha, 53, 0, intereses);  // HABER 751 (ingresos por disponibilidades)
-      }
 
       // C2: Liquidar pasivos
       this.idComprobantePasivos = 0;
@@ -456,6 +432,8 @@ export class FiniquitoComponent implements OnInit {
       }
 
       // C3: Refundición de resultados — consulta cuentas leaf con saldo ≠ 0
+      // Estructura: ingresos (75X) al DEBE contra 734, gastos (74X) al HABER contra 734.
+      // La 734 acumula el resultado neto del ejercicio (ingresos - gastos).
       this.idComprobanteResultado = 0;
       const cuentasNominales = await this.finiquitoService.consultarCuentasNominalesPlan(planId);
       console.log('[Finiquito] C3 cuentas nominales (raw):', cuentasNominales.length, cuentasNominales);
@@ -464,23 +442,6 @@ export class FiniquitoComponent implements OnInit {
       const cuentasParaC3 = cuentasNominales.filter(
         c => !FiniquitoComponent.CUENTAS_EXCLUIDAS_NOMINALES.includes(Number(c.id_cuenta)) && Number(c.saldo) !== 0
       );
-
-      // Ajustar hoja 53 con intereses de C1 (mismos que se acreditaron en HABER 53)
-      if (intereses > 0) {
-        const existe = cuentasParaC3.find(c => c.id_cuenta === 53);
-        if (existe) {
-          existe.saldo += intereses;
-        } else {
-          cuentasParaC3.push({ id_cuenta: 53, codigo_padre: '751', descripcion: 'ingresos por disponibilidades', aumenta: 'HABER', saldo: intereses });
-        }
-        // Actualizar saldo 751 en el mapa para display (grupo = 28 + 53 ajustado)
-        const saldo28 = this.getSaldo('751'); // valor original del diagnostico (incluye 28+53)
-        const saldo53ajustado = cuentasParaC3.find(c => c.id_cuenta === 53)?.saldo || 0;
-        // El grupo 751 = saldo28(que incluye 53 original) - 53_original + 53_ajustado
-        // Simpler: grupo 751 = saldo28 + intereses (porque 53_está ya en saldo28)
-        this.saldos.set('751', { codigo_padre: '751', descripcion: 'ingresos financieros', saldo: saldo28 + intereses });
-        console.log('[Finiquito] C3 ajuste intereses en hoja 53:', { intereses, saldo751Grupo: saldo28 + intereses });
-      }
 
       console.log('[Finiquito] C3 cuentas para refundición:', cuentasParaC3.length, cuentasParaC3);
 
@@ -492,16 +453,18 @@ export class FiniquitoComponent implements OnInit {
         this.idComprobanteResultado = await this.crearComprobante(planId, fecha, 'FINIQUITO - REFUNDICION DE RESULTADOS', Math.abs(totalRefundicion));
         for (const c of cuentasParaC3) {
           if (c.aumenta === 'HABER') {
+            // Ingresos: DEBE leaf (se cierra) / HABER 734 (absorbe)
             await this.crearDetalle(this.idComprobanteResultado, planId, fecha, c.id_cuenta, c.saldo, 0);
             await this.crearDetalle(this.idComprobanteResultado, planId, fecha, 40, 0, c.saldo);
           } else {
+            // Gastos: DEBE 734 (absorbe) / HABER leaf (se cierra)
             await this.crearDetalle(this.idComprobanteResultado, planId, fecha, 40, c.saldo, 0);
             await this.crearDetalle(this.idComprobanteResultado, planId, fecha, c.id_cuenta, 0, c.saldo);
           }
         }
       } else {
-        console.error('[Finiquito] C3: No se encontraron cuentas nominales con saldo ≠ 0');
-        throw new Error('No se encontraron cuentas nominales con saldo para la refundición. Verifique que existan saldos en las cuentas 740/744/750/751/752.');
+        // Sin nominales con saldo: se omite C3 (la 734 conserva su saldo acumulado)
+        console.log('[Finiquito] C3: sin cuentas nominales con saldo, se omite la refundición');
       }
 
       // C4: Extinción patrimonial — solo 731 + 734 + 711 (sin cuentas 751)
@@ -544,7 +507,10 @@ export class FiniquitoComponent implements OnInit {
         throw new Error('La verificación de balance cero falló. Se revirtieron los cambios.');
       }
 
-      // Paso 8: Registrar finiquito (ANTES de cambiar estatus para evitar estado inconsistente)
+      // Paso 8: Registrar finiquito
+      // El plan NO cambia de estatus ni de observación: sigue activo (estatus 1)
+      // y continúa participando del cierre diario con sus cuentas en 0.00.
+      // Prevención de finiquito doble: UNIQUE KEY id_plan en tabla finiquito.
       const registro: RegistroFiniquito = {
         id_plan: planId,
         fecha_finiquito: fecha,
@@ -562,21 +528,19 @@ export class FiniquitoComponent implements OnInit {
         banco_destino: this.bancoDestino,
         cuenta_destino: this.cuentaDestino,
         referencia: this.referencia,
-        intereses_disponibilidad: intereses,
+        intereses_disponibilidad: 0,
         saldo_712: saldo712,
         saldo_714: saldo714,
         monto_liquidacion: montoLiquidacion,
-        comprobante_intereses: this.idComprobanteIntereses,
+        comprobante_intereses: 0,
         estatus: 'COMPLETADO',
         usuario: 'sistema'
       };
       await this.finiquitoService.registrarFiniquito(registro);
 
-      // Paso 9: Cambiar estatus del plan a finiquitado (solo si el INSERT fue exitoso)
-      const observacionOriginal = this.planSeleccionado?.observacion || '';
-      const observacionLimpia = observacionOriginal.replace(/\s*\[FINIQUITADO[^\]]*\]/g, '').trim();
-      const observacionFiniquito = observacionLimpia + ' [FINIQUITADO - ' + fecha + ']';
-      await this.finiquitoService.cambiarEstatusPlan(planId, 3, observacionFiniquito);
+      // Paso 9: NO se cambia el estatus del plan ni su observación.
+      // El ciclo post-finiquito continúa: cierre diario (0.00) → intereses fin de mes
+      // → pago de intereses (744/711) → cierre semestral extingue 751/744.
 
       // Paso 10: Reload resultado
       this.resultadoFiniquito = registro;
@@ -723,7 +687,7 @@ export class FiniquitoComponent implements OnInit {
 
     filasSaldos += `
       <tr style="background-color: #eeeee4; font-weight: bold;">
-        <td style="padding: 6px 8px; text-align: left;">MONTO A TRANSFERIR (711 + intereses - 722)</td>
+        <td style="padding: 6px 8px; text-align: left;">MONTO A TRANSFERIR (711 - 722)</td>
         <td style="padding: 6px 8px; text-align: right;">${this.formatearMonto(montoLiquidacion)}</td>
       </tr>`;
 
@@ -825,10 +789,10 @@ export class FiniquitoComponent implements OnInit {
 
         <div style="margin-top: 12px;">
           <p style="margin: 2px 0; text-align: justify;">
-            Con la firma del presente documento, las partes declaran extinguidas todas las obligaciones
+            Con la firma del presente documento, las partes declaran extinguidas las obligaciones de disponibilidad
             derivadas del contrato de fideicomiso identificado como <strong>${nombreLimpio}</strong>,
-            quedando cancelados los pasivos, el patrimonio asignado, los resultados acumulados
-            y los intereses por disponibilidad pendientes.
+            quedando transferidos los recursos de disponibilidad netos de pasivos. La generación y el pago de
+            intereses por disponibilidad continúa conforme al proceso mensual y al módulo de pago de rendimientos.
           </p>
         </div>
       </div>

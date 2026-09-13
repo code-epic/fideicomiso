@@ -270,15 +270,21 @@ export class CcierreComponent implements OnInit {
     d = dt.split('T')
     let fopera = d[0]
 
-    if (llave == 'S' || llave == 'D') {
-      let f = new Date(fopera);
-      f.setDate(f.getDate() - 1);
-      fopera = f.toISOString().split('T')[0]
+      if (llave == 'S' || llave == 'D') {
+        let f = new Date(fopera);
+        f.setDate(f.getDate() - 1);
+        fopera = f.toISOString().split('T')[0]
 
-      let fo = new Date(fultimo);
-      fo.setDate(f.getDate() - 1);
-      fultimo = fo.toISOString().split('T')[0]
-    }
+        if (llave == 'S') {
+          // Cierre semestral: fultimo = fopera (Dec 31) para tomar D saldo como anterior
+          fultimo = fopera
+        } else {
+          // Cierre mensual: fultimo = ayer de fopera (Nov 30)
+          let fo = new Date(fultimo);
+          fo.setDate(f.getDate() - 1);
+          fultimo = fo.toISOString().split('T')[0]
+        }
+      }
 
     let usuario = 'Administrador'
     let plan = '%'
@@ -314,8 +320,11 @@ export class CcierreComponent implements OnInit {
       return;
     }
     this.ngxService.startLoader('load-precierre')
-    let d = this.fechaultimo.split('/')
-    let fultimo = d[2] + '-' + d[1] + '-' + d[0]
+    // this.fechai = primer día del semestre (ej: 2027-01-01)
+    // fultimo = último día del semestre (ayer de fechai) = fecha del cierre
+    let dt = new Date(this.fechai)
+    dt.setDate(dt.getDate() - 1)
+    let fultimo = dt.toISOString().split('T')[0]
     this.xAPI.funcion = environment.xApi.BORRAR_CIERRE_SEMESTRAL
     this.xAPI.parametros = fultimo
     this.xAPI.valores = ''
@@ -488,6 +497,9 @@ export class CcierreComponent implements OnInit {
       let fopera = d[0]
 
       if (llave == 'S' || llave == 'D') {
+        // Para cierre semestral/mensual:
+        // fopera = último día del período (ayer de this.fechai)
+        // fultimo = fecha del último M balance (ayer de fopera)
         let f = new Date(fopera);
         f.setDate(f.getDate() - 1);
         fopera = f.toISOString().split('T')[0]

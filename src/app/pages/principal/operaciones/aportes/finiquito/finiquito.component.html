@@ -158,12 +158,12 @@
               <td><mat-icon class="text-danger" style="font-size: 16px; height: 16px; width: 16px;">warning</mat-icon> Rendimientos por cobrar (714) — BLOQUEANTE</td>
               <td class="text-right text-danger">{{ formatearMonto(getSaldo('714')) }}</td>
             </tr>
-            <tr *ngIf="diagnostico && diagnostico.intereses_proyectados > 0" class="table-success">
-              <td>Intereses por disponibilidad (1° mes → corte)</td>
-              <td class="text-right text-success">+ {{ formatearMonto(diagnostico.intereses_proyectados) }}</td>
+            <tr *ngIf="diagnostico && diagnostico.intereses_proyectados > 0" style="color: #666; font-size: 12px;">
+              <td>Intereses proyectados del mes (no se liquidan en el finiquito)</td>
+              <td class="text-right">{{ formatearMonto(diagnostico.intereses_proyectados) }}</td>
             </tr>
-            <tr *ngIf="diagnostico && diagnostico.intereses_proyectados > 0">
-              <td style="padding-left: 20px; font-size: 12px; color: #666;">
+            <tr *ngIf="diagnostico && diagnostico.intereses_proyectados > 0" style="font-size: 11px; color: #999;">
+              <td style="padding-left: 20px;">
                 Base: {{ diagnostico.ultimo_cierre }} | Días: {{ diagnostico.int_dias }} | Tasa: {{ diagnostico.tasa }}%
               </td>
               <td></td>
