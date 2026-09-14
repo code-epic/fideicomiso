@@ -118,6 +118,24 @@ export class ProcesocontablesComponent implements OnInit {
 
     this.estatus = this.semestral ? 'S' : 'M'
 
+    // Verificar si ya existe cierre semestral
+    if (this.semestral) {
+      try {
+        const verifData = await firstValueFrom(this.apiService.Ejecutar({
+          funcion: 'FID_CFechaMaxPreCierreSemestral',
+          parametros: '',
+          valores: ''
+        }))
+        const fecha = verifData?.Cuerpo?.[0]?.fecha
+        const fechaCierre = this.util.ConvertirFechaDB(this.fechaultimo)
+        this.yaProcesadoCierreSemestral = !!(fecha && fecha.substring(0, 10) === fechaCierre)
+      } catch (e) {
+        this.yaProcesadoCierreSemestral = false
+      }
+    } else {
+      this.yaProcesadoCierreSemestral = false
+    }
+
     this.ngxService.stopLoader('load-precierre')
   }
 
@@ -181,35 +199,72 @@ export class ProcesocontablesComponent implements OnInit {
     let fini = this.util.ConvertirFechaDB(this.fechai)
 
     this.ngxService.startLoader('load-precierre')
-    this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIVIENTOS_COMPROBANTES
-    if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
-    this.xAPI.parametros = fini + ',' + this.estatus    
-    this.xAPI.valores = ''
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        this.apiService.Mensaje(
-          "Proceso exitoso",
-          "Se ha realizado el Precierre",
-          "success",
-          "Cierre"
-        )
+    // Si es semestral, borrar movimientos S existentes antes de insertar nuevos
+    const ejecutar = async () => {
+      if (this.estatus === 'S') {
+        // Verificar si ya existe cierre semestral
+        try {
+          const verifData = await firstValueFrom(this.apiService.Ejecutar({
+            funcion: 'FID_CFechaMaxPreCierreSemestral',
+            parametros: '',
+            valores: ''
+          }))
+          const fecha = verifData?.Cuerpo?.[0]?.fecha
+          const fechaCierre = this.util.ConvertirFechaDB(this.fechaultimo)
+          if (fecha && fecha.substring(0, 10) === fechaCierre) {
+            this._snackBar.open('Ya existe un cierre semestral para esta fecha', 'OK')
+            this.ngxService.stopLoader('load-precierre')
+            return
+          }
+        } catch (e) {
+          console.error('Error verificando cierre semestral:', e)
+        }
 
-        this.semestral = false;
-        this.estatus = 'M';
-        this.consultarUltimoCierre()
-        this.cierre.actualizarCierres()
-        this.ngxService.stopLoader('load-precierre')
-        this.lstMovimientos = []
-        this.blista = false
-      },
-
-      (error) => {
-        console.error(error);
-        this.ngxService.stopLoader('load-precierre');
-        this._snackBar.open('Error al generar el precierre. Intente de nuevo.', 'Ok');
+        try {
+          const fechaCierre = this.util.ConvertirFechaDB(this.fechaultimo)
+          await firstValueFrom(this.apiService.Ejecutar({
+            funcion: environment.xApi.BORRAR_PRECIERRE_SEMESTRAL,
+            parametros: fechaCierre,
+            valores: ''
+          }));
+        } catch (e) {
+          console.error('Error borrando movimientos S existentes:', e);
+        }
       }
-    )
+
+      this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIVIENTOS_COMPROBANTES
+      if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
+      this.xAPI.parametros = fini + ',' + this.estatus    
+      this.xAPI.valores = ''
+
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        async data => {
+          this.apiService.Mensaje(
+            "Proceso exitoso",
+            "Se ha realizado el Precierre",
+            "success",
+            "Cierre"
+          )
+
+          this.semestral = false;
+          this.estatus = 'M';
+          this.consultarUltimoCierre()
+          this.cierre.actualizarCierres()
+          this.ngxService.stopLoader('load-precierre')
+          this.lstMovimientos = []
+          this.blista = false
+        },
+
+        (error) => {
+          console.error(error);
+          this.ngxService.stopLoader('load-precierre');
+          this._snackBar.open('Error al generar el precierre. Intente de nuevo.', 'Ok');
+        }
+      )
+    }
+
+   ejecutar()
   }
 
   getMoneda(monto: number): string {

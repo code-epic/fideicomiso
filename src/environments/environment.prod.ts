@@ -117,6 +117,11 @@ export const environment = {
     INSERTAR_INVERSIONES_PORTAFOLIO: 'FID_IInversionesPortafolio',
     CONSULTAR_INVERSIONES_PORTAFOLIO: 'FID_CInversionesPortafolio',
     BORRAR_INVERSIONES_PORTAFOLIO: 'FID_DInversionesPortafolio',
+    CONSULTAR_INVERSIONES_PORTAFOLIO_DIST: 'FID_CInversionesPortafolioDist',
+    INSERTAR_DEVENGO_INVERSIONES_DIST: 'FID_IDevengoInversionesDist',
+    INSERTAR_VENCIMIENTO_INVERSIONES_DIST: 'FID_IVencimientoInversionesDist',
+    INSERTAR_COMPRA_INVERSIONES_DIST: 'FID_ICompraInversionesDist',
+    INSERTAR_LIQUIDACION_INVERSION_DIST: 'FID_ILiquidacionInversionDist',
 
     // Capital y comisiones
     CONSULTAR_CAPITAL_ASIGNADO: 'FID_CCapitalAsignado',

@@ -8,6 +8,7 @@ import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { CierreService } from "src/app/services/banfanb/cierre.service";
 import { FID_IComprobante } from "src/app/services/banfanb/comprobante.service";
 import { UtilService } from "src/app/services/util/util.service";
+import { DistribucionInversion } from "src/app/services/banfanb/inversiones.service";
 import { environment } from "src/environments/environment";
 import Swal from "sweetalert2";
 
@@ -426,80 +427,99 @@ export class ProcesosComponent implements OnInit {
     try {
       const sinPlan: string[] = [];
 
-      // 1. Comprobantes Devengo (uno por inversión)
+      // 1. Comprobantes Devengo (distribuidos por plan)
       if (this.lstAsientos.length > 0) {
         for (const e of this.lstAsientos) {
-          const planDev = e.id_plan ? Number(e.id_plan) : 0;
-          if (!planDev) {
+          const montoTotal = parseFloat(e.interes_acumulado || 0);
+          if (!montoTotal) continue;
+
+          const dist = await this.consultarDistribucion(Number(e.codigo));
+          if (!dist || dist.length === 0) {
             sinPlan.push(`DEVENGO ${e.codigo || ""}`.trim());
             continue;
           }
-          const montoDev = parseFloat(e.interes_acumulado || 0);
-          const comprobanteDevengo: FID_IComprobante = {
-            plan: planDev,
-            codigo: this.util.GenerarUnicId(),
-            descripcion: `DEVENGO DE INVERSIONES ${e.instrumento || ""} ${this.util.ConvertirFechaHumana(fecha)}`.trim(),
-            detalle: e.plan_nombre || `DEVENGO DE INVERSIONES ${e.instrumento || ""} ${this.util.ConvertirFechaHumana(fecha)}`.trim(),
-            fecha_operacion: fecha,
-            fecha_ejercicio: fecha,
-            debe: montoDev,
-            haber: montoDev,
-            llave: "M",
-          };
 
-          const apiDev: IAPICore = {
-            funcion: environment.xApi.INSERTAR_COMPROBANTE,
-            parametros: "",
-            valores: JSON.stringify(comprobanteDevengo)
-          };
+          for (const d of dist) {
+            // Calcular monto proporcional usando el porcentaje de la distribución
+            const montoProporcional = Math.round(montoTotal * (Number(d.porcentaje) / 100) * 100) / 100;
+            if (montoProporcional <= 0) continue;
 
-          const resDev = await firstValueFrom(this.apiService.Ejecutar(apiDev));
-          if (resDev && resDev.msj) {
-            const apiDevData: IAPICore = {
-              funcion: environment.xApi.INSERTAR_DEVENGO_INVERIONES,
-              parametros: resDev.msj + "," + fecha + "," + e.codigo,
-              valores: ""
+            const comprobanteDevengo: FID_IComprobante = {
+              plan: d.id_plan,
+              codigo: this.util.GenerarUnicId(),
+              descripcion: `DEVENGO DE INVERSIONES ${e.instrumento || ""} ${this.util.ConvertirFechaHumana(fecha)}`.trim(),
+              detalle: d.plan_nombre || `DEVENGO DE INVERSIONES ${e.instrumento || ""} ${this.util.ConvertirFechaHumana(fecha)}`.trim(),
+              fecha_operacion: fecha,
+              fecha_ejercicio: fecha,
+              debe: montoProporcional,
+              haber: montoProporcional,
+              llave: "M",
             };
-            await firstValueFrom(this.apiService.Ejecutar(apiDevData));
+
+            const apiDev: IAPICore = {
+              funcion: environment.xApi.INSERTAR_COMPROBANTE,
+              parametros: "",
+              valores: JSON.stringify(comprobanteDevengo)
+            };
+
+            const resDev = await firstValueFrom(this.apiService.Ejecutar(apiDev));
+            if (resDev && resDev.msj) {
+              const apiDevData: IAPICore = {
+                funcion: environment.xApi.INSERTAR_DEVENGO_INVERSIONES_DIST,
+                parametros: `${resDev.msj},${fecha},${e.codigo},${montoProporcional},${d.id_plan}`,
+                valores: ""
+              };
+              await firstValueFrom(this.apiService.Ejecutar(apiDevData));
+            }
           }
         }
       }
 
-      // 2. Comprobantes Vencimiento
+      // 2. Comprobantes Vencimiento (distribuidos por plan — capital e intereses separados)
       if (this.lstVencimiento.length > 0) {
         for (const e of this.lstVencimiento) {
-          const planVenc = e.id_plan ? Number(e.id_plan) : 0;
-          if (!planVenc) {
+          const dist = await this.consultarDistribucion(Number(e.codigo));
+          if (!dist || dist.length === 0) {
             sinPlan.push(`VENCIMIENTO ${e.codigo || ""}`.trim());
             continue;
           }
-           const monto = Math.round((parseFloat(e.valor_nominal) + parseFloat(e.rendimiento_vencimiento)) * 100) / 100;
-          const vencimiento = {
-            plan: planVenc,
-            codigo: this.util.GenerarUnicId(),
-            descripcion: `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
-            detalle: e.plan_nombre || `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
-            fecha_operacion: fecha,
-            fecha_ejercicio: fecha,
-            debe: monto,
-            haber: monto,
-            llave: "M",
-          };
 
-          const apiVenc: IAPICore = {
-            funcion: environment.xApi.INSERTAR_COMPROBANTE,
-            parametros: "",
-            valores: JSON.stringify(vencimiento)
-          };
+          // Calcular intereses acumulados del 714 para esta inversión
+          const totalIntereses = await this.consultarInteresesAcumulados(Number(e.codigo), fecha);
 
-          const resVenc = await firstValueFrom(this.apiService.Ejecutar(apiVenc));
-          if (resVenc && resVenc.msj) {
-            const apiVencData: IAPICore = {
-              funcion: environment.xApi.INSERTAR_VENCIMIENTO_INVERSIONES,
-              parametros: resVenc.msj + "," + fecha + "," + e.codigo,
-              valores: ""
+          for (const d of dist) {
+            const capital = Number(d.monto) || Math.round(Number(e.valor_nominal) * (Number(d.porcentaje) / 100) * 100) / 100;
+            const intereses = Math.round(totalIntereses * (Number(d.porcentaje) / 100) * 100) / 100;
+            const montoTotal = Math.round((capital + intereses) * 100) / 100;
+            if (montoTotal <= 0) continue;
+
+            const vencimiento = {
+              plan: d.id_plan,
+              codigo: this.util.GenerarUnicId(),
+              descripcion: `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+              detalle: d.plan_nombre || `VENCIMIENTO DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+              fecha_operacion: fecha,
+              fecha_ejercicio: fecha,
+              debe: montoTotal,
+              haber: montoTotal,
+              llave: "M",
             };
-            await firstValueFrom(this.apiService.Ejecutar(apiVencData));
+
+            const apiVenc: IAPICore = {
+              funcion: environment.xApi.INSERTAR_COMPROBANTE,
+              parametros: "",
+              valores: JSON.stringify(vencimiento)
+            };
+
+            const resVenc = await firstValueFrom(this.apiService.Ejecutar(apiVenc));
+            if (resVenc && resVenc.msj) {
+              const apiVencData: IAPICore = {
+                funcion: environment.xApi.INSERTAR_VENCIMIENTO_INVERSIONES_DIST,
+                parametros: `${resVenc.msj},${fecha},${e.codigo},${montoTotal},${capital},${intereses},${d.id_plan}`,
+                valores: ""
+              };
+              await firstValueFrom(this.apiService.Ejecutar(apiVencData));
+            }
           }
 
           // Actualizar estatus de inversión a 2 (VENCIDA)
@@ -512,40 +532,46 @@ export class ProcesosComponent implements OnInit {
         }
       }
 
-      // 3. Comprobantes Compra
+      // 3. Comprobantes Compra (distribuidos por plan — monto exacto)
       if (this.lstCompra.length > 0) {
         for (const e of this.lstCompra) {
-          const planComp = e.id_plan ? Number(e.id_plan) : 0;
-          if (!planComp) {
+          const dist = await this.consultarDistribucion(Number(e.codigo));
+          if (!dist || dist.length === 0) {
             sinPlan.push(`COMPRA ${e.codigo || ""}`.trim());
             continue;
           }
-          const compra = {
-            plan: planComp,
-            codigo: this.util.GenerarUnicId(),
-            descripcion: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
-            detalle: e.plan_nombre || `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
-            fecha_operacion: fecha,
-            fecha_ejercicio: fecha,
-            debe: e.valor_nominal,
-            haber: e.valor_nominal,
-            llave: "M",
-          };
 
-          const apiComp: IAPICore = {
-            funcion: environment.xApi.INSERTAR_COMPROBANTE,
-            parametros: "",
-            valores: JSON.stringify(compra)
-          };
+          for (const d of dist) {
+            const montoProporcional = Number(d.monto) || Math.round(Number(e.valor_nominal) * (Number(d.porcentaje) / 100) * 100) / 100;
+            if (montoProporcional <= 0) continue;
 
-          const resComp = await firstValueFrom(this.apiService.Ejecutar(apiComp));
-          if (resComp && resComp.msj) {
-            const apiCompData: IAPICore = {
-              funcion: environment.xApi.INSERTAR_COMPRA_INVERSIONES,
-              parametros: resComp.msj + "," + fecha + "," + e.codigo,
-              valores: ""
+            const compra = {
+              plan: d.id_plan,
+              codigo: this.util.GenerarUnicId(),
+              descripcion: `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+              detalle: d.plan_nombre || `COMPRA DE INVERSIONES ${this.util.ConvertirFechaHumana(fecha)}`,
+              fecha_operacion: fecha,
+              fecha_ejercicio: fecha,
+              debe: montoProporcional,
+              haber: montoProporcional,
+              llave: "M",
             };
-            await firstValueFrom(this.apiService.Ejecutar(apiCompData));
+
+            const apiComp: IAPICore = {
+              funcion: environment.xApi.INSERTAR_COMPROBANTE,
+              parametros: "",
+              valores: JSON.stringify(compra)
+            };
+
+            const resComp = await firstValueFrom(this.apiService.Ejecutar(apiComp));
+            if (resComp && resComp.msj) {
+              const apiCompData: IAPICore = {
+                funcion: environment.xApi.INSERTAR_COMPRA_INVERSIONES_DIST,
+                parametros: `${resComp.msj},${fecha},${e.codigo},${montoProporcional},${d.id_plan}`,
+                valores: ""
+              };
+              await firstValueFrom(this.apiService.Ejecutar(apiCompData));
+            }
           }
         }
       }
@@ -575,6 +601,16 @@ export class ProcesosComponent implements OnInit {
       this.generandoComprobante = false;
       this._snackBar.open("Error al generar comprobantes", "OK");
     }
+  }
+
+  async consultarDistribucion(idInversion: number): Promise<DistribucionInversion[]> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_INVERSIONES_PORTAFOLIO_DIST,
+      parametros: idInversion.toString(),
+      valores: ""
+    };
+    const data: any = await firstValueFrom(this.apiService.Ejecutar(xAPI));
+    return data?.Cuerpo || [];
   }
 
   limpiarPantalla() {
@@ -607,5 +643,19 @@ export class ProcesosComponent implements OnInit {
       dias;
 
     return parseFloat(rendicion.toFixed(2));
+  }
+
+  async consultarInteresesAcumulados(idInversion: number, fechaHasta: string): Promise<number> {
+    const xAPI: IAPICore = {
+      funcion: 'FID_CInteresesAcumuladosInversion',
+      parametros: `${idInversion},${fechaHasta}`,
+      valores: ""
+    };
+    try {
+      const data: any = await firstValueFrom(this.apiService.Ejecutar(xAPI));
+      return data?.Cuerpo?.[0]?.total_intereses || 0;
+    } catch {
+      return 0;
+    }
   }
 }

@@ -34,12 +34,12 @@ export class WzportafolioComponent implements OnInit {
   public index: number = null
   public editado: boolean = false
 
-  public valor_inversion = null
+  public valorNominalTotal = 0
 
-  public porcentaje : any = 0
+  public porcentaje : any = ''
 
   public monto = 0
-  public monto_general: any = 0
+  public monto_general: any = ''
 
   public lstDataPortafolio = []
 
@@ -82,12 +82,13 @@ export class WzportafolioComponent implements OnInit {
 
   public lstData = []
 
-  public total = 0
-  public totalPorcentaje = 0
-  public totalInicial = 0
+  public montoAsignado = 0
 
+  public titulo = 'DETALLES DE LA INVERSIÓN POR PORTAFOLIO'
 
-  public titulo = 'DETALLES DE LA INVERSION POR PORTAFOLIO'
+  get restante(): number {
+    return Math.max(0, this.valorNominalTotal - this.montoAsignado);
+  }
 
   bloquearMonto = false;
   bloquearPorcentaje = false;
@@ -103,7 +104,7 @@ export class WzportafolioComponent implements OnInit {
 
   ngOnInit(): void {
     this.Inversiones = this.data
-    this.valor_inversion = this.Inversiones.valor_nominal
+    this.valorNominalTotal = Number(this.Inversiones.valor_nominal)
     this.evaluarSoloLectura()
     this.Consultar()
     this.ListarPortafolio()
@@ -134,11 +135,13 @@ export class WzportafolioComponent implements OnInit {
       data => {
         this.lstInversiones = data.Cuerpo
         if( this.lstInversiones!= undefined ) {
-          this.total =  this.lstInversiones.reduce((sum, e) => sum + parseFloat(e.porcentaje), 0)
-          this.totalInicial = this.total
+          this.montoAsignado = this.lstInversiones.reduce((sum, e) => {
+            return sum + (e.monto || ((e.porcentaje / 100) * this.valorNominalTotal));
+          }, 0)
           this.editado = true
         }else{
-          this.totalInicial = 0
+          this.lstInversiones = []
+          this.montoAsignado = 0
           this.editado = false
         }
         this.actualizarBlSave()
@@ -166,32 +169,24 @@ export class WzportafolioComponent implements OnInit {
 
   soloNumeros(event: KeyboardEvent): boolean {
     const charCode = event.charCode;
-    return charCode >= 48 && charCode <= 57;
+    if (charCode >= 48 && charCode <= 57) return true;
+    if (charCode === 46) {
+      const input = event.target as HTMLInputElement;
+      return !input.value.includes('.');
+    }
+    return false;
   }
 
   habilitar(): boolean {
-    const camposLlenos= this.portafolio !== '1' &&
-                        this.monto_general !== null &&
-                        this.porcentaje !== null &&
-                        this.porcentaje > 0; 
+    if (!this.portafolio || this.portafolio === '1') return true;
+    if (this.monto_general === null || this.monto_general === '' || this.monto_general === undefined) return true;
+    if (this.porcentaje === null || this.porcentaje === '' || this.porcentaje === undefined) return true;
 
-    if (!camposLlenos) {
-      return true;
-    }
+    const montoAInvertir = Number(String(this.monto_general).replace(/[^0-9.]/g, ''));
+    if (isNaN(montoAInvertir) || montoAInvertir <= 0) return true;
 
-    const porcentajeNumerico = Number(this.porcentaje);
-
-    const porcentajeRestante = 100 - this.total;
-
-    if (porcentajeNumerico > porcentajeRestante) {
-      return true;
-    }
-
-    const montoParaInvertir = Number(String(this.monto_general).replace(/[^0-9.]/g, ''));
-
-    if (montoParaInvertir > this.monto) {
-      return true;
-    }
+    const montoRemanente = this.valorNominalTotal - this.montoAsignado;
+    if (montoAInvertir > montoRemanente + 0.01) return true;
 
     return false;
   }
@@ -201,11 +196,12 @@ export class WzportafolioComponent implements OnInit {
   }
 
   actualizarBlSave() {
-    if (this.total == 100) {
-      this.blSave = true
-    } else if (this.editado && this.total != this.totalInicial) {
+    const diferencia = Math.abs(this.montoAsignado - this.valorNominalTotal);
+    if (diferencia < 0.01) {
       this.blSave = true
     } else if (this.editado && this.lstInversiones.length === 0) {
+      this.blSave = true
+    } else if (this.editado && Math.abs(this.montoAsignado - this.montoAsignado) > 0.01) {
       this.blSave = true
     } else {
       this.blSave = false
@@ -213,39 +209,45 @@ export class WzportafolioComponent implements OnInit {
   }
 
   Agregar() {
-    const porcentajeNumerico = Number(this.porcentaje);
-    const porcentajeRestante = 100 - this.total;
-    if (porcentajeNumerico <= 0 || porcentajeNumerico > porcentajeRestante) return
+    const montoAInvertir = Number(String(this.monto_general).replace(/[^0-9.]/g, ''));
+    if (isNaN(montoAInvertir) || montoAInvertir <= 0) return;
+
+    const montoRemanente = this.valorNominalTotal - this.montoAsignado;
+    if (montoAInvertir > montoRemanente + 0.01) return;
 
     const portf = this.portafolio.split('|')
     const fecha = new Date()
     const fechaFormato = this._util.ConvertirFechaDB(fecha)
-      const iPor = {
-        id_inversion : this.Inversiones.identificador,
-        id_portafolio : parseInt( portf[0]),
-        descripcion : portf[1],
-        porcentaje : parseFloat(this.porcentaje),
-        estatus : 1,
-        usuario: '',
-        fecha: fechaFormato
-      }
-      this.total += parseFloat(this.porcentaje)
-      this.actualizarBlSave()
 
-      this.valor_inversion -= Number(this.monto_general)
-      this.Limpiar()
+    const porcentajeCalc = Number(((montoAInvertir / this.valorNominalTotal) * 100).toFixed(2));
+
+    const iPor = {
+      id_inversion : this.Inversiones.identificador,
+      id_portafolio : parseInt( portf[0]),
+      porcentaje : porcentajeCalc,
+      monto : montoAInvertir,
+      estatus : 1,
+      usuario: '',
+      fecha: fechaFormato
+    }
 
     if(this.editando){
       this.lstInversiones[this.index] = iPor
       this.editando = false
+      this.index = null
     }else{
       this.lstInversiones.push(iPor)
     }
 
+    this.montoAsignado += montoAInvertir;
+    this.actualizarBlSave()
+    this.Limpiar()
   }
 
   eliminar(i: number) {
-    this.total -= parseFloat(this.lstInversiones[i].porcentaje)
+    const e = this.lstInversiones[i];
+    const montoEliminado = e.monto || ((e.porcentaje / 100) * this.valorNominalTotal);
+    this.montoAsignado -= montoEliminado;
     this.lstInversiones.splice(i, 1)
     this.actualizarBlSave()
     if (this.editando && this.index === i) {
@@ -257,10 +259,12 @@ export class WzportafolioComponent implements OnInit {
   }
 
   editar(e: any, i: number){
+    const montoEditar = e.monto || ((e.porcentaje / 100) * this.valorNominalTotal);
     this.porcentaje = e.porcentaje
+    this.monto_general = montoEditar.toFixed(2)
     this.portafolio = e.id_portafolio + '|' + e.descripcion 
     this.editando = true
-    this.total -= e.porcentaje
+    this.montoAsignado -= montoEditar
     this.index = i
     this.actualizarBlSave()
   }
@@ -313,7 +317,6 @@ export class WzportafolioComponent implements OnInit {
     });
   }
 
-  // La función Borrar ahora debe devolver el observable
   Borrar():Observable<any> {
     const xAPI: IAPICore = {
       funcion: environment.xApi.BORRAR_INVERSIONES_PORTAFOLIO,
@@ -324,9 +327,11 @@ export class WzportafolioComponent implements OnInit {
   }
 
   private Limpiar() {
-    this.porcentaje = 0.00
-    this.monto_general = 0
+    this.porcentaje = ''
+    this.monto_general = ''
     this.portafolio = null
+    this.bloquearMonto = false
+    this.bloquearPorcentaje = false
   }
 
 
@@ -375,13 +380,12 @@ export class WzportafolioComponent implements OnInit {
   private editandoMonto = false;
 
   onPorcentajeChange() {
-    if (this.editandoMonto) return; // Evita bucle
+    if (this.editandoMonto) return;
     this.editandoPorcentaje = true;
-    const valor = Number(this.Inversiones.valor_nominal);
     if (this.porcentaje !== null && this.porcentaje !== undefined && this.porcentaje !== '') {
       const porcentajeNum = Number(this.porcentaje);
-      if (!isNaN(porcentajeNum) && this.Inversiones?.valor_nominal) {
-        this.monto_general = ((porcentajeNum / 100) * valor).toFixed(2);
+      if (!isNaN(porcentajeNum) && this.valorNominalTotal > 0) {
+        this.monto_general = ((porcentajeNum / 100) * this.valorNominalTotal).toFixed(2);
         this.bloquearMonto = true;
         this.bloquearPorcentaje = false;
       }
@@ -392,13 +396,12 @@ export class WzportafolioComponent implements OnInit {
   }
 
   onMontoChange() {
-    if (this.editandoPorcentaje) return; // Evita bucle
+    if (this.editandoPorcentaje) return;
     this.editandoMonto = true;
-    const valor = Number(this.Inversiones.valor_nominal);
     if (this.monto_general !== null && this.monto_general !== undefined && this.monto_general !== '') {
       const montoNum = Number((this.monto_general + '').replace(/[^0-9.]/g, ''));
-      if (!isNaN(montoNum) && this.Inversiones?.valor_nominal) {
-        this.porcentaje = ((montoNum / valor) * 100).toFixed(2);
+      if (!isNaN(montoNum) && this.valorNominalTotal > 0) {
+        this.porcentaje = ((montoNum / this.valorNominalTotal) * 100).toFixed(2);
         this.bloquearPorcentaje = true;
         this.bloquearMonto = false;
       }
@@ -460,7 +463,6 @@ export class WzportafolioComponent implements OnInit {
           };
           await firstValueFrom(this.apiService.Ejecutar(apiData));
 
-          // Actualizar estatus de inversión a 2 (VENCIDA)
           const apiEstatus: IAPICore = {
             funcion: environment.xApi.LIQUIDAR_INVERSION_ESTATUS,
             parametros: `${v.codigo}, 2`,
@@ -476,7 +478,9 @@ export class WzportafolioComponent implements OnInit {
 
   limpiarCampos() {
     if (this.editando && this.index !== null) {
-      this.total += parseFloat(this.lstInversiones[this.index].porcentaje)
+      const e = this.lstInversiones[this.index];
+      const montoRestaurar = e.monto || ((e.porcentaje / 100) * this.valorNominalTotal);
+      this.montoAsignado += montoRestaurar;
     }
     this.editando = false
     this.index = null

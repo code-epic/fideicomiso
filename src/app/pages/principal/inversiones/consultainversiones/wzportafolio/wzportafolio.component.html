@@ -2,144 +2,135 @@
 
 <mat-dialog-content>
 
-    <hr style="margin-top: 0;">
-
-    <div *ngIf="soloLectura" class="alert alert-info" style="padding: 8px 12px; margin-bottom: 10px; font-size: 13px; background-color: #e3f2fd; border-radius: 4px;">
-        <i class="fa fa-info-circle"></i> Solo consulta: La fecha de compra ya fue procesada. No se puede modificar la asignacion del portafolio.
+    <div *ngIf="soloLectura" class="alert-readonly">
+        <i class="fa fa-info-circle"></i> Solo consulta: La fecha de compra ya fue procesada. No se puede modificar la asignación del portafolio.
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <p>
-                SALDO DISPONIBLE DEL PORTAFOLIO: <b>{{monto | number:'1.2-2'}}</b> Bs.<br>
-                VALOR NOMINAL DE LA INVERSION: <b>{{valor_inversion | number:'1.2-2'}}</b> Bs.
-            </p>
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+        <div class="kpi-card kpi-nominal">
+            <span class="kpi-label">Valor Nominal</span>
+            <span class="kpi-value">{{valorNominalTotal | number:'1.2-2'}} Bs.</span>
+        </div>
+        <div class="kpi-card kpi-asignado">
+            <span class="kpi-label">Asignado</span>
+            <span class="kpi-value">{{montoAsignado | number:'1.2-2'}} Bs.</span>
+        </div>
+        <div class="kpi-card" [class.kpi-restante-ok]="restante <= 0.01" [class.kpi-restante-pendiente]="restante > 0.01">
+            <span class="kpi-label">Restante</span>
+            <span class="kpi-value">{{restante | number:'1.2-2'}} Bs.</span>
+        </div>
+        <div class="kpi-card kpi-saldo">
+            <span class="kpi-label">Saldo Portafolio</span>
+            <span class="kpi-value">{{monto | number:'1.2-2'}} Bs.</span>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-5">
-            <mat-form-field appearance="outline">
+    <!-- FORMULARIO DE ENTRADA -->
+    <div class="form-row">
+        <div class="form-field form-field-portafolio">
+            <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Portafolio</mat-label>
-
-                <mat-select placeholder="Portafolio" [ngModelOptions]="{standalone: true}" [(ngModel)]="portafolio"
-                    (selectionChange)="ConsultarMontoPortafolio()" value="{{portafolio}}" [disabled]="soloLectura">
+                <mat-select placeholder="Seleccionar portafolio" [ngModelOptions]="{standalone: true}" [(ngModel)]="portafolio"
+                    (selectionChange)="ConsultarMontoPortafolio()" [disabled]="soloLectura">
                     <mat-option *ngFor="let e of lstDataPortafolio"
-                        value="{{e.id + '|' + e.descripcion}}">{{e.descripcion | uppercase}}</mat-option>
+                        [value]="e.id + '|' + e.descripcion">{{e.descripcion | uppercase}}</mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
-        <div class="col-md-3">
-            <mat-form-field appearance="outline">
-                <mat-label>Saldo para invertir</mat-label>
-                <span matPrefix>Bs &nbsp;</span>
+        <div class="form-field form-field-monto">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Monto a invertir</mat-label>
+                <span matPrefix>Bs.&nbsp;</span>
                 <input matInput
-                    placeholder="Saldo para invertir"
+                    placeholder="0.00"
                     [ngModelOptions]="{standalone: true}"
                     [(ngModel)]="monto_general"
-                    value="{{monto_general}}"
                     (input)="onMontoChange()"
                     [readonly]="bloquearMonto || soloLectura">
             </mat-form-field>
         </div>
-        <div class="col-md-2">
-            <mat-form-field appearance="outline">
+        <div class="form-field form-field-porcentaje">
+            <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Porcentaje</mat-label>
-                <span matSuffix>&nbsp; %</span>
+                <span matSuffix>&nbsp;%</span>
                 <input matInput
-                    placeholder="Porcentaje"
-                    [ngModelOptions]="{standalone: true}" 
+                    placeholder="0.00"
+                    [ngModelOptions]="{standalone: true}"
                     [(ngModel)]="porcentaje"
-                    value="{{porcentaje}}"
                     (keypress)="soloNumeros($event)"
                     (input)="onPorcentajeChange()"
                     [readonly]="bloquearPorcentaje || soloLectura">
             </mat-form-field>
         </div>
-        <div class="col-md-2">
-            <div class="asistente-button-container">
-
-                <button mat-mini-fab color="primary" [disabled]="habilitar() || soloLectura" (click)="Agregar()" [matTooltip]="editando ? 'Editar' : 'Agregar'">
-                    <mat-icon>{{editando ? 'edit' : 'add'}}</mat-icon>
-                </button>
-                &nbsp; &nbsp;
-                <button mat-mini-fab color="warn" [disabled]="soloLectura" (click)="limpiarCampos()" matTooltip="Limpiar campos">
-                    <mat-icon>clear</mat-icon>
-                </button>
-            </div>
+        <div class="form-field form-field-actions">
+            <button mat-mini-fab color="primary" [disabled]="habilitar() || soloLectura" (click)="Agregar()" matTooltip="Agregar asignación">
+                <mat-icon>{{editando ? 'edit' : 'add'}}</mat-icon>
+            </button>
+            <button mat-mini-fab color="warn" [disabled]="soloLectura" (click)="limpiarCampos()" matTooltip="Limpiar">
+                <mat-icon>clear</mat-icon>
+            </button>
         </div>
-
     </div>
 
-
-
-    <div class="row">
-
-        <div class="col-md-12">
-            <mat-selection-list>
-                <mat-list *ngFor="let e of lstInversiones; let i=index "
-                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                    <div class="row">
-
-                        <div class="col-md-7 texto-lista">
-                            {{ e.descripcion | uppercase }}
-                        </div>
-                        <div class="col-md-2 texto-lista">
-                            {{ e.porcentaje }} %.
-                        </div>
-
-                        <div class="col-md-2 texto-detalle">
-                            {{ getStatus(e.estatus) }}
-                        </div>
-
-                        <div class="col-md-1 text-right">
-
-                            <button mat-icon-button aria-label="Editar" matTooltip="Editar" (click)="editar(e, i)" [disabled]="soloLectura">
-                                <mat-icon class="texto-gray">edit</mat-icon>
-                            </button>
-
-                            <button mat-icon-button aria-label="Eliminar" matTooltip="Eliminar" (click)="eliminar(i)" [disabled]="soloLectura">
-                                <mat-icon class="texto-delete">delete</mat-icon>
-                            </button>
-
-                        </div>
-                    </div>
-                </mat-list>
-            </mat-selection-list>
-        </div>
-
+    <!-- TABLA DE ASIGNACIONES -->
+    <div class="table-container" *ngIf="lstInversiones.length > 0">
+        <table class="asignaciones-table">
+            <thead>
+                <tr>
+                    <th class="th-portfolio">Portafolio</th>
+                    <th class="th-monto">Monto (Bs.)</th>
+                    <th class="th-pct">%</th>
+                    <th class="th-status">Estado</th>
+                    <th class="th-actions">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let e of lstInversiones; let i = index" class="asignacion-row">
+                    <td class="td-portfolio">{{e.descripcion | uppercase}}</td>
+                    <td class="td-monto">{{(e.porcentaje / 100) * valorNominalTotal | number:'1.2-2'}}</td>
+                    <td class="td-pct">{{e.porcentaje}}%</td>
+                    <td class="td-status">
+                        <span class="badge badge-active">ACTIVO</span>
+                    </td>
+                    <td class="td-actions">
+                        <button mat-icon-button class="btn-edit" matTooltip="Editar" (click)="editar(e, i)" [disabled]="soloLectura">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button class="btn-delete" matTooltip="Eliminar" (click)="eliminar(i)" [disabled]="soloLectura">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td class="td-portfolio"><strong>TOTAL ASIGNADO</strong></td>
+                    <td class="td-monto"><strong>{{montoAsignado | number:'1.2-2'}}</strong></td>
+                    <td class="td-pct"><strong>{{montoAsignado > 0 ? ((montoAsignado / valorNominalTotal) * 100).toFixed(2) : '0.00'}}%</strong></td>
+                    <td class="td-status">
+                        <span class="badge" [class.badge-complete]="restante <= 0.01" [class.badge-pending]="restante > 0.01">
+                            {{restante <= 0.01 ? 'COMPLETO' : 'PARCIAL'}}
+                        </span>
+                    </td>
+                    <td class="td-actions"></td>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <mat-list>
-                <div class="row">
-
-                    <div class="col-md-7 texto-lista">
-                        TOTAL DEL PORCENTAJE
-                    </div>
-
-                    <div class="col-md-2 texto-lista">
-                        {{ total }} %.
-                    </div>
-
-                </div>
-
-            </mat-list>
-        </div>
-
+    <div class="empty-state" *ngIf="lstInversiones.length === 0">
+        <mat-icon>account_balance</mat-icon>
+        <p>No hay portafolios asignados a esta inversión</p>
     </div>
-    <hr style="margin-bottom: 0;">
+
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-    <button mat-flat-button color="primary" (click)="Commit()" *ngIf="blSave && !soloLectura">
-        <mat-icon>{{editado ? 'edit' : 'save'}}</mat-icon>&nbsp;{{editado ? 'Editar' : 'Guardar'}}
+<mat-dialog-actions align="end" class="dialog-footer">
+    <button mat-stroked-button color="warn" mat-dialog-close>
+        <mat-icon>close</mat-icon>&nbsp;Cancelar
     </button>
-
-    &nbsp;&nbsp;
-
-    <button mat-flat-button color="warn" mat-dialog-close>
-        <mat-icon>cancel</mat-icon>&nbsp;&nbsp;Cancelar
+    <button mat-flat-button color="primary" (click)="Commit()" *ngIf="blSave && !soloLectura">
+        <mat-icon>{{editado ? 'edit' : 'save'}}</mat-icon>&nbsp;{{editado ? 'Actualizar' : 'Guardar'}}
     </button>
 </mat-dialog-actions>

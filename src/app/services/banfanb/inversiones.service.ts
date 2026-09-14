@@ -58,6 +58,16 @@ export interface InversionPortafolio {
   usuario: string
 }
 
+export interface DistribucionInversion {
+  id_inversion: number;
+  id_portafolio: number;
+  porcentaje: number;
+  monto: number;
+  estatus: number;
+  id_plan: number;
+  plan_nombre: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })

@@ -5,7 +5,7 @@ import { debounceTime, map, startWith } from "rxjs/operators";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
-import { Inversion, MovInversion } from "src/app/services/banfanb/inversiones.service";
+import { DistribucionInversion, Inversion, MovInversion } from "src/app/services/banfanb/inversiones.service";
 import { UtilService } from "src/app/services/util/util.service";
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 import { MatDialog } from "@angular/material/dialog";
@@ -954,11 +954,16 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
   }
 
   async liquidarInversion(inv: any): Promise<void> {
-    const planId = await this.resolverPlanInversion(inv);
-    if (planId) {
-      const bloqueado = await this.planGuard.planBloqueado(planId);
+    const dist = await this.consultarDistribucion(inv.identificador);
+    if (!dist || dist.length === 0) {
+      this._snackBar.open('La inversión no tiene portafolios con plan asignado', 'Ok');
+      return;
+    }
+
+    for (const d of dist) {
+      const bloqueado = await this.planGuard.planBloqueado(d.id_plan);
       if (bloqueado) {
-        this._snackBar.open('El plan está finiquitado o cerrado', 'Ok');
+        this._snackBar.open(`El plan ${d.plan_nombre} está finiquitado o cerrado`, 'Ok');
         return;
       }
     }
@@ -967,7 +972,8 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
       title: '¿Liquidar inversión?',
       html: `<p><strong>${inv.instrumento}</strong></p>
              <p>Valor nominal: ${this.getMoneda(inv.valor_nominal)}</p>
-             <p>Vencimiento: ${this.getFecha(inv.fecha_vencimiento)}</p>`,
+             <p>Vencimiento: ${this.getFecha(inv.fecha_vencimiento)}</p>
+             <p>Planes: ${dist.map(d => `${d.plan_nombre} (${d.porcentaje}%)`).join(', ')}</p>`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -989,41 +995,48 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
       // Paso 1: Eliminar comprobantes de devengos, compras y vencimientos de esa fecha
       await this.eliminarComprobantesPorFecha(fecha);
 
-      // Paso 2: Crear comprobante de liquidación
+      // Paso 2: Calcular monto total de liquidación
       const fechaCompraDate = new Date(inv.fecha_compra);
       const fechaOperacionDate = new Date(fecha);
       const diasAcumulados = Math.floor((fechaOperacionDate.getTime() - fechaCompraDate.getTime()) / 86400000);
       const interesReal = Math.round(parseFloat(inv.interes_diario) * diasAcumulados * 100) / 100;
-      const monto = Math.round((parseFloat(inv.valor_nominal) + interesReal) * 100) / 100;
-      const comprobante: any = {
-        plan: planId,
-        codigo: this.util.GenerarUnicId(),
-        descripcion: `LIQUIDACION INVERSION - ${inv.instrumento} ${fecha}`,
-        detalle: `Liquidación Individual`,
-        fecha_operacion: fecha,
-        fecha_ejercicio: fecha,
-        debe: monto,
-        haber: monto,
-        llave: 'M'
-      };
+      const montoTotal = Math.round((parseFloat(inv.valor_nominal) + interesReal) * 100) / 100;
 
-      this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE;
-      this.xAPI.parametros = '';
-      this.xAPI.valores = JSON.stringify(comprobante);
-      const res: any = await this.apiService.Ejecutar(this.xAPI).toPromise();
-      const idComprobante = parseInt(res?.msj);
+      // Paso 3: Crear comprobante por cada plan participante
+      for (const d of dist) {
+        const montoProporcional = Math.round(montoTotal * (d.porcentaje / 100) * 100) / 100;
+        if (montoProporcional <= 0) continue;
 
-      if (isNaN(idComprobante)) {
-        throw new Error('No se pudo obtener el ID del comprobante generado');
+        const comprobante: any = {
+          plan: d.id_plan,
+          codigo: this.util.GenerarUnicId(),
+          descripcion: `LIQUIDACION INVERSION - ${inv.instrumento} ${fecha}`,
+          detalle: `Liquidación Individual - ${d.plan_nombre} (${d.porcentaje}%)`,
+          fecha_operacion: fecha,
+          fecha_ejercicio: fecha,
+          debe: montoProporcional,
+          haber: montoProporcional,
+          llave: 'M'
+        };
+
+        this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE;
+        this.xAPI.parametros = '';
+        this.xAPI.valores = JSON.stringify(comprobante);
+        const res: any = await this.apiService.Ejecutar(this.xAPI).toPromise();
+        const idComprobante = parseInt(res?.msj);
+
+        if (isNaN(idComprobante)) {
+          throw new Error('No se pudo obtener el ID del comprobante generado');
+        }
+
+        // Paso 4: Insertar detalle via FID_ILiquidacionInversionDist
+        this.xAPI.funcion = environment.xApi.INSERTAR_LIQUIDACION_INVERSION_DIST;
+        this.xAPI.parametros = `${idComprobante},${fecha},${inv.identificador},${montoProporcional},${d.id_plan}`;
+        this.xAPI.valores = '';
+        await this.apiService.Ejecutar(this.xAPI).toPromise();
       }
 
-      // Paso 3: Insertar detalle via FID_ILiquidacionInversion (fecha_ultimo_cierre + 1)
-      this.xAPI.funcion = environment.xApi.INSERTAR_LIQUIDACION_INVERSION;
-      this.xAPI.parametros = `${idComprobante},${fecha},${inv.identificador}`;
-      this.xAPI.valores = '';
-      await this.apiService.Ejecutar(this.xAPI).toPromise();
-
-      // Paso 4: Actualizar estatus a 2 (VENCIDA)
+      // Paso 5: Actualizar estatus a 2 (VENCIDA)
       this.xAPI.funcion = environment.xApi.LIQUIDAR_INVERSION_ESTATUS;
       this.xAPI.parametros = `${inv.identificador}, 2`;
       this.xAPI.valores = '';
@@ -1037,6 +1050,14 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     } finally {
       this.ngxService.stopLoader('load-inver');
     }
+  }
+
+  async consultarDistribucion(idInversion: number): Promise<DistribucionInversion[]> {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES_PORTAFOLIO_DIST;
+    this.xAPI.parametros = idInversion.toString();
+    this.xAPI.valores = '';
+    const data: any = await this.apiService.Ejecutar(this.xAPI).toPromise();
+    return data?.Cuerpo || [];
   }
 
 

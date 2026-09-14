@@ -148,6 +148,23 @@ export class CcierreComponent implements OnInit {
     this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1
   }
 
+  // Verifica si ya existe cierre semestral (S saldos) para la fecha del cierre
+  async existeCierreSemestral(): Promise<boolean> {
+    try {
+      const d = this.fechaultimo.split('/')
+      const fechaCierre = `${d[2]}-${d[1]}-${d[0]}`
+      const data: any = await firstValueFrom(this.apiService.Ejecutar({
+        funcion: 'FID_CFechaMaxPreCierreSemestral',
+        parametros: '',
+        valores: ''
+      }))
+      const fecha = data?.Cuerpo?.[0]?.fecha
+      return fecha != null && fecha.substring(0, 10) === fechaCierre
+    } catch (e) {
+      return false
+    }
+  }
+
 
   async ValidarPreCierre() {
     this.ngxService.startLoader('load-precierre')
@@ -314,17 +331,46 @@ export class CcierreComponent implements OnInit {
   }
 
 
-  CrearSemestral(llave) {
+  async CrearSemestral(llave) {
     if (!this.cierreMensualCompletado) {
       this.toastr.error('Debe completar el cierre mensual antes del cierre semestral', 'Cierre Semestral');
       return;
     }
+
+    // Verificar si ya existe cierre semestral
+    if (await this.existeCierreSemestral()) {
+      this.toastr.error('Ya existe un cierre semestral para esta fecha. No se puede crear otro.', 'Cierre Semestral');
+      return;
+    }
+
     this.ngxService.startLoader('load-precierre')
     // this.fechai = primer día del semestre (ej: 2027-01-01)
     // fultimo = último día del semestre (ayer de fechai) = fecha del cierre
     let dt = new Date(this.fechai)
     dt.setDate(dt.getDate() - 1)
     let fultimo = dt.toISOString().split('T')[0]
+
+    // Validación 1: Verificar que existe precierre semestral
+    try {
+      const verifData = await firstValueFrom(this.apiService.Ejecutar({
+        funcion: environment.xApi.CONSULTAR_ULTIMO_CIERRE_SEMESTRAL,
+        parametros: '',
+        valores: ''
+      }));
+      const fechaPrecierre = verifData?.Cuerpo?.[0]?.fecha;
+      if (!fechaPrecierre || fechaPrecierre.substring(0, 10) !== fultimo) {
+        this.toastr.error('No existe precierre semestral para la fecha ' + this.util.ConvertirFechaHumana(fultimo), 'Cierre Semestral');
+        this.ngxService.stopLoader('load-precierre');
+        return;
+      }
+    } catch (e) {
+      console.error('Error verificando precierre semestral:', e);
+      this.toastr.error('Error al verificar precierre semestral', 'Cierre Semestral');
+      this.ngxService.stopLoader('load-precierre');
+      return;
+    }
+
+    // Ejecutar cierre semestral (solo borra saldos D+S y crea S)
     this.xAPI.funcion = environment.xApi.BORRAR_CIERRE_SEMESTRAL
     this.xAPI.parametros = fultimo
     this.xAPI.valores = ''
@@ -454,6 +500,12 @@ export class CcierreComponent implements OnInit {
   }
 
   async ejecutarPrecierreMensual() {
+    // Verificar si ya existe cierre semestral
+    if (await this.existeCierreSemestral()) {
+      this.toastr.error('Ya existe un cierre semestral. No se puede ejecutar el precierre mensual.', 'Cierre Mensual');
+      return;
+    }
+
     this.ngxService.startLoader('load-precierre');
     try {
       // Usar la fecha seleccionada por el usuario (fechaf o fechai)
@@ -548,6 +600,12 @@ export class CcierreComponent implements OnInit {
   }
 
   async ejecutarCierreMensual() {
+    // Verificar si ya existe cierre semestral
+    if (await this.existeCierreSemestral()) {
+      this.toastr.error('Ya existe un cierre semestral. No se puede ejecutar el cierre mensual.', 'Cierre Mensual');
+      return;
+    }
+
     this.ngxService.startLoader('load-precierre');
     try {
       const d = this.fechaultimo.split('/');

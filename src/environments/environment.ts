@@ -86,6 +86,7 @@ export const environment = {
     // Cierres
     INSERTAR_SALDOS_CIERRE: 'FID_ISaldosCierre',
     BORRAR_CIERRE_SEMESTRAL: 'FID_DCierreSemestral',
+    BORRAR_PRECIERRE_SEMESTRAL: 'FID_DPreCierreSemestral',
     CONSULTAR_MOVIMIENTOS_SEMESTRALES: 'FID_CMovimientosSemestrales',
     VALIDAR_CIERRE:'FID_CValidarReconciliacion',
     VERIFICAR_MOVIMIENTOS_D: 'FID_CVerificarMovimientosD',
@@ -121,6 +122,11 @@ export const environment = {
     INSERTAR_INVERSIONES_PORTAFOLIO: 'FID_IInversionesPortafolio',
     CONSULTAR_INVERSIONES_PORTAFOLIO: 'FID_CInversionesPortafolio',
     BORRAR_INVERSIONES_PORTAFOLIO: 'FID_DInversionesPortafolio',
+    CONSULTAR_INVERSIONES_PORTAFOLIO_DIST: 'FID_CInversionesPortafolioDist',
+    INSERTAR_DEVENGO_INVERSIONES_DIST: 'FID_IDevengoInversionesDist',
+    INSERTAR_VENCIMIENTO_INVERSIONES_DIST: 'FID_IVencimientoInversionesDist',
+    INSERTAR_COMPRA_INVERSIONES_DIST: 'FID_ICompraInversionesDist',
+    INSERTAR_LIQUIDACION_INVERSION_DIST: 'FID_ILiquidacionInversionDist',
 
     // Capital y comisiones
     CONSULTAR_CAPITAL_ASIGNADO: 'FID_CCapitalAsignado',
