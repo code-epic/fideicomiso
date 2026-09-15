@@ -169,7 +169,7 @@ export const environment = {
     // Pago de rendimientos / intereses
     CONSULTAR_DIAGNOSTICO_PAGO_INTERESES: 'FID_CSeDiagnosticoPagoIntereses',
     INSERTAR_PAGO_INTERESES: 'FID_IPagoIntereses',
-  }, 
+  },
 
   functions: {
     

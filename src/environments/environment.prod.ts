@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  ID : 'ID-003',
+  ID : 'fideicomiso',
   Url: 'https://fideicomiso.banfanb.com.ve',
   API: '/v1/api/',
   Hash: ':c521f27fb1b3311d686d511b668e5bd4',
@@ -83,6 +83,7 @@ export const environment = {
     // Cierres
     INSERTAR_SALDOS_CIERRE: 'FID_ISaldosCierre',
     BORRAR_CIERRE_SEMESTRAL: 'FID_DCierreSemestral',
+    BORRAR_PRECIERRE_SEMESTRAL: 'FID_DPreCierreSemestral',
     CONSULTAR_MOVIMIENTOS_SEMESTRALES: 'FID_CMovimientosSemestrales',
     VERIFICAR_MOVIMIENTOS_D: 'FID_CVerificarMovimientosD',
     VERIFICAR_CIERRE_MENSUAL: 'FID_CVerificarCierreMensual',
@@ -155,6 +156,7 @@ export const environment = {
     CONSULTAR_CUENTAS_NOMINALES_PLAN: 'FID_CSeCuentasNominalesPlan',
     AUDITORIA_BALANCE_CERO: 'FID_CSeAuditoriaBalanceCero',
     CONSULTAR_SALDOS_AJUSTADOS: 'FID_CSeSaldosAjustados',
+    CONSULTAR_ULTIMA_FECHA_LIQUIDACION_712_714: 'FID_CSeUltimaFechaLiquidacion712_714',
 
     // Pago de rendimientos / intereses
     CONSULTAR_DIAGNOSTICO_PAGO_INTERESES: 'FID_CSeDiagnosticoPagoIntereses',
