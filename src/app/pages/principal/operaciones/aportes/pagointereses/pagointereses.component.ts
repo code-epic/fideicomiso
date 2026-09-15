@@ -95,7 +95,7 @@ export class PagointeresesComponent implements OnInit {
 
     this.ngxService.startLoader('load-pagointereses');
     try {
-      this.fechaCorte = this.util.ConvertirFechaDB(this.fechaultimo);
+      this.fechaCorte = this.util.ConvertirFechaDB(new Date());
       this.diagnostico = await this.interesesService.consultarDiagnosticoPagoIntereses(
         plan.id,
         this.util.ConvertirFechaDB(this.fechaultimo),
@@ -207,8 +207,9 @@ export class PagointeresesComponent implements OnInit {
 
   // Fecha de aplicación contable (cierre + 1 día)
   get fechaAplicacion(): string {
-    if (!this.fechaCorte) return '';
-    return this.util.SumarDias(this.fechaCorte, 1);
+    if (!this.fechaultimo) return '';
+    const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaultimo);
+    return this.util.SumarDias(fechaCierreDB, 1);
   }
 
   limpiarNombrePlan(observacion: string): string {

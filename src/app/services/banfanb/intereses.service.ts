@@ -160,7 +160,7 @@ export class InteresesService {
   async consultarDiagnosticoPagoIntereses(idPlan: number, fechaCierre: string, fechaCorte: string): Promise<DiagnosticoPagoIntereses | null> {
     const xAPI: IAPICore = {
       funcion: environment.xApi.CONSULTAR_DIAGNOSTICO_PAGO_INTERESES,
-      parametros: `${idPlan},${fechaCorte},${fechaCierre}`,
+      parametros: `${idPlan},${fechaCierre},${fechaCorte}`,
       valores: ''
     };
     const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
