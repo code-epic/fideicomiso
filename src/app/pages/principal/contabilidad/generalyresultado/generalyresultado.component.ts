@@ -266,6 +266,9 @@ export class GeneralyresultadoComponent implements OnInit {
 
         let result = this.acum_saldo_actual - this.total_gastos;
 
+        // Evaluar calcularacero al final: solo si ambos ingresos y gastos son 0
+        this.calcularacero = (this.acum_saldo_actual == 0 && this.total_gastos == 0) ? 1 : 0
+
         this.HTMLBalance += ``;
         this.HTMLResultados += `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
@@ -347,7 +350,10 @@ export class GeneralyresultadoComponent implements OnInit {
       this.acum_saldo_actual += parseFloat(saldo_actual)
       this.HTMLResultados += this.getTitulosACuentasBalance(e)
     } else {
-      this.total_gastos = this.posicion==3?this.acum_saldo_actual: 0
+      // Solo guardar total_gastos cuando se procesa la sección GASTOS (posicion==3)
+      if (this.posicion == 3) {
+        this.total_gastos = this.acum_saldo_actual
+      }
       let cadena = `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th class="th-general">${this.lstIndex[this.posicion].nombre} </th>
@@ -358,7 +364,7 @@ export class GeneralyresultadoComponent implements OnInit {
         </tr>
        
       `;
-      if (this.acum_saldo_actual == 0) this.calcularacero = 1
+      // calcularacero se evalúa al final del procesamiento
       
       if (this.tiempo == 0) {
         this.HTMLBalance += cadena

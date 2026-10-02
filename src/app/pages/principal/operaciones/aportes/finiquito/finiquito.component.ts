@@ -159,20 +159,29 @@ export class FiniquitoComponent implements OnInit {
           cuenta_destino: existe.cuenta_destino,
           referencia: existe.referencia
         };
+        // Auto-cargar datos del finiquito existente
+        this.numeroOficio = existe.numero_oficio || '';
+        this.bancoDestino = existe.banco_destino || '';
+        this.cuentaDestino = existe.cuenta_destino || '';
+        this.referencia = existe.referencia || '';
+        // No consultar inversiones/comprobantes: el plan ya está finiquitado
+        this.inversionesActivas = [];
+        this.comprobantesPendientes = [];
+        this.validarPrerrequisitos();
       } else {
         // Consultar diagnostico completo (siempre usar diagnostico dinamico)
-        const fechaConsulta = this.fechaFiniquito
+        const fechaDiagnostico = this.fechaFiniquito
           ? this.util.ConvertirFechaDB(this.fechaFiniquito)
           : this.util.ConvertirFechaDB(new Date());
-        await this.cargarDiagnostico(plan.id, fechaConsulta);
+        await this.cargarDiagnostico(plan.id, fechaDiagnostico);
+
+        const fechaConsulta = this.fechaFiniquito ? this.util.ConvertirFechaDB(this.fechaFiniquito) : undefined;
+        this.inversionesActivas = await this.finiquitoService.consultarInversionesActivasPlan(plan.id, fechaConsulta);
+        this.comprobantesPendientes = await this.finiquitoService.consultarComprobantesPendientesPlan(plan.id);
+        this.ultimaFechaLiquidacion = await this.finiquitoService.consultarUltimaFechaLiquidacion(plan.id);
+
+        this.validarPrerrequisitos();
       }
-
-      const fechaConsulta = this.fechaFiniquito ? this.util.ConvertirFechaDB(this.fechaFiniquito) : undefined;
-      this.inversionesActivas = await this.finiquitoService.consultarInversionesActivasPlan(plan.id, fechaConsulta);
-      this.comprobantesPendientes = await this.finiquitoService.consultarComprobantesPendientesPlan(plan.id);
-      this.ultimaFechaLiquidacion = await this.finiquitoService.consultarUltimaFechaLiquidacion(plan.id);
-
-      this.validarPrerrequisitos();
     } catch (error) {
       console.error(error);
       this.toastr.error('Error al consultar la información del plan', 'Finiquito');
@@ -182,6 +191,12 @@ export class FiniquitoComponent implements OnInit {
   }
 
   async onFechaChange(): Promise<void> {
+    // Si el plan ya está finiquitado, no reconsultar inversiones
+    if (this.yaFiniquitado) {
+      this.validarPrerrequisitos();
+      return;
+    }
+
     if (this.planSeleccionado && this.fechaFiniquito) {
       const fecha = this.util.ConvertirFechaDB(this.fechaFiniquito);
       if (fecha) {
@@ -229,8 +244,16 @@ export class FiniquitoComponent implements OnInit {
   validarPrerrequisitos(): void {
     this.errores = [];
 
+    // Si el plan ya fue finiquitado, no ejecutar validaciones adicionales
     if (this.yaFiniquitado) {
-      this.errores.push('El plan seleccionado ya posee un finiquito registrado.');
+      const fechaFiniq = this.resultadoFiniquito?.fecha_finiquito
+        ? this.util.ConvertirFechaDB(this.resultadoFiniquito.fecha_finiquito)
+        : '';
+      this.errores.push(
+        `El plan seleccionado ya posee un finiquito registrado${fechaFiniq ? ` el ${fechaFiniq}` : ''}.`
+      );
+      this.validacionesPasadas = false;
+      return;
     }
 
     if (!this.fechaFiniquito) {
@@ -480,8 +503,10 @@ export class FiniquitoComponent implements OnInit {
       const debe731C4 = saldo731 > 0 ? saldo731 : 0;
       const haber734C4 = saldo734PostC3 < 0 ? Math.abs(saldo734PostC3) : 0;
       const debe734C4 = saldo734PostC3 > 0 ? saldo734PostC3 : 0;
+      // Fuente única de verdad: total a cancelar = DEBE 731 + DEBE 734 - HABER 734
+      const totalCancelarC4 = debe731C4 + debe734C4 - haber734C4;
 
-      this.idComprobanteFiniquito = await this.crearComprobante(planId, fecha, 'FINIQUITO - CANCELACION DE PATRIMONIO Y RESULTADOS', Math.max(debe731C4, monto711));
+      this.idComprobanteFiniquito = await this.crearComprobante(planId, fecha, 'FINIQUITO - CANCELACION DE PATRIMONIO Y RESULTADOS', totalCancelarC4);
       if (debe731C4 > 0) {
         await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 19, debe731C4, 0);  // DEBE 731.02
       }
@@ -491,8 +516,8 @@ export class FiniquitoComponent implements OnInit {
       if (haber734C4 > 0) {
         await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 40, 0, haber734C4);  // HABER 734 (absorción pérdida)
       }
-      await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 3, 0, monto711);  // HABER 711.02 (disponibilidad neta)
-      console.log('[Finiquito] C4:', { debe731C4, debe734C4, haber734C4, monto711, DR: debe731C4 + debe734C4, CR: monto711 + haber734C4 });
+      await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 3, 0, totalCancelarC4);  // HABER 711.02 (disponibilidad neta)
+      console.log('[Finiquito] C4:', { debe731C4, debe734C4, haber734C4, monto711, totalCancelarC4, DR: debe731C4 + debe734C4, CR: totalCancelarC4 + haber734C4 });
 
       // Paso 5: Copiar detalles de finiquito a movimientos (plan-scoped)
       await this.finiquitoService.insertarMovimientosFiniquito(planId, fecha, 'M');

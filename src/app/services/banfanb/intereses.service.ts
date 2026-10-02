@@ -115,7 +115,11 @@ export class InteresesService {
       valores: JSON.stringify(comprobante)
     };
     const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
-    return parseInt(data?.msj);
+    const id = parseInt(data?.msj);
+    if (isNaN(id) || id <= 0) {
+      throw new Error(`Error al crear comprobante: respuesta inválida (${data?.msj})`);
+    }
+    return id;
   }
 
   async insertarDetalleComprobante(detalle: any): Promise<void> {
@@ -124,7 +128,11 @@ export class InteresesService {
       parametros: '',
       valores: JSON.stringify(detalle)
     };
-    await lastValueFrom(this.apiService.Ejecutar(xAPI));
+    const data: any = await lastValueFrom(this.apiService.Ejecutar(xAPI));
+    // Validar que no haya error en la respuesta
+    if (data?.error || data?.mensaje?.toLowerCase().includes('error')) {
+      throw new Error(`Error al insertar detalle (cuenta ${detalle.cuenta}): ${data?.mensaje || 'respuesta inválida'}`);
+    }
   }
 
   async insertarDetalleInteres(idComprobante: number, monto: number, fecha: string, idPlan: number): Promise<void> {
@@ -238,6 +246,19 @@ export class InteresesService {
     descripcion: string,
     detalle: string
   ): Promise<number> {
+    // Validar que hay líneas para insertar
+    const lineasValidas = lineas.filter(l => l.debe > 0 || l.haber > 0);
+    if (lineasValidas.length === 0) {
+      throw new Error('No hay líneas de detalle válidas para el comprobante.');
+    }
+
+    // Validar que las líneas cuadran
+    const totalDebe = lineasValidas.reduce((sum, l) => sum + l.debe, 0);
+    const totalHaber = lineasValidas.reduce((sum, l) => sum + l.haber, 0);
+    if (Math.abs(totalDebe - totalHaber) >= 0.01) {
+      throw new Error(`Las líneas no cuadran: DEBE=${totalDebe}, HABER=${totalHaber}`);
+    }
+
     const comprobante = {
       plan: planId,
       codigo: '',
@@ -250,10 +271,12 @@ export class InteresesService {
       llave: 'M'
     };
 
+    // Crear comprobante (valida que retorne ID válido)
     const idComprobante = await this.insertarComprobante(comprobante);
 
-    for (const linea of lineas) {
-      if (linea.debe > 0 || linea.haber > 0) {
+    // Insertar líneas de detalle con manejo de errores
+    for (const linea of lineasValidas) {
+      try {
         await this.insertarDetalleComprobante({
           id_comprobante: idComprobante,
           cuenta: linea.cuenta,
@@ -263,6 +286,10 @@ export class InteresesService {
           fecha_operacion: fecha,
           plan: planId
         });
+      } catch (error: any) {
+        throw new Error(
+          `Comprobante ${idComprobante} creado pero falló el detalle (cuenta ${linea.cuenta}): ${error?.message || error}`
+        );
       }
     }
 

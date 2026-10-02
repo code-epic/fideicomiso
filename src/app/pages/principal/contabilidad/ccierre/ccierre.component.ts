@@ -85,6 +85,7 @@ export class CcierreComponent implements OnInit {
   public interesesGenerados: boolean = false;
   public precierreEjecutado: boolean = false;
   public cierreMensualCompletado: boolean = false;
+  public cierreSemestralCompletado: boolean = false;
   public movimientosDEncontrados: boolean = false;
   public lstInteresesGenerados: any[] = [];
   public tasaInteres: number = 2.00;
@@ -154,13 +155,16 @@ export class CcierreComponent implements OnInit {
       const d = this.fechaultimo.split('/')
       const fechaCierre = `${d[2]}-${d[1]}-${d[0]}`
       const data: any = await firstValueFrom(this.apiService.Ejecutar({
-        funcion: 'FID_CFechaMaxPreCierreSemestral',
+        funcion: 'FID_CFechaCierreSemestral',
         parametros: '',
         valores: ''
       }))
       const fecha = data?.Cuerpo?.[0]?.fecha
-      return fecha != null && fecha.substring(0, 10) === fechaCierre
+      const resultado = fecha != null && fecha.substring(0, 10) === fechaCierre
+      this.cierreSemestralCompletado = resultado
+      return resultado
     } catch (e) {
+      this.cierreSemestralCompletado = false
       return false
     }
   }
