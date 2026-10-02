@@ -353,16 +353,8 @@ export class FiniquitoComponent implements OnInit {
   }
 
   get saldo734Final(): number {
-    const saldo734Previo = this.getSaldo('734');
-    let resultado = saldo734Previo;
-    for (const n of this.nominalesConSaldo) {
-      if (n.aumenta === 'HABER') {
-        resultado += n.saldo;
-      } else {
-        resultado -= n.saldo;
-      }
-    }
-    return resultado;
+    // Refundición eliminada: 734 se mantiene sin cambios
+    return this.getSaldo('734');
   }
 
   async procesarFiniquito(): Promise<void> {
@@ -430,94 +422,86 @@ export class FiniquitoComponent implements OnInit {
       }
 
       // Recalcular saldos frescos del diagnóstico
-      const saldo711 = this.getSaldo('711');
-      const saldo722 = this.getSaldo('722');
-      const saldo731 = this.getSaldo('731');
-      const saldo734 = this.getSaldo('734');
-      const saldo740 = this.getSaldo('740');
-      const saldo744 = this.getSaldo('744');
-      const saldo750 = this.getSaldo('750');
-      const saldo751 = this.getSaldo('751');
-      const saldo752 = this.getSaldo('752');
+      const saldo711 = this.getSaldo('711');   // D = Disponibilidad
+      const saldo722 = this.getSaldo('722');   // P = Pasivos
+      const saldo731 = this.getSaldo('731');   // PAT 731
+      const saldo734 = this.getSaldo('734');   // PAT 734
+      const saldo740 = this.getSaldo('740');   // Gastos
+      const saldo744 = this.getSaldo('744');   // Gastos
+      const saldo750 = this.getSaldo('750');   // Ingresos
+      const saldo751 = this.getSaldo('751');   // Ingresos
+      const saldo752 = this.getSaldo('752');   // Ingresos
       const saldo712 = this.getSaldo('712');
       const saldo714 = this.getSaldo('714');
-      const montoLiquidacion = this.montoLiquidacion;
+
+      // Variables de negocio
+      const D = saldo711;                          // Disponibilidad
+      const P = saldo722;                          // Pasivos
+      const I = saldo750 + saldo751 + saldo752;    // Ingresos
+      const G = saldo740 + saldo744;               // Gastos
+      const RN = I - G;                            // Resultado Neto
+      const D_final = D - P - RN;                  // Remanente
 
       // Limpieza defensiva (idempotencia)
       await this.compensarSilencioso(planId, fecha);
 
-      // C2: Liquidar pasivos
+      // ====================================================
+      // C1: LIQUIDACION DE PASIVOS
+      // DEBE 722 (cuenta 14) / HABER 711 (cuenta 3)
+      // ====================================================
       this.idComprobantePasivos = 0;
-      if (saldo722 > 0) {
-        this.idComprobantePasivos = await this.crearComprobante(planId, fecha, 'FINIQUITO - LIQUIDACION DE PASIVOS', saldo722);
-        await this.crearDetalle(this.idComprobantePasivos, planId, fecha, 14, saldo722, 0);  // DEBE 722.01
-        await this.crearDetalle(this.idComprobantePasivos, planId, fecha, 3, 0, saldo722);    // HABER 711.02
+      if (P > 0) {
+        this.idComprobantePasivos = await this.crearComprobante(planId, fecha, 'FINIQUITO - LIQUIDACION DE PASIVOS', P);
+        await this.crearDetalle(this.idComprobantePasivos, planId, fecha, 14, P, 0);  // DEBE 722.01
+        await this.crearDetalle(this.idComprobantePasivos, planId, fecha, 3, 0, P);    // HABER 711.02
       }
 
-      // C3: Refundición de resultados — consulta cuentas leaf con saldo ≠ 0
-      // Estructura: ingresos (75X) al DEBE contra 734, gastos (74X) al HABER contra 734.
-      // La 734 acumula el resultado neto del ejercicio (ingresos - gastos).
+      // ====================================================
+      // C2: CIERRE DEL RESULTADO NETO (si RN != 0)
+      // Si D >= RN: DEBE 744.23 (cuenta 70) / HABER 711
+      // Si D < RN:  DEBE 744.23 (cuenta 70) / HABER 722 (cuenta 13)
+      // ====================================================
       this.idComprobanteResultado = 0;
-      const cuentasNominales = await this.finiquitoService.consultarCuentasNominalesPlan(planId);
-      console.log('[Finiquito] C3 cuentas nominales (raw):', cuentasNominales.length, cuentasNominales);
-
-      // Excluir cuentas de ejercicio cerrado anterior (solo período corriente)
-      const cuentasParaC3 = cuentasNominales.filter(
-        c => !FiniquitoComponent.CUENTAS_EXCLUIDAS_NOMINALES.includes(Number(c.id_cuenta)) && Number(c.saldo) !== 0
-      );
-
-      console.log('[Finiquito] C3 cuentas para refundición:', cuentasParaC3.length, cuentasParaC3);
-
-      if (cuentasParaC3.length > 0) {
-        let totalRefundicion = 0;
-        for (const c of cuentasParaC3) {
-          totalRefundicion += c.saldo;
+      if (Math.round(RN * 100) / 100 !== 0) {
+        if (D >= RN) {
+          // Caso 1: Disponibilidad suficiente -> pago directo
+          this.idComprobanteResultado = await this.crearComprobante(planId, fecha, 'FINIQUITO - CIERRE RESULTADO NETO', RN);
+          await this.crearDetalle(this.idComprobanteResultado, planId, fecha, 70, RN, 0);  // DEBE 744.23
+          await this.crearDetalle(this.idComprobanteResultado, planId, fecha, 3, 0, RN);    // HABER 711
+        } else {
+          // Caso 2: Disponibilidad insuficiente -> causación
+          this.idComprobanteResultado = await this.crearComprobante(planId, fecha, 'FINIQUITO - CIERRE RESULTADO NETO', RN);
+          await this.crearDetalle(this.idComprobanteResultado, planId, fecha, 70, RN, 0);  // DEBE 744.23
+          await this.crearDetalle(this.idComprobanteResultado, planId, fecha, 13, 0, RN);  // HABER 722 (otras ctas por pagar)
         }
-        this.idComprobanteResultado = await this.crearComprobante(planId, fecha, 'FINIQUITO - REFUNDICION DE RESULTADOS', Math.abs(totalRefundicion));
-        for (const c of cuentasParaC3) {
-          if (c.aumenta === 'HABER') {
-            // Ingresos: DEBE leaf (se cierra) / HABER 734 (absorbe)
-            await this.crearDetalle(this.idComprobanteResultado, planId, fecha, c.id_cuenta, c.saldo, 0);
-            await this.crearDetalle(this.idComprobanteResultado, planId, fecha, 40, 0, c.saldo);
-          } else {
-            // Gastos: DEBE 734 (absorbe) / HABER leaf (se cierra)
-            await this.crearDetalle(this.idComprobanteResultado, planId, fecha, 40, c.saldo, 0);
-            await this.crearDetalle(this.idComprobanteResultado, planId, fecha, c.id_cuenta, 0, c.saldo);
-          }
-        }
-      } else {
-        // Sin nominales con saldo: se omite C3 (la 734 conserva su saldo acumulado)
-        console.log('[Finiquito] C3: sin cuentas nominales con saldo, se omite la refundición');
       }
 
-      // C4: Extinción patrimonial — solo 731 + 734 + 711 (sin cuentas 751)
+      // ====================================================
+      // C3: DESEMBOLSO REMANENTE Y CIERRE PATRIMONIAL
+      // DEBE 731 (cuenta 19) + DEBE/HABER 734 (cuenta 40) / HABER 711 (cuenta 3)
+      // D_final = D - P - RN
+      // ====================================================
       this.idComprobanteFiniquito = 0;
-      const saldo734Previo = this.getSaldo('734');
-      let netoRefundicion734 = 0;
-      for (const c of cuentasParaC3) {
-        if (c.aumenta === 'HABER') netoRefundicion734 += c.saldo;
-        else netoRefundicion734 -= c.saldo;
-      }
-      const saldo734PostC3 = saldo734Previo + netoRefundicion734;
-      const monto711 = this.montoLiquidacion;
-      const debe731C4 = saldo731 > 0 ? saldo731 : 0;
-      const haber734C4 = saldo734PostC3 < 0 ? Math.abs(saldo734PostC3) : 0;
-      const debe734C4 = saldo734PostC3 > 0 ? saldo734PostC3 : 0;
-      // Fuente única de verdad: total a cancelar = DEBE 731 + DEBE 734 - HABER 734
-      const totalCancelarC4 = debe731C4 + debe734C4 - haber734C4;
+      const debe731C3 = saldo731 !== 0 ? saldo731 : 0;
+      const haber734C3 = saldo734 < 0 ? Math.abs(saldo734) : 0;
+      const debe734C3 = saldo734 > 0 ? saldo734 : 0;
+      const totalCancelarC3 = debe731C3 + debe734C3 - haber734C3;
 
-      this.idComprobanteFiniquito = await this.crearComprobante(planId, fecha, 'FINIQUITO - CANCELACION DE PATRIMONIO Y RESULTADOS', totalCancelarC4);
-      if (debe731C4 > 0) {
-        await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 19, debe731C4, 0);  // DEBE 731.02
+      if (Math.round(D_final * 100) / 100 !== 0) {
+        this.idComprobanteFiniquito = await this.crearComprobante(planId, fecha, 'FINIQUITO - CIERRE PATRIMONIAL', Math.abs(D_final));
+        if (debe731C3 !== 0) {
+          await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 19, debe731C3, 0);  // DEBE 731.02
+        }
+        if (debe734C3 > 0) {
+          await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 40, debe734C3, 0);
+        }
+        if (haber734C3 > 0) {
+          await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 40, 0, haber734C3);  // HABER 734
+        }
+        await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 3, 0, D_final);  // HABER 711.02
       }
-      if (debe734C4 > 0) {
-        await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 40, debe734C4, 0);
-      }
-      if (haber734C4 > 0) {
-        await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 40, 0, haber734C4);  // HABER 734 (absorción pérdida)
-      }
-      await this.crearDetalle(this.idComprobanteFiniquito, planId, fecha, 3, 0, totalCancelarC4);  // HABER 711.02 (disponibilidad neta)
-      console.log('[Finiquito] C4:', { debe731C4, debe734C4, haber734C4, monto711, totalCancelarC4, DR: debe731C4 + debe734C4, CR: totalCancelarC4 + haber734C4 });
+
+      console.log('[Finiquito] Variables:', { D, P, I, G, RN, D_final, saldo731, saldo734 });
 
       // Paso 5: Copiar detalles de finiquito a movimientos (plan-scoped)
       await this.finiquitoService.insertarMovimientosFiniquito(planId, fecha, 'M');
@@ -545,7 +529,7 @@ export class FiniquitoComponent implements OnInit {
         saldo_734: saldo734,
         saldo_740: saldo740,
         saldo_750: saldo750,
-        remanente: this.remanente,
+        remanente: D_final,
         comprobante_pasivos: this.idComprobantePasivos,
         comprobante_resultado: this.idComprobanteResultado,
         comprobante_finiquito: this.idComprobanteFiniquito,
@@ -556,7 +540,7 @@ export class FiniquitoComponent implements OnInit {
         intereses_disponibilidad: 0,
         saldo_712: saldo712,
         saldo_714: saldo714,
-        monto_liquidacion: montoLiquidacion,
+        monto_liquidacion: D_final,
         comprobante_intereses: 0,
         estatus: 'COMPLETADO',
         usuario: 'sistema'
