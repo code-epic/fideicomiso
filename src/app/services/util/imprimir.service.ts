@@ -95,6 +95,7 @@ export class ImprimirService {
                     padding: 6px 8px;
                 }
                 tr td { text-align: center; border-bottom: 1px solid #e5e7eb; padding: 5px 8px; }
+                td.right, th.right { text-align: right !important; }
                 td, th { padding: 5px 8px; }
                 .right { text-align: right; }
                 .bgblue { background-color: #eeeee4; color: #0F172A; font-weight: 600; }

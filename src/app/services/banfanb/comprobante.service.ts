@@ -14,7 +14,7 @@ export interface Comprobante {
   detalle : string
   tipo: string // debe o haber
   estatus : boolean 
-  items : []
+  items : any[]
 }
 
 
@@ -31,7 +31,7 @@ export interface FID_IComprobante {
 }
 
 export interface FID_IDetalleComprobante {
-	comprobante	 :	number
+	id_comprobante	 :	number
 	cuenta	 :	number
 	debe	 :	number
 	haber	 :	number

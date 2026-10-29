@@ -28,6 +28,7 @@ export interface Politicas {
   tasa: number;
   flat: string;
   tasaflat: number;
+  tasa_anual: number;
   enviar: string;
   numeromaximo: number;
   intervalominimo: number;
@@ -59,7 +60,7 @@ export interface Contrato {
   oficinatutora: string;
   fecha: Date;
   Direccion: Direccion;
-  Ejecutivo: any;
+  Ejecutivo: Ejecutivo[];
   Politicas: Politicas;
   Saldos: Saldos;
 }

@@ -11,13 +11,13 @@ export interface Inversion {
   instrumento: string;
   numero: string;
   pais: string;
-  codigo_isin: any;
+  codigo_isin: string;
   emisor: string;
   custodio: string;
   id_instrumento?: number;
-  fecha_emision: any; // fecha
-  fecha_compra: any; // fecha
-  fecha_vencimiento: any; // fecha
+  fecha_emision: string;
+  fecha_compra: string;
+  fecha_vencimiento: string;
   id_cartera: number;
   id_portafolio: number;
   valor_nominal: number; //doble
@@ -56,6 +56,16 @@ export interface InversionPortafolio {
   estatus: number,
   descripcion: string
   usuario: string
+}
+
+export interface DistribucionInversion {
+  id_inversion: number;
+  id_portafolio: number;
+  porcentaje: number;
+  monto: number;
+  estatus: number;
+  id_plan: number;
+  plan_nombre: string;
 }
 
 @Injectable({

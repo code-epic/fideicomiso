@@ -4,7 +4,7 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 export const environment = {
   production: false,
-  ID : 'ID-003',
+  ID : 'fideicomiso',
   Url: 'http://localhost',
   API: '/v1/api/',
   Hash: ':c521f27fb1b3311d686d511b668e5bd4',
@@ -33,7 +33,10 @@ export const environment = {
     CONSULTAR_PORTAFOLIOS: 'FID_CPortafolios',
     CONSULTAR_PORTAFOLIO: 'FID_CPortafolio',
     INSERTAR_PORTAFOLIO: 'FID_IPortafolio',
+    ACTUALIZAR_PORTAFOLIO: 'FID_UPortafolio',
+    INSERTAR_SALDOS_PLAN: 'FID_ISaldosPlan',
     CONSULTAR_MONTO_PORTAFOLIO: 'FID_CMontoPortafolio',
+    CONSULTAR_SALDO_PORTAFOLIO: 'FID_CSaldoPortafolio',
     CONSULTAR_APORTE_INICIAL: 'FID_CAporteInicial',
     INSERTAR_APORTE_INICIAL: 'FID_IAporteInicial',
     INSERTAR_RETIROS: 'FID_IRetiros',
@@ -49,6 +52,7 @@ export const environment = {
     INSERTAR_COMPROBANTE: 'FID_IComprobante',
     ELIMINAR_COMPROBANTE: 'FID_EComprobante',
     ELIMINAR_COMPROBANTES_INVERSIONES: 'FID_EComprobantesInversiones',
+    ELIMINAR_INTERESES_DISPONIBILIDAD: 'FID_EInteresesDisponibilidad',
     INSERTAR_DETALLE_COMPROBANTE: 'FID_IDetalleComprobante',
     CONSULTAR_MOVIMIENTOS_COMPROBANTE: 'FID_CMovimientosComprobante',
     INSERTAR_MOVIMIVIENTOS_COMPROBANTES: 'FID_IMovimientosComprobantes',
@@ -60,9 +64,15 @@ export const environment = {
     CONSULTAR_CUENTAS: 'FID_CCuentas',
     CONSULTAR_CUENTA: 'FID_CCuenta',
     INSERTAR_CUENTA: 'FID_ICuenta',
+    ACTUALIZAR_CUENTA: 'FID_UCuenta',
     BORRAR_CUENTA: 'FID_DCuentaContable',
     CONSULTAR_PLAN_CONTABLE: 'FID_CPlanContable',
     CONSULTAR_ESTADO_CUENTA: 'FID_CEstadoCuenta',
+
+    // Configuracion de cuentas
+    CONSULTAR_CONFIGURACION_CUENTAS: 'FID_CConfiguracionCuentas',
+    INSERTAR_CONFIGURACION_CUENTA: 'FID_IConfiguracionCuenta',
+    ACTUALIZAR_CONFIGURACION_CUENTA: 'FID_UConfiguracionCuenta',
 
     // Reportes contables
     CONSULTAR_BALANCE_COMPROBACION: 'FID_CBalanceComprobacion',
@@ -76,8 +86,13 @@ export const environment = {
     // Cierres
     INSERTAR_SALDOS_CIERRE: 'FID_ISaldosCierre',
     BORRAR_CIERRE_SEMESTRAL: 'FID_DCierreSemestral',
+    BORRAR_PRECIERRE_SEMESTRAL: 'FID_DPreCierreSemestral',
     CONSULTAR_MOVIMIENTOS_SEMESTRALES: 'FID_CMovimientosSemestrales',
-    VALIDAR_CIERRE:'FID_CValidarCierre',
+    VALIDAR_CIERRE:'FID_CValidarReconciliacion',
+    VERIFICAR_MOVIMIENTOS_D: 'FID_CVerificarMovimientosD',
+    VERIFICAR_CIERRE_MENSUAL: 'FID_CVerificarCierreMensual',
+    BORRAR_CIERRE_MENSUAL: 'FID_DCierreMensual',
+    INSERTAR_SALDOS_CIERRE_MENSUAL: 'FID_ISaldosCierreMensual',
 
     // Rendición de cuentas
     CONSULTAR_PLANES_FIDEICOMISO: 'FID_CPlanesFideicomiso',
@@ -89,33 +104,72 @@ export const environment = {
     INSERTAR_INVESION: 'FID_IInversion',
     ELIMINAR_INVERSION: 'FID_DInversion',
     ACTUALIZAR_INVERSION: 'FID_UInversion',
+    LIQUIDAR_INVERSION_ESTATUS: 'FID_ULiquidarInversion',
     CONSULTAR_EMISOR: 'FID_CEmisor',
     CONSULTAR_CUSTODIA: 'FID_CCustodia',
     CONSULTAR_INSTRUMENTO: 'FID_CInstrumento',
     CONSULTAR_CARTERA_INVERSIONES: 'FID_CCarteraInversiones',
+    CONSULTAR_CARTERA_INVERSIONES_PLAN: 'FID_CCarteraInversionesPlan',
     CONSULTAR_POSICIONES_INVERSIONES: 'FID_CPosicionInversiones',
     CONSULTAR_VENCIMIENTO_INVERSIONES: 'FID_CVencimientoInversiones',
     CONSULTAR_COMPRA_INVERSIONES: 'FID_CCompraInversiones',
     INSERTAR_DEVENGO_INVERIONES: 'FID_IDevengoInversiones',
     INSERTAR_VENCIMIENTO_INVERSIONES: 'FID_IVencimientoInversiones',
+    INSERTAR_LIQUIDACION_INVERSION: 'FID_ILiquidacionInversion',
     INSERTAR_COMPRA_INVERSIONES: 'FID_ICompraInversiones',
     INSERTAR_MOVIMIENTOS_INVERSION: 'FID_IMovInversion',
     ELIMINAR_MOVIMIENTOS_INVERSION: 'FID_DInversion',
     INSERTAR_INVERSIONES_PORTAFOLIO: 'FID_IInversionesPortafolio',
     CONSULTAR_INVERSIONES_PORTAFOLIO: 'FID_CInversionesPortafolio',
     BORRAR_INVERSIONES_PORTAFOLIO: 'FID_DInversionesPortafolio',
+    CONSULTAR_INVERSIONES_PORTAFOLIO_DIST: 'FID_CInversionesPortafolioDist',
+    INSERTAR_DEVENGO_INVERSIONES_DIST: 'FID_IDevengoInversionesDist',
+    INSERTAR_VENCIMIENTO_INVERSIONES_DIST: 'FID_IVencimientoInversionesDist',
+    INSERTAR_COMPRA_INVERSIONES_DIST: 'FID_ICompraInversionesDist',
+    INSERTAR_LIQUIDACION_INVERSION_DIST: 'FID_ILiquidacionInversionDist',
 
     // Capital y comisiones
     CONSULTAR_CAPITAL_ASIGNADO: 'FID_CCapitalAsignado',
     CONSULTAR_SALDO_DISPONIBLE: 'FID_CSaldoDisponible',
     CALCULAR_COMISION: 'FID_CalcularComision',
     INSERTAR_COMISIONES_ADMINISTRATIVAS: 'FID_IComisionesAdministrativas',
+    ELIMINAR_COMISIONES_ADMINISTRATIVAS: 'FID_EComisionesAdministrativas',
+    CONSULTAR_INCREMENTOS_POR_FECHA: 'FID_CIncrementosPorFecha',
+    CONSULTAR_RETIROS_POR_FECHA: 'FID_CRetirosPorFecha',
     INSERTAR_MOVIMIENTO_COMISION: 'FID_IMovComision',
     INSERTAR_MOVIMIENTOS_LOTE: 'FID_BashIPosicion',
     BORRAR_MOVIMIENTOS_LOTE: 'FID_BashDPosicion',
     DISTRIBUIR_INTERESES: 'FID_BashIntereses',
-    INSERTAR_INCREMENTO: 'FID_IIncremento'
-  }, 
+    INSERTAR_INCREMENTO: 'FID_IIncremento',
+
+    // Aportes
+    CONSULTAR_COMPROBANTE_APORTE_INICIAL: 'FID_CComprobanteAporteInicial',
+
+    // Finiquito
+    CONSULTAR_SALDOS_FINIQUITO_PLAN: 'FID_CSaldosFiniquitoPlan',
+    CONSULTAR_INVERSIONES_ACTIVAS_PLAN: 'FID_CInversionesActivasPlan',
+    CONSULTAR_COMPROBANTES_PENDIENTES_PLAN: 'FID_CComprobantesPendientesPlan',
+    ACTUALIZAR_ESTATUS_PLAN: 'FID_UCambiarEstatusPlan',
+    INSERTAR_FINIQUITO: 'FID_IFiniquito',
+    CONSULTAR_FINIQUITO: 'FID_CFiniquito',
+    CONSULTAR_DIAGNOSTICO_FINIQUITO: 'FID_CSeDiagnosticoFiniquito',
+    INSERTAR_MOVIMIENTOS_FINIQUITO: 'FID_IMovimientosFiniquito',
+    ELIMINAR_COMPROBANTES_FINIQUITO: 'FID_EDeleteComprobantesFiniquito',
+    ELIMINAR_MOVIMIENTOS_FINIQUITO: 'FID_EDeleteMovimientosFiniquito',
+    ELIMINAR_SALDOS_FINIQUITO: 'FID_EDeleteSaldosFiniquito',
+    CONSULTAR_CUENTAS_NOMINALES_PLAN: 'FID_CSeCuentasNominalesPlan',
+    AUDITORIA_BALANCE_CERO: 'FID_CSeAuditoriaBalanceCero',
+    CONSULTAR_SALDOS_AJUSTADOS: 'FID_CSeSaldosAjustados',
+    CONSULTAR_ULTIMA_FECHA_LIQUIDACION_712_714: 'FID_CSeUltimaFechaLiquidacion712_714',
+
+    // Intereses por disponibilidad
+    CALCULAR_INTERESES_DISPONIBILIDAD: 'FID_CalcularInteresesDisponibilidad',
+    VERIFICAR_PAGO_INTERESES: 'FID_CVerificarPagoIntereses',
+
+    // Pago de rendimientos / intereses
+    CONSULTAR_DIAGNOSTICO_PAGO_INTERESES: 'FID_CSeDiagnosticoPagoIntereses',
+    INSERTAR_PAGO_INTERESES: 'FID_IPagoIntereses',
+  },
 
   functions: {
     

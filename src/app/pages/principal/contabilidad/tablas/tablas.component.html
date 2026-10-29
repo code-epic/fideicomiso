@@ -1,6 +1,6 @@
 <ngx-ui-loader [loaderId]="'load-config'"></ngx-ui-loader>
 <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" (selectedTabChange)="tabActive($event)"
-  [selectedIndex]="selectedIndex" style="padding:10px;">
+  [(selectedIndex)]="selectedIndex" style="padding:10px;">
   <mat-tab>
     <ng-template mat-tab-label>
       &nbsp;CONSULTA DINAMICA
@@ -250,7 +250,7 @@
 
           <div class="col-md-12 text-right">
             <button mat-flat-button color="primary" (click)="Guardar()" style="height: 50px;">
-              <mat-icon>verified</mat-icon>&nbsp;Registar</button>
+              <mat-icon>verified</mat-icon>&nbsp;{{ esEdicion ? 'Actualizar' : 'Registrar' }}</button>
             &nbsp;&nbsp;
             <button mat-flat-button color="warn" (click)="Limpiar()" style="height: 50px;">
               <mat-icon>delete</mat-icon>&nbsp;Cancelar</button>

@@ -62,6 +62,7 @@ export class GeneralyresultadoComponent implements OnInit {
   public planNombre: string = ''
 
   public lstIndex = [] //Cuentas totalizadores de Fideicomiso
+  public saldosMadres: Map<string, number> = new Map() // Saldo calculado de cuentas madres
 
   constructor(
     private apiService: ApiService,
@@ -195,6 +196,29 @@ export class GeneralyresultadoComponent implements OnInit {
     ]
   }
 
+  calcularSaldosMadres() {
+    this.saldosMadres = new Map()
+    this.lstBalance.forEach(e => {
+      const saldo = e.saldo_actual == null ? 0 : parseFloat(e.saldo_actual)
+      if (saldo === 0) return
+
+      const key = `${e.codigo_padre}.${e.parte}.${e.moneda}.${e.nivel_1}.${e.nivel_2}`
+      const codigoMadre = e.codigo_padre
+
+      if (this.saldosMadres.has(codigoMadre)) {
+        this.saldosMadres.set(codigoMadre, this.saldosMadres.get(codigoMadre) + saldo)
+      } else {
+        this.saldosMadres.set(codigoMadre, saldo)
+      }
+
+      if (this.saldosMadres.has(key)) {
+        this.saldosMadres.set(key, this.saldosMadres.get(key) + saldo)
+      } else {
+        this.saldosMadres.set(key, saldo)
+      }
+    })
+  }
+
   consultarBalance() {
   // Asignar la fecha restada a this.fecha
     if (this.plan != '%') {
@@ -202,7 +226,7 @@ export class GeneralyresultadoComponent implements OnInit {
       this.xAPI.parametros = `${this.fecha},${this.estatus},${this.plan}`
     } else {
       this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_FECHA
-      this.xAPI.parametros = `${this.fecha},${this.estatus}`
+      this.xAPI.parametros = `${this.fecha},${this.estatus},%`
     }
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -215,6 +239,8 @@ export class GeneralyresultadoComponent implements OnInit {
         this.csvHead = data.Cabecera;
         this.csvBody = data.Cuerpo
         this.lstBalance = data.Cuerpo;
+        this.calcularSaldosMadres();
+
         this.HTMLBalance = `
           <table class="asientos">
           <thead>
@@ -239,6 +265,9 @@ export class GeneralyresultadoComponent implements OnInit {
         });
 
         let result = this.acum_saldo_actual - this.total_gastos;
+
+        // Evaluar calcularacero al final: solo si ambos ingresos y gastos son 0
+        this.calcularacero = (this.acum_saldo_actual == 0 && this.total_gastos == 0) ? 1 : 0
 
         this.HTMLBalance += ``;
         this.HTMLResultados += `
@@ -321,7 +350,10 @@ export class GeneralyresultadoComponent implements OnInit {
       this.acum_saldo_actual += parseFloat(saldo_actual)
       this.HTMLResultados += this.getTitulosACuentasBalance(e)
     } else {
-      this.total_gastos = this.posicion==3?this.acum_saldo_actual: 0
+      // Solo guardar total_gastos cuando se procesa la sección GASTOS (posicion==3)
+      if (this.posicion == 3) {
+        this.total_gastos = this.acum_saldo_actual
+      }
       let cadena = `
         <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
           <th class="th-general">${this.lstIndex[this.posicion].nombre} </th>
@@ -332,7 +364,7 @@ export class GeneralyresultadoComponent implements OnInit {
         </tr>
        
       `;
-      if (this.acum_saldo_actual == 0) this.calcularacero = 1
+      // calcularacero se evalúa al final del procesamiento
       
       if (this.tiempo == 0) {
         this.HTMLBalance += cadena
@@ -382,8 +414,10 @@ export class GeneralyresultadoComponent implements OnInit {
     } else {
       let montoMadre = "";
       if (this.tipoVista === 'MADRES') {
+        const saldoCalculado = this.saldosMadres.get(e.codigo_padre) || 0
+        const saldoMostrar = saldoCalculado > 0 ? saldoCalculado : saldo_actual
         montoMadre = `<td class="text-right" style="background-color: #eeeee4; font-weight: bold;">${
-          this.getMoneda(saldo_actual) == "0" ? "0,00" : this.getMoneda(saldo_actual)
+          this.getMoneda(saldoMostrar) == "0" ? "0,00" : this.getMoneda(saldoMostrar)
         }</td>`;
       }
       titulo = `

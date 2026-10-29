@@ -5,6 +5,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -43,33 +44,7 @@ export class ComprobacionComponent implements OnInit {
 
   printv: boolean = false
 
-  public lstFecha = [
-    { id: 0, value: '2023-12-01,2023-12-31,2023-11-30', nombre: 'DICIEMBRE - 2023' },
-    { id: 1, value: '2024-01-01,2024-01-31,2023-12-31', nombre: 'ENERO - 2024' },
-    { id: 2, value: '2024-02-01,2024-02-28,2024-01-31', nombre: 'FEBRERO - 2024' },
-    { id: 3, value: '2024-03-01,2024-03-31,2024-02-28', nombre: 'MARZO - 2024' },
-    { id: 4, value: '2024-04-01,2024-04-30,2024-03-31', nombre: 'ABRIL - 2024' },
-    { id: 5, value: '2024-05-01,2024-05-31,2024-04-30', nombre: 'MAYO - 2024' },
-    { id: 6, value: '2024-06-01,2024-06-30,2024-05-31', nombre: 'JUNIO - 2024' },
-    { id: 7, value: '2024-07-01,2024-07-31,2024-06-30', nombre: 'JULIO - 2024' },
-    { id: 8, value: '2024-08-01,2024-08-31,2024-07-31', nombre: 'AGOSTO - 2024' },
-    { id: 9, value: '2024-09-01,2024-09-30,2024-08-31', nombre: 'SEPTIEMBRE - 2024' },
-    { id: 10, value: '2024-10-01,2024-10-31,2024-09-30', nombre: 'OCTUBRE - 2024' },
-    { id: 11, value: '2024-11-01,2024-11-30,2024-10-31', nombre: 'NOVIEMBRE - 2024' },
-    { id: 12, value: '2024-12-01,2024-12-31,2024-11-30', nombre: 'DICIEMBRE - 2024' },
-    { id: 13, value: '2025-01-01,2025-01-31,2024-12-31', nombre: 'ENERO - 2025' },
-    { id: 14, value: '2025-02-01,2025-02-28,2025-01-31', nombre: 'FEBRERO - 2025' },
-    { id: 15, value: '2025-03-01,2025-03-31,2025-02-28', nombre: 'MARZO - 2025' },
-    { id: 16, value: '2025-04-01,2025-04-30,2025-03-31', nombre: 'ABRIL - 2025' },
-    { id: 17, value: '2025-05-01,2025-05-31,2025-04-30', nombre: 'MAYO - 2025' },
-    { id: 18, value: '2025-06-01,2025-06-30,2025-05-31', nombre: 'JUNIO - 2025' },
-    { id: 19, value: '2025-07-01,2025-07-31,2025-06-30', nombre: 'JULIO - 2025' },
-    { id: 20, value: '2025-08-01,2025-08-31,2025-07-31', nombre: 'AGOSTO - 2025' },
-    { id: 21, value: '2025-09-01,2025-09-30,2025-08-31', nombre: 'SEPTIEMBRE - 2025' },
-    { id: 22, value: '2025-10-01,2025-10-31,2025-09-30', nombre: 'OCTUBRE - 2025' },
-    { id: 23, value: '2025-11-01,2025-11-30,2025-10-31', nombre: 'NOVIEMBRE - 2025' },
-    { id: 24, value: '2025-12-01,2025-12-31,2025-11-30', nombre: 'DICIEMBRE - 2025' },
-  ]
+  public lstFecha: { id: number; value: string; nombre: string }[] = []
 
   public lstIndex = [
     {
@@ -118,6 +93,8 @@ export class ComprobacionComponent implements OnInit {
   public fechaTexto = ''
   public fechai: any
   public mes = 0
+  public lstPlanesFideicomiso: any[] = []
+  public planNombre: string = ''
 
   constructor(
     private apiService: ApiService,
@@ -125,39 +102,123 @@ export class ComprobacionComponent implements OnInit {
     private util: UtilService,
     public formatter: NgbDateParserFormatter,
     private _imprimir: ImprimirService,
-    private cierre: CierreService
+    private cierre: CierreService,
+    private planGuard: PlanGuardService
   ) { }
 
   ngOnInit(): void {
     this.consultarUltimoCierre()
-
+    this.ListarPlanesFideicomiso()
   }
 
   async consultarUltimoCierre() {
     this.ngxService.stopLoader('load-precierre')
     this.fechaultimo = await this.cierre.getUltimoCierre()
+    this.generarMeses()
     this.ngxService.stopLoader('load-precierre')
+  }
+
+  ListarPlanesFideicomiso() {
+    const xAPI: IAPICore = {
+      funcion: 'FID_CPlanesFideicomiso',
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data) => {
+        this.lstPlanesFideicomiso = (data.Cuerpo || []).map((p: any) => {
+          const estatus = parseInt(p.estatus) || 0;
+          const bloqueado = this.planGuard.esBloqueado(estatus);
+          return {
+            ...p,
+            displayName: bloqueado
+              ? `${p.observacion} [${this.planGuard.getNombreEstatus(estatus)}]`
+              : p.observacion
+          };
+        })
+      },
+      error: (err) => console.error(err)
+    })
+  }
+
+  seleccionarPlan() {
+    if (this.plan === '%') {
+      this.planNombre = 'TODOS LOS PLANES'
+    } else {
+      const plan = this.lstPlanesFideicomiso.find(p => p.id == this.plan)
+      this.planNombre = plan ? (plan.displayName || plan.observacion) : ''
+    }
+  }
+
+  onMesChange(event: any) {
+    this.mes = Number(event.value)
+  }
+
+  getNombrePlan(): string {
+    if (this.plan === '%') return 'TODOS LOS PLANES';
+    const plan = this.lstPlanesFideicomiso.find(p => p.id == this.plan);
+    return plan ? (plan.displayName || plan.observacion || plan.fideicomiso) : '';
+  }
+
+  generarMeses() {
+    const meses = []
+    const hoy = new Date()
+    const inicio = new Date(2023, 11, 1)
+
+    const fecha = new Date(inicio)
+
+    while (fecha <= hoy) {
+      const anio = fecha.getFullYear()
+      const mes = fecha.getMonth()
+
+      const desde = new Date(anio, mes, 1)
+      const hasta = new Date(anio, mes + 1, 0)
+      const vienen = new Date(anio, mes, 0)
+
+      const formato = (d: Date) => {
+        const y = d.getFullYear()
+        const m = String(d.getMonth() + 1).padStart(2, '0')
+        const dia = String(d.getDate()).padStart(2, '0')
+        return `${y}-${m}-${dia}`
+      }
+
+      const nombreMes = desde.toLocaleDateString('es-ES', { month: 'long' }).toUpperCase()
+
+      meses.push({
+        id: 0,
+        value: `${formato(desde)},${formato(hasta)},${formato(vienen)}`,
+        nombre: `${nombreMes} - ${anio}`
+      })
+
+      fecha.setMonth(fecha.getMonth() + 1)
+    }
+
+    this.lstFecha = meses.reverse()
+    this.lstFecha.forEach((item, index) => {
+      item.id = index
+    })
+    this.mes = 0
   }
 
   ConsultarComprobacion() {
     this.ngxService.startLoader('load-cont')
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
-    this.xAPI.parametros = `${this.lstFecha[this.mes].value},S`
+    const mesIndex = Number(this.mes)
+    this.xAPI.parametros = `${this.lstFecha[mesIndex].value},M,${this.plan}`
     this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         this.lstComprobacion = data.Cuerpo;
         this.HTMLComprobacion = `
-          <table class="asientos" >
-                          
-          <thead background-color: #e1e1d154; height: 35px;>
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">
-              <th style="text-align: left; " >DESCRIPCION DE LA CUENTA</th>
-              <th style="text-align: center;">SALDO INICIAL</th>
-              <th style="text-align: center;">MONTO DEBE</th>
-              <th style="text-align: center;">MONTO HABER</th>
-              <th style="text-align: center;">SALDO ACTUAL</th>
+          <table class="asientos" style="width: 100%; min-width: 700px; border-collapse: collapse; font-size: 11px;">
+          <thead>
+            <tr style="border: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">
+              <th style="text-align: left; padding: 6px 10px; width: 46%;">DESCRIPCION DE LA CUENTA</th>
+              <th style="text-align: right; padding: 6px 12px; width: 13%;">SALDO INICIAL</th>
+              <th style="text-align: right; padding: 6px 12px; width: 13%;">MONTO DEBE</th>
+              <th style="text-align: right; padding: 6px 12px; width: 13%;">MONTO HABER</th>
+              <th style="text-align: right; padding: 6px 12px; width: 15%;">SALDO ACTUAL</th>
             </tr>
           </thead>
           <tbody>
@@ -176,21 +237,21 @@ export class ComprobacionComponent implements OnInit {
         let result = this.lstIndex[4].haber - this.lstIndex[3].debe;
 
         this.HTMLComprobacion += `
-            <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
-              <th >${this.lstIndex[this.posicion].nombre} </th>
-              <th class="text-right">${this.getMoneda(this.acum_saldo_inicial) == "0"
+            <tr style="border-top: 2px solid #999; border-bottom: 1px solid #ccc; background-color: #d4d4c8; height: 40px;">  
+              <th style="padding: 8px 10px; text-align: left;">${this.lstIndex[this.posicion].nombre} </th>
+              <th style="padding: 8px 12px; text-align: right;">${this.getMoneda(this.acum_saldo_inicial) == "0"
             ? "-"
             : this.getMoneda(this.acum_saldo_inicial)
           }</th>
-              <th class="text-right">${this.getMoneda(this.acumuladord) == "0"
+              <th style="padding: 8px 12px; text-align: right;">${this.getMoneda(this.acumuladord) == "0"
             ? "-"
             : this.getMoneda(this.acumuladord)
           }</th>
-              <th class="text-right">${this.getMoneda(this.acumuladorh) == "0"
+              <th style="padding: 8px 12px; text-align: right;">${this.getMoneda(this.acumuladorh) == "0"
             ? "-"
             : this.getMoneda(this.acumuladorh)
           }</th>
-              <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+              <th style="padding: 8px 12px; text-align: right;">${this.getMoneda(this.acum_saldo_actual) == "0"
             ? "-"
             : this.getMoneda(this.acum_saldo_actual)
           }</th>
@@ -227,17 +288,17 @@ export class ComprobacionComponent implements OnInit {
         "." +
         e.nivel_2;
       titulo = `
-      <tr>  
-          <td>${txt + ". " + e.descripcion.toUpperCase()}</td>
-          <td class="text-right">${this.getMoneda(saldo_inicial) == "0"
+      <tr style="border-bottom: 1px solid #eee;">  
+          <td style="padding: 4px 10px;">${txt + ". " + e.descripcion.toUpperCase()}</td>
+          <td style="text-align: right; padding: 4px 12px;">${this.getMoneda(saldo_inicial) == "0"
           ? "-"
           : this.getMoneda(saldo_inicial)
         }</td>
-          <td class="text-right">${this.getMoneda(debe) == "0" ? "-" : this.getMoneda(debe)
+          <td style="text-align: right; padding: 4px 12px;">${this.getMoneda(debe) == "0" ? "-" : this.getMoneda(debe)
         }</td>
-          <td class="text-right">${this.getMoneda(haber) == "0" ? "-" : this.getMoneda(haber)
+          <td style="text-align: right; padding: 4px 12px;">${this.getMoneda(haber) == "0" ? "-" : this.getMoneda(haber)
         }</td>
-          <td class="text-right">${this.getMoneda(saldo_actual) == "0"
+          <td style="text-align: right; padding: 4px 12px;">${this.getMoneda(saldo_actual) == "0"
           ? "-"
           : this.getMoneda(saldo_actual)
         }</td>
@@ -270,27 +331,27 @@ export class ComprobacionComponent implements OnInit {
       this.lstIndex[this.posicion].haber = this.acumuladorh;
 
       this.HTMLComprobacion += `
-        <tr style="border: 0px; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
-          <th >${this.lstIndex[this.posicion].nombre} </th>
-          <th class="text-right">${this.getMoneda(this.acum_saldo_inicial) == "0"
+        <tr style="border-top: 2px solid #999; border-bottom: 1px solid #ccc; background-color: #e1e1d154; height: 35px;">  
+          <th style="padding: 6px 10px; text-align: left;">${this.lstIndex[this.posicion].nombre} </th>
+          <th style="padding: 6px 12px; text-align: right;">${this.getMoneda(this.acum_saldo_inicial) == "0"
           ? "-"
           : this.getMoneda(this.acum_saldo_inicial)
         }</th>
-          <th class="text-right">${this.getMoneda(this.acumuladord) == "0"
+          <th style="padding: 6px 12px; text-align: right;">${this.getMoneda(this.acumuladord) == "0"
           ? "-"
           : this.getMoneda(this.acumuladord)
         }</th>
-          <th class="text-right">${this.getMoneda(this.acumuladorh) == "0"
+          <th style="padding: 6px 12px; text-align: right;">${this.getMoneda(this.acumuladorh) == "0"
           ? "-"
           : this.getMoneda(this.acumuladorh)
         }</th>
-          <th class="text-right">${this.getMoneda(this.acum_saldo_actual) == "0"
+          <th style="padding: 6px 12px; text-align: right;">${this.getMoneda(this.acum_saldo_actual) == "0"
           ? "-"
           : this.getMoneda(this.acum_saldo_actual)
         }</th>
         </tr>
         <tr>  
-          <td  colspan="5">${this.getTitulosACuentas(e)} </td>
+          <td colspan="5" style="padding: 4px 10px;">${this.getTitulosACuentas(e)} </td>
         </tr>
         
       `;

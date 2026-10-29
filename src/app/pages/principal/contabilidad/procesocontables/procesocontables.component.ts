@@ -9,7 +9,9 @@ import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { FID_IComprobante, FID_IDetalleComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { LPosicionInversiones } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 import { environment } from 'src/environments/environment';
+import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -80,7 +82,7 @@ export class ProcesocontablesComponent implements OnInit {
 
 
   public IDComprobante: FID_IDetalleComprobante = {
-    comprobante: 0,
+    id_comprobante: 0,
     cuenta: 0,
     debe: 0,
     haber: 0,
@@ -99,6 +101,7 @@ export class ProcesocontablesComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private util: UtilService,
     private cierre: CierreService,
+    private planGuard: PlanGuardService,
     public formatter: NgbDateParserFormatter,
   ) { }
 
@@ -114,6 +117,24 @@ export class ProcesocontablesComponent implements OnInit {
     this.fechaf = this.fechai
 
     this.estatus = this.semestral ? 'S' : 'M'
+
+    // Verificar si ya existe cierre semestral
+    if (this.semestral) {
+      try {
+        const verifData = await firstValueFrom(this.apiService.Ejecutar({
+          funcion: 'FID_CFechaMaxPreCierreSemestral',
+          parametros: '',
+          valores: ''
+        }))
+        const fecha = verifData?.Cuerpo?.[0]?.fecha
+        const fechaCierre = this.util.ConvertirFechaDB(this.fechaultimo)
+        this.yaProcesadoCierreSemestral = !!(fecha && fecha.substring(0, 10) === fechaCierre)
+      } catch (e) {
+        this.yaProcesadoCierreSemestral = false
+      }
+    } else {
+      this.yaProcesadoCierreSemestral = false
+    }
 
     this.ngxService.stopLoader('load-precierre')
   }
@@ -138,14 +159,22 @@ export class ProcesocontablesComponent implements OnInit {
     this.xAPI.valores = ''
     if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
     this.xAPI.parametros = fini + ',' + this.estatus
-    console.log(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        console.log('ARTE ... ', data)
         this.lstMovimientos = data.Cuerpo
+
+        const filtered = [];
+        for (const e of this.lstMovimientos) {
+          const planId = e.id_plan || e.plan;
+          if (!planId || !(await this.planGuard.planBloqueado(planId))) {
+            filtered.push(e);
+          }
+        }
+        this.lstMovimientos = filtered;
+
         this.lstMovimientos.map(e => {
-          this.total_debe += parseFloat(e.debe)
-          this.total_haber += parseFloat(e.haber)
+          this.total_debe += parseFloat(e.debe) || 0
+          this.total_haber += parseFloat(e.haber) || 0
         })
         this.blista = true
 
@@ -169,47 +198,84 @@ export class ProcesocontablesComponent implements OnInit {
     }
     let fini = this.util.ConvertirFechaDB(this.fechai)
 
-    this.ngxService.stopLoader('load-precierre')
-    this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIVIENTOS_COMPROBANTES
-    if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
-    this.xAPI.parametros = fini + ',' + this.estatus    
-    this.xAPI.valores = ''
+    this.ngxService.startLoader('load-precierre')
 
-    console.log('GenerarPrecierre ... ', this.xAPI)
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        console.log('GenerarPrecierre ... ', data)
-        this.apiService.Mensaje(
-          "Proceso exitoso",
-          "Se ha realizado el Precierre",
-          "success",
-          "Cierre"
-        )
+    // Si es semestral, borrar movimientos S existentes antes de insertar nuevos
+    const ejecutar = async () => {
+      if (this.estatus === 'S') {
+        // Verificar si ya existe cierre semestral
+        try {
+          const verifData = await firstValueFrom(this.apiService.Ejecutar({
+            funcion: 'FID_CFechaMaxPreCierreSemestral',
+            parametros: '',
+            valores: ''
+          }))
+          const fecha = verifData?.Cuerpo?.[0]?.fecha
+          const fechaCierre = this.util.ConvertirFechaDB(this.fechaultimo)
+          if (fecha && fecha.substring(0, 10) === fechaCierre) {
+            this._snackBar.open('Ya existe un cierre semestral para esta fecha', 'OK')
+            this.ngxService.stopLoader('load-precierre')
+            return
+          }
+        } catch (e) {
+          console.error('Error verificando cierre semestral:', e)
+        }
 
-        this.semestral = false;
-        this.estatus = 'M';
-        this.consultarUltimoCierre()
-        this.cierre.actualizarCierres()
-        this.ngxService.stopLoader('load-precierre')
-        this.lstMovimientos = []
-        this.blista = false
-      },
-
-      (error) => {
-        console.error(error)
+        try {
+          const fechaCierre = this.util.ConvertirFechaDB(this.fechaultimo)
+          await firstValueFrom(this.apiService.Ejecutar({
+            funcion: environment.xApi.BORRAR_PRECIERRE_SEMESTRAL,
+            parametros: fechaCierre,
+            valores: ''
+          }));
+        } catch (e) {
+          console.error('Error borrando movimientos S existentes:', e);
+        }
       }
-    )
+
+      this.xAPI.funcion = environment.xApi.INSERTAR_MOVIMIVIENTOS_COMPROBANTES
+      if(this.estatus == "S") fini = this.util.ConvertirFechaDB(this.fechaultimo)
+      this.xAPI.parametros = fini + ',' + this.estatus    
+      this.xAPI.valores = ''
+
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        async data => {
+          this.apiService.Mensaje(
+            "Proceso exitoso",
+            "Se ha realizado el Precierre",
+            "success",
+            "Cierre"
+          )
+
+          this.semestral = false;
+          this.estatus = 'M';
+          this.consultarUltimoCierre()
+          this.cierre.actualizarCierres()
+          this.ngxService.stopLoader('load-precierre')
+          this.lstMovimientos = []
+          this.blista = false
+        },
+
+        (error) => {
+          console.error(error);
+          this.ngxService.stopLoader('load-precierre');
+          this._snackBar.open('Error al generar el precierre. Intente de nuevo.', 'Ok');
+        }
+      )
+    }
+
+   ejecutar()
   }
 
   getMoneda(monto: number): string {
     return this.util.ConvertirMoneda( monto );
   }
 
-  //Cierre semestral a plan fijo (soporte multi-plan pendiente)
-  iniciarComprobante(fecha) {
+  //Cierre semestral multi-plan
+  iniciarComprobante(fecha, planId: number) {
     this.Comprobante.descripcion = 'CIERRE SEMESTRAL ASIENTO ' + fecha
     this.Comprobante.detalle = 'CIERRE SEMESTRAL ASIENTO ' + fecha
-    this.Comprobante.plan = 1
+    this.Comprobante.plan = planId
     this.Comprobante.fecha_ejercicio = this.util.FechaActual()
     this.Comprobante.fecha_operacion = fecha
     this.Comprobante.debe = 0.00
@@ -226,37 +292,74 @@ export class ProcesocontablesComponent implements OnInit {
     this.procesando = true
     let fecha = this.util.ConvertirFechaDB(this.fechaultimo)
     
-    // Verificar si ya existe comprobante semestral para esta fecha
-    this.xAPI.funcion = environment.xApi.CONSULTAR_COMPROBANTES
+    // Consultar todos los planes activos
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PLANES_FIDEICOMISO
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     
     this.apiService.Ejecutar(this.xAPI).subscribe({
-      next: (data) => {
-        // Buscar comprobante semestral existente para esta fecha
-        let comprobanteExistente = null
-        if (data.Cuerpo) {
-          comprobanteExistente = data.Cuerpo.find((c: any) => 
-            c.llave === 'S' && c.fecha_operacion === fecha
-          )
-        }
+      next: async (data) => {
+        const planes = (data.Cuerpo || []).filter((p: any) => Number(p.estatus) === 1 || Number(p.estatus) === 2)
         
-        if (comprobanteExistente) {
-          // Eliminar comprobante existente antes de crear el nuevo
-          this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTE
-          this.xAPI.parametros = comprobanteExistente.id
-          this.xAPI.valores = ''
-          this.apiService.Ejecutar(this.xAPI).subscribe({
-            next: () => {
-              this.crearComprobanteSemestral(fecha)
-            },
-            error: () => {
-              this.procesando = false
-            }
-          })
-        } else {
-          this.crearComprobanteSemestral(fecha)
+        if (planes.length === 0) {
+          this._snackBar.open('No hay planes activos para procesar', 'OK')
+          this.procesando = false
+          return
         }
+
+        // Confirmar antes de procesar
+        const result = await Swal.fire({
+          title: 'Cierre Semestral',
+          text: `Se procesará el cierre semestral para ${planes.length} plan(es) activo(s). ¿Continuar?`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Si, procesar',
+          cancelButtonText: 'Cancelar'
+        })
+
+        if (!result.isConfirmed) {
+          this.procesando = false
+          return
+        }
+
+        // Eliminar comprobantes semestrales existentes para esta fecha
+        this.xAPI.funcion = environment.xApi.CONSULTAR_COMPROBANTES
+        this.xAPI.parametros = ''
+        this.xAPI.valores = ''
+        
+        this.apiService.Ejecutar(this.xAPI).subscribe({
+          next: async (dataComp) => {
+            const existentes = (dataComp.Cuerpo || []).filter((c: any) => 
+              c.llave === 'S' && c.fecha_operacion === fecha
+            )
+            
+            // Eliminar existentes uno por uno
+            for (const comp of existentes) {
+              await new Promise<void>((resolve) => {
+                this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTE
+                this.xAPI.parametros = comp.id
+                this.xAPI.valores = ''
+                this.apiService.Ejecutar(this.xAPI).subscribe({
+                  next: () => resolve(),
+                  error: () => resolve()
+                })
+              })
+            }
+
+            // Crear comprobante por cada plan activo
+            for (const plan of planes) {
+              await this.crearComprobanteSemestral(fecha, plan.id)
+            }
+            
+            this.procesando = false
+            this._snackBar.open(`Cierre semestral procesado para ${planes.length} plan(es)`, 'OK')
+          },
+          error: () => {
+            this.procesando = false
+          }
+        })
       },
       error: () => {
         this.procesando = false
@@ -264,68 +367,76 @@ export class ProcesocontablesComponent implements OnInit {
     })
   }
 
-  crearComprobanteSemestral(fecha: string) {
-    this.lstData = []
-    this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
-    this.xAPI.parametros = fecha + ',1'
-    this.xAPI.valores = ''
+  crearComprobanteSemestral(fecha: string, planId: number) {
+    return new Promise<void>((resolve) => {
+      this.lstData = []
+      this.xAPI.funcion = environment.xApi.CONSULTAR_MOVIMIENTOS_SEMESTRALES
+      this.xAPI.parametros = fecha + ',' + planId
+      this.xAPI.valores = ''
 
-    this.iniciarComprobante(fecha)
+      this.iniciarComprobante(fecha, planId)
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-        console.log(data)
-        let debe = 0
-        let haber = 0
-        data.Cuerpo.forEach(e => {
-          debe += e.disminuye == "DEBE" ? parseFloat(e.saldo) : 0
-          haber += e.disminuye == "HABER" ? parseFloat(e.saldo) : 0
-          let dc = {
-            'comprobante': 0,
-            'cuenta': e.id_cuenta,
-            'debe': e.disminuye == "DEBE" ? parseFloat(e.saldo) : 0,
-            'haber': e.disminuye == "HABER" ? parseFloat(e.saldo) : 0,
-            'fecha_ejercicio': fecha,
-            'fecha_operacion': fecha
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        data => {
+          if (!data.Cuerpo || data.Cuerpo.length === 0) {
+            resolve()
+            return
           }
-          this.lstData.push(dc)
-        });
 
-        let saldo = debe - haber
-        let dcx = {
-          'comprobante': 0,
-          'cuenta': '40',
-          'debe': 0,
-          'haber': saldo,
-          'fecha_ejercicio': fecha,
-          'fecha_operacion': fecha
+          let debe = 0
+          let haber = 0
+          data.Cuerpo.forEach(e => {
+            debe += e.disminuye == "DEBE" ? parseFloat(e.saldo) : 0
+            haber += e.disminuye == "HABER" ? parseFloat(e.saldo) : 0
+            let dc = {
+              'comprobante': 0,
+              'cuenta': e.id_cuenta,
+              'debe': e.disminuye == "DEBE" ? parseFloat(e.saldo) : 0,
+              'haber': e.disminuye == "HABER" ? parseFloat(e.saldo) : 0,
+              'fecha_ejercicio': fecha,
+              'fecha_operacion': fecha
+            }
+            this.lstData.push(dc)
+          });
+
+          let saldo = debe - haber
+          if (saldo > 0) {
+            // Utilidad → HABER 734 (aumenta patrimonio)
+            let dcx = {
+              'comprobante': 0,
+              'cuenta': '40',
+              'debe': 0,
+              'haber': saldo,
+              'fecha_ejercicio': fecha,
+              'fecha_operacion': fecha
+            }
+            this.lstData.push(dcx)
+          } else if (saldo < 0) {
+            // Pérdida → DEBE 734 (disminuye patrimonio)
+            let dcx = {
+              'comprobante': 0,
+              'cuenta': '40',
+              'debe': Math.abs(saldo),
+              'haber': 0,
+              'fecha_ejercicio': fecha,
+              'fecha_operacion': fecha
+            }
+            this.lstData.push(dcx)
+          }
+          // Si saldo == 0 → no se agrega línea 734
+          this.Comprobante.debe = debe
+          this.Comprobante.haber = debe
+
+          // Insertar directamente sin confirmación (ya se confirmó en el flujo principal)
+          this.Acepar().then(() => {
+            resolve();
+          })
+        },
+        error => {
+          resolve()
         }
-        this.lstData.push(dcx)
-        this.Comprobante.debe = debe
-        this.Comprobante.haber = debe
-        Swal.fire({
-          title: 'Esta seguro que desea realizar la operación de cierre semestral',
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Si',
-          cancelButtonText: 'No',
-          allowEscapeKey: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.Acepar().then(() => {
-              this.procesando = false
-            })
-          } else {
-            this.procesando = false
-          }
-        })
-      },
-      error => {
-        this.procesando = false
-      }
-    )
+      )
+    })
   }
 
   Acepar(): Promise<void> {
@@ -338,13 +449,34 @@ export class ProcesocontablesComponent implements OnInit {
       this.xAPI.valores = JSON.stringify(this.Comprobante);
       this.apiService.Ejecutar(this.xAPI).subscribe(
         async (data) => {
-          
-          await this.GuardarDetalle(data.msj);
-          this.ngxService.stopLoader("load-cont");
-          this.lstData = [];
-          resolve();
+          try {
+            await this.GuardarDetalle(data.msj);
+            this.ngxService.stopLoader("load-cont");
+            this.lstData = [];
+            resolve();
+          } catch (error) {
+            // Rollback: eliminar comprobante si falló el detalle
+            console.error('Error al guardar detalle, eliminando comprobante:', error)
+            this.xAPI.funcion = environment.xApi.ELIMINAR_COMPROBANTE
+            this.xAPI.parametros = data.msj
+            this.xAPI.valores = ''
+            this.apiService.Ejecutar(this.xAPI).subscribe({
+              next: () => {
+                this.ngxService.stopLoader("load-cont");
+                this.lstData = [];
+                resolve();
+              },
+              error: () => {
+                this.ngxService.stopLoader("load-cont");
+                this.lstData = [];
+                resolve();
+              }
+            })
+          }
         },
         (err) => {
+          console.error('Error al insertar comprobante:', err)
+          this.ngxService.stopLoader("load-cont");
           resolve();
         }
       );
@@ -352,24 +484,21 @@ export class ProcesocontablesComponent implements OnInit {
   }
 
   async GuardarDetalle(comprobante: number) {
-    this.IDComprobante.comprobante = comprobante;
-    await this.lstData.map(async (e) => {      
+    this.IDComprobante.id_comprobante = comprobante;
+    for (const e of this.lstData) {
       this.IDComprobante.debe = e.debe
       this.IDComprobante.haber = e.haber
       this.IDComprobante.fecha_ejercicio = e.fecha_ejercicio
       this.IDComprobante.fecha_operacion = e.fecha_operacion
       this.IDComprobante.cuenta = e.cuenta
-      this.IDComprobante.plan = 1
+      this.IDComprobante.plan = this.Comprobante.plan
 
       this.xAPI.funcion = environment.xApi.INSERTAR_DETALLE_COMPROBANTE
       this.xAPI.parametros = "";
-      this.xAPI.valores = JSON.stringify(this.IDComprobante);      
+      this.xAPI.valores = JSON.stringify(this.IDComprobante);
 
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => { },
-        (err) => { }
-      );
-    })
+      await firstValueFrom(this.apiService.Ejecutar(this.xAPI));
+    }
     this.ConsultarComprobante()
   }
 
@@ -416,17 +545,8 @@ export class ProcesocontablesComponent implements OnInit {
           fechaUltimoAux.setUTCDate(fechaUltimoAux.getUTCDate() + 2);
           const fechaUltimoUTCAux = fechaUltimoAux.toISOString();
 
-          console.log('ultimoPrecierreDate', ultimoPrecierreDate);
-          console.log('fechaAPrecerrarDate', fechaAPrecerrarDate);
-          console.log('fechaUltimoUTCAux', fechaUltimoUTCAux);
-          console.log('fechaAPrecerrarDate < ultimoPrecierreDate', fechaAPrecerrarDate < ultimoPrecierreDate);
-          console.log('fechaAPrecerrarDate >= fechaUltimoUTCAux', fechaAPrecerrarDate >= fechaUltimoUTCAux);
-          console.log('fechaAPrecerrarDate == ultimoPrecierreDate', fechaAPrecerrarDate == ultimoPrecierreDate);
-          
-
           if (this.cierre.getSemestral(this.util.ConvertirFechaHumana(fechaAPrecerrar)) && this.estatus == 'S') {            
               this.ValidarPreCierreSemestral()
-               console.log('ValidarPreCierre precierre semestral ... ', this.xAPI)
               return;
           }
 
@@ -513,12 +633,11 @@ export class ProcesocontablesComponent implements OnInit {
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.ngxService.startLoader('load-precierre')
-    console.log('ValidarPreCierreSemestral ... ', this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log('ValidarPreCierreSemestral ... ', data)
-        if (data.Cuerpo != undefined ){
-          let fentrada = data.Cuerpo[0].fecha.substring(0, 10);
+        const fecha = data?.Cuerpo?.[0]?.fecha;
+        if (fecha) {
+          let fentrada = fecha.substring(0, 10);
           let finicio = this.util.ConvertirFechaDB(this.fechai);          
           
           if (fentrada == finicio){            
@@ -530,9 +649,11 @@ export class ProcesocontablesComponent implements OnInit {
             )
             this.ngxService.stopLoader('load-precierre')
           }else{
-            console.log('ValidarPreCierreSemestral GenerarPrecierre semestral ... ')
             this.GenerarPrecierre()
-          }      
+          }
+        } else {
+          // No hay precierre semestral previo → proceder
+          this.GenerarPrecierre()
         }
       },
       err => {

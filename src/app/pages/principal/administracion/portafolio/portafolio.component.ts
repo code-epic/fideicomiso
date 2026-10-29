@@ -34,6 +34,7 @@ export class PortafolioComponent implements OnInit {
 
   public porta_insert : string = ''
   public porta_search : string = 'none'
+  public esEdicion : boolean = false
   constructor(private apiService: ApiService,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
@@ -54,6 +55,7 @@ export class PortafolioComponent implements OnInit {
 
   editar(e) {
     this.Portafolio = e
+    this.esEdicion = true
     this.porta_insert = ''
     this.porta_search = 'none'
   }
@@ -61,6 +63,7 @@ export class PortafolioComponent implements OnInit {
   Listar() {
     this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIOS
     this.xAPI.parametros = ''
+    this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
 
       (data) => {
@@ -121,34 +124,64 @@ export class PortafolioComponent implements OnInit {
 
 
   Guardar() {
-
-    if (this.Portafolio.codigo == "") {
-      this._snackBar.open('Debe verificar todos los campos...', 'dance')
+    if (!this.Portafolio.descripcion || this.Portafolio.descripcion.trim() === '') {
+      this._snackBar.open('Debe indicar la descripción.', 'Ok')
       return
     }
-    this.ngxService.startLoader('load-inver')
-    // var obj = {
-    //   "coleccion": "portafolio",
-    //   "objeto": this.Portafolio,
-    //   "donde": `{\"codigo\":\"${this.Portafolio.codigo}\"}`,
-    //   "driver": "MDBFIDE",
-    //   "upsert": true
-    // }
-    this.xAPI.funcion = environment.xApi.INSERTAR_PORTAFOLIO
-    this.xAPI.parametros = ''
-    this.xAPI.valores = JSON.stringify(this.Portafolio)
+    if (!this.Portafolio.moneda || this.Portafolio.moneda.trim() === '') {
+      this._snackBar.open('Debe seleccionar la moneda.', 'Ok')
+      return
+    }
+    if (!this.Portafolio.porcentaje || this.Portafolio.porcentaje <= 0) {
+      this._snackBar.open('Debe indicar el máximo de inversión.', 'Ok')
+      return
+    }
 
+    this.ngxService.startLoader('load-inver')
+
+    this.Portafolio.frecuencia = this.Portafolio.frecuencia || ''
+    this.Portafolio.distribucion = this.Portafolio.distribucion || ''
+    this.Portafolio.tipo = this.Portafolio.tipo || ''
+    this.Portafolio.numerocuenta = this.Portafolio.numerocuenta || ''
+    this.Portafolio.valormercado = this.Portafolio.valormercado || ''
+    this.Portafolio.autor = this.Portafolio.autor || ''
+
+    if (this.esEdicion) {
+      this.xAPI.funcion = environment.xApi.ACTUALIZAR_PORTAFOLIO
+      this.xAPI.parametros = `${this.Portafolio.codigo},${this.Portafolio.descripcion},${this.Portafolio.moneda},${this.Portafolio.tipo},${this.Portafolio.frecuencia},${this.Portafolio.distribucion},${this.Portafolio.numerocuenta},${this.Portafolio.valormercado}`
+      this.xAPI.valores = ''
+    } else {
+      this.xAPI.funcion = environment.xApi.INSERTAR_PORTAFOLIO
+      this.xAPI.parametros = ''
+      this.xAPI.valores = JSON.stringify(this.Portafolio)
+    }
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
+        this.apiService.Mensaje('Proceso exitoso', 'Portafolio guardado correctamente', 'success', 'portafolio')
         this.ngxService.stopLoader('load-inver')
+        this.esEdicion = false
         this.Limpiar()
+        this.Listar()
+        this.porta_insert = 'none'
+        this.porta_search = ''
       },
       (error) => {
         console.error(error)
+        this.ngxService.stopLoader('load-inver')
       }
     )
+  }
+
+  soloNumerico(event: KeyboardEvent): boolean {
+    const permitidas = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'F5'];
+    if (permitidas.includes(event.key)) return true;
+    if (event.ctrlKey || event.metaKey) return true;
+    if (event.key.length === 1 && !/^[0-9.]$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
   }
 
 

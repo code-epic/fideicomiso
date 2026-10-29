@@ -28,6 +28,7 @@ export class EstadocuentaComponent implements OnInit {
   public saldoInicial: number = 0
   public saldoFinal: number = 0
   public lstMovimientos: any[] = []
+  public mostrarAviso: boolean = false
 
   constructor(
     public dialogRef: MatDialogRef<EstadocuentaComponent>,
@@ -63,6 +64,14 @@ export class EstadocuentaComponent implements OnInit {
     if (this.desde == undefined || this.hasta == undefined) {
       return
     }
+
+    this.mostrarAviso = false
+    const fecha = new Date(this.desde)
+    const corte = new Date('2026-07-31')
+    if (fecha < corte && this.Contrato.numero != '1') {
+      this.mostrarAviso = true
+    }
+
     this.ngxService.startLoader('load-EstadoCuenta')
     let xAPI: IAPICore = {
       funcion: environment.xApi.CONSULTAR_ESTADO_CUENTA_PLAN,

@@ -46,6 +46,8 @@
                 <mat-form-field appearance="outline">
                     <mat-label>Máximo de inversión</mat-label>
                     <input matInput placeholder="Máximo de inversión"
+                        type="number"
+                        (keypress)="soloNumerico($event)"
                         [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="Portafolio.porcentaje" value="{{Portafolio.porcentaje}}">
                 </mat-form-field>

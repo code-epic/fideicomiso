@@ -39,6 +39,8 @@ export class ListadosComponent implements OnInit {
   public fdesde : string = '2023-12-01'
   public fhasta : string = '2023-12-31'
   public fecha_vienen : string = '2023-11-30'
+  public plan: string = '%'
+  public lstPlanesFideicomiso: any[] = []
 
   public lstFecha = [
     {id : '2023-12-01,2023-12-31,2023-11-30', value: 'DICIEMBRE'},
@@ -108,6 +110,21 @@ export class ListadosComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.ListarPlanesFideicomiso()
+  }
+
+  ListarPlanesFideicomiso() {
+    const xAPI: IAPICore = {
+      funcion: 'FID_CPlanesFideicomiso',
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data) => {
+        this.lstPlanesFideicomiso = data.Cuerpo || []
+      },
+      error: (err) => console.error(err)
+    })
   }
 
 
@@ -120,7 +137,7 @@ export class ListadosComponent implements OnInit {
 
   consultarBalance() {
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
-    this.xAPI.parametros = `${this.fecha}`
+    this.xAPI.parametros = `${this.fecha},S,${this.plan}`
     // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'
     this.xAPI.valores = "";
 
@@ -323,7 +340,7 @@ export class ListadosComponent implements OnInit {
    
     this.xAPI.funcion = environment.xApi.CONSULTAR_BALANCE_COMPROBACION
     // this.xAPI.parametros = "2023-08-01,2023-08-31,2023-07-31";
-    this.xAPI.parametros = `${this.fdesde},${this.fhasta},${this.fecha_vienen}`
+    this.xAPI.parametros = `${this.fdesde},${this.fhasta},${this.fecha_vienen},${this.plan}`
     // this.xAPI.parametros = '2023-06-01,2023-06-30,2023-05-31'
     this.xAPI.valores = "";
 

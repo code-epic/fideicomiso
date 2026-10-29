@@ -47,8 +47,8 @@
           <mat-label>Frecuencia</mat-label>
           <mat-select placeholder="Frecuencia" [(ngModel)]="estatus">
             <mat-option value='M'>MENSUAL</mat-option>
+            <mat-option value='D'>INTERESES DISPONIBILIDAD</mat-option>
             <mat-option value='S'>CIERRE SEMESTRAL</mat-option>
-            <!-- <mat-option value='S'>SEMESTRAL</mat-option> -->
           </mat-select>
     
         </mat-form-field>
@@ -60,7 +60,7 @@
     <div class="row">
 
       <div class="col-md-6 ">
-        <button *ngIf="semestral" mat-flat-button color="warn" (click)="consultarValoresSemestrales()" [disabled]="procesando" style="height: 50px;">
+        <button *ngIf="semestral && !yaProcesadoCierreSemestral" mat-flat-button color="warn" (click)="consultarValoresSemestrales()" [disabled]="procesando" style="height: 50px;">
           <mat-icon>print</mat-icon>&nbsp;Generar comprobante semestral
         </button>
       </div>
@@ -185,9 +185,6 @@
          mat-flat-button color="primary" (click)="ValidarPreCierre()" style="height: 50px;">
           <mat-icon>verified</mat-icon>&nbsp;Generar precierre
         </button>
-       
-
-
 
       </div>
 

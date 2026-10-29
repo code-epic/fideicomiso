@@ -56,6 +56,10 @@ export class CuentaComponent implements OnInit {
 
   public focus: boolean = false;
   public active: boolean = false;
+  private cambioProgramatico: boolean = false;
+  public avisoEdicion: boolean = false;
+  public esEdicion: boolean = false;
+  public cuentaId: number = 0;
 
   public porta_insert: string = "";
   public porta_search: string = "none";
@@ -80,9 +84,18 @@ export class CuentaComponent implements OnInit {
   }
 
   editar(e) {
-    this.Cuenta = e;
-    this.porta_insert = "";
-    this.porta_search = "none";
+    this.Limpiar()
+    this.esEdicion = true
+    this.cuentaId = e.codigo
+
+    this.txtCuenta = e.cuenta || ''
+    this.Cuenta.descripcion = e.descripcion || ''
+    this.Cuenta.aumenta = e.aumenta_por || ''
+    this.Cuenta.disminuye = e.disminuye_por || ''
+    this.cmbTotalizadora = e.codigo_asignacion != null ? e.codigo_asignacion.toString() : '0'
+
+    this.cambioProgramatico = true
+    this.selectedIndex = 1
   }
 
   Consultar() {
@@ -141,7 +154,9 @@ export class CuentaComponent implements OnInit {
   }
 
   Limpiar() {
-
+    this.avisoEdicion = false
+    this.esEdicion = false
+    this.cuentaId = 0
 
     this.Cuenta = {
       moneda: "",
@@ -205,40 +220,75 @@ export class CuentaComponent implements OnInit {
   }
 
   Guardar() {
-    this.txtCuenta.length;
+    if (!this.txtCuenta || this.txtCuenta.trim() === "") {
+      this._snackBar.open("Debe indicar el código de la cuenta.", "Ok");
+      return;
+    }
+    if (!this.Cuenta.descripcion || this.Cuenta.descripcion.trim() === "") {
+      this._snackBar.open("Debe indicar la descripción de la cuenta.", "Ok");
+      return;
+    }
+    if (!this.Cuenta.aumenta || this.Cuenta.aumenta.trim() === "") {
+      this._snackBar.open("Debe indicar por dónde aumenta (DEBE/HABER).", "Ok");
+      return;
+    }
+    if (!this.Cuenta.disminuye || this.Cuenta.disminuye.trim() === "") {
+      this._snackBar.open("Debe indicar por dónde disminuye (DEBE/HABER).", "Ok");
+      return;
+    }
+    if (!this.cmbTotalizadora) {
+      this._snackBar.open("Debe indicar si es cuenta totalizadora.", "Ok");
+      return;
+    }
 
     
     this.Cuenta.totalizadora = parseInt(this.cmbTotalizadora);
 
-    if (this.Cuenta.codigo == "") {
-      this._snackBar.open("Debe verificar todos los campos...", "Ok");
-      return;
-    }
     this.ngxService.startLoader("load-inver");
-    this.xAPI.funcion = environment.xApi.INSERTAR_CUENTA
-    this.xAPI.parametros = "";
-    this.xAPI.valores = JSON.stringify(this.Cuenta);
+    
+    if (this.esEdicion && this.cuentaId > 0) {
+      this.xAPI.funcion = environment.xApi.ACTUALIZAR_CUENTA;
+      this.xAPI.parametros = `${this.cuentaId},${this.Cuenta.descripcion}`;
+      this.xAPI.valores = "";
+    } else {
+      this.xAPI.funcion = environment.xApi.INSERTAR_CUENTA;
+      this.xAPI.parametros = "";
+      this.xAPI.valores = JSON.stringify(this.Cuenta);
+    }
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.apiService.Mensaje(
           "Proceso exitoso",
-          "Felicitaciones",
+          this.esEdicion ? "Cuenta actualizada correctamente" : "Cuenta guardada correctamente",
           "success",
-          "inversion"
+          "cuenta"
         );
         this.ngxService.stopLoader("load-inver");
         this.Limpiar();
         this.txtCuenta = "";
+        this.cargarContenido();
       },
       (error) => {
         console.error(error);
+        this.ngxService.stopLoader("load-inver");
       }
     );
   }
 
   getTotalizadora(codigo: number): string {
     return codigo == 1 ? "SI" : "NO";
+  }
+
+  soloCodigoCuenta(event: KeyboardEvent): boolean {
+    const permitidas = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'F5'];
+    if (permitidas.includes(event.key)) return true;
+    if (event.ctrlKey || event.metaKey) return true;
+    if (event.key.length === 1 && !/^[0-9.]$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
   }
 
   getDebe(tipo: string): string {
@@ -252,6 +302,10 @@ export class CuentaComponent implements OnInit {
 
   tabActive(event) {
     this.selectedIndex = event.index;
+    if (this.cambioProgramatico) {
+      this.cambioProgramatico = false;
+      return;
+    }
     if (!this.active) {
       this.Limpiar();
       this.txtCuenta = ''

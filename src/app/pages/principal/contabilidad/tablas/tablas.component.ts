@@ -98,8 +98,12 @@ export class TablasComponent implements OnInit {
 
   public blcod: boolean = false;
   public txtInstrumento: boolean = false;
+  public avisoEdicion: boolean = false;
+  public esEdicion: boolean = false;
+  public configuracionId: number = 0;
 
   public posicion: number = 0;
+  private cambioProgramatico: boolean = false;
 
   constructor(
     private apiService: ApiService,
@@ -119,6 +123,10 @@ export class TablasComponent implements OnInit {
 
   tabActive(event) {
     this.selectedIndex = event.index;
+    if (this.cambioProgramatico) {
+      this.cambioProgramatico = false;
+      return;
+    }
     if (!this.active) {
       this.Limpiar();
       this.txtCuenta = "";
@@ -133,11 +141,52 @@ export class TablasComponent implements OnInit {
   }
 
   editar(e) {
-    this.porta_insert = "";
-    this.porta_search = "none";
+    this.Limpiar()
+    this.posicion = 0
+    this.esEdicion = true
+    this.configuracionId = e.id || 0
+
+    this.concepto = e.tipo || ''
+    this.operaciones = e.operacion != null ? e.operacion.toString() : ''
+    this.validar()
+
+    if (e.definicion === 'AUMENTA' || e.accion === 'AUMENTA') {
+      this.definicion = 'A'
+    } else if (e.definicion === 'DISMINUYE' || e.accion === 'DISMINUYE') {
+      this.definicion = 'D'
+    } else {
+      this.definicion = e.definicion || ''
+    }
+
+    const codigoCuenta = e.cuenta || ''
+    const matchCuenta = this.lstXC.find((item: string) => {
+      const parts = item.split('|')
+      return parts.length > 0 && parts[0].trim().startsWith(codigoCuenta)
+    })
+    if (matchCuenta) {
+      this.cuenta = matchCuenta.split('|').slice(0, 2).join('|').trim()
+      this.myCuentas.setValue(this.cuenta)
+    } else {
+      this.cuenta = codigoCuenta
+      this.myCuentas.setValue(codigoCuenta)
+    }
+
+    if (e.instrumento) {
+      const matchInstrumento = this.lstInstrumento.find((item: string) =>
+        item === e.instrumento || item.startsWith(e.instrumento)
+      )
+      this.instrumento = matchInstrumento || e.instrumento
+      this.myInstrumento.setValue(this.instrumento)
+    }
+
+    this.cambioProgramatico = true
+    this.selectedIndex = 1
   }
 
   Limpiar() {
+    this.avisoEdicion = false
+    this.esEdicion = false
+    this.configuracionId = 0
     this.ICuenta = {
       accion: "",
       cuenta: 0,
@@ -149,8 +198,11 @@ export class TablasComponent implements OnInit {
     this.instrumento = "";
     this.definicion = "";
     this.concepto = "";
+    this.operaciones = "";
     this.myCuentas.setValue("");
+    this.myInstrumento.setValue("");
     this.txtInstrumento = false;
+    this.blInstrumento = false;
     this.ELEMENT_DATA_CUENTA = [];
     this.dataSourceCuenta = new MatTableDataSource<ILConfiguracionCuenta>(
       this.ELEMENT_DATA_CUENTA
@@ -166,6 +218,12 @@ export class TablasComponent implements OnInit {
         codigo = parseInt(e.split("|")[2].toString());
       }
     });
+    
+    if (codigo === 0) {
+      this._snackBar.open("Seleccione una cuenta válida del listado.", "Ok");
+      return;
+    }
+    
     this.ILCuenta = {
       cuenta: this.cuenta,
       codigo: codigo.toString(),
@@ -186,29 +244,75 @@ export class TablasComponent implements OnInit {
 
   Guardar() {
     this.ngxService.startLoader("load-config");
-    let cont = this.instrumento.split("|")[0].toString();
-    this.ICuenta.accion = this.ELEMENT_DATA_CUENTA[this.posicion].definicion;
-    this.ICuenta.instrumento =
-      this.instrumento != ""
-        ? parseInt(this.instrumento.split("|")[0].toString())
-        : 0;
-    this.ICuenta.tipo = this.ELEMENT_DATA_CUENTA[this.posicion].concepto;
-    this.ICuenta.operacion = this.ELEMENT_DATA_CUENTA[this.posicion].operacion;
-    this.ICuenta.cuenta = parseInt(
-      this.ELEMENT_DATA_CUENTA[this.posicion].codigo
-    );
+    
+    if (this.esEdicion && this.configuracionId > 0) {
+      this.ICuenta.accion = this.definicion || 'A';
+      
+      let instrId = 0;
+      if (this.instrumento && this.instrumento.includes("|")) {
+        const parsed = parseInt(this.instrumento.split("|")[0].toString());
+        instrId = isNaN(parsed) ? 0 : parsed;
+      }
+      this.ICuenta.instrumento = instrId;
+      
+      this.ICuenta.tipo = this.concepto || '';
+      this.ICuenta.operacion = parseInt(this.operaciones) || 0;
+      
+      let codigo = 0;
+      this.lstXC.forEach((e) => {
+        if (this.cuenta.substring(0, 23) == e.substring(0, 23)) {
+          codigo = parseInt(e.split("|")[2].toString());
+        }
+      });
+      this.ICuenta.cuenta = isNaN(codigo) ? 0 : codigo;
+      
+      if (this.ICuenta.cuenta === 0) {
+        this._snackBar.open("Seleccione una cuenta válida del listado.", "Ok");
+        this.ngxService.stopLoader("load-config");
+        return;
+      }
 
-    this.lstCuentas = [];
-    this.xAPI.funcion = "FID_IConfiguracionCuenta";
-    this.xAPI.parametros = "";
-    this.xAPI.valores = JSON.stringify(this.ICuenta);
+      this.lstCuentas = [];
+      this.xAPI.funcion = "FID_UConfiguracionCuenta";
+      this.xAPI.parametros = `${this.configuracionId},${this.ICuenta.cuenta},${this.ICuenta.instrumento},${this.ICuenta.tipo},${this.ICuenta.accion},${this.ICuenta.operacion}`;
+      this.xAPI.valores = "";
+    } else {
+      if (this.ELEMENT_DATA_CUENTA.length === 0) {
+        this._snackBar.open("Debe agregar al menos una configuración.", "Ok");
+        this.ngxService.stopLoader("load-config");
+        return;
+      }
+      
+      let cont = this.instrumento.split("|")[0].toString();
+      this.ICuenta.accion = this.ELEMENT_DATA_CUENTA[this.posicion].definicion;
+      this.ICuenta.instrumento =
+        this.instrumento != ""
+          ? parseInt(this.instrumento.split("|")[0].toString())
+          : 0;
+      this.ICuenta.tipo = this.ELEMENT_DATA_CUENTA[this.posicion].concepto;
+      this.ICuenta.operacion = this.ELEMENT_DATA_CUENTA[this.posicion].operacion;
+      this.ICuenta.cuenta = parseInt(
+        this.ELEMENT_DATA_CUENTA[this.posicion].codigo
+      );
+
+      this.lstCuentas = [];
+      this.xAPI.funcion = "FID_IConfiguracionCuenta";
+      this.xAPI.parametros = "";
+      this.xAPI.valores = JSON.stringify(this.ICuenta);
+    }
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if (this.ELEMENT_DATA_CUENTA.length - 1 == this.posicion) {
+        if (this.esEdicion) {
           this.Limpiar()
-          this.apiService.Mensaje('Proceso exitoso', 'Felicitaciones', 'success', 'inversion')
+          this.apiService.Mensaje('Proceso exitoso', 'Configuración actualizada', 'success', 'inversion')
           this.ngxService.stopLoader('load-config')
+          this.cargarContenido()
+        } else if (this.ELEMENT_DATA_CUENTA.length - 1 == this.posicion) {
+          this.Limpiar()
+          this.apiService.Mensaje('Proceso exitoso', 'Configuración guardada', 'success', 'inversion')
+          this.ngxService.stopLoader('load-config')
+          this.cargarContenido()
         } else {
           this.posicion++
           this.Guardar()
@@ -217,6 +321,7 @@ export class TablasComponent implements OnInit {
       },
       (err) => {
         console.error(err)
+        this.ngxService.stopLoader('load-config')
       }
     )
   }
@@ -309,6 +414,7 @@ export class TablasComponent implements OnInit {
         if (data.Cuerpo != undefined) {
           data.Cuerpo.forEach((e) => {
             this.ELEMENT_DATA.push({
+              id: e.identificador || 0,
               cuenta: e.cuenta,
               descripcion: e.descripcion,
               instrumento: e.instrumento,
@@ -400,8 +506,7 @@ export class TablasComponent implements OnInit {
   }
 
   validar() {
-    this.blInstrumento = false
-    if (this.operaciones == '1') this.blInstrumento = true
+    this.blInstrumento = this.operaciones === '1'
   }
 
   getInstrumento(e): string {

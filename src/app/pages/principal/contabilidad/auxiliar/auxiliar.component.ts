@@ -42,10 +42,11 @@ export class AuxiliarComponent implements OnInit {
 
   public lstIndex = [] 
   public cuenta = ''
-  public plan = ''
+  public plan = '%'
   lstData = []
   public total_debe : number = 0
   public total_haber : number = 0
+  public lstPlanesFideicomiso: any[] = []
 
   constructor(private apiService: ApiService,
     private toastrService: ToastrService,
@@ -62,6 +63,21 @@ export class AuxiliarComponent implements OnInit {
     this.plan = '%'
     this.consultarUltimoPreCierre()
     this.iniciarIndex()
+    this.ListarPlanesFideicomiso()
+  }
+
+  ListarPlanesFideicomiso() {
+    const xAPI: IAPICore = {
+      funcion: 'FID_CPlanesFideicomiso',
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data) => {
+        this.lstPlanesFideicomiso = data.Cuerpo || []
+      },
+      error: (err) => console.error(err)
+    })
   }
 
   iniciarIndex() {
@@ -131,7 +147,7 @@ export class AuxiliarComponent implements OnInit {
     
     this.ngxService.startLoader('load-precierre')
     this.xAPI.funcion = environment.xApi.CONSULTAR_AUXILIAR
-    this.xAPI.parametros = `${fecha},${this.cuenta}`
+    this.xAPI.parametros = `${fecha},${this.cuenta},${this.plan}`
     this.xAPI.valores = ''
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -154,11 +170,15 @@ export class AuxiliarComponent implements OnInit {
     const fecha = new Date(this.fechai).toLocaleDateString('es-VE');
     const cuentaSeleccionada = this.lstIndex.find(e => e.id === this.cuenta);
     const nombreCuenta = cuentaSeleccionada ? cuentaSeleccionada.nombre : '';
+    const nombrePlan = this.plan === '%'
+      ? 'TODOS LOS PLANES'
+      : (this.lstPlanesFideicomiso.find(p => p.id == this.plan)?.observacion || '');
 
     let filasHTML = this.lstMovimientos.map(e => `
       <tr>
         <td style="padding: 8px; border-bottom: 1px solid #E4E5E7; font-size: 11px;">${e.cuenta}</td>
         <td style="padding: 8px; border-bottom: 1px solid #E4E5E7; text-align: left; font-size: 11px;">${e.descripcion || ''}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E4E5E7; text-align: left; font-size: 11px;">${e.plan_nombre || ''}</td>
         <td style="padding: 8px; border-bottom: 1px solid #E4E5E7; text-align: right; font-size: 11px;">${e.debe > 0 ? this.getMoneda(e.debe) : ''}</td>
         <td style="padding: 8px; border-bottom: 1px solid #E4E5E7; text-align: right; font-size: 11px;">${e.haber > 0 ? this.getMoneda(e.haber) : ''}</td>
       </tr>
@@ -183,6 +203,7 @@ export class AuxiliarComponent implements OnInit {
         <div style="text-align: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #E4E5E7;">
           <p style="font-size: 11px; color: #2563EB; text-transform: uppercase; letter-spacing: 2px; margin: 0;">AUXILIAR CONTABLE</p>
           <p style="font-size: 16px; font-weight: 700; color: #1E293B; margin: 4px 0 0 0;">${this.cuenta} - ${nombreCuenta}</p>
+          <p style="font-size: 13px; color: #64748B; margin: 4px 0 0 0;">Plan: ${nombrePlan}</p>
           <p style="font-size: 13px; color: #64748B; margin: 4px 0 0 0;">Fecha: ${fecha}</p>
         </div>
 
@@ -192,6 +213,7 @@ export class AuxiliarComponent implements OnInit {
               <tr style="background: #1E293B;">
                 <th style="padding: 10px 12px; font-size: 11px; text-align: left; color: #fff; border-bottom: 1px solid #E4E5E7;">CUENTA</th>
                 <th style="padding: 10px 12px; font-size: 11px; text-align: left; color: #fff; border-bottom: 1px solid #E4E5E7;">DESCRIPCIÓN</th>
+                <th style="padding: 10px 12px; font-size: 11px; text-align: left; color: #fff; border-bottom: 1px solid #E4E5E7;">PLAN</th>
                 <th style="padding: 10px 12px; font-size: 11px; text-align: right; color: #fff; border-bottom: 1px solid #E4E5E7;">DEBE</th>
                 <th style="padding: 10px 12px; font-size: 11px; text-align: right; color: #fff; border-bottom: 1px solid #E4E5E7;">HABER</th>
               </tr>

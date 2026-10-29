@@ -118,3 +118,17 @@ textarea {
   width: 50px;
   padding-top: 5px;
 }
+
+.aviso-edicion {
+  padding: 10px 14px;
+  margin: 0 15px 10px;
+  font-size: 13px;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  border-radius: 6px;
+  border-left: 4px solid #f39c12;
+
+  b {
+    color: #f39c12;
+  }
+}

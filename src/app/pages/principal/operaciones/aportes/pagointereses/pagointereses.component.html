@@ -1,0 +1,184 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <h4>Pago de Rendimientos / Intereses</h4>
+      <p class="text-muted">Distribución de rendimientos según reglas de partida doble y consumo de saldos.</p>
+    </div>
+  </div>
+
+  <!-- Seleccion de Plan -->
+  <div class="row" *ngIf="lstPlanes.length > 0">
+    <div class="col-md-12">
+      <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>Seleccionar Plan</mat-label>
+        <mat-select [(value)]="planSeleccionado" (selectionChange)="seleccionarPlan(planSeleccionado)">
+          <mat-option *ngFor="let plan of lstPlanes" [value]="plan">
+            {{ limpiarNombrePlan(plan.observacion) }} ({{ plan.id }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Diagnostico -->
+  <div class="row" *ngIf="diagnostico">
+    <div class="col-md-12">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Diagnóstico — {{ diagnostico.plan }}</mat-card-title>
+          <mat-card-subtitle>
+            <span>Fecha Último Cierre: <strong>{{ diagnostico.fecha_corte }}</strong></span>
+            <span style="margin-left: 16px;">Fecha Aplicación Contable: <strong style="color: #1565c0;">{{ fechaAplicacion }}</strong></span>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="diagnostico-item">
+                <span class="label">711 Disponible</span>
+                <span class="value">{{ formatearMonto(diagnostico.saldo_711_disponible) }}</span>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="diagnostico-item">
+                <span class="label">734 Rendimientos Acumulados</span>
+                <span class="value">{{ formatearMonto(diagnostico.saldo_734) }}</span>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="diagnostico-item">
+                <span class="label">Resultado Neto</span>
+                <span class="value" [class.positivo]="diagnostico.resultado_neto > 0" [class.negativo]="diagnostico.resultado_neto < 0">
+                  {{ formatearMonto(diagnostico.resultado_neto) }}
+                </span>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="diagnostico-item">
+                <span class="label">Máximo Pagable</span>
+                <span class="value maximo">{{ formatearMonto(diagnostico.maximo_pagable) }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="row" style="margin-top: 12px;">
+            <div class="col-md-3">
+              <div class="diagnostico-item">
+                <span class="label">Total Ingresos (750+751+752)</span>
+                <span class="value positivo">{{ formatearMonto(diagnostico.total_ingresos) }}</span>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="diagnostico-item">
+                <span class="label">Total Gastos (740+744)</span>
+                <span class="value negativo">{{ formatearMonto(diagnostico.total_gastos) }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Formulario de monto -->
+  <div class="row" *ngIf="diagnostico" style="margin-top: 16px;">
+    <div class="col-md-6">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Solicitar Pago</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-form-field appearance="outline" style="width: 100%;">
+            <mat-label>Monto a Pagar (Bs.)</mat-label>
+            <input matInput type="number" [(ngModel)]="montoSolicitado" min="0" step="0.01">
+          </mat-form-field>
+          <div class="text-muted" style="font-size: 12px; margin-top: -10px;">
+            Máximo pagable: {{ formatearMonto(diagnostico.maximo_pagable) }} |
+            Disponible 711: {{ formatearMonto(diagnostico.saldo_711_disponible) }}
+          </div>
+          <div style="margin-top: 16px;">
+            <button mat-flat-button color="primary" (click)="prepararComprobante()"
+              [disabled]="montoSolicitado <= 0 || procesando">
+              <mat-icon>receipt</mat-icon>&nbsp;Preparar Comprobante
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Preview del comprobante -->
+  <div class="row" *ngIf="mostrarPreview && comprobante" style="margin-top: 16px;">
+    <div class="col-md-12">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Preview del Comprobante</mat-card-title>
+          <mat-card-subtitle>
+            <span *ngIf="comprobante.esValido" class="badge badge-success">VALIDO</span>
+            <span *ngIf="!comprobante.esValido" class="badge badge-danger">INVALIDO</span>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Errores -->
+          <div *ngIf="comprobante.errores.length > 0" class="alert alert-danger">
+            <ul style="margin: 0; padding-left: 18px;">
+              <li *ngFor="let e of comprobante.errores">{{ e }}</li>
+            </ul>
+          </div>
+
+          <!-- Desglose -->
+          <table class="table table-bordered" *ngIf="comprobante.esValido">
+            <thead>
+              <tr>
+                <th>Cuenta</th>
+                <th>Descripción</th>
+                <th style="text-align: right;">DEBE</th>
+                <th style="text-align: right;">HABER</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let linea of comprobante.lineas">
+                <td>{{ linea.cuenta }}</td>
+                <td>
+                  <span *ngIf="linea.cuenta === 3">711.02 — Disponibilidad en cuenta operativa</span>
+                  <span *ngIf="linea.cuenta === 40">734.01 — Resultados acumulados</span>
+                  <span *ngIf="linea.cuenta === 70">744.00 — Gastos por pago de intereses</span>
+                </td>
+                <td style="text-align: right;">{{ linea.debe > 0 ? formatearMonto(linea.debe) : '' }}</td>
+                <td style="text-align: right;">{{ linea.haber > 0 ? formatearMonto(linea.haber) : '' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr style="font-weight: bold;">
+                <td colspan="2">TOTALES</td>
+                <td style="text-align: right;">{{ formatearMonto(getTotalDebe()) }}</td>
+                <td style="text-align: right;">{{ formatearMonto(getTotalHaber()) }}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <!-- Resumen -->
+          <div *ngIf="comprobante.esValido" class="resumen-pago">
+            <div class="resumen-item">
+              <span>DEBE 734:</span>
+              <span>{{ formatearMonto(comprobante.debe_734) }}</span>
+            </div>
+            <div class="resumen-item" *ngIf="comprobante.debe_744 > 0">
+              <span>DEBE 744:</span>
+              <span>{{ formatearMonto(comprobante.debe_744) }}</span>
+            </div>
+            <div class="resumen-item total">
+              <span>HABER 711:</span>
+              <span>{{ formatearMonto(comprobante.haber_711) }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions align="end" *ngIf="comprobante.esValido">
+          <button mat-button (click)="limpiar()">Cancelar</button>
+          <button mat-flat-button color="accent" (click)="confirmarPago()" [disabled]="procesando">
+            <mat-icon>save</mat-icon>&nbsp;Registrar Pago
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

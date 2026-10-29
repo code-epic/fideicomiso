@@ -1,6 +1,6 @@
 <ngx-ui-loader [loaderId]="'load-inver'"></ngx-ui-loader>
 <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" (selectedTabChange)="tabActive($event)"
-  [selectedIndex]="selectedIndex" style="padding:10px;">
+  [(selectedIndex)]="selectedIndex" style="padding:10px;">
   <mat-tab>
     <ng-template mat-tab-label>
       &nbsp;CONSULTA CUENTA
@@ -40,14 +40,20 @@
               <ng-container matColumnDef="disparador">
                 <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
                 <td mat-cell *matCellDef="let e">
-                  <button mat-icon-button aria-label="Editar"
-                    (click)="editar(e)" >
-                    <mat-icon class="texto-gray">edit</mat-icon>
+                  <button mat-icon-button [matMenuTriggerFor]="menuCuenta" aria-label="Acciones">
+                    <mat-icon class="texto-gray">more_vert</mat-icon>
                   </button>
-                  <button mat-icon-button aria-label="Eliminar"
-                    (click)="eliminar(e)" >
-                    <mat-icon class="texto-gray">delete</mat-icon>
-                  </button>
+                  <mat-menu #menuCuenta="matMenu">
+                    <button mat-menu-item (click)="editar(e)">
+                      <mat-icon>edit</mat-icon>
+                      <span>Editar</span>
+                    </button>
+                    <mat-divider></mat-divider>
+                    <button mat-menu-item (click)="eliminar(e)">
+                      <mat-icon>delete</mat-icon>
+                      <span>Eliminar</span>
+                    </button>
+                  </mat-menu>
                 </td>
               </ng-container>
   
@@ -106,12 +112,13 @@
           <form>
 
             <div class="row">
-              <div class="col-md-6">
+                <div class="col-md-6">
                 <mat-form-field appearance="outline">
                   <mat-label>Codigo</mat-label>
                   <input matInput placeholder="Codigo" [ngModelOptions]="{standalone: true}" [(ngModel)]="txtCuenta"
-                    value="{{txtCuenta}}" (blur)="setSegmento();Consultar()" maxlength="23" >
-                  <mat-icon matSuffix (click)="Seleccionar()">search</mat-icon>
+                    value="{{txtCuenta}}" (blur)="setSegmento();Consultar()" maxlength="23"
+                    (keydown)="soloCodigoCuenta($event)" [disabled]="esEdicion">
+                  <mat-icon matSuffix (click)="Seleccionar()" *ngIf="!esEdicion">search</mat-icon>
 
                 </mat-form-field>
               </div>
@@ -121,7 +128,7 @@
                 <mat-form-field appearance="outline">
                   <mat-label>Aumenta por </mat-label>
                   <mat-select placeholder="Aumenta por " [ngModelOptions]="{standalone: true}"
-                    [(ngModel)]="Cuenta.aumenta" value="{{Cuenta.aumenta}}">
+                    [(ngModel)]="Cuenta.aumenta" value="{{Cuenta.aumenta}}" [disabled]="esEdicion">
                     <mat-option value="DEBE">DEBE</mat-option>
                     <mat-option value="HABER">HABER</mat-option>
                   </mat-select>
@@ -133,7 +140,7 @@
                 <mat-form-field appearance="outline">
                   <mat-label>Disminuye por </mat-label>
                   <mat-select placeholder="Disminuye por " [ngModelOptions]="{standalone: true}"
-                    [(ngModel)]="Cuenta.disminuye" value="{{Cuenta.disminuye}}">
+                    [(ngModel)]="Cuenta.disminuye" value="{{Cuenta.disminuye}}" [disabled]="esEdicion">
                     <mat-option value="DEBE">DEBE</mat-option>
                     <mat-option value="HABER">HABER</mat-option>
                   </mat-select>
@@ -151,7 +158,7 @@
                 <mat-form-field appearance="outline">
                   <mat-label>Cuenta Totalizadora</mat-label>
                   <mat-select placeholder="Cuenta Totalizadora" [ngModelOptions]="{standalone: true}"
-                    [(ngModel)]="cmbTotalizadora" value="{{cmbTotalizadora}}">
+                    [(ngModel)]="cmbTotalizadora" value="{{cmbTotalizadora}}" [disabled]="esEdicion">
                     <mat-option value="1">SI</mat-option>
                     <mat-option value="0">NO</mat-option>
                   </mat-select>
@@ -162,7 +169,7 @@
                 <mat-form-field appearance="outline">
                   <mat-label>Tipo de moneda</mat-label>
                   <mat-select placeholder="Tipo de moneda" [ngModelOptions]="{standalone: true}"
-                    [(ngModel)]="Cuenta.moneda" value="{{Cuenta.moneda}}">
+                    [(ngModel)]="Cuenta.moneda" value="{{Cuenta.moneda}}" [disabled]="esEdicion">
                     <mat-option value="1">BOLIVARES</mat-option>
                     <mat-option value="2">DOLARES</mat-option>
                     <mat-option value="3">EUROS</mat-option>
@@ -187,7 +194,7 @@
         <div class="row">
 
           <div class="col-md-12 text-right">
-            <button mat-flat-button color="primary" (click)="Guardar()">Registar</button>
+            <button mat-flat-button color="primary" (click)="Guardar()">{{ esEdicion ? 'Actualizar' : 'Registrar' }}</button>
           </div>
 
         </div>

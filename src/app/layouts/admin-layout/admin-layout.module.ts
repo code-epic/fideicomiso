@@ -32,6 +32,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
+import { MatCardModule } from '@angular/material/card';
 
 import { CambiarclaveComponent } from 'src/app/pages/generico/perfil/cambiarclave/cambiarclave.component';
 import { HechiceroComponent } from 'src/app/pages/generico/hechicero/hechicero.component';
@@ -54,6 +55,8 @@ import { ComprobanteComponent } from 'src/app/pages/principal/contabilidad/compr
 import { CurrencyMaskModule } from "ng2-currency-mask";
 import { CuentaComponent } from 'src/app/pages/principal/contabilidad/cuenta/cuenta.component';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatDividerModule} from '@angular/material/divider';
 
 import { NgxMaskModule, IConfig } from 'ngx-mask'
 import { OperacionesComponent } from 'src/app/pages/principal/operaciones/operaciones.component';
@@ -75,6 +78,9 @@ import { WzportafolioComponent } from 'src/app/pages/principal/inversiones/consu
 import { AporteinicialComponent } from 'src/app/pages/principal/operaciones/aportes/aporteinicial/aporteinicial.component';
 import { IncrementosComponent } from 'src/app/pages/principal/operaciones/aportes/incrementos/incrementos.component';
 import { RetirosComponent } from 'src/app/pages/principal/operaciones/aportes/retiros/retiros.component';
+import { FiniquitoComponent } from 'src/app/pages/principal/operaciones/aportes/finiquito/finiquito.component';
+import { InteresesComponent } from 'src/app/pages/principal/operaciones/aportes/intereses/intereses.component';
+import { PagointeresesComponent } from 'src/app/pages/principal/operaciones/aportes/pagointereses/pagointereses.component';
 import { ProcesocontablesComponent } from 'src/app/pages/principal/contabilidad/procesocontables/procesocontables.component';
 import { GeneralyresultadoComponent } from 'src/app/pages/principal/contabilidad/generalyresultado/generalyresultado.component';
 import { ComprobacionComponent } from 'src/app/pages/principal/contabilidad/comprobacion/comprobacion.component';
@@ -118,11 +124,14 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     MatToolbarModule,
     MatSelectModule,
     MatTooltipModule,
+    MatMenuModule,
+    MatDividerModule,
     MatStepperModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatSnackBarModule,
     MatAutocompleteModule,
+    MatCardModule,
     CurrencyMaskModule,
     ToastContainerModule,
     MatRippleModule,
@@ -175,6 +184,9 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
     AporteinicialComponent,
     IncrementosComponent,
     RetirosComponent,
+    FiniquitoComponent,
+    InteresesComponent,
+    PagointeresesComponent,
     ProcesocontablesComponent,
     GeneralyresultadoComponent,
     ComprobacionComponent,

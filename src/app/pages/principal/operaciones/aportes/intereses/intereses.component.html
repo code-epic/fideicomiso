@@ -1,0 +1,324 @@
+<ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
+
+<div class="intereses-container" role="main" aria-label="Módulo de Intereses por Disponibilidad">
+  <!-- SECCIÓN 1: Filtros -->
+  <header class="section-header">
+    <h2 class="section-title">Intereses por Disponibilidad</h2>
+  </header>
+
+  <section class="filtros-form" aria-label="Filtros de búsqueda">
+    <div class="row">
+      <div class="col-6 col-md-3">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Mes</mat-label>
+          <mat-select [(ngModel)]="mes" (selectionChange)="consultar()" aria-label="Seleccionar mes">
+            <mat-option *ngFor="let m of lstMeses" [value]="m.valor">
+              {{ m.valor }} - {{ m.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Año</mat-label>
+          <mat-select [(ngModel)]="anio" (selectionChange)="consultar()" aria-label="Seleccionar año">
+            <mat-option *ngFor="let a of anios" [value]="a">{{ a }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Tasa Anual (%)</mat-label>
+          <input matInput type="number" [(ngModel)]="tasa" (change)="consultar()" aria-label="Tasa anual porcentual">
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 col-md-3 text-right">
+        <button mat-flat-button color="primary" (click)="consultar()" class="btn-consultar" aria-label="Consultar intereses">
+          <mat-icon>search</mat-icon>&nbsp;Consultar
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 2: Tabla de intereses calculados -->
+  <section *ngIf="mostrarResultados" aria-label="Intereses calculados">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Intereses Calculados</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="tabla-container">
+          <table class="table" aria-label="Tabla de intereses calculados por plan">
+            <thead>
+              <tr>
+                <th scope="col">Plan</th>
+                <th scope="col">Nombre</th>
+                <th scope="col" class="text-right">Saldo Promedio</th>
+                <th scope="col" class="text-right">Interés Calculado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of lstIntereses">
+                <td>{{ e.id_plan }}</td>
+                <td>{{ e.plan }}</td>
+                <td class="text-right">{{ formatearMonto(e.saldo_promedio) }}</td>
+                <td class="text-right">{{ formatearMonto(e.interes_calculado) }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"><strong>TOTAL</strong></td>
+                <td class="text-right"></td>
+                <td class="text-right"><strong>{{ formatearMonto(totalInteresCalculado) }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="mt-3" *ngIf="!mostrarFormPago && planesUsados.length < lstIntereses.length">
+          <button mat-flat-button color="accent" (click)="abrirFormPago()" aria-label="Agregar nuevo pago">
+            <mat-icon>add</mat-icon>&nbsp;Agregar Pago
+          </button>
+        </div>
+        <div class="mt-3" *ngIf="!mostrarFormPago && planesUsados.length >= lstIntereses.length">
+          <span class="text-muted"><mat-icon>info</mat-icon> Todos los planes ya están asignados a pagos</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <!-- SECCIÓN 3: Formulario inline para agregar/editar pago -->
+  <section *ngIf="mostrarFormPago" class="mt-3" aria-label="Formulario de pago">
+    <mat-card class="form-pago-card">
+      <mat-card-header>
+        <mat-card-title>{{ editandoPagoId ? 'Editar Pago' : 'Nuevo Pago' }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="row">
+          <div class="col-12 col-md-4">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Fecha Valor</mat-label>
+              <input matInput type="date" [(ngModel)]="nuevoPagoFecha" aria-label="Fecha valor del pago">
+            </mat-form-field>
+          </div>
+          <div class="col-12 col-md-4">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Monto (Bs.)</mat-label>
+              <input matInput type="number" [(ngModel)]="nuevoPagoMonto" min="0" aria-label="Monto del pago en bolívares">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Selector de planes -->
+        <div class="planes-selector" role="group" aria-label="Selección de planes para el pago">
+          <div class="planes-label-row">
+            <label class="planes-label">Seleccionar Planes:</label>
+            <button mat-stroked-button color="primary" type="button"
+                    (click)="seleccionarTodosPlanes()"
+                    class="btn-select-all"
+                    [attr.aria-label]="todosPlanesSeleccionados ? 'Deseleccionar todos los planes' : 'Seleccionar todos los planes'">
+              <mat-icon>{{ todosPlanesSeleccionados ? 'deselect' : 'checklist' }}</mat-icon>
+              {{ todosPlanesSeleccionados ? 'Limpiar' : 'Seleccionar Todos' }}
+            </button>
+          </div>
+          <div class="planes-list">
+            <div *ngFor="let plan of lstIntereses" class="plan-item">
+              <mat-checkbox
+                *ngIf="isPlanDisponible(plan.id_plan)"
+                [checked]="isPlanSeleccionado(plan.id_plan)"
+                (change)="togglePlanSeleccion(plan.id_plan)"
+                [attr.aria-label]="'Seleccionar plan ' + plan.plan">
+                {{ plan.plan }} ({{ formatearMonto(plan.interes_calculado) }})
+              </mat-checkbox>
+            </div>
+            <span *ngIf="planesUsados.length > 0" class="text-muted planes-en-uso-hint">
+              {{ planesUsados.length }} plan(es) ya asignado(s) a otros pagos
+            </span>
+          </div>
+        </div>
+
+        <!-- Distribución preliminar -->
+        <div class="distribucion-preliminar" *ngIf="nuevoPagoMonto > 0 && nuevoPagoPlanes.length > 0">
+          <label>Distribución Preliminar (basada en interés calculado):</label>
+          <div class="tabla-container">
+            <table class="table" aria-label="Distribución preliminar del pago">
+              <thead>
+                <tr>
+                  <th scope="col">Plan</th>
+                  <th scope="col" class="text-right">Interés Calculado</th>
+                  <th scope="col" class="text-right">% Participación</th>
+                  <th scope="col" class="text-right">Interés Real</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let planId of nuevoPagoPlanes">
+                  <td>{{ getNombrePlan(planId) }}</td>
+                  <td class="text-right">{{ formatearMonto(getInteresTeoricoPlan(planId)) }}</td>
+                  <td class="text-right">
+                    {{ getTotalTeoricoSeleccion() > 0 ? ((getInteresTeoricoPlan(planId) / getTotalTeoricoSeleccion()) * 100 | number:'1.2-2') : '0.00' }}%
+                  </td>
+                  <td class="text-right">
+                    {{ getTotalTeoricoSeleccion() > 0 ? formatearMonto((getInteresTeoricoPlan(planId) / getTotalTeoricoSeleccion()) * nuevoPagoMonto) : formatearMonto(0) }}
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td><strong>TOTAL</strong></td>
+                  <td class="text-right"><strong>{{ formatearMonto(getTotalTeoricoSeleccion()) }}</strong></td>
+                  <td class="text-right"><strong>100%</strong></td>
+                  <td class="text-right"><strong>{{ formatearMonto(nuevoPagoMonto) }}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-flat-button color="primary" (click)="guardarPago()" aria-label="Guardar pago">
+          <mat-icon>save</mat-icon>&nbsp;{{ editandoPagoId ? 'Actualizar' : 'Guardar' }}
+        </button>
+        <button mat-flat-button (click)="cancelarFormPago()" aria-label="Cancelar">
+          <mat-icon>cancel</mat-icon>&nbsp;Cancelar
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </section>
+
+  <!-- SECCIÓN 4: Tramos con distribución -->
+  <section *ngIf="tramosConDistribucion.length > 0" class="mt-3" aria-label="Distribución por tramos">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Distribución por Tramos</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngFor="let tramo of tramosConDistribucion; let i = index" class="tramo-card">
+          <div class="tramo-header" [class.tramo-error]="!tramo.cuadra">
+            <div class="tramo-info">
+              <span class="tramo-fecha">{{ tramo.pago.fechaValor }}</span>
+              <span class="tramo-monto">{{ formatearMonto(tramo.pago.montoPago) }}</span>
+              <span class="tramo-status" [class]="tramo.cuadra ? 'cuadra-ok' : 'cuadra-error'"
+                    [attr.aria-label]="tramo.cuadra ? 'Tramo cuadra correctamente' : 'Tramo tiene diferencia'">
+                {{ tramo.cuadra ? '✓ Cuadra' : '✗ Diferencia: ' + formatearMonto(tramo.pago.montoPago - tramo.totalReal) }}
+              </span>
+            </div>
+            <div class="tramo-acciones">
+              <button mat-icon-button (click)="editarPago(tramo.pago)" matTooltip="Editar pago" [attr.aria-label]="'Editar pago ' + (i + 1)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="eliminarPago(tramo.pago.id)" matTooltip="Eliminar pago" [attr.aria-label]="'Eliminar pago ' + (i + 1)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+           <div class="tabla-container">
+            <table class="table" [attr.aria-label]="'Distribución del pago ' + (i + 1)">
+              <thead>
+                <tr>
+                  <th scope="col">Plan</th>
+                  <th scope="col" class="text-right">Saldo Base</th>
+                  <th scope="col" class="text-right">Interés Calculado</th>
+                  <th scope="col" class="text-right">% Tramo</th>
+                  <th scope="col" class="text-right">Interés Real</th>
+                  <th scope="col" class="text-right">Diferencia</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let dist of tramo.distribuciones">
+                  <td>{{ dist.plan }}</td>
+                  <td class="text-right">{{ formatearMonto(dist.saldo_promedio) }}</td>
+                  <td class="text-right">{{ formatearMonto(dist.interes_calculado) }}</td>
+                  <td class="text-right">{{ dist.porcentajeTramo | number:'1.2-2' }}%</td>
+                  <td class="text-right">{{ formatearMonto(dist.interesRealTramo) }}</td>
+                  <td class="text-right" [style.color]="dist.diferenciaTramo > 0 ? 'green' : dist.diferenciaTramo < 0 ? 'red' : 'inherit'">
+                    {{ formatearMonto(dist.diferenciaTramo) }}
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td><strong>TOTAL TRAMO</strong></td>
+                  <td class="text-right"></td>
+                  <td class="text-right"><strong>{{ formatearMonto(tramo.totalTeorico) }}</strong></td>
+                  <td class="text-right"><strong>100%</strong></td>
+                  <td class="text-right"><strong>{{ formatearMonto(tramo.totalReal) }}</strong></td>
+                  <td class="text-right"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <!-- SECCIÓN 5: Resumen y planes sin asignar -->
+  <section *ngIf="tramosConDistribucion.length > 0" class="mt-3">
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <mat-card aria-label="Resumen de conciliación">
+          <mat-card-header>
+            <mat-card-title>Resumen</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="resumen-row">
+              <span>Total Interés Teórico:</span>
+              <span class="font-weight-bold">{{ formatearMonto(totalTeoricoGlobal) }}</span>
+            </div>
+            <div class="resumen-row">
+              <span>Total Interés Real:</span>
+              <span class="font-weight-bold">{{ formatearMonto(totalRealGlobal) }}</span>
+            </div>
+            <div class="resumen-row">
+              <span>Diferencia Global:</span>
+              <span class="font-weight-bold" [style.color]="(totalTeoricoGlobal - totalRealGlobal) > 0 ? 'red' : 'green'">
+                {{ formatearMonto(totalTeoricoGlobal - totalRealGlobal) }}
+              </span>
+            </div>
+            <div class="resumen-status mt-2">
+              <span [class]="todosCuadran ? 'cuadra-ok' : 'cuadra-error'"
+                    [attr.aria-label]="todosCuadran ? 'Todos los tramos cuadran correctamente' : 'Hay tramos con diferencia'">
+                {{ todosCuadran ? '✓ Todos los tramos cuadran' : '✗ Hay tramos con diferencia' }}
+              </span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <mat-card *ngIf="planesSinAsignar.length > 0" aria-label="Planes sin pago asignado">
+          <mat-card-header>
+            <mat-card-title style="color: #f57c00;">Planes sin Pago Asignado</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngFor="let plan of planesSinAsignar" class="plan-sin-asignar">
+              <span>{{ plan.plan }}</span>
+              <span>{{ formatearMonto(plan.interes_calculado) }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 6: Acciones -->
+  <section *ngIf="tramosConDistribucion.length > 0" class="mt-3">
+    <div class="row">
+      <div class="col-12 text-right">
+        <button mat-flat-button color="warn" (click)="generarComprobantes()"
+                [disabled]="!puedeGenerar || !todosCuadran" class="btn-comprobantes"
+                [attr.aria-disabled]="!puedeGenerar || !todosCuadran"
+                aria-label="Generar comprobantes contables">
+          <mat-icon>receipt_long</mat-icon>&nbsp;Generar Comprobantes
+        </button>
+        <span *ngIf="!puedeGenerar" class="text-muted ml-2" role="status">
+          <i class="fas fa-info-circle" aria-hidden="true"></i> Mes aún no cerrado
+        </span>
+      </div>
+    </div>
+  </section>
+</div>

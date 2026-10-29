@@ -49,6 +49,15 @@ export class LoginComponent implements OnInit {
 
 
   async login(){
+    if (!this.usuario || this.usuario.trim().length < 3) {
+      this.toastrService.warning('El usuario debe tener al menos 3 caracteres.', 'Validación');
+      return;
+    }
+    if (!this.clave || this.clave.length < 4) {
+      this.toastrService.warning('La contraseña debe tener al menos 4 caracteres.', 'Validación');
+      return;
+    }
+
     this.ngxService.startLoader("loader-login");
     
     await this.loginService.getLogin(this.usuario, this.clave).subscribe(

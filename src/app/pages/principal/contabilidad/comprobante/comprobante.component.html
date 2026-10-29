@@ -19,7 +19,7 @@
                   <br>
                   <div class="row">
 
-                    <div class="col-md-6 col-lg-6 col-xl-8 text-center">
+                    <div class="col-md-3 col-lg-4 col-xl-4 text-center">
                       <mat-form-field appearance="outline">
                         <mat-label>Buscar</mat-label>
                         <input matInput placeholder="Buscar..." [(ngModel)]="buscar" (ngModelChange)="filtrarLista()" />
@@ -27,7 +27,19 @@
                       </mat-form-field>
                     </div>
 
-                    <div class="col-md-6 col-lg-3 col-xl-2 text-center">
+                    <div class="col-md-3 col-lg-4 col-xl-4 text-center">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Plan</mat-label>
+                        <mat-select [(ngModel)]="planFiltro" (selectionChange)="cargarComprobantes()">
+                          <mat-option value="%">TODOS</mat-option>
+                          <mat-option *ngFor="let p of lstPlanes" [value]="p.id">
+                            {{ p.id }} - {{ p.observacion }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-md-3 col-lg-2 col-xl-2 text-center">
                       <mat-form-field appearance="outline">
                         <mat-label>Mes</mat-label>
                         <mat-select [(ngModel)]="mes" (selectionChange)="cargarComprobantes()">
@@ -38,7 +50,7 @@
                       </mat-form-field>
                     </div>
 
-                    <div class="col-md-6 col-lg-3 col-xl-2 text-center">
+                    <div class="col-md-3 col-lg-2 col-xl-2 text-center">
                       <mat-form-field appearance="outline">
                         <mat-label>Año</mat-label>
                         <mat-select [(ngModel)]="anio" (selectionChange)="cargarComprobantes()">
@@ -91,20 +103,26 @@
                         <div class="col-md-2 texto-lista auto-ajuste">
                           Bs. {{ getMoneda(e) }}
                         </div>
-                        <div class="col-md-1 text-right d-flex flex-column justify-content-center align-items-end">
-                          <button *ngIf="!esPeriodoCerrado(e)" mat-icon-button aria-label="Eliminar"
-                            (click)="eliminarComprobante(e)" matTooltip="Eliminar">
-                            <mat-icon class="texto-gray">delete</mat-icon>
+                        <div class="col-md-1 text-left d-flex justify-content-start align-items-center">
+                          <button mat-icon-button [matMenuTriggerFor]="menuAcciones" aria-label="Acciones"
+                            matTooltip="Acciones">
+                            <mat-icon class="texto-gray">more_vert</mat-icon>
                           </button>
-
-                          <button *ngIf="!esPeriodoCerrado(e)" mat-icon-button aria-label="Editar" (click)="editar(e)" matTooltip="Editar">
-                            <mat-icon class="texto-gray">edit</mat-icon>
-                          </button>
-
-                          <button mat-icon-button aria-label="Imprimir" (click)="abrirDialogo(e)" matTooltip="Imprimir">
-                            <mat-icon class="texto-gray">print</mat-icon>
-                          </button>
-
+                          <mat-menu #menuAcciones="matMenu">
+                            <button *ngIf="!esPeriodoCerrado(e)" mat-menu-item (click)="editar(e)">
+                              <mat-icon>edit</mat-icon>
+                              <span>Editar</span>
+                            </button>
+                            <button *ngIf="!esPeriodoCerrado(e)" mat-menu-item (click)="eliminarComprobante(e)">
+                              <mat-icon>delete</mat-icon>
+                              <span>Eliminar</span>
+                            </button>
+                            <mat-divider *ngIf="!esPeriodoCerrado(e)"></mat-divider>
+                            <button mat-menu-item (click)="abrirDialogo(e)">
+                              <mat-icon>print</mat-icon>
+                              <span>Imprimir</span>
+                            </button>
+                          </mat-menu>
                         </div>
                       </div>
                     </mat-list>

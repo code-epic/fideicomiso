@@ -5,14 +5,16 @@ import { debounceTime, map, startWith } from "rxjs/operators";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
-import { Inversion, MovInversion } from "src/app/services/banfanb/inversiones.service";
+import { DistribucionInversion, Inversion, MovInversion } from "src/app/services/banfanb/inversiones.service";
 import { UtilService } from "src/app/services/util/util.service";
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 import { MatDialog } from "@angular/material/dialog";
 import { environment } from "src/environments/environment";
 import { WzportafolioComponent } from "./wzportafolio/wzportafolio.component";
 import { CierreService } from "src/app/services/banfanb/cierre.service";
+import { PlanGuardService } from "src/app/services/banfanb/plan-guard.service";
 import { InversionDialogComponent } from "./inversion-dialog/inversion-dialog.component";
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-consultainversiones',
@@ -67,6 +69,7 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
   public lstInstrumento = [];
   public lstEmisor = [];
   public lstCustodia = [];
+  public lstPortafolios: any[] = [];
   public buscar: string = "";
   public focus: boolean = false;
   public filtroInstrumento: string = "";
@@ -128,6 +131,7 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     private util: UtilService,
     public formatter: NgbDateParserFormatter,
     private _cierre: CierreService,
+    private planGuard: PlanGuardService,
   ) {}
 
   async ngOnInit() {
@@ -136,6 +140,7 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     this.ListarEmisor();
     this.ListarInstrumento();
     this.ListarInver();
+    this.ListarPortafolios();
     this.fechaUltimo = await this._cierre.getUltimoCierre();
   }
 
@@ -275,7 +280,16 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     return this.util.zfill(numero , 4) 
   }
 
-  editar(e) {
+  async editar(e) {
+    const planId = e.id_plan || e.plan;
+    if (planId) {
+      const bloqueado = await this.planGuard.planBloqueado(planId);
+      if (bloqueado) {
+        this._snackBar.open("El plan asociado está bloqueado (finiquitado o cerrado)", "Ok");
+        return;
+      }
+    }
+
     this.Inversiones = { ...e }
     this.selectedIndex = 1
     this.active = true
@@ -344,6 +358,20 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
           startWith(''),
           map((value) => this._filterInstrumento(value || ''))
         );
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+  }
+
+  ListarPortafolios() {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PORTAFOLIOS;
+    this.xAPI.parametros = '';
+    this.xAPI.valores = '';
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstPortafolios = data?.Cuerpo || [];
       },
       (error) => {
         console.error(error);
@@ -621,11 +649,65 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
       this._snackBar.open("La tasa de cupón no puede ser negativa.", "Ok");
       return;
     }
-    const fechaEmision = this.obtenerFechaEfectiva(this.fecha_emi, this.Inversiones.fecha_emision);
-    const fechaVencimiento = this.obtenerFechaEfectiva(this.fecha_ven, this.Inversiones.fecha_vencimiento);
-    if (fechaEmision && fechaVencimiento && this.compararFechasISO(fechaVencimiento, fechaEmision) < 0) {
-      this._snackBar.open("La fecha de vencimiento no puede ser anterior a la de emisión.", "Ok");
+    if (!this.Inversiones.emisor || String(this.Inversiones.emisor).trim() === "") {
+      this._snackBar.open("Debe indicar el emisor.", "Ok");
       return;
+    }
+    if (!this.Inversiones.custodio || String(this.Inversiones.custodio).trim() === "") {
+      this._snackBar.open("Debe indicar el custodio.", "Ok");
+      return;
+    }
+    if (this.Inversiones.plazo_cupon !== null && this.Inversiones.plazo_cupon !== undefined && this.Inversiones.plazo_cupon <= 0) {
+      this._snackBar.open("El plazo de cupón debe ser mayor que cero.", "Ok");
+      return;
+    }
+    if (!this.tipo_moneda || parseInt(this.tipo_moneda) <= 0) {
+      this._snackBar.open("Debe seleccionar un tipo de moneda.", "Ok");
+      return;
+    }
+    if (!this.estatus || parseInt(this.estatus) <= 0) {
+      this._snackBar.open("Debe seleccionar un estatus.", "Ok");
+      return;
+    }
+    if (!this.tipo_inversion || parseInt(this.tipo_inversion) <= 0) {
+      this._snackBar.open("Debe seleccionar un tipo de inversión.", "Ok");
+      return;
+    }
+    const fechaEmision = this.obtenerFechaEfectiva(this.fecha_emi, this.Inversiones.fecha_emision);
+    const fechaCompra = this.obtenerFechaEfectiva(this.fecha_com, this.Inversiones.fecha_compra);
+    const fechaVencimiento = this.obtenerFechaEfectiva(this.fecha_ven, this.Inversiones.fecha_vencimiento);
+    if (!fechaEmision) {
+      this._snackBar.open("Debe indicar la fecha de emisión.", "Ok");
+      return;
+    }
+    if (!fechaCompra) {
+      this._snackBar.open("Debe indicar la fecha de compra.", "Ok");
+      return;
+    }
+    if (!fechaVencimiento) {
+      this._snackBar.open("Debe indicar la fecha de vencimiento.", "Ok");
+      return;
+    }
+    if (fechaCompra < fechaEmision) {
+      this._snackBar.open("La fecha de compra no puede ser anterior a la fecha de emisión.", "Ok");
+      return;
+    }
+    if (fechaVencimiento < fechaCompra) {
+      this._snackBar.open("La fecha de vencimiento no puede ser anterior a la fecha de compra.", "Ok");
+      return;
+    }
+
+    // Validar que las fechas no sean anteriores o iguales al último cierre
+    const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaUltimo);
+    if (fechaCierreDB) {
+      if (fechaEmision <= fechaCierreDB) {
+        this._snackBar.open(`La fecha de emisión ${fechaEmision} no puede ser anterior o igual al último cierre (${fechaCierreDB})`, "Ok");
+        return;
+      }
+      if (fechaCompra <= fechaCierreDB) {
+        this._snackBar.open(`La fecha de compra ${fechaCompra} no puede ser anterior o igual al último cierre (${fechaCierreDB})`, "Ok");
+        return;
+      }
     }
 
     const esEdicion = this.Inversiones.identificador > 0;
@@ -635,7 +717,7 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     this.Inversiones.tipo_moneda = parseInt(this.tipo_moneda)
     this.Inversiones.estatus = parseInt(this.estatus)
     this.Inversiones.tipo_inversion = parseInt(this.tipo_inversion)
-    this.Inversiones.codigo_isin = parseInt(this.Inversiones.codigo_isin)
+    this.Inversiones.codigo_isin = this.Inversiones.codigo_isin?.toString().trim() || ''
     this.Inversiones.fecha_emision = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_emi) : this.Inversiones.fecha_emision.substring(0, 10)
     this.Inversiones.fecha_compra = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_com) : this.Inversiones.fecha_compra.substring(0, 10)
     this.Inversiones.fecha_vencimiento = typeof this.fecha_emi == 'object' ? this.util.ConvertirFecha(this.fecha_ven) : this.Inversiones.fecha_vencimiento.substring(0, 10)
@@ -663,7 +745,9 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
         await this.AsientoInversion(this.Inversiones)
       },
       (error) => {
-        console.error(error)
+        console.error(error);
+        this.ngxService.stopLoader("load-inver");
+        this._snackBar.open("Error al guardar la inversión. Intente de nuevo.", "Ok");
       }
     )
   }
@@ -832,7 +916,148 @@ export class ConsultainversionesComponent implements OnInit, OnDestroy {
     if (!this.fechaUltimo) return false;
     const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
     const fechaCompra = (e.fecha_compra || '').substring(0, 10);
-    return new Date(fechaCierre) > new Date(fechaCompra);
+    return new Date(fechaCierre) >= new Date(fechaCompra);
+  }
+
+  portafolioReadOnly(e: any): boolean {
+    if (!this.fechaUltimo) return false;
+    const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
+    const fechaCompra = (e.fecha_compra || '').substring(0, 10);
+    return new Date(fechaCierre) >= new Date(fechaCompra);
+  }
+
+  esVencible(e: any): boolean {
+    if (!e || Number(e.estatus) !== 1) return false;
+    if (!this.fechaUltimo) return false;
+    const fechaCierre = this.util.ConvertirFechaDB(this.fechaUltimo);
+    const partes = fechaCierre.split('-').map(Number);
+    const siguienteDia = new Date(partes[0], partes[1] - 1, partes[2] + 1);
+    const fechaRef = siguienteDia.toISOString().substring(0, 10);
+    const venc = (e.fecha_vencimiento || '').substring(0, 10);
+    const compra = (e.fecha_compra || '').substring(0, 10);
+    return venc !== '' && compra !== '' && fechaRef < venc && fechaRef > compra;
+  }
+
+  private async resolverPlanInversion(inv: any): Promise<number> {
+    const directo = inv.id_plan || inv.plan;
+    if (directo) return Number(directo);
+
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES_PORTAFOLIO;
+    this.xAPI.parametros = inv.identificador.toString();
+    this.xAPI.valores = '';
+    const data: any = await this.apiService.Ejecutar(this.xAPI).toPromise();
+    const zr = data?.Cuerpo?.[0];
+    if (!zr) return 0;
+
+    const portafolio = this.lstPortafolios.find(p => p.id === zr.id_portafolio);
+    return portafolio?.id_plan || 0;
+  }
+
+  async liquidarInversion(inv: any): Promise<void> {
+    const dist = await this.consultarDistribucion(inv.identificador);
+    if (!dist || dist.length === 0) {
+      this._snackBar.open('La inversión no tiene portafolios con plan asignado', 'Ok');
+      return;
+    }
+
+    for (const d of dist) {
+      const bloqueado = await this.planGuard.planBloqueado(d.id_plan);
+      if (bloqueado) {
+        this._snackBar.open(`El plan ${d.plan_nombre} está finiquitado o cerrado`, 'Ok');
+        return;
+      }
+    }
+
+    const confirm = await Swal.fire({
+      title: '¿Liquidar inversión?',
+      html: `<p><strong>${inv.instrumento}</strong></p>
+             <p>Valor nominal: ${this.getMoneda(inv.valor_nominal)}</p>
+             <p>Vencimiento: ${this.getFecha(inv.fecha_vencimiento)}</p>
+             <p>Planes: ${dist.map(d => `${d.plan_nombre} (${d.porcentaje}%)`).join(', ')}</p>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Liquidar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    this.ngxService.startLoader('load-inver');
+
+    try {
+      // Fecha = fecha_ultimo_cierre + 1
+      const partesCierre = this.util.ConvertirFechaDB(this.fechaUltimo).split('-').map(Number);
+      const fechaDate = new Date(partesCierre[0], partesCierre[1] - 1, partesCierre[2] + 1);
+      const fecha = fechaDate.toISOString().substring(0, 10);
+
+      // Paso 1: Eliminar comprobantes de devengos, compras y vencimientos de esa fecha
+      await this.eliminarComprobantesPorFecha(fecha);
+
+      // Paso 2: Calcular monto total de liquidación
+      const fechaCompraDate = new Date(inv.fecha_compra);
+      const fechaOperacionDate = new Date(fecha);
+      const diasAcumulados = Math.floor((fechaOperacionDate.getTime() - fechaCompraDate.getTime()) / 86400000);
+      const interesReal = Math.round(parseFloat(inv.interes_diario) * diasAcumulados * 100) / 100;
+      const montoTotal = Math.round((parseFloat(inv.valor_nominal) + interesReal) * 100) / 100;
+
+      // Paso 3: Crear comprobante por cada plan participante
+      for (const d of dist) {
+        const montoProporcional = Math.round(montoTotal * (d.porcentaje / 100) * 100) / 100;
+        if (montoProporcional <= 0) continue;
+
+        const comprobante: any = {
+          plan: d.id_plan,
+          codigo: this.util.GenerarUnicId(),
+          descripcion: `LIQUIDACION INVERSION - ${inv.instrumento} ${fecha}`,
+          detalle: `Liquidación Individual - ${d.plan_nombre} (${d.porcentaje}%)`,
+          fecha_operacion: fecha,
+          fecha_ejercicio: fecha,
+          debe: montoProporcional,
+          haber: montoProporcional,
+          llave: 'M'
+        };
+
+        this.xAPI.funcion = environment.xApi.INSERTAR_COMPROBANTE;
+        this.xAPI.parametros = '';
+        this.xAPI.valores = JSON.stringify(comprobante);
+        const res: any = await this.apiService.Ejecutar(this.xAPI).toPromise();
+        const idComprobante = parseInt(res?.msj);
+
+        if (isNaN(idComprobante)) {
+          throw new Error('No se pudo obtener el ID del comprobante generado');
+        }
+
+        // Paso 4: Insertar detalle via FID_ILiquidacionInversionDist
+        this.xAPI.funcion = environment.xApi.INSERTAR_LIQUIDACION_INVERSION_DIST;
+        this.xAPI.parametros = `${idComprobante},${fecha},${inv.identificador},${montoProporcional},${d.id_plan}`;
+        this.xAPI.valores = '';
+        await this.apiService.Ejecutar(this.xAPI).toPromise();
+      }
+
+      // Paso 5: Actualizar estatus a 2 (VENCIDA)
+      this.xAPI.funcion = environment.xApi.LIQUIDAR_INVERSION_ESTATUS;
+      this.xAPI.parametros = `${inv.identificador}, 2`;
+      this.xAPI.valores = '';
+      await this.apiService.Ejecutar(this.xAPI).toPromise();
+
+      this._snackBar.open('Inversión liquidada exitosamente', 'Ok');
+      this.ListarInver();
+    } catch (error) {
+      console.error('Error al liquidar inversión:', error);
+      this._snackBar.open('Error al liquidar la inversión', 'Ok');
+    } finally {
+      this.ngxService.stopLoader('load-inver');
+    }
+  }
+
+  async consultarDistribucion(idInversion: number): Promise<DistribucionInversion[]> {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INVERSIONES_PORTAFOLIO_DIST;
+    this.xAPI.parametros = idInversion.toString();
+    this.xAPI.valores = '';
+    const data: any = await this.apiService.Ejecutar(this.xAPI).toPromise();
+    return data?.Cuerpo || [];
   }
 
 

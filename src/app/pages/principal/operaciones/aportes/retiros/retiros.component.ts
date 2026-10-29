@@ -7,6 +7,8 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LIncremento } from 'src/app/services/banfanb/contabilidad.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 
 @Component({
   selector: 'app-retiros',
@@ -20,6 +22,7 @@ export class RetirosComponent implements OnInit {
   public fideicomiso: string = ''
   public plan = ''
   public rif = ''
+  public observacion = ''
   public monto = ''
   public fechaultimo = ''
   public max: number = 0
@@ -45,6 +48,8 @@ export class RetirosComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private toastr: ToastrService,
     private util: UtilService,
+    private planGuard: PlanGuardService,
+    private cierre: CierreService,
   ) { }
 
   ngOnInit(): void {
@@ -61,6 +66,11 @@ export class RetirosComponent implements OnInit {
           let fecha = data.Cuerpo[0].fecha_cierre
           let d = fecha.split('-')
           this.fechaultimo = d[2] + '/' + d[1] + '/' + d[0]
+
+          // Fecha valor = siguiente día al último cierre
+          let fechaCierre = new Date(parseInt(d[0]), parseInt(d[1]) - 1, parseInt(d[2]))
+          fechaCierre.setDate(fechaCierre.getDate() + 1)
+          this.fechai = fechaCierre
         }
       },
       (error) => {
@@ -84,6 +94,7 @@ export class RetirosComponent implements OnInit {
           this.rif = Contrato.rif + '-' + Contrato.razonsocial
           this.fideicomiso = Contrato.plan
           this.idplan = parseInt(this.plan)
+          this.verificarEstatusPlan(this.idplan)
         } else {
           this.toastr.warning('Plan no encontrado', 'Retiros')
         }
@@ -97,7 +108,57 @@ export class RetirosComponent implements OnInit {
     )
   }
 
-  Add() {
+  verificarEstatusPlan(idPlan: number) {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_PLANES_FIDEICOMISO,
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe(
+      (data) => {
+        if (data?.Cuerpo) {
+          const plan = data.Cuerpo.find((p: any) => parseInt(p.id) === idPlan)
+          if (plan) {
+            const estatus = parseInt(plan.estatus) || 0
+            if (estatus === 3 || estatus === 4) {
+              const nombre = estatus === 3 ? 'FINIQUITADO' : 'CERRADO'
+              this.toastr.error(`Este plan está ${nombre}. No se permiten retiros.`, 'Plan bloqueado')
+              this.limpiarFormulario()
+            } else {
+              this.ConsultarObservacion(idPlan)
+            }
+          }
+        }
+      },
+      (error) => console.error(error)
+    )
+  }
+
+  limpiarFormulario() {
+    this.plan = ''
+    this.rif = ''
+    this.fideicomiso = ''
+    this.idplan = 0
+    this.observacion = ''
+    this.monto = ''
+  }
+
+  ConsultarObservacion(idplan: number) {
+    this.xAPI.funcion = environment.xApi.CONSULTAR_PLANES_FIDEICOMISO
+    this.xAPI.parametros = ''
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        if (data != null && data.Cuerpo && data.Cuerpo.length > 0) {
+          const p = data.Cuerpo.find((x: any) => Number(x.id) === idplan)
+          this.observacion = p ? p.observacion : ''
+        }
+      },
+      (error) => console.error(error)
+    )
+  }
+
+  async Add() {
     if (!this.plan) {
       this.toastr.warning('Debe ingresar un plan', 'Retiros')
       return
@@ -111,12 +172,31 @@ export class RetirosComponent implements OnInit {
       return
     }
 
+    // Validar que la fecha no sea anterior o igual al último cierre
+    const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaultimo)
+    const fechaOperacion = this.util.ConvertirFechaDB(this.fechai)
+    if (fechaCierreDB && fechaOperacion && fechaOperacion <= fechaCierreDB) {
+      this.toastr.error(
+        `La fecha ${fechaOperacion} no puede ser anterior o igual al último cierre (${fechaCierreDB})`,
+        'Error'
+      );
+      return;
+    }
+
+    // Verificar si el plan está bloqueado
+    const bloqueado = await this.planGuard.planBloqueado(this.idplan)
+    if (bloqueado) {
+      this.toastr.error('Este plan está finiquitado o cerrado. No se permiten retiros.', 'Plan bloqueado')
+      this.limpiarFormulario()
+      return
+    }
+
     this.ELEMENT_DATA.push({
       id: this.idplan,
       codigo: this.plan,
       tipo: this.fideicomiso.toUpperCase(),
-      plan: this.rif.toUpperCase(),
-      monto: this.monto,
+      plan: this.observacion || this.rif.toUpperCase(),
+      monto: parseFloat(this.monto) || 0,
       fecha: this.util.ConvertirFechaDB(this.fechai)
     })
 
@@ -124,8 +204,9 @@ export class RetirosComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
 
     this.monto = ''
-    this.fechai = ''
+    this.fechai = this.cierre.getSiguienteDia(this.fechaultimo)
     this.rif = ''
+    this.observacion = ''
     this.fideicomiso = ''
     this.plan = ''
     this.idplan = 0
@@ -139,6 +220,7 @@ export class RetirosComponent implements OnInit {
     this.monto = ''
     this.fechai = ''
     this.rif = ''
+    this.observacion = ''
     this.fideicomiso = ''
     this.plan = ''
     this.idplan = 0
@@ -168,7 +250,7 @@ export class RetirosComponent implements OnInit {
       this.close()
       return
     }
-    let monto = parseFloat(this.ELEMENT_DATA[cant].monto)
+    let monto = this.ELEMENT_DATA[cant].monto
     let idplan = this.ELEMENT_DATA[cant].id
     let fecha = this.ELEMENT_DATA[cant].fecha
     let Comprobante = {

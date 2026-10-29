@@ -21,6 +21,7 @@ import { ComprobanteDialogComponent } from "./comprobante-dialog/comprobante-dia
 import { MatDialog } from "@angular/material/dialog";
 import { environment } from "src/environments/environment";
 import { CierreService } from "src/app/services/banfanb/cierre.service";
+import { PlanGuardService } from "src/app/services/banfanb/plan-guard.service";
 
 @Component({
   selector: "app-comprobante",
@@ -135,7 +136,7 @@ export class ComprobanteComponent implements OnInit {
   private auxComprobante: string;
 
   public IDComprobante: FID_IDetalleComprobante = {
-    comprobante: 0,
+    id_comprobante: 0,
     cuenta: 0,
     debe: 0,
     haber: 0,
@@ -180,6 +181,9 @@ export class ComprobanteComponent implements OnInit {
 
   public lstOriginal: any[] = []; // Lista original sin filtrar
 
+  public lstPlanes: any[] = []; // Lista de planes para filtro
+  public planFiltro: string = '%'; // '% = todos, o id del plan
+
   constructor(
     private apiService: ApiService,
     private _snackBar: MatSnackBar,
@@ -188,7 +192,8 @@ export class ComprobanteComponent implements OnInit {
     private util: UtilService,
     private dialog: MatDialog,
     private _fb: FormBuilder,
-    private _cierre: CierreService
+    private _cierre: CierreService,
+    private planGuard: PlanGuardService
   ) {}
 
   async ngOnInit() {
@@ -200,7 +205,24 @@ export class ComprobanteComponent implements OnInit {
     this.cargarContenido();
     this.GenerarSemillero();
     this.cargarComprobantes()
+    this.cargarPlanes()
     this.fechaUltimo = await this._cierre.getUltimoCierre()
+  }
+
+  cargarPlanes() {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_PLANES_FIDEICOMISO,
+      parametros: '',
+      valores: ''
+    };
+    this.apiService.Ejecutar(xAPI).subscribe(
+      (data) => {
+        this.lstPlanes = data?.Cuerpo || [];
+      },
+      (err) => {
+        console.error(err);
+      }
+    );
   }
 
   cargarComprobantes(){
@@ -267,13 +289,6 @@ export class ComprobanteComponent implements OnInit {
 
     this.actualizarPlanConCeros();
     this.ConsultarContrato();
-
-    // Suscribirse a los cambios de plan
-    this.formComprobante.get("plan").valueChanges.subscribe((val) => {
-      if (val && Number(val) > 0 && val.toString().length < 4) {
-        this.actualizarPlanConCeros();
-      }
-    });
   }
 
   private actualizarPlanConCeros() {
@@ -311,13 +326,22 @@ export class ComprobanteComponent implements OnInit {
 
   filtrarLista() {
     const texto = (this.buscar || '').toLowerCase();
-    if (!texto) {
-      this.lst = [...this.lstOriginal];
-      return;
+    let filtrados = [...this.lstOriginal];
+
+    // Filtro por texto
+    if (texto) {
+      filtrados = filtrados.filter(e =>
+        (e.descripcion || '').toLowerCase().includes(texto)
+      );
     }
-    this.lst = this.lstOriginal.filter(e =>
-      (e.descripcion || '').toLowerCase().includes(texto)
-    );
+
+    // Filtro por plan
+    if (this.planFiltro && this.planFiltro !== '%') {
+      const planId = parseInt(this.planFiltro);
+      filtrados = filtrados.filter(e => parseInt(e.plan) === planId);
+    }
+
+    this.lst = filtrados;
   }
 
   // Añade este método para manejar cambios de página
@@ -667,6 +691,28 @@ export class ComprobanteComponent implements OnInit {
   async Guardar() {
     this.convertirComprobante();
 
+    const planId = parseInt(this.formComprobante.get("plan").value);
+    
+    // Verificar estatus del plan desde MySQL
+    if (planId) {
+      const bloqueado = await this.verificarPlanBloqueado(planId);
+      if (bloqueado) {
+        this._snackBar.open("El plan seleccionado está bloqueado (finiquitado o cerrado)", "Ok");
+        return;
+      }
+    }
+
+    // Validar que la fecha no sea anterior o igual al último cierre
+    const fechaCierreDB = this.util.ConvertirFechaDB(this.fechaUltimo);
+    const fechaOperacion = this.Comprobante.fecha_operacion;
+    if (fechaCierreDB && fechaOperacion && fechaOperacion <= fechaCierreDB) {
+      this.apiService.Mensaje(
+        `La fecha ${fechaOperacion} no puede ser anterior o igual al último cierre (${fechaCierreDB})`,
+        "Advertencia", "warning", "comprobante"
+      );
+      return;
+    }
+
     if (this.saldo_debe != this.saldo_haber) {
       let saldo = parseFloat(this.saldo_debe) - parseFloat(this.saldo_haber);
       let msj = "Existe una diferencia de Bs. " + saldo * -1;
@@ -734,11 +780,37 @@ export class ComprobanteComponent implements OnInit {
     );
   }
 
+  async verificarPlanBloqueado(idPlan: number): Promise<boolean> {
+    const xAPI: IAPICore = {
+      funcion: environment.xApi.CONSULTAR_PLANES_FIDEICOMISO,
+      parametros: '',
+      valores: ''
+    };
+    return new Promise((resolve) => {
+      this.apiService.Ejecutar(xAPI).subscribe(
+        (data) => {
+          if (data?.Cuerpo) {
+            const plan = data.Cuerpo.find((p: any) => parseInt(p.id) === idPlan);
+            if (plan) {
+              const estatus = parseInt(plan.estatus) || 0;
+              resolve(estatus === 3 || estatus === 4);
+            } else {
+              resolve(false);
+            }
+          } else {
+            resolve(false);
+          }
+        },
+        () => resolve(false)
+      );
+    });
+  }
+
   async GuardarDetalle(comprobante: number) {
     const plan = Number(this.formComprobante.get("plan").value);
     const promises = this.ELEMENT_DATA.map((e) => {
       const detalle: FID_IDetalleComprobante = {
-        comprobante: comprobante,
+        id_comprobante: comprobante,
         cuenta: this.getIDCuenta(e.cuenta),
         debe: e.debe,
         haber: e.haber,

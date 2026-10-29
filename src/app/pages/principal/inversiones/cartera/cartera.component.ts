@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
 
@@ -36,11 +37,16 @@ export class CarteraComponent implements OnInit {
     private util: UtilService,
     private toasService: ToastrService,
     private apiService: ApiService,
-    private _imprimir: ImprimirService
+    private _imprimir: ImprimirService,
+    private _cierre: CierreService
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.ListarPlanesFideicomiso()
+    const ultimoCierre = await this._cierre.getUltimoCierre()
+    if (ultimoCierre) {
+      this.fechai = this._cierre.getSiguienteDia(ultimoCierre)
+    }
   }
 
   ListarPlanesFideicomiso() {
@@ -64,13 +70,7 @@ export class CarteraComponent implements OnInit {
   }
 
   seleccionarPlan() {
-    if (this.plan != '%') {
-      this.toasService.info(
-        "La cartera individual por plan estará disponible al activar el portafolio de inversiones. Por ahora se muestra la cartera general.",
-        "Rendición de cuentas"
-      )
-      this.plan = '%'
-    }
+    // El plan se usa en ConsultarCarteraAl
   }
 
   CalcularDias(fechai, fechaf): number {
@@ -102,14 +102,17 @@ export class CarteraComponent implements OnInit {
     let fini = saldoAl.substring(0, 8) + '01'
     let ffin = saldoAl
 
-
-
     this.fecha_al = ffin
-
-    this.xAPI.funcion = environment.xApi.CONSULTAR_CARTERA_INVERSIONES
     this.iniciarContadores()
 
-    this.xAPI.parametros = `${fini},${ffin},${ffin}`
+    if (this.plan != '%') {
+      this.xAPI.funcion = environment.xApi.CONSULTAR_CARTERA_INVERSIONES_PLAN
+      this.xAPI.parametros = `${ffin},${this.plan}`
+    } else {
+      this.xAPI.funcion = environment.xApi.CONSULTAR_CARTERA_INVERSIONES
+      this.xAPI.parametros = `${fini},${ffin},${ffin}`
+    }
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {        
         this.lstCartera = data.Cuerpo

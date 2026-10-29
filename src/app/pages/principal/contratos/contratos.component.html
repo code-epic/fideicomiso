@@ -137,9 +137,11 @@
                                                 <mat-form-field appearance="outline">
                                                     <mat-label>Estatus del Plan</mat-label>
                                                     <mat-select placeholder="Estatus del Plan" formControlName="estatus"
-                                                        readonly>
+                                                        [disabled]="soloLectura">
                                                         <mat-option value=1>ACTIVO</mat-option>
                                                         <mat-option value=2>EN PROCESO</mat-option>
+                                                        <mat-option value=3>FINIQUITADO</mat-option>
+                                                        <mat-option value=4>CERRADO</mat-option>
                                                         <mat-option value=0>INACTIVO</mat-option>
                                                     </mat-select>
                                                 </mat-form-field>
@@ -412,7 +414,7 @@
                                                             </div>
 
                                                             <div class="row">
-                                                                <div class="col-md-4">
+                                                                <div class="col-md-3">
                                                                     <mat-form-field appearance="outline">
                                                                         <mat-label>Comisi&oacute;n Flat</mat-label>
                                                                         <mat-select placeholder="Comision Flat"
@@ -433,7 +435,16 @@
                                                                     </mat-form-field>
                                                                 </div>
 
-                                                                <div class="col-md-5">
+                                                                <div class="col-md-3">
+                                                                    <mat-form-field appearance="outline">
+                                                                        <mat-label>Tasa Anual Intereses (%)</mat-label>
+                                                                        <input matInput
+                                                                            placeholder="Tasa anual"
+                                                                            formControlName="tasa_anual">
+                                                                    </mat-form-field>
+                                                                </div>
+
+                                                                <div class="col-md-3">
                                                                     <mat-form-field appearance="outline">
                                                                         <mat-label>Máximo de inversión</mat-label>
                                                                         <input matInput
@@ -483,7 +494,8 @@
                                                                         <mat-label>Portafolio</mat-label>
 
                                                                         <mat-select placeholder="Portafolio"
-                                                                            formControlName="portafolionomb">
+                                                                            formControlName="portafolionomb"
+                                                                            (selectionChange)="onPortafolioChange()">
                                                                             <mat-option
                                                                                 *ngFor="let e of lstDataPortafolio"
                                                                                 value="{{e.id}}">
@@ -570,7 +582,7 @@
 
                                             &nbsp;&nbsp;&nbsp;
 
-                                            <button mat-flat-button [disabled]="contratoForm.invalid" color="primary"
+                                            <button mat-flat-button [disabled]="tabSaldos ? !portafolioModificado : contratoForm.invalid" color="primary"
                                                 (click)="Guardar()">
                                                 {{!tabSaldos ? 'Guardar' : 'Editar'}}
                                                 Contrato

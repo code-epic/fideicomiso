@@ -4,6 +4,8 @@ import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { CierreService } from 'src/app/services/banfanb/cierre.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { ImprimirService } from 'src/app/services/util/imprimir.service';
 import { environment } from 'src/environments/environment';
@@ -15,6 +17,7 @@ interface MovimientoAnalitico {
   id_comprobante: number;
   descripcion_comprobante: string;
   referencia: string;
+  plan_nombre: string;
   debe: number;
   haber: number;
   saldo_corrido: number;
@@ -72,6 +75,10 @@ export class MayoranaliticoComponent implements OnInit {
   public estatus: string = '%';
   public bAntes: boolean = true;
   public filtroCuentas: string = '%';
+  public lstPlanesFideicomiso: any[] = [];
+  public planesHabilitados: any[] = [];
+  public mostrarAvisoPlan: boolean = false;
+  public fechaultimo = '';
 
   constructor(
     private apiService: ApiService,
@@ -79,13 +86,17 @@ export class MayoranaliticoComponent implements OnInit {
     private toasService: ToastrService,
     private util: UtilService,
     private _imprimir: ImprimirService,
+    private cierre: CierreService,
     public formatter: NgbDateParserFormatter,
+    private planGuard: PlanGuardService,
   ) { }
 
   ngOnInit(): void {
     this.fechaInicio = new Date();
     this.fechaFin = new Date();
     this.cargarCuentas();
+    this.ListarPlanesFideicomiso();
+    this.consultarUltimoCierre();
     this.filteredCuentas = this.lstCuentas;
 
     this.cuentaControl.valueChanges.pipe(
@@ -93,7 +104,47 @@ export class MayoranaliticoComponent implements OnInit {
       map(value => this._filterCuentas(value))
     ).subscribe(result => {
       this.filteredCuentas = result;
+      if (!this.cuentaControl.value || this.cuentaControl.value === '') {
+        this.cuentaIdSeleccionada = 0;
+        this.cuentaSeleccionada = '';
+        this.cuentaDescripcionSeleccionada = '';
+      }
     });
+  }
+
+  async consultarUltimoCierre() {
+    this.fechaultimo = await this.cierre.getUltimoCierre();
+  }
+
+  filtrarPlanesPorFecha() {
+    const fecha = new Date(this.fechaInicio);
+    const corte = new Date('2026-07-31');
+
+    if (fecha < corte) {
+      this.planesHabilitados = this.lstPlanesFideicomiso.filter(p => p.id === 1);
+      this.mostrarAvisoPlan = true;
+      if (this.plan !== '%' && this.plan !== '1') {
+        this.plan = '%';
+      }
+    } else {
+      this.planesHabilitados = this.lstPlanesFideicomiso;
+      this.mostrarAvisoPlan = false;
+    }
+  }
+
+  ListarPlanesFideicomiso() {
+    const xAPI: IAPICore = {
+      funcion: 'FID_CPlanesFideicomiso',
+      parametros: '',
+      valores: ''
+    }
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data) => {
+        this.lstPlanesFideicomiso = data.Cuerpo || []
+        this.filtrarPlanesPorFecha()
+      },
+      error: (err) => console.error(err)
+    })
   }
 
   private _filterCuentas(value: string): CuentaItem[] {
@@ -140,12 +191,34 @@ export class MayoranaliticoComponent implements OnInit {
       return;
     }
 
+    if (this.plan !== '%' && this.plan !== '1') {
+      const fecha = new Date(this.fechaInicio);
+      if (fecha < new Date('2026-07-31')) {
+        this.toasService.warning(
+          'Los movimientos anteriores al 31/07/2026 están consolidados en el Plan 1',
+          'Fideicomiso'
+        );
+        return;
+      }
+    }
+
     const sInicio = new Date(this.fechaInicio).toISOString().substring(0, 10);
     const sFin = new Date(this.fechaFin).toISOString().substring(0, 10);
-    const cuentaId = this.cuentaIdSeleccionada > 0 ? this.cuentaIdSeleccionada : '%';
+    let filtroCuenta = '%';
+    if (this.cuentaIdSeleccionada > 0) {
+      const cuenta = this.lstCuentas.find(c => c.id === this.cuentaIdSeleccionada);
+      if (cuenta) {
+        filtroCuenta = cuenta.codigo.substring(0, 2);
+      }
+    }
+    const fechaCierre = this.fechaultimo || sInicio;
+    const fechaCierreDB = this.util.ConvertirFechaDB(fechaCierre);
+    const fechaSaldo = new Date(fechaCierreDB);
+    fechaSaldo.setDate(fechaSaldo.getDate() - 1);
+    const fechaSaldoStr = fechaSaldo.toISOString().substring(0, 10);
 
     this.xAPI.funcion = environment.xApi.CONSULTAR_MAYOR_ANALITICO;
-    this.xAPI.parametros = `${sInicio},${sFin},${cuentaId}`;
+    this.xAPI.parametros = `${sInicio},${sFin},${filtroCuenta},${this.plan},${fechaSaldoStr}`;
     this.xAPI.valores = '';
 
     this.ngxService.startLoader('load-cont');
@@ -199,6 +272,7 @@ export class MayoranaliticoComponent implements OnInit {
           id_comprobante: row.id_comprobante || 0,
           descripcion_comprobante: row.descripcion_comprobante || '',
           referencia: row.referencia || '',
+          plan_nombre: row.plan_nombre || '',
           debe: parseFloat(row.debe) || 0,
           haber: parseFloat(row.haber) || 0,
           saldo_corrido: 0
@@ -268,6 +342,12 @@ export class MayoranaliticoComponent implements OnInit {
     return `${dia}/${mes}/${anio}`;
   }
 
+  getNombrePlan(): string {
+    if (this.plan === '%') return 'TODOS LOS PLANES';
+    const plan = this.lstPlanesFideicomiso.find(p => p.id == this.plan);
+    return plan ? plan.observacion : '';
+  }
+
   imprimir() {
     const fechaInicioStr = new Date(this.fechaInicio).toLocaleDateString('es-VE');
     const fechaFinStr = new Date(this.fechaFin).toLocaleDateString('es-VE');
@@ -279,6 +359,7 @@ export class MayoranaliticoComponent implements OnInit {
           <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">${this.formatFecha(mov.fecha_operacion)}</td>
           <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">${mov.id_comprobante}</td>
           <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">${mov.descripcion_comprobante}</td>
+          <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; border-bottom: 1px solid #E4E5E7;">${mov.plan_nombre || ''}</td>
           <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">${mov.debe > 0 ? this.util.ConvertirMoneda(mov.debe) : ''}</td>
           <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">${mov.haber > 0 ? this.util.ConvertirMoneda(mov.haber) : ''}</td>
           <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;">${this.util.ConvertirMoneda(mov.saldo_corrido)}</td>
@@ -296,6 +377,7 @@ export class MayoranaliticoComponent implements OnInit {
                 <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Fecha</th>
                 <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Comprobante</th>
                 <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Descripción</th>
+                <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left; border-bottom: 1px solid #E4E5E7;">Plan</th>
                 <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7;">Débito</th>
                 <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7;">Crédito</th>
                 <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right; border-bottom: 1px solid #E4E5E7;">Saldo</th>
@@ -303,7 +385,7 @@ export class MayoranaliticoComponent implements OnInit {
             </thead>
             <tbody>
               <tr style="background: #F1F5F9;">
-                <td colspan="3" style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; border-bottom: 1px solid #E4E5E7;">SALDO INICIAL</td>
+                <td colspan="4" style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; border-bottom: 1px solid #E4E5E7;">SALDO INICIAL</td>
                 <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
                 <td style="padding: 10px 16px; font-size: 12px; color: #0F172A; text-align: right; border-bottom: 1px solid #E4E5E7;"></td>
                 <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #1E293B; text-align: right; border-bottom: 1px solid #E4E5E7;">${this.util.ConvertirMoneda(cuenta.saldo_inicial)}</td>
@@ -312,7 +394,7 @@ export class MayoranaliticoComponent implements OnInit {
             </tbody>
             <tfoot>
               <tr style="background: #F1F5F9; font-weight: 700;">
-                <td colspan="3" style="padding: 10px 16px; font-size: 12px; color: #1E293B; border-top: 2px solid #1E293B;">TOTALES</td>
+                <td colspan="4" style="padding: 10px 16px; font-size: 12px; color: #1E293B; border-top: 2px solid #1E293B;">TOTALES</td>
                 <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">${this.util.ConvertirMoneda(cuenta.total_debe)}</td>
                 <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">${this.util.ConvertirMoneda(cuenta.total_haber)}</td>
                 <td style="padding: 10px 16px; font-size: 12px; color: #1E293B; text-align: right; border-top: 2px solid #1E293B;">${this.util.ConvertirMoneda(cuenta.saldo_final)}</td>
@@ -353,6 +435,9 @@ export class MayoranaliticoComponent implements OnInit {
           </p>
           <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748B;">
             Cuenta: ${cuentaStr}
+          </p>
+          <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748B;">
+            Plan: ${this.getNombrePlan()}
           </p>
         </div>
 
@@ -423,11 +508,11 @@ export class MayoranaliticoComponent implements OnInit {
   }
 
   exportCSV() {
-    const headers = ['Código Cuenta', 'Nombre Cuenta', 'Fecha', 'Comprobante', 'Descripción', 'Débito', 'Crédito', 'Saldo'];
+    const headers = ['Código Cuenta', 'Nombre Cuenta', 'Fecha', 'Comprobante', 'Descripción', 'Plan', 'Débito', 'Crédito', 'Saldo'];
     const rows = [];
 
     this.cuentasConMovimientos.forEach(cuenta => {
-      rows.push([cuenta.codigo_cuenta, cuenta.nombre_cuenta, 'SALDO INICIAL', '', '', '', '', cuenta.saldo_inicial.toFixed(2)]);
+      rows.push([cuenta.codigo_cuenta, cuenta.nombre_cuenta, 'SALDO INICIAL', '', '', '', '', '', cuenta.saldo_inicial.toFixed(2)]);
       cuenta.movimientos.forEach(mov => {
         rows.push([
           cuenta.codigo_cuenta,
@@ -435,12 +520,13 @@ export class MayoranaliticoComponent implements OnInit {
           this.formatFecha(mov.fecha_operacion),
           mov.id_comprobante,
           mov.descripcion_comprobante,
+          mov.plan_nombre || '',
           mov.debe > 0 ? mov.debe.toFixed(2) : '',
           mov.haber > 0 ? mov.haber.toFixed(2) : '',
           mov.saldo_corrido.toFixed(2)
         ]);
       });
-      rows.push([cuenta.codigo_cuenta, cuenta.nombre_cuenta, 'TOTALES', '', '', cuenta.total_debe.toFixed(2), cuenta.total_haber.toFixed(2), cuenta.saldo_final.toFixed(2)]);
+      rows.push([cuenta.codigo_cuenta, cuenta.nombre_cuenta, 'TOTALES', '', '', '', cuenta.total_debe.toFixed(2), cuenta.total_haber.toFixed(2), cuenta.saldo_final.toFixed(2)]);
       rows.push([]);
     });
 

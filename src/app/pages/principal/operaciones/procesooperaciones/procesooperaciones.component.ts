@@ -5,6 +5,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { CierreService } from 'src/app/services/banfanb/cierre.service';
 import { FID_IComprobante } from 'src/app/services/banfanb/comprobante.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { PlanGuardService } from 'src/app/services/banfanb/plan-guard.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -21,6 +22,8 @@ export class ProcesooperacionesComponent implements OnInit {
 
   public lstAsientos = []
   public lstComisiones = []
+  public lstIncrementos: any[] = []
+  public lstRetiros: any[] = []
   public bcuentat = false
   public dias: number = 0
   public acum_debe = 0
@@ -52,6 +55,7 @@ export class ProcesooperacionesComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private cierre: CierreService,
     private util: UtilService,
+    private planGuard: PlanGuardService,
     public formatter: NgbDateParserFormatter
   ) { }
 
@@ -60,19 +64,18 @@ export class ProcesooperacionesComponent implements OnInit {
   }
 
   async consultarUltimoPrecierre() {
-    this.ngxService.stopLoader('load-precierre')
-    this.fechaultimo = await this.cierre.getUltimoPrecierre()
+    this.fechaultimo = await this.cierre.getUltimoCierre()
     this.fechai = this.cierre.getSiguienteDia(this.fechaultimo);
     this.fechaf = this.cierre.getSiguienteDia(this.fechaultimo);    
     this.dias = 1
-    this.ngxService.stopLoader('load-precierre')
   }
 
   consultarComisiones() {
     let dia = parseInt(this.dias.toString())
-    this.ngxService.stopLoader('load-precierre')
+    let fechaFin = this.util.ConvertirFechaDB(this.fechai)
+    this.ngxService.startLoader('load-cont')
     this.xAPI.funcion = environment.xApi.CALCULAR_COMISION
-    this.xAPI.parametros = dia + ',360'
+    this.xAPI.parametros = dia + ',360,' + fechaFin
     this.xAPI.valores = ''
     this.visible = false
     this.blComprobante = true
@@ -82,6 +85,14 @@ export class ProcesooperacionesComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.lstComisiones = data.Cuerpo
+
+        const filtered = [];
+        for (const e of this.lstComisiones) {
+          if (!(await this.planGuard.planBloqueado(e.id))) {
+            filtered.push(e);
+          }
+        }
+        this.lstComisiones = filtered;
         
         this.lstComisiones.map(e => {
           this.acum_debe += parseFloat(e.calculo_capital)
@@ -89,12 +100,35 @@ export class ProcesooperacionesComponent implements OnInit {
         })
         if (this.lstComisiones.length > 0) this.visible = true
 
+        this.ConsultarIncrementos()
+        this.ConsultarRetiros()
+
         let factual = new Date(this.fechau + ' 00:00:00')
         let fcalculo = new Date(this.fechai)
         
         if( factual.getTime() >= fcalculo.getTime() ) this.blComprobante = false
 
-        this.ngxService.stopLoader('load-precierre')
+        this.ngxService.stopLoader('load-cont')
+      },
+      (error) => {
+        console.error(error)
+        this.ngxService.stopLoader('load-cont')
+      }
+    )
+  }
+
+  CalcularDias(type: string) {
+    this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1
+  }
+
+  ConsultarIncrementos() {
+    let fecha = this.util.ConvertirFechaDB(this.fechai)
+    this.xAPI.funcion = environment.xApi.CONSULTAR_INCREMENTOS_POR_FECHA
+    this.xAPI.parametros = fecha
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstIncrementos = data.Cuerpo || []
       },
       (error) => {
         console.error(error)
@@ -102,8 +136,19 @@ export class ProcesooperacionesComponent implements OnInit {
     )
   }
 
-  CalcularDias(type: string) {
-    this.dias = this.util.CalcuarDiasTranscurridos(this.fechai, this.fechaf) + 1
+  ConsultarRetiros() {
+    let fecha = this.util.ConvertirFechaDB(this.fechai)
+    this.xAPI.funcion = environment.xApi.CONSULTAR_RETIROS_POR_FECHA
+    this.xAPI.parametros = fecha
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstRetiros = data.Cuerpo || []
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
   }
 
   getMoneda(numero: number): string {
@@ -123,38 +168,51 @@ export class ProcesooperacionesComponent implements OnInit {
       valores: ''
     }
 
-    this.lstComisiones.forEach((e) =>{
-      let Comprobante = {
-        plan: e.id,
-        codigo: this.util.GenerarUnicId(),
-        descripcion: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
-        detalle: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
-        fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
-        fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
-        debe: e.calculo_capital,
-        haber: e.calculo_capital,
-        llave: 'M'
+    let xApiDelete: IAPICore = {
+      funcion: environment.xApi.ELIMINAR_COMISIONES_ADMINISTRATIVAS,
+      parametros: fecha,
+      valores: ''
+    }
+
+    this.apiService.Ejecutar(xApiDelete).subscribe({
+      next: () => {
+        this.lstComisiones.forEach((e) =>{
+          let Comprobante = {
+            plan: e.id,
+            codigo: this.util.GenerarUnicId(),
+            descripcion: `COMISIONES ADMINISTRATIVAS ${this.util.ConvertirFechaHumana(fecha)}`,
+            detalle: e.plan,
+            fecha_operacion: this.util.ConvertirFechaDB(this.fechai),
+            fecha_ejercicio: this.util.ConvertirFechaDB(this.fechai),
+            debe: e.calculo_capital,
+            haber: e.calculo_capital,
+            llave: 'M'
+          }
+
+          xApi.valores = JSON.stringify(Comprobante)      
+
+          this.apiService.Ejecutar(xApi).subscribe(
+            data => {
+              this.InsertData(data, this.lstComisiones.length, Comprobante)
+            },
+            (error) => {
+              console.error(error)
+              this.ngxService.stopLoader('load-cont')
+            }
+          )
+        })
+
+        this.apiService.Mensaje(
+          "Proceso exitoso",
+          "Se realizaron los comprobantes para el dia: " + this.util.ConvertirFechaHumana(this.fechai),
+          "success",
+          "Comprobantes"
+        )
+      },
+      error: (error) => {
+        console.error('Error eliminando comisiones existentes', error)
       }
-
-      xApi.valores = JSON.stringify(Comprobante)      
-
-      this.apiService.Ejecutar(xApi).subscribe(
-        data => {
-          this.InsertData(data, this.lstComisiones.length, Comprobante)
-        },
-        (error) => {
-          console.error(error)
-          this.ngxService.stopLoader('load-cont')
-        }
-      )
     })
-
-    this.apiService.Mensaje(
-      "Proceso exitoso",
-      "Se realizaron los comprobantes para el dia: " + this.util.ConvertirFechaHumana(this.fechai),
-      "success",
-      "Comprobantes"
-    )
   }
 
   InsertData(dt: any, cant: number, e: any) {
