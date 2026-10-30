@@ -11,6 +11,7 @@ import {
 } from "src/app/services/banfanb/contabilidad.service";
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
+import { firstValueFrom } from "rxjs";
 
 @Component({
   selector: "app-cuenta",
@@ -257,7 +258,26 @@ export class CuentaComponent implements OnInit {
     }
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+      async (data) => {
+        // Al CREAR una cuenta nueva, sembrar saldos (saldo 0) en cada plan activo
+        // al cierre más reciente, para que no falte hasta el próximo cierre.
+        if (!this.esEdicion) {
+          const idCuenta = parseInt(data?.msj, 10);
+          if (!isNaN(idCuenta) && idCuenta > 0) {
+            try {
+              const xSaldo: IAPICore = {
+                funcion: environment.xApi.INSERTAR_SALDOS_CUENTA,
+                parametros: `${idCuenta},Administrador`,
+                valores: "",
+              };
+              await firstValueFrom(this.apiService.Ejecutar(xSaldo));
+            } catch (e) {
+              // No se bloquea la creación: el próximo cierre corrige la omisión
+              console.error("Error sembrando saldos de la cuenta nueva:", e);
+            }
+          }
+        }
+
         this.apiService.Mensaje(
           "Proceso exitoso",
           this.esEdicion ? "Cuenta actualizada correctamente" : "Cuenta guardada correctamente",

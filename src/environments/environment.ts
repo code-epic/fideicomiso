@@ -64,6 +64,7 @@ export const environment = {
     CONSULTAR_CUENTAS: 'FID_CCuentas',
     CONSULTAR_CUENTA: 'FID_CCuenta',
     INSERTAR_CUENTA: 'FID_ICuenta',
+    INSERTAR_SALDOS_CUENTA: 'FID_ISaldosCuenta',
     ACTUALIZAR_CUENTA: 'FID_UCuenta',
     BORRAR_CUENTA: 'FID_DCuentaContable',
     CONSULTAR_PLAN_CONTABLE: 'FID_CPlanContable',
