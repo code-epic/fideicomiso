@@ -2,192 +2,130 @@
   <div class="col-md-12">
     <ngx-ui-loader [loaderId]="'load-cont'"></ngx-ui-loader>
 
-
-
-
     <div class="row">
-      <div class="col-md-2">
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha de Contable</mat-label>
-          <input matInput placeholder="Fecha de Contable" [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="fechaultimo" disabled="disabled">
-          <mat-icon matSuffix>event</mat-icon>
-        </mat-form-field>
-        <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
-
-      </div>
-      
-
-      <div class="col-md-2">
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha de Inicio</mat-label>
-          <input matInput [matDatepicker]="ypicker" [(ngModel)]="fechai">
-          <mat-datepicker #ypicker></mat-datepicker>
-          <mat-icon matSuffix (click)="ypicker.open()">event</mat-icon>
-        </mat-form-field>
-        <!-- <button mat-raised-button (click)="picker.open()">Open</button> -->
-
-      </div>
       <div class="col-md-4">
-        <mat-form-field appearance="outline">
-          <mat-label>Plan</mat-label>
-          <mat-select placeholder="Plan" [(ngModel)]="plan" value="{{plan}}">
-            <mat-option value='%'>TODOS</mat-option>
-            <mat-option *ngFor="let p of lstPlanesFideicomiso" value='{{p.id}}'>{{p.observacion}}</mat-option>
-          </mat-select>
-    
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Cuenta Contable</mat-label>
+          <input type="text" matInput [formControl]="cuentaControl" [matAutocomplete]="autoCuenta"
+            placeholder="Buscar cuenta contable...">
+          <mat-autocomplete #autoCuenta="matAutocomplete" [displayWith]="displayCuenta.bind(this)"
+            (optionSelected)="onCuentaSelected($event)">
+            <mat-option *ngFor="let c of filteredCuentas | async" [value]="c.codigo">
+              {{ c.codigo }} - {{ c.descripcion }}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-icon matSuffix>account_balance</mat-icon>
         </mat-form-field>
       </div>
 
-     
-      
-
-      <div class="col-md-4">
-        <mat-form-field appearance="outline">
-          <mat-label>Cuentas Contables</mat-label>
-          <mat-select placeholder="CUENTAS CONTABLES" [(ngModel)]="cuenta" value="{{cuenta}}">
-            <mat-option  value='X'>DEBE SELECCIONAR CUENTA</mat-option>
-            <mat-option *ngFor="let e of lstIndex" value='{{e.id}}'>{{e.id}} - {{e.nombre}}</mat-option>
-           
+      <div class="col-md-2">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Plan / Fideicomiso</mat-label>
+          <mat-select [(ngModel)]="plan">
+            <mat-option value="%">TODOS LOS PLANES</mat-option>
+            <mat-option *ngFor="let p of lstPlanesFideicomiso" [value]="p.id">{{ p.observacion }}</mat-option>
           </mat-select>
-    
         </mat-form-field>
       </div>
 
-      
+      <div class="col-md-2">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Fecha Inicio</mat-label>
+          <input matInput [matDatepicker]="pickerInicio" [(ngModel)]="fechaInicio">
+          <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+          <mat-datepicker #pickerInicio></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-2">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Fecha Fin</mat-label>
+          <input matInput [matDatepicker]="pickerFin" [(ngModel)]="fechaFin">
+          <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFin></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-2">
+        <mat-button-toggle-group [(ngModel)]="modoReporte" name="modoReporte" aria-label="Modo de reporte"
+          style="width: 100%; margin-top: 4px;">
+          <mat-button-toggle value="abierto" style="width: 50%;">Abierto</mat-button-toggle>
+          <mat-button-toggle value="resumido" style="width: 50%;">Resumido</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
     </div>
 
     <div class="row">
-
       <div class="col-md-12 text-right">
-        <button mat-flat-button color="primary" (click)="ConsultarDetalles()" style="height: 50px;">
+        <button mat-flat-button color="primary" (click)="Consultar()" style="height: 45px; margin-right: 8px;">
           <mat-icon>search</mat-icon>&nbsp;Consultar
         </button>
-      </div>
-    </div>
-
-    <div class="row" *ngIf="blista">
-      <div class="col-md-12">
-        <mat-selection-list>
-          <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-            <div class="row">
-              <div class="col-md-2 texto-detalle auto-title">
-                CUENTA
-              </div>
-              <div class="col-md-4 texto-detalle auto-title">
-                DESCRIPCION
-              </div>
-              <div class="col-md-2 texto-detalle auto-title">
-                PLAN
-              </div>
-              <div class="col-md-2 texto-detalle auto-title">
-                DEBE
-              </div>
-              <div class="col-md-2 texto-lista auto-title">
-                HABER
-              </div>
-            </div>
-          </mat-list>
-          <mat-list *ngFor="let e of lstMovimientos; let i=index "
-            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-            <div class="row">
-              <div class="col-md-2 texto-detalle auto-ajuste">
-                {{ e.cuenta }}
-              </div>
-              <div class="col-md-4 texto-detalle auto-ajuste">
-                {{ e.descripcion | uppercase }}
-              </div>
-              <div class="col-md-2 texto-detalle auto-ajuste">
-                {{ e.plan_nombre }}
-              </div>
-              <div class="col-md-2 texto-detalle auto-ajuste">
-                {{ getMoneda(e.debe) }}
-              </div>
-              <div class="col-md-2 texto-lista auto-ajuste">
-                {{ getMoneda(e.haber) }}
-              </div>
-              
-            </div>
-          </mat-list>
-          <!-- <mat-list 
-          style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-          <div class="row">
-            <div class="col-md-8 texto-detalle auto-title auto-ajuste">
-              TOTAL DE CUENTAS
-            </div>
-            <div class="col-md-2 texto-detalle auto-ajuste auto-title">
-              Bs. {{ getMoneda( total_debe ) }}
-            </div>
-            <div class="col-md-2 texto-detalle auto-ajuste auto-title">
-              Bs. {{ getMoneda( total_haber ) }}
-            </div>
-          </div>
-        </mat-list> -->
-        </mat-selection-list>
-        <br><br>
-      </div>
-    </div>
-  
-
-
-
-
-    <div class="row" *ngIf="bauxiliar">
-      <div class="col-md-12">
-        <mat-selection-list>
-          <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-            <div class="row">
-              <div class="col-md-3 texto-detalle auto-title">
-                CUENTA
-              </div>
-              <div class="col-md-7 texto-detalle auto-title">
-                DESCRIPCION
-              </div>
-              <div class="col-md-2 texto-detalle auto-title">
-                SALDO
-              </div>
-            </div>
-          </mat-list>
-          <mat-list *ngFor="let e of lstMovimientosAuxliares; let i=index "
-            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-            <div class="row">
-              <div class="col-md-3 texto-detalle auto-ajuste">
-                {{ e.cuenta }}
-              </div>
-              <div class="col-md-7 texto-detalle auto-ajuste">
-                {{ e.descripcion | uppercase }}
-              </div>
-              <div class="col-md-2 texto-detalle auto-ajuste">
-                Bs. {{(e.saldo) }}
-              </div>
-            </div>
-          </mat-list>
-
-         
-        </mat-selection-list>
-        <br><br>
-      </div>
-    </div>
-    <hr>
-    
-    <div class="row" *ngIf="blista">
-
-      <div class="col-md-12 text-right">
-
-        <button mat-flat-button color="primary" (click)="imprimir()" style="height: 50px;">
+        <button mat-flat-button color="accent" (click)="imprimir()" [disabled]="!mostrarResultados"
+          style="height: 45px; margin-right: 8px;">
           <mat-icon>print</mat-icon>&nbsp;Imprimir
         </button>
-       
-
+        <button mat-flat-button style="background-color: #107c41; color: white; height: 45px;"
+          (click)="exportarExcel()" [disabled]="!mostrarResultados">
+          <mat-icon>table_view</mat-icon>&nbsp;Excel
+        </button>
       </div>
-
     </div>
 
+    <div class="row" *ngIf="mostrarResultados">
+      <div class="col-md-12">
+        <div style="text-align: center; margin: 24px 0 16px 0;">
+          <p style="font-size: 18px; font-weight: 700; margin: 0;">AUXILIAR CONTABLE</p>
+          <p style="font-size: 15px; font-weight: 600; margin: 6px 0 0 0;">{{ getNombreCuenta() }}</p>
+          <p style="font-size: 13px; color: #64748B; margin: 4px 0 0 0;">{{ getCodigoCuenta() }}</p>
+          <p style="font-size: 13px; color: #64748B; margin: 4px 0 0 0;">{{ getNombrePlan() }} - AL {{ getFechaCorte() }}</p>
+        </div>
 
+        <div class="table-responsive">
+          <table class="table table-striped table-hover" style="border: 1px solid #dee2e6;">
+            <thead class="thead-dark">
+              <tr>
+                <th style="width: 15%; text-align: center;">Fecha Registro</th>
+                <th [style.width]="mostrarColumnaPlan() ? '45%' : '60%'">Descripción</th>
+                <th *ngIf="mostrarColumnaPlan()" style="width: 18%;">Plan</th>
+                <th style="width: 25%; text-align: right;">Saldo Auxiliar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let f of filas" [ngClass]="{'font-weight-bold': f.esNegrita}">
+                <td style="text-align: center;">{{ f.fecha ? formatFecha(f.fecha) : '' }}</td>
+                <td>{{ f.descripcion }}</td>
+                <td *ngIf="mostrarColumnaPlan()">{{ f.planNombre }}</td>
+                <td style="text-align: right;" [ngStyle]="{'color': f.saldoAuxiliar < 0 ? '#dc2626' : 'inherit'}">
+                  {{ getMoneda(f.saldoAuxiliar) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
+        <div class="row" style="margin-top: 16px;">
+          <div class="col-md-4 offset-md-8">
+            <table class="table table-sm" style="border: 1px solid #dee2e6;">
+              <tbody>
+                <tr>
+                  <td><strong>TOTAL AUXILIAR</strong></td>
+                  <td style="text-align: right;"><strong>{{ getMoneda(totalAuxiliar) }}</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>TOTAL BALANCE</strong></td>
+                  <td style="text-align: right;"><strong>{{ getMoneda(totalBalance) }}</strong></td>
+                </tr>
+                <tr [ngClass]="{'table-success': diferencia === 0, 'table-danger': diferencia !== 0}">
+                  <td><strong>DIFERENCIA</strong></td>
+                  <td style="text-align: right;"><strong>{{ getMoneda(diferencia) }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-
-
+      </div>
+    </div>
 
   </div>
 </div>

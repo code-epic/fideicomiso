@@ -375,6 +375,81 @@ export class ProcesosComponent implements OnInit {
     return parseFloat(rendicion.toFixed(2));
   }
 
+  // =========================================================================
+  // Método Directo — devengo por inversor
+  // -------------------------------------------------------------------------
+  // En lugar de calcular el interés TOTAL del instrumento y multiplicarlo por
+  // un porcentaje de participación (redondeado a 2 decimales), cada inversor
+  // calcula su devengo individual con la fórmula exacta:
+  //
+  //   (Capital Individual × Tasa Cupón × Días) / (100 × Base de Cálculo)
+  //
+  // El interés total del instrumento es simplemente la sumatoria de los
+  // devengos individuales. Aritmética en céntimos enteros (los montos se
+  // escalan ×100 antes de operar) y el redondeo a 2 decimales se aplica UNA
+  // sola vez, al final del cálculo de cada individuo — nunca por día
+  // intermedio (el redondeo diario × días multiplicaría el error).
+  // =========================================================================
+
+  /**
+   * Convierte un monto a céntimos enteros (entero exacto, sin fracciones).
+   * MySQL serializa DECIMAL como string, por eso la conversión explícita.
+   */
+  aCentesimos(valor: string | number): number {
+    const n = Number(valor);
+    return Number.isFinite(n) ? Math.round(n * 100) : 0;
+  }
+
+  /**
+   * Capital individual aportado por un inversor, en céntimos enteros.
+   * Prefiere el monto EXACTO registrado en zr_inversiones_portafolios.monto;
+   * si no existe (registros antiguos), recalcular desde el porcentaje.
+   */
+  capitalIndividualCentesimos(d: DistribucionInversion, valorNominal: number): number {
+    const montoExacto = Number(d.monto);
+    if (Number.isFinite(montoExacto) && montoExacto > 0) {
+      return this.aCentesimos(montoExacto);
+    }
+    const porcentaje = Number(d.porcentaje) || 0;
+    return Math.round(valorNominal * (porcentaje / 100) * 100);
+  }
+
+  /**
+   * Devengo del período para UN inversor — Método Directo, en céntimos.
+   *
+   * (Capital × Tasa × Días) / (100 × Base), escalado a céntimos, con un ÚNICO
+   * Math.round al final (los días se multiplican ANTES de redondear).
+   *
+   * Ej.: capital 1.215.449,25 Bs → 121544925 céntimos × 61 × 20 días
+   *      / (360 × 100) = 4.119.022,46 céntimos → 4.119.022 → Bs 41.190,22
+   *      (si antes se redondeara el diario: 2.059,51 × 20 = Bs 41.190,20 →
+   *       el redondeo intermedio habría perdido Bs 0,02)
+   */
+  devengoPeriodoCentesimos(capitalCents: number, tasaCupon: number, dias: number, baseCalculo: number): number {
+    if (!Number.isFinite(capitalCents) || capitalCents <= 0) return 0;
+    if (!Number.isFinite(tasaCupon) || tasaCupon <= 0) return 0;
+    if (!Number.isFinite(dias) || dias <= 0) return 0;
+    if (!Number.isFinite(baseCalculo) || baseCalculo <= 0) return 0;
+    return Math.round((capitalCents * tasaCupon * dias) / (baseCalculo * 100));
+  }
+
+  /**
+   * Conciliación: compara la sumatoria de devengos individuales contra el
+   * interes_acumulado precalculado de la cabecera. Si el capital de los
+   * participantes suma exactamente e.valor_nominal, ambos totales coinciden
+   * al céntimo; cualquier diferencia se audita por inversión.
+   */
+  conciliarDevengo(codigo: string, sumaDevengoCents: number, acumuladoCabeceraCents: number, dias: number): void {
+    const diferenciaCents = sumaDevengoCents - acumuladoCabeceraCents;
+    if (diferenciaCents !== 0) {
+      console.warn(
+        `[DEVENGO|Método Directo] Inversión ${codigo}: diferencia de ${(diferenciaCents / 100).toFixed(2)} Bs ` +
+        `en ${dias} día(s) — sumatoria individual ${(sumaDevengoCents / 100).toFixed(2)} Bs vs ` +
+        `interes_acumulado ${(acumuladoCabeceraCents / 100).toFixed(2)} Bs`
+      );
+    }
+  }
+
   getCuenta(e) {
     return (
       e.codigo_padre +
@@ -427,11 +502,12 @@ export class ProcesosComponent implements OnInit {
     try {
       const sinPlan: string[] = [];
 
-      // 1. Comprobantes Devengo (distribuidos por plan)
+      // 1. Comprobantes Devengo — Método Directo: devengo individual por inversor
       if (this.lstAsientos.length > 0) {
         for (const e of this.lstAsientos) {
-          const montoTotal = parseFloat(e.interes_acumulado || 0);
-          if (!montoTotal) continue;
+          // Control de tipos: MySQL/DECIMAL puede serializar como string
+          const acumuladoCabeceraCents = this.aCentesimos(e.interes_acumulado);
+          if (acumuladoCabeceraCents <= 0) continue;
 
           const dist = await this.consultarDistribucion(Number(e.codigo));
           if (!dist || dist.length === 0) {
@@ -439,10 +515,33 @@ export class ProcesosComponent implements OnInit {
             continue;
           }
 
+          const tasaCupon = Number(e.tasa_cupon);
+          const baseCalculo = Number(e.base_calculo);
+          const valorNominal = Number(e.valor_nominal) || 0;
+          const dias = Number(e.acum?.dias) || 1;
+
+          if (!Number.isFinite(tasaCupon) || tasaCupon <= 0 ||
+              !Number.isFinite(baseCalculo) || baseCalculo <= 0) {
+            console.error(
+              `[DEVENGO] Inversión ${e.codigo}: parámetros inválidos ` +
+              `(tasa_cupon=${e.tasa_cupon}, base_calculo=${e.base_calculo}) — omitida`
+            );
+            continue;
+          }
+
+          let sumaDevengoCents = 0;
+
           for (const d of dist) {
-            // Calcular monto proporcional usando el porcentaje de la distribución
-            const montoProporcional = Math.round(montoTotal * (Number(d.porcentaje) / 100) * 100) / 100;
-            if (montoProporcional <= 0) continue;
+            // Capital individual aportado por este inversor, en céntimos
+            const capitalCents = this.capitalIndividualCentesimos(d, valorNominal);
+
+            // Devengo del período: los días se multiplican ANTES de redondear
+            // y el redondeo a 2 decimales ocurre UNA sola vez, al final
+            const devengoCents = this.devengoPeriodoCentesimos(capitalCents, tasaCupon, dias, baseCalculo);
+            if (devengoCents <= 0) continue;
+
+            const devengoPeriodo = devengoCents / 100;
+            sumaDevengoCents += devengoCents;
 
             const comprobanteDevengo: FID_IComprobante = {
               plan: d.id_plan,
@@ -451,8 +550,8 @@ export class ProcesosComponent implements OnInit {
               detalle: d.plan_nombre || `DEVENGO DE INVERSIONES ${e.instrumento || ""} ${this.util.ConvertirFechaHumana(fecha)}`.trim(),
               fecha_operacion: fecha,
               fecha_ejercicio: fecha,
-              debe: montoProporcional,
-              haber: montoProporcional,
+              debe: devengoPeriodo,
+              haber: devengoPeriodo,
               llave: "M",
             };
 
@@ -466,12 +565,15 @@ export class ProcesosComponent implements OnInit {
             if (resDev && resDev.msj) {
               const apiDevData: IAPICore = {
                 funcion: environment.xApi.INSERTAR_DEVENGO_INVERSIONES_DIST,
-                parametros: `${resDev.msj},${fecha},${e.codigo},${montoProporcional},${d.id_plan}`,
+                parametros: `${resDev.msj},${fecha},${e.codigo},${devengoPeriodo},${d.id_plan}`,
                 valores: ""
               };
               await firstValueFrom(this.apiService.Ejecutar(apiDevData));
             }
           }
+
+          // Conciliación: total del instrumento = sumatoria de devengos individuales
+          this.conciliarDevengo(String(e.codigo ?? ""), sumaDevengoCents, acumuladoCabeceraCents, dias);
         }
       }
 
